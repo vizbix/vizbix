@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Markup Calculator – Vizbix</title>
+  <meta name="description" content="Calculate selling price, profit, and margin using cost price and markup percentage." />
+
+ <!-- FAVICON -->
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+
+  <style>
+    :root{
+      --bg:#ffffff; --text:#0f172a; --muted:#64748b; --border:#e5e7eb;
+      --card:#f8fafc; --radius:16px; --shadow: 0 10px 30px rgba(2,6,23,.06);
+    }
+    *{ box-sizing:border-box; font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif; }
+    body{ margin:0; background:var(--bg); color:var(--text); }
+    header{ border-bottom:1px solid var(--border); padding:14px 18px; text-align:center; }
+    header a{ text-decoration:none; color:var(--text); font-weight:800; }
+    main{ max-width: 900px; margin:0 auto; padding: 24px 16px 60px; }
+
+    h1{ margin: 12px 0 8px; font-size: clamp(24px, 3vw, 36px); }
+    p{ margin:0 0 18px; color:var(--muted); line-height:1.6; }
+
+    .box{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    label{ font-size: 13px; color: var(--muted); display:block; margin-bottom:6px; }
+    input{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      font-size: 16px;
+      outline: none;
+      background: #fff;
+    }
+    input:focus{ border-color:#cbd5e1; }
+
+    .actions{
+      display:flex;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    button{
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid #111827;
+      background:#111827;
+      color:#fff;
+      font-weight:700;
+      cursor:pointer;
+      font-size: 14px;
+    }
+    .ghost{
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .result{
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px dashed var(--border);
+      background:#fff;
+    }
+    .result h2{ margin:0 0 8px; font-size: 18px; }
+    .numbers{ display:flex; gap: 18px; flex-wrap:wrap; }
+    .metric{ min-width: 200px; }
+    .metric .k{ font-size:12px; color: var(--muted); }
+    .metric .v{ font-size: 20px; font-weight:800; margin-top:4px; }
+
+    .note{
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .mini{
+      margin-top: 16px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+    }
+    .mini h3{
+      margin: 0 0 8px;
+      font-size: 14px;
+    }
+    .mini ul{
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 640px){
+      .grid{ grid-template-columns: 1fr; }
+      .metric{ min-width: 160px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="../index.html">Vizbix</a>
+</header>
+
+<main>
+  <h1>Markup Calculator</h1>
+  <p>
+    Markup helps you set a selling price based on your cost. Enter cost price and markup %
+    to calculate selling price, profit, and profit margin.
+  </p>
+
+  <div class="box">
+    <div class="grid">
+      <div>
+        <label for="costPrice">Cost Price per Unit (₹)</label>
+        <input id="costPrice" type="number" inputmode="decimal" placeholder="e.g. 300" />
+      </div>
+
+      <div>
+        <label for="markupPercent">Markup (%)</label>
+        <input id="markupPercent" type="number" inputmode="decimal" placeholder="e.g. 40" />
+      </div>
+
+      <div>
+        <label for="extraCosts">Extra Costs per Unit (Optional) (₹)</label>
+        <input id="extraCosts" type="number" inputmode="decimal" placeholder="e.g. 20 (delivery/packing)" />
+      </div>
+
+      <div>
+        <label for="sellingPrice">Selling Price (Optional) (₹)</label>
+        <input id="sellingPrice" type="number" inputmode="decimal" placeholder="Leave empty to auto-calculate" />
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="calcBtn">Calculate</button>
+      <button class="ghost" id="resetBtn" type="button">Reset</button>
+    </div>
+
+    <div class="result" id="resultBox" style="display:none;">
+      <h2>Result</h2>
+
+      <div class="numbers">
+        <div class="metric">
+          <div class="k">Selling Price</div>
+          <div class="v" id="sellingValue">—</div>
+        </div>
+
+        <div class="metric">
+          <div class="k">Profit per Unit</div>
+          <div class="v" id="profitValue">—</div>
+        </div>
+
+        <div class="metric">
+          <div class="k">Profit Margin</div>
+          <div class="v" id="marginValue">—</div>
+        </div>
+      </div>
+
+      <div class="note" id="interpretation">—</div>
+    </div>
+
+    <div class="mini">
+      <h3>How markup is calculated</h3>
+      <ul>
+        <li><b>Total Cost</b> = Cost Price + Extra Costs</li>
+        <li><b>Selling Price</b> = Total Cost × (1 + Markup% ÷ 100)</li>
+        <li><b>Profit</b> = Selling Price − Total Cost</li>
+        <li><b>Profit Margin (%)</b> = (Profit ÷ Selling Price) × 100</li>
+      </ul>
+    </div>
+  </div>
+
+  <p style="margin-top:18px;">
+    Tip: Markup is not the same as margin. A 50% markup does not mean 50% margin.
+  </p>
+</main>
+
+<script>
+  const costPriceEl = document.getElementById("costPrice");
+  const markupPercentEl = document.getElementById("markupPercent");
+  const extraCostsEl = document.getElementById("extraCosts");
+  const sellingPriceEl = document.getElementById("sellingPrice");
+
+  const calcBtn = document.getElementById("calcBtn");
+  const resetBtn = document.getElementById("resetBtn");
+
+  const resultBox = document.getElementById("resultBox");
+  const sellingValue = document.getElementById("sellingValue");
+  const profitValue = document.getElementById("profitValue");
+  const marginValue = document.getElementById("marginValue");
+  const interpretation = document.getElementById("interpretation");
+
+  function formatINR(num){
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 2
+    }).format(num);
+  }
+
+  function calculate(){
+    const costPrice = parseFloat(costPriceEl.value);
+    const markupPercent = parseFloat(markupPercentEl.value);
+    const extraCosts = parseFloat(extraCostsEl.value || "0");
+    const manualSelling = parseFloat(sellingPriceEl.value);
+
+    if (isNaN(costPrice) || costPrice < 0){
+      alert("Please enter a valid Cost Price.");
+      return;
+    }
+    if (isNaN(markupPercent) || markupPercent < 0){
+      alert("Please enter a valid Markup %.");
+      return;
+    }
+
+    const totalCost = costPrice + extraCosts;
+
+    let sellingPrice;
+    if (!isNaN(manualSelling) && manualSelling > 0){
+      sellingPrice = manualSelling;
+    } else {
+      sellingPrice = totalCost * (1 + (markupPercent / 100));
+    }
+
+    if (sellingPrice <= 0){
+      alert("Selling price must be greater than 0.");
+      return;
+    }
+
+    const profit = sellingPrice - totalCost;
+    const margin = (profit / sellingPrice) * 100;
+
+    sellingValue.textContent = formatINR(sellingPrice);
+    profitValue.textContent = formatINR(profit);
+    marginValue.textContent = margin.toFixed(2) + "%";
+
+    let msg = "";
+    if (profit < 0){
+      msg = "You are selling below cost. Increase price or reduce costs.";
+    } else if (margin < 10){
+      msg = "Low margin. Discounts or returns can easily remove your profit.";
+    } else if (margin < 25){
+      msg = "Decent margin. Track expenses and avoid heavy discounting.";
+    } else {
+      msg = "Healthy margin. Ensure your sales volume and repeat orders stay strong.";
+    }
+
+    interpretation.textContent = msg;
+    resultBox.style.display = "block";
+  }
+
+  function reset(){
+    costPriceEl.value = "";
+    markupPercentEl.value = "";
+    extraCostsEl.value = "";
+    sellingPriceEl.value = "";
+
+    resultBox.style.display = "none";
+    sellingValue.textContent = "—";
+    profitValue.textContent = "—";
+    marginValue.textContent = "—";
+    interpretation.textContent = "—";
+  }
+
+  calcBtn.addEventListener("click", calculate);
+  resetBtn.addEventListener("click", reset);
+
+  [costPriceEl, markupPercentEl, extraCostsEl, sellingPriceEl].forEach(el => {
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") calculate();
+    });
+  });
+</script>
+
+</body>
+</html>

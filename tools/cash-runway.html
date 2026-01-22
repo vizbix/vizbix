@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Cash Runway Calculator – Vizbix</title>
+  <meta name="description" content="Calculate how long your cash will last based on current cash balance and monthly burn rate." />
+
+ <!-- FAVICON -->
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+
+  <style>
+    :root{
+      --bg:#ffffff; --text:#0f172a; --muted:#64748b; --border:#e5e7eb;
+      --card:#f8fafc; --radius:16px; --shadow: 0 10px 30px rgba(2,6,23,.06);
+    }
+    *{ box-sizing:border-box; font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif; }
+    body{ margin:0; background:var(--bg); color:var(--text); }
+    header{ border-bottom:1px solid var(--border); padding:14px 18px; text-align:center; }
+    header a{ text-decoration:none; color:var(--text); font-weight:800; }
+    main{ max-width: 900px; margin:0 auto; padding: 24px 16px 60px; }
+
+    h1{ margin: 12px 0 8px; font-size: clamp(24px, 3vw, 36px); }
+    p{ margin:0 0 18px; color:var(--muted); line-height:1.6; }
+
+    .box{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    label{ font-size: 13px; color: var(--muted); display:block; margin-bottom:6px; }
+    input{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      font-size: 16px;
+      outline: none;
+      background: #fff;
+    }
+    input:focus{ border-color:#cbd5e1; }
+
+    .actions{
+      display:flex;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    button{
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid #111827;
+      background:#111827;
+      color:#fff;
+      font-weight:700;
+      cursor:pointer;
+      font-size: 14px;
+    }
+    .ghost{
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .result{
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px dashed var(--border);
+      background:#fff;
+    }
+    .result h2{ margin:0 0 8px; font-size: 18px; }
+    .numbers{ display:flex; gap: 18px; flex-wrap:wrap; }
+    .metric{ min-width: 220px; }
+    .metric .k{ font-size:12px; color: var(--muted); }
+    .metric .v{ font-size: 20px; font-weight:800; margin-top:4px; }
+
+    .note{
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .mini{
+      margin-top: 16px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+    }
+    .mini h3{
+      margin: 0 0 8px;
+      font-size: 14px;
+    }
+    .mini ul{
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 640px){
+      .grid{ grid-template-columns: 1fr; }
+      .metric{ min-width: 160px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="../index.html">Vizbix</a>
+</header>
+
+<main>
+  <h1>Cash Runway Calculator</h1>
+  <p>
+    Cash runway tells you how long your current cash will last if your monthly burn stays the same.
+    This helps you plan spending, hiring, and growth decisions.
+  </p>
+
+  <div class="box">
+    <div class="grid">
+      <div>
+        <label for="cashBalance">Current Cash Balance (₹)</label>
+        <input id="cashBalance" type="number" inputmode="decimal" placeholder="e.g. 250000" />
+      </div>
+
+      <div>
+        <label for="monthlyBurn">Monthly Burn (₹)</label>
+        <input id="monthlyBurn" type="number" inputmode="decimal" placeholder="e.g. 50000" />
+      </div>
+
+      <div>
+        <label for="monthlyRevenue">Monthly Revenue (Optional) (₹)</label>
+        <input id="monthlyRevenue" type="number" inputmode="decimal" placeholder="e.g. 150000" />
+      </div>
+
+      <div>
+        <label for="monthlyExpenses">Monthly Expenses (Optional) (₹)</label>
+        <input id="monthlyExpenses" type="number" inputmode="decimal" placeholder="e.g. 180000" />
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="calcBtn">Calculate</button>
+      <button class="ghost" id="resetBtn" type="button">Reset</button>
+    </div>
+
+    <div class="result" id="resultBox" style="display:none;">
+      <h2>Result</h2>
+
+      <div class="numbers">
+        <div class="metric">
+          <div class="k">Monthly Burn Used</div>
+          <div class="v" id="burnUsedValue">—</div>
+        </div>
+
+        <div class="metric">
+          <div class="k">Cash Runway</div>
+          <div class="v" id="runwayValue">—</div>
+        </div>
+
+        <div class="metric">
+          <div class="k">Runway in Days</div>
+          <div class="v" id="daysValue">—</div>
+        </div>
+      </div>
+
+      <div class="note" id="interpretation">—</div>
+    </div>
+
+    <div class="mini">
+      <h3>How runway is calculated</h3>
+      <ul>
+        <li><b>Monthly Burn</b> = Expenses − Revenue (if provided)</li>
+        <li><b>Runway (months)</b> = Cash Balance ÷ Monthly Burn</li>
+        <li><b>Runway (days)</b> ≈ Runway months × 30</li>
+      </ul>
+    </div>
+  </div>
+
+  <p style="margin-top:18px;">
+    Tip: If your runway is short, reduce expenses, improve collections, or increase revenue.
+    Always keep buffer for unexpected costs.
+  </p>
+</main>
+
+<script>
+  const cashBalanceEl = document.getElementById("cashBalance");
+  const monthlyBurnEl = document.getElementById("monthlyBurn");
+  const monthlyRevenueEl = document.getElementById("monthlyRevenue");
+  const monthlyExpensesEl = document.getElementById("monthlyExpenses");
+
+  const calcBtn = document.getElementById("calcBtn");
+  const resetBtn = document.getElementById("resetBtn");
+
+  const resultBox = document.getElementById("resultBox");
+  const burnUsedValue = document.getElementById("burnUsedValue");
+  const runwayValue = document.getElementById("runwayValue");
+  const daysValue = document.getElementById("daysValue");
+  const interpretation = document.getElementById("interpretation");
+
+  function formatINR(num){
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 2
+    }).format(num);
+  }
+
+  function formatNumber(num){
+    return new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 }).format(num);
+  }
+
+  function calculate(){
+    const cashBalance = parseFloat(cashBalanceEl.value);
+    let monthlyBurn = parseFloat(monthlyBurnEl.value);
+
+    const monthlyRevenue = parseFloat(monthlyRevenueEl.value);
+    const monthlyExpenses = parseFloat(monthlyExpensesEl.value);
+
+    if (isNaN(cashBalance) || cashBalance <= 0){
+      alert("Please enter a valid Cash Balance (> 0).");
+      return;
+    }
+
+    // If revenue & expenses provided, compute burn automatically
+    if (!isNaN(monthlyRevenue) && !isNaN(monthlyExpenses)){
+      monthlyBurn = monthlyExpenses - monthlyRevenue;
+    }
+
+    if (isNaN(monthlyBurn) || monthlyBurn <= 0){
+      alert("Monthly burn must be > 0. If your burn is 0 or negative, runway is unlimited.");
+      return;
+    }
+
+    const runwayMonths = cashBalance / monthlyBurn;
+    const runwayDays = runwayMonths * 30;
+
+    burnUsedValue.textContent = formatINR(monthlyBurn);
+    runwayValue.textContent = formatNumber(runwayMonths) + " months";
+    daysValue.textContent = formatNumber(runwayDays) + " days";
+
+    let msg = `At a burn rate of ${formatINR(monthlyBurn)} per month, your cash runway is about ${formatNumber(runwayMonths)} months.`;
+
+    if (!isNaN(monthlyRevenue) && !isNaN(monthlyExpenses)){
+      msg += ` (Based on Revenue ${formatINR(monthlyRevenue)} and Expenses ${formatINR(monthlyExpenses)}.)`;
+    }
+
+    if (runwayMonths < 2){
+      msg += " Runway is very short. Cut costs or improve cash inflow immediately.";
+    } else if (runwayMonths < 6){
+      msg += " Runway is tight. Plan carefully and avoid unnecessary spending.";
+    } else {
+      msg += " Runway looks comfortable. Still track cash weekly to avoid surprises.";
+    }
+
+    interpretation.textContent = msg;
+    resultBox.style.display = "block";
+  }
+
+  function reset(){
+    cashBalanceEl.value = "";
+    monthlyBurnEl.value = "";
+    monthlyRevenueEl.value = "";
+    monthlyExpensesEl.value = "";
+
+    resultBox.style.display = "none";
+    burnUsedValue.textContent = "—";
+    runwayValue.textContent = "—";
+    daysValue.textContent = "—";
+    interpretation.textContent = "—";
+  }
+
+  calcBtn.addEventListener("click", calculate);
+  resetBtn.addEventListener("click", reset);
+
+  // Press Enter to calculate
+  [cashBalanceEl, monthlyBurnEl, monthlyRevenueEl, monthlyExpensesEl].forEach(el => {
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") calculate();
+    });
+  });
+</script>
+
+</body>
+</html>

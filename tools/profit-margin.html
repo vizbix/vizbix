@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profit Margin Calculator – Vizbix</title>
+  <meta name="description" content="Calculate profit margin using revenue and total costs." />
+
+ <!-- FAVICON -->
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+
+  <style>
+    :root{
+      --bg:#ffffff; --text:#0f172a; --muted:#64748b; --border:#e5e7eb;
+      --card:#f8fafc; --radius:16px; --shadow: 0 10px 30px rgba(2,6,23,.06);
+    }
+    *{ box-sizing:border-box; font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif; }
+    body{ margin:0; background:var(--bg); color:var(--text); }
+    header{ border-bottom:1px solid var(--border); padding:14px 18px; text-align:center; }
+    header a{ text-decoration:none; color:var(--text); font-weight:800; }
+    main{ max-width: 900px; margin:0 auto; padding: 24px 16px 60px; }
+
+    h1{ margin: 12px 0 8px; font-size: clamp(24px, 3vw, 36px); }
+    p{ margin:0 0 18px; color:var(--muted); line-height:1.6; }
+
+    .box{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    label{ font-size: 13px; color: var(--muted); display:block; margin-bottom:6px; }
+    input{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      font-size: 16px;
+      outline: none;
+      background: #fff;
+    }
+    input:focus{ border-color:#cbd5e1; }
+
+    .actions{
+      display:flex;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    button{
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid #111827;
+      background:#111827;
+      color:#fff;
+      font-weight:700;
+      cursor:pointer;
+      font-size: 14px;
+    }
+    .ghost{
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .result{
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px dashed var(--border);
+      background:#fff;
+    }
+    .result h2{ margin:0 0 8px; font-size: 18px; }
+    .numbers{ display:flex; gap: 18px; flex-wrap:wrap; }
+    .metric{ min-width: 180px; }
+    .metric .k{ font-size:12px; color: var(--muted); }
+    .metric .v{ font-size: 20px; font-weight:800; margin-top:4px; }
+    .note{ margin-top: 10px; color: var(--muted); font-size: 13px; }
+
+    @media (max-width: 640px){
+      .grid{ grid-template-columns: 1fr; }
+      .metric{ min-width: 140px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="../index.html">Vizbix</a>
+</header>
+
+<main>
+  <h1>Profit Margin Calculator</h1>
+  <p>Enter your revenue and total costs to calculate profit and profit margin.</p>
+
+  <div class="box">
+    <div class="grid">
+      <div>
+        <label for="revenue">Total Revenue (₹)</label>
+        <input id="revenue" type="number" inputmode="decimal" placeholder="e.g. 100000" />
+      </div>
+
+      <div>
+        <label for="costs">Total Costs (₹)</label>
+        <input id="costs" type="number" inputmode="decimal" placeholder="e.g. 70000" />
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="calcBtn">Calculate</button>
+      <button class="ghost" id="resetBtn" type="button">Reset</button>
+    </div>
+
+    <div class="result" id="resultBox" style="display:none;">
+      <h2>Result</h2>
+
+      <div class="numbers">
+        <div class="metric">
+          <div class="k">Profit</div>
+          <div class="v" id="profitValue">—</div>
+        </div>
+
+        <div class="metric">
+          <div class="k">Profit Margin</div>
+          <div class="v" id="marginValue">—</div>
+        </div>
+      </div>
+
+      <div class="note" id="interpretation">—</div>
+    </div>
+  </div>
+
+  <p style="margin-top:18px;">
+    Tip: Profit margin helps you compare products and pricing decisions. If your margin is low,
+    try reducing costs or increasing price (carefully).
+  </p>
+</main>
+
+<script>
+  const revenueEl = document.getElementById("revenue");
+  const costsEl = document.getElementById("costs");
+
+  const calcBtn = document.getElementById("calcBtn");
+  const resetBtn = document.getElementById("resetBtn");
+
+  const resultBox = document.getElementById("resultBox");
+  const profitValue = document.getElementById("profitValue");
+  const marginValue = document.getElementById("marginValue");
+  const interpretation = document.getElementById("interpretation");
+
+  function formatINR(num){
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 2
+    }).format(num);
+  }
+
+  function calculate(){
+    const revenue = parseFloat(revenueEl.value);
+    const costs = parseFloat(costsEl.value);
+
+    if (isNaN(revenue) || isNaN(costs) || revenue <= 0){
+      alert("Please enter a valid Revenue (> 0) and Costs.");
+      return;
+    }
+
+    const profit = revenue - costs;
+    const margin = (profit / revenue) * 100;
+
+    profitValue.textContent = formatINR(profit);
+    marginValue.textContent = margin.toFixed(2) + "%";
+
+    let msg = "";
+    if (profit < 0){
+      msg = "You are running at a loss. Reduce costs or increase price/sales volume.";
+    } else if (margin < 10){
+      msg = "Low margin. Small cost increases can hurt profit quickly.";
+    } else if (margin < 25){
+      msg = "Decent margin. Keep an eye on costs and discounting.";
+    } else {
+      msg = "Healthy margin. Make sure sales volume and repeat purchases stay strong.";
+    }
+
+    interpretation.textContent = msg;
+    resultBox.style.display = "block";
+  }
+
+  function reset(){
+    revenueEl.value = "";
+    costsEl.value = "";
+    resultBox.style.display = "none";
+    profitValue.textContent = "—";
+    marginValue.textContent = "—";
+    interpretation.textContent = "—";
+  }
+
+  calcBtn.addEventListener("click", calculate);
+  resetBtn.addEventListener("click", reset);
+
+  [revenueEl, costsEl].forEach(el => {
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") calculate();
+    });
+  });
+</script>
+
+</body>
+</html>

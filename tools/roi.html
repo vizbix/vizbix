@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ROI Calculator – Vizbix</title>
+  <meta name="description" content="Calculate ROI (Return on Investment) using investment cost and return value." />
+
+ <!-- FAVICON -->
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+
+  <style>
+    :root{
+      --bg:#ffffff; --text:#0f172a; --muted:#64748b; --border:#e5e7eb;
+      --card:#f8fafc; --radius:16px; --shadow: 0 10px 30px rgba(2,6,23,.06);
+    }
+    *{ box-sizing:border-box; font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif; }
+    body{ margin:0; background:var(--bg); color:var(--text); }
+    header{ border-bottom:1px solid var(--border); padding:14px 18px; text-align:center; }
+    header a{ text-decoration:none; color:var(--text); font-weight:800; }
+    main{ max-width: 900px; margin:0 auto; padding: 24px 16px 60px; }
+
+    h1{ margin: 12px 0 8px; font-size: clamp(24px, 3vw, 36px); }
+    p{ margin:0 0 18px; color:var(--muted); line-height:1.6; }
+
+    .box{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    label{ font-size: 13px; color: var(--muted); display:block; margin-bottom:6px; }
+    input{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      font-size: 16px;
+      outline: none;
+      background: #fff;
+    }
+    input:focus{ border-color:#cbd5e1; }
+
+    .actions{
+      display:flex;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    button{
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid #111827;
+      background:#111827;
+      color:#fff;
+      font-weight:700;
+      cursor:pointer;
+      font-size: 14px;
+    }
+    .ghost{
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .result{
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px dashed var(--border);
+      background:#fff;
+    }
+    .result h2{ margin:0 0 8px; font-size: 18px; }
+    .numbers{ display:flex; gap: 18px; flex-wrap:wrap; }
+    .metric{ min-width: 200px; }
+    .metric .k{ font-size:12px; color: var(--muted); }
+    .metric .v{ font-size: 20px; font-weight:800; margin-top:4px; }
+
+    .note{
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .mini{
+      margin-top: 16px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+    }
+    .mini h3{
+      margin: 0 0 8px;
+      font-size: 14px;
+    }
+    .mini ul{
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 640px){
+      .grid{ grid-template-columns: 1fr; }
+      .metric{ min-width: 160px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="../index.html">Vizbix</a>
+</header>
+
+<main>
+  <h1>ROI Calculator</h1>
+  <p>
+    ROI (Return on Investment) tells you how much profit you made compared to what you spent.
+    Use it to compare marketing, inventory, equipment, or any business investment.
+  </p>
+
+  <div class="box">
+    <div class="grid">
+      <div>
+        <label for="investment">Investment Cost (₹)</label>
+        <input id="investment" type="number" inputmode="decimal" placeholder="e.g. 20000" />
+      </div>
+
+      <div>
+        <label for="returnValue">Return Value (₹)</label>
+        <input id="returnValue" type="number" inputmode="decimal" placeholder="e.g. 32000" />
+      </div>
+
+      <div>
+        <label for="profit">Profit (Optional) (₹)</label>
+        <input id="profit" type="number" inputmode="decimal" placeholder="Leave empty to auto-calculate" />
+      </div>
+
+      <div>
+        <label for="timePeriod">Time Period (Optional)</label>
+        <input id="timePeriod" type="text" placeholder="e.g. 30 days / 3 months" />
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="calcBtn">Calculate</button>
+      <button class="ghost" id="resetBtn" type="button">Reset</button>
+    </div>
+
+    <div class="result" id="resultBox" style="display:none;">
+      <h2>Result</h2>
+
+      <div class="numbers">
+        <div class="metric">
+          <div class="k">Profit</div>
+          <div class="v" id="profitValue">—</div>
+        </div>
+
+        <div class="metric">
+          <div class="k">ROI</div>
+          <div class="v" id="roiValue">—</div>
+        </div>
+
+        <div class="metric">
+          <div class="k">ROI Meaning</div>
+          <div class="v" id="roiMeaning">—</div>
+        </div>
+      </div>
+
+      <div class="note" id="interpretation">—</div>
+    </div>
+
+    <div class="mini">
+      <h3>How ROI is calculated</h3>
+      <ul>
+        <li><b>Profit</b> = Return Value − Investment Cost</li>
+        <li><b>ROI (%)</b> = (Profit ÷ Investment Cost) × 100</li>
+      </ul>
+    </div>
+  </div>
+
+  <p style="margin-top:18px;">
+    Tip: ROI is useful only if your numbers include all costs (ads, delivery, commissions, returns, etc.).
+  </p>
+</main>
+
+<script>
+  const investmentEl = document.getElementById("investment");
+  const returnValueEl = document.getElementById("returnValue");
+  const profitEl = document.getElementById("profit");
+  const timePeriodEl = document.getElementById("timePeriod");
+
+  const calcBtn = document.getElementById("calcBtn");
+  const resetBtn = document.getElementById("resetBtn");
+
+  const resultBox = document.getElementById("resultBox");
+  const profitValue = document.getElementById("profitValue");
+  const roiValue = document.getElementById("roiValue");
+  const roiMeaning = document.getElementById("roiMeaning");
+  const interpretation = document.getElementById("interpretation");
+
+  function formatINR(num){
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 2
+    }).format(num);
+  }
+
+  function calculate(){
+    const investment = parseFloat(investmentEl.value);
+    const returnValue = parseFloat(returnValueEl.value);
+    const manualProfit = parseFloat(profitEl.value);
+    const timePeriod = (timePeriodEl.value || "").trim();
+
+    if (isNaN(investment) || investment <= 0){
+      alert("Please enter a valid Investment Cost (> 0).");
+      return;
+    }
+
+    // Profit: use manual if provided, else auto calculate if return value provided
+    let profit;
+    if (!isNaN(manualProfit)){
+      profit = manualProfit;
+    } else {
+      if (isNaN(returnValue)){
+        alert("Enter Return Value OR Profit.");
+        return;
+      }
+      profit = returnValue - investment;
+    }
+
+    const roi = (profit / investment) * 100;
+
+    profitValue.textContent = formatINR(profit);
+    roiValue.textContent = roi.toFixed(2) + "%";
+
+    let meaning = "";
+    if (roi < 0) meaning = "Loss";
+    else if (roi < 20) meaning = "Low";
+    else if (roi < 60) meaning = "Good";
+    else meaning = "Strong";
+
+    roiMeaning.textContent = meaning;
+
+    let msg = `For every ${formatINR(investment)} invested, your return is ${formatINR(investment + profit)}.`;
+    if (timePeriod) msg += ` (Time period: ${timePeriod})`;
+
+    if (roi < 0){
+      msg += " This investment is currently not profitable.";
+    } else if (roi < 20){
+      msg += " ROI is low. Check hidden costs or improve pricing/sales.";
+    } else if (roi < 60){
+      msg += " ROI looks healthy. Keep tracking repeat performance.";
+    } else {
+      msg += " ROI is strong. Consider scaling carefully if results stay consistent.";
+    }
+
+    interpretation.textContent = msg;
+    resultBox.style.display = "block";
+  }
+
+  function reset(){
+    investmentEl.value = "";
+    returnValueEl.value = "";
+    profitEl.value = "";
+    timePeriodEl.value = "";
+
+    resultBox.style.display = "none";
+    profitValue.textContent = "—";
+    roiValue.textContent = "—";
+    roiMeaning.textContent = "—";
+    interpretation.textContent = "—";
+  }
+
+  calcBtn.addEventListener("click", calculate);
+  resetBtn.addEventListener("click", reset);
+
+  // Press Enter to calculate
+  [investmentEl, returnValueEl, profitEl, timePeriodEl].forEach(el => {
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") calculate();
+    });
+  });
+</script>
+
+</body>
+</html>

@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Disclaimer – Vizbix</title>
+  <meta name="description" content="Vizbix disclaimer and limitations of liability." />
+
+  <!-- FAVICON -->
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e5e7eb;
+      --card:#f8fafc;
+      --shadow: 0 10px 30px rgba(2, 6, 23, 0.06);
+      --radius:16px;
+      --max: 980px;
+      --maxHeader: 1100px;
+    }
+
+    *{ box-sizing:border-box; font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif; }
+    html, body{ margin:0; padding:0; background:var(--bg); color:var(--text); }
+
+    /* HEADER */
+    header{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav{
+      max-width: var(--maxHeader);
+      margin: 0 auto;
+      padding: 10px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 14px;
+    }
+
+    .brand{
+      display:flex;
+      flex-direction:column;
+      line-height: 1.05;
+    }
+    .brand a{
+      text-decoration:none;
+      color: var(--text);
+      font-weight: 900;
+      letter-spacing: 0.2px;
+      font-size: 20px;
+    }
+    .tagline{
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* MENU BUTTON */
+    .menu-btn{
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.05);
+      transition: transform .12s ease;
+      flex-shrink: 0;
+    }
+    .menu-btn:active{ transform: translateY(1px); }
+
+    .menu-icon{
+      width: 18px;
+      height: 14px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+    }
+    .menu-icon span{
+      height: 2px;
+      width: 100%;
+      background: var(--text);
+      border-radius: 999px;
+      display:block;
+    }
+
+    /* OVERLAY */
+    .overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(2,6,23,0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease;
+      z-index: 80;
+    }
+    .overlay.show{
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* SLIDE MENU */
+    .drawer{
+      position: fixed;
+      top: 0;
+      right: 0;
+      height: 100%;
+      width: min(320px, 88vw);
+      background: #fff;
+      border-left: 1px solid var(--border);
+      box-shadow: -20px 0 50px rgba(2,6,23,0.12);
+      transform: translateX(105%);
+      transition: transform .22s ease;
+      z-index: 90;
+      padding: 18px;
+      display:flex;
+      flex-direction:column;
+      gap: 14px;
+    }
+    .drawer.open{
+      transform: translateX(0);
+    }
+
+    .drawer-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .drawer-title{
+      font-weight: 900;
+      letter-spacing: 0.2px;
+      font-size: 16px;
+      color: var(--text);
+    }
+    .close-btn{
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #fff;
+      cursor: pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .close-btn:hover{ background: var(--card); }
+
+    .drawer-links{
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+      padding-top: 6px;
+    }
+    .drawer-links a{
+      text-decoration:none;
+      color: var(--text);
+      font-weight: 700;
+      padding: 12px 12px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+      transition: background .15s ease, transform .15s ease;
+    }
+    .drawer-links a:hover{
+      background: var(--card);
+      transform: translateY(-1px);
+    }
+
+    .drawer-note{
+      margin-top: auto;
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* PAGE CONTENT */
+    main{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 22px 16px 70px;
+    }
+
+    h1{
+      margin: 14px 0 10px;
+      font-size: clamp(26px, 3vw, 40px);
+      letter-spacing: -0.02em;
+    }
+    p{
+      margin: 0 0 14px;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 15px;
+    }
+
+    .box{
+      margin-top: 18px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    h2{
+      margin: 0 0 10px;
+      font-size: 16px;
+      color: var(--text);
+    }
+
+    ul{
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 14px;
+    }
+
+    /* FOOTER */
+    footer{
+      border-top: 1px solid var(--border);
+      padding: 22px 18px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .footer-inner{
+      max-width: var(--maxHeader);
+      margin: 0 auto;
+      display:flex;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .footer-links a{
+      color: var(--muted);
+      text-decoration:none;
+      margin-right: 14px;
+    }
+    .footer-links a:hover{ color: var(--text); }
+
+    @media (max-width: 520px){
+      main{ padding: 18px 14px 60px; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- OVERLAY -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- DRAWER MENU -->
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer-top">
+      <div class="drawer-title">Menu</div>
+      <button class="close-btn" id="closeBtn" aria-label="Close menu">✕</button>
+    </div>
+
+    <nav class="drawer-links">
+      <a href="index.html">Home</a>
+      <a href="tools/index.html">All Tools</a>
+      <a href="blog.html">Blog</a>
+      <a href="about.html">About</a>
+      <a href="privacy.html">Privacy Policy</a>
+      <a href="disclaimer.html">Disclaimer</a>
+    </nav>
+
+    <div class="drawer-note">
+      Tip: Press <b>Esc</b> to close menu.
+    </div>
+  </aside>
+
+  <header>
+    <div class="nav">
+      <div class="brand">
+        <a href="index.html">Vizbix</a>
+        <div class="tagline">Free tools for business owners</div>
+      </div>
+
+      <!-- MENU BUTTON -->
+      <button class="menu-btn" id="menuBtn" aria-label="Open menu">
+        <div class="menu-icon" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <h1>Disclaimer</h1>
+    <p>
+      The information and calculators provided on Vizbix are for general informational and educational purposes only.
+      By using this website, you agree to the terms below.
+    </p>
+
+    <div class="box">
+      <h2>1) Not financial, legal, or tax advice</h2>
+      <p>
+        Vizbix does not provide financial, legal, tax, accounting, or investment advice.
+        The tools and content are meant to help you estimate and plan using your own numbers.
+      </p>
+    </div>
+
+    <div class="box">
+      <h2>2) Accuracy of results</h2>
+      <p>
+        We try to keep our calculators correct and up to date, but we do not guarantee that the results will always be
+        accurate, complete, or suitable for your specific situation.
+      </p>
+      <ul>
+        <li>Results depend entirely on the inputs you provide.</li>
+        <li>Business rules and taxes can vary by location and change over time.</li>
+        <li>Always verify important calculations with a professional.</li>
+      </ul>
+    </div>
+
+    <div class="box">
+      <h2>3) Limitation of liability</h2>
+      <p>
+        Vizbix and its owners are not responsible for any losses, damages, or issues that may occur from using this website,
+        including direct, indirect, incidental, or consequential damages.
+      </p>
+    </div>
+
+    <div class="box">
+      <h2>4) External links</h2>
+      <p>
+        This website may contain links to other websites. We do not control those websites and are not responsible for their
+        content or policies.
+      </p>
+    </div>
+
+    <div class="box">
+      <h2>5) Use at your own risk</h2>
+      <p>
+        By using Vizbix, you agree that you are responsible for your business decisions and outcomes.
+        If you do not agree with this disclaimer, please stop using the website.
+      </p>
+    </div>
+
+    <p style="margin-top:18px;">
+      If you have any questions, contact: <b>hello@vizbix.com</b>
+    </p>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div>© 2026 Vizbix</div>
+      <div class="footer-links">
+        <a href="about.html">About</a>
+        <a href="tools/index.html">Tools</a>
+        <a href="blog.html">Blog</a>
+        <a href="privacy.html">Privacy Policy</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // MENU OPEN/CLOSE
+    const menuBtn = document.getElementById("menuBtn");
+    const closeBtn = document.getElementById("closeBtn");
+    const drawer = document.getElementById("drawer");
+    const overlay = document.getElementById("overlay");
+
+    function openMenu(){
+      drawer.classList.add("open");
+      overlay.classList.add("show");
+      drawer.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeMenu(){
+      drawer.classList.remove("open");
+      overlay.classList.remove("show");
+      drawer.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    menuBtn.addEventListener("click", openMenu);
+    closeBtn.addEventListener("click", closeMenu);
+    overlay.addEventListener("click", closeMenu);
+
+    document.addEventListener("keydown", (e) => {
+      if(e.key === "Escape") closeMenu();
+    });
+  </script>
+
+</body>
+</html>

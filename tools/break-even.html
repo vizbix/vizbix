@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Break-even Calculator – Vizbix</title>
+  <meta name="description" content="Calculate break-even units and break-even revenue using fixed costs, selling price, and variable cost." />
+
+ <!-- FAVICON -->
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+
+  <style>
+    :root{
+      --bg:#ffffff; --text:#0f172a; --muted:#64748b; --border:#e5e7eb;
+      --card:#f8fafc; --radius:16px; --shadow: 0 10px 30px rgba(2,6,23,.06);
+    }
+    *{ box-sizing:border-box; font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif; }
+    body{ margin:0; background:var(--bg); color:var(--text); }
+    header{ border-bottom:1px solid var(--border); padding:14px 18px; text-align:center; }
+    header a{ text-decoration:none; color:var(--text); font-weight:800; }
+    main{ max-width: 900px; margin:0 auto; padding: 24px 16px 60px; }
+
+    h1{ margin: 12px 0 8px; font-size: clamp(24px, 3vw, 36px); }
+    p{ margin:0 0 18px; color:var(--muted); line-height:1.6; }
+
+    .box{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    label{ font-size: 13px; color: var(--muted); display:block; margin-bottom:6px; }
+    input{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      font-size: 16px;
+      outline: none;
+      background: #fff;
+    }
+    input:focus{ border-color:#cbd5e1; }
+
+    .actions{
+      display:flex;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    button{
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid #111827;
+      background:#111827;
+      color:#fff;
+      font-weight:700;
+      cursor:pointer;
+      font-size: 14px;
+    }
+    .ghost{
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .result{
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px dashed var(--border);
+      background:#fff;
+    }
+    .result h2{ margin:0 0 8px; font-size: 18px; }
+    .numbers{ display:flex; gap: 18px; flex-wrap:wrap; }
+    .metric{ min-width: 200px; }
+    .metric .k{ font-size:12px; color: var(--muted); }
+    .metric .v{ font-size: 20px; font-weight:800; margin-top:4px; }
+
+    .note{
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .mini{
+      margin-top: 16px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+    }
+    .mini h3{
+      margin: 0 0 8px;
+      font-size: 14px;
+    }
+    .mini ul{
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 640px){
+      .grid{ grid-template-columns: 1fr; }
+      .metric{ min-width: 160px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="../index.html">Vizbix</a>
+</header>
+
+<main>
+  <h1>Break-even Calculator</h1>
+  <p>
+    Find how many units you need to sell to cover all costs. This calculator uses fixed costs,
+    selling price, and variable cost per unit.
+  </p>
+
+  <div class="box">
+    <div class="grid">
+      <div>
+        <label for="fixedCosts">Fixed Costs (₹)</label>
+        <input id="fixedCosts" type="number" inputmode="decimal" placeholder="e.g. 50000" />
+      </div>
+
+      <div>
+        <label for="sellingPrice">Selling Price per Unit (₹)</label>
+        <input id="sellingPrice" type="number" inputmode="decimal" placeholder="e.g. 500" />
+      </div>
+
+      <div>
+        <label for="variableCost">Variable Cost per Unit (₹)</label>
+        <input id="variableCost" type="number" inputmode="decimal" placeholder="e.g. 300" />
+      </div>
+
+      <div>
+        <label for="targetProfit">Target Profit (Optional) (₹)</label>
+        <input id="targetProfit" type="number" inputmode="decimal" placeholder="e.g. 20000" />
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="calcBtn">Calculate</button>
+      <button class="ghost" id="resetBtn" type="button">Reset</button>
+    </div>
+
+    <div class="result" id="resultBox" style="display:none;">
+      <h2>Result</h2>
+
+      <div class="numbers">
+        <div class="metric">
+          <div class="k">Contribution per Unit</div>
+          <div class="v" id="contributionValue">—</div>
+        </div>
+
+        <div class="metric">
+          <div class="k">Break-even Units</div>
+          <div class="v" id="unitsValue">—</div>
+        </div>
+
+        <div class="metric">
+          <div class="k">Break-even Revenue</div>
+          <div class="v" id="revenueValue">—</div>
+        </div>
+      </div>
+
+      <div class="note" id="interpretation">—</div>
+    </div>
+
+    <div class="mini">
+      <h3>How break-even is calculated</h3>
+      <ul>
+        <li><b>Contribution per unit</b> = Selling Price − Variable Cost</li>
+        <li><b>Break-even units</b> = Fixed Costs ÷ Contribution per unit</li>
+        <li><b>Break-even revenue</b> = Break-even units × Selling Price</li>
+      </ul>
+    </div>
+  </div>
+
+  <p style="margin-top:18px;">
+    Tip: If break-even units are too high, you can reduce fixed costs, reduce variable costs, or increase price.
+  </p>
+</main>
+
+<script>
+  const fixedCostsEl = document.getElementById("fixedCosts");
+  const sellingPriceEl = document.getElementById("sellingPrice");
+  const variableCostEl = document.getElementById("variableCost");
+  const targetProfitEl = document.getElementById("targetProfit");
+
+  const calcBtn = document.getElementById("calcBtn");
+  const resetBtn = document.getElementById("resetBtn");
+
+  const resultBox = document.getElementById("resultBox");
+  const contributionValue = document.getElementById("contributionValue");
+  const unitsValue = document.getElementById("unitsValue");
+  const revenueValue = document.getElementById("revenueValue");
+  const interpretation = document.getElementById("interpretation");
+
+  function formatINR(num){
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 2
+    }).format(num);
+  }
+
+  function formatNumber(num){
+    return new Intl.NumberFormat("en-IN", {
+      maximumFractionDigits: 2
+    }).format(num);
+  }
+
+  function calculate(){
+    const fixedCosts = parseFloat(fixedCostsEl.value);
+    const sellingPrice = parseFloat(sellingPriceEl.value);
+    const variableCost = parseFloat(variableCostEl.value);
+    const targetProfit = parseFloat(targetProfitEl.value || "0");
+
+    if (isNaN(fixedCosts) || isNaN(sellingPrice) || isNaN(variableCost)){
+      alert("Please fill Fixed Costs, Selling Price, and Variable Cost.");
+      return;
+    }
+
+    if (fixedCosts < 0 || sellingPrice <= 0 || variableCost < 0){
+      alert("Please enter valid values (Selling Price must be > 0).");
+      return;
+    }
+
+    const contribution = sellingPrice - variableCost;
+
+    if (contribution <= 0){
+      alert("Your Selling Price must be greater than Variable Cost per unit to reach break-even.");
+      return;
+    }
+
+    // Break-even units for fixed costs
+    const breakEvenUnits = fixedCosts / contribution;
+
+    // Break-even units including optional target profit
+    const breakEvenUnitsWithTarget = (fixedCosts + targetProfit) / contribution;
+
+    const breakEvenRevenue = breakEvenUnits * sellingPrice;
+
+    contributionValue.textContent = formatINR(contribution);
+    unitsValue.textContent = formatNumber(breakEvenUnits) + " units";
+    revenueValue.textContent = formatINR(breakEvenRevenue);
+
+    let msg = `You need to sell approximately ${formatNumber(breakEvenUnits)} units to cover your fixed costs.`;
+
+    if (targetProfit > 0){
+      msg += ` To earn a target profit of ${formatINR(targetProfit)}, you need about ${formatNumber(breakEvenUnitsWithTarget)} units.`;
+    }
+
+    interpretation.textContent = msg;
+    resultBox.style.display = "block";
+  }
+
+  function reset(){
+    fixedCostsEl.value = "";
+    sellingPriceEl.value = "";
+    variableCostEl.value = "";
+    targetProfitEl.value = "";
+
+    resultBox.style.display = "none";
+    contributionValue.textContent = "—";
+    unitsValue.textContent = "—";
+    revenueValue.textContent = "—";
+    interpretation.textContent = "—";
+  }
+
+  calcBtn.addEventListener("click", calculate);
+  resetBtn.addEventListener("click", reset);
+
+  // Press Enter to calculate
+  [fixedCostsEl, sellingPriceEl, variableCostEl, targetProfitEl].forEach(el => {
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") calculate();
+    });
+  });
+</script>
+
+</body>
+</html>

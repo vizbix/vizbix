@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Monthly Revenue Target Calculator – Vizbix</title>
+  <meta name="description" content="Break a monthly revenue target into daily and weekly goals using working days and average order value." />
+
+ <!-- FAVICON -->
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+
+  <style>
+    :root{
+      --bg:#ffffff; --text:#0f172a; --muted:#64748b; --border:#e5e7eb;
+      --card:#f8fafc; --radius:16px; --shadow: 0 10px 30px rgba(2,6,23,.06);
+    }
+    *{ box-sizing:border-box; font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif; }
+    body{ margin:0; background:var(--bg); color:var(--text); }
+    header{ border-bottom:1px solid var(--border); padding:14px 18px; text-align:center; }
+    header a{ text-decoration:none; color:var(--text); font-weight:800; }
+    main{ max-width: 900px; margin:0 auto; padding: 24px 16px 60px; }
+
+    h1{ margin: 12px 0 8px; font-size: clamp(24px, 3vw, 36px); }
+    p{ margin:0 0 18px; color:var(--muted); line-height:1.6; }
+
+    .box{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    label{ font-size: 13px; color: var(--muted); display:block; margin-bottom:6px; }
+    input, select{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      font-size: 16px;
+      outline: none;
+      background: #fff;
+    }
+    input:focus, select:focus{ border-color:#cbd5e1; }
+
+    .actions{
+      display:flex;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    button{
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid #111827;
+      background:#111827;
+      color:#fff;
+      font-weight:700;
+      cursor:pointer;
+      font-size: 14px;
+    }
+    .ghost{
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .result{
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px dashed var(--border);
+      background:#fff;
+    }
+    .result h2{ margin:0 0 8px; font-size: 18px; }
+    .numbers{ display:flex; gap: 18px; flex-wrap:wrap; }
+    .metric{ min-width: 220px; }
+    .metric .k{ font-size:12px; color: var(--muted); }
+    .metric .v{ font-size: 20px; font-weight:800; margin-top:4px; }
+
+    .note{
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .mini{
+      margin-top: 16px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+    }
+    .mini h3{
+      margin: 0 0 8px;
+      font-size: 14px;
+    }
+    .mini ul{
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 640px){
+      .grid{ grid-template-columns: 1fr; }
+      .metric{ min-width: 160px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="../index.html">Vizbix</a>
+</header>
+
+<main>
+  <h1>Monthly Revenue Target Calculator</h1>
+  <p>
+    Enter your monthly revenue target and working days to get a daily and weekly target.
+    Optionally add Average Order Value (AOV) to estimate required orders.
+  </p>
+
+  <div class="box">
+    <div class="grid">
+      <div>
+        <label for="monthlyTarget">Monthly Revenue Target (₹)</label>
+        <input id="monthlyTarget" type="number" inputmode="decimal" placeholder="e.g. 300000" />
+      </div>
+
+      <div>
+        <label for="workingDays">Working Days in Month</label>
+        <input id="workingDays" type="number" inputmode="numeric" placeholder="e.g. 26" />
+      </div>
+
+      <div>
+        <label for="weeksInMonth">Weeks in Month (Optional)</label>
+        <input id="weeksInMonth" type="number" inputmode="decimal" placeholder="e.g. 4.3" />
+      </div>
+
+      <div>
+        <label for="aov">Average Order Value (Optional) (₹)</label>
+        <input id="aov" type="number" inputmode="decimal" placeholder="e.g. 1200" />
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="calcBtn">Calculate</button>
+      <button class="ghost" id="resetBtn" type="button">Reset</button>
+    </div>
+
+    <div class="result" id="resultBox" style="display:none;">
+      <h2>Result</h2>
+
+      <div class="numbers">
+        <div class="metric">
+          <div class="k">Daily Target</div>
+          <div class="v" id="dailyValue">—</div>
+        </div>
+
+        <div class="metric">
+          <div class="k">Weekly Target</div>
+          <div class="v" id="weeklyValue">—</div>
+        </div>
+
+        <div class="metric">
+          <div class="k">Orders Needed / Day (if AOV given)</div>
+          <div class="v" id="ordersValue">—</div>
+        </div>
+      </div>
+
+      <div class="note" id="interpretation">—</div>
+    </div>
+
+    <div class="mini">
+      <h3>How it is calculated</h3>
+      <ul>
+        <li><b>Daily Target</b> = Monthly Target ÷ Working Days</li>
+        <li><b>Weekly Target</b> = Monthly Target ÷ Weeks in Month (or Daily Target × 7)</li>
+        <li><b>Orders/Day</b> = Daily Target ÷ AOV</li>
+      </ul>
+    </div>
+  </div>
+
+  <p style="margin-top:18px;">
+    Tip: If your daily target feels too high, increase AOV (bundles), improve conversion, or add one more sales channel.
+  </p>
+</main>
+
+<script>
+  const monthlyTargetEl = document.getElementById("monthlyTarget");
+  const workingDaysEl = document.getElementById("workingDays");
+  const weeksInMonthEl = document.getElementById("weeksInMonth");
+  const aovEl = document.getElementById("aov");
+
+  const calcBtn = document.getElementById("calcBtn");
+  const resetBtn = document.getElementById("resetBtn");
+
+  const resultBox = document.getElementById("resultBox");
+  const dailyValue = document.getElementById("dailyValue");
+  const weeklyValue = document.getElementById("weeklyValue");
+  const ordersValue = document.getElementById("ordersValue");
+  const interpretation = document.getElementById("interpretation");
+
+  function formatINR(num){
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 2
+    }).format(num);
+  }
+
+  function formatNumber(num){
+    return new Intl.NumberFormat("en-IN", { maximumFractionDigits: 2 }).format(num);
+  }
+
+  function calculate(){
+    const monthlyTarget = parseFloat(monthlyTargetEl.value);
+    const workingDays = parseFloat(workingDaysEl.value);
+    const weeksInMonth = parseFloat(weeksInMonthEl.value);
+    const aov = parseFloat(aovEl.value);
+
+    if (isNaN(monthlyTarget) || monthlyTarget <= 0){
+      alert("Please enter a valid Monthly Target (> 0).");
+      return;
+    }
+    if (isNaN(workingDays) || workingDays <= 0){
+      alert("Please enter valid Working Days (> 0).");
+      return;
+    }
+
+    const dailyTarget = monthlyTarget / workingDays;
+
+    let weeklyTarget;
+    if (!isNaN(weeksInMonth) && weeksInMonth > 0){
+      weeklyTarget = monthlyTarget / weeksInMonth;
+    } else {
+      weeklyTarget = dailyTarget * 7;
+    }
+
+    dailyValue.textContent = formatINR(dailyTarget);
+    weeklyValue.textContent = formatINR(weeklyTarget);
+
+    if (!isNaN(aov) && aov > 0){
+      const ordersPerDay = dailyTarget / aov;
+      ordersValue.textContent = formatNumber(ordersPerDay) + " orders";
+    } else {
+      ordersValue.textContent = "—";
+    }
+
+    let msg = `To hit ${formatINR(monthlyTarget)} in a month, aim for about ${formatINR(dailyTarget)} per working day.`;
+
+    if (!isNaN(aov) && aov > 0){
+      msg += ` With an AOV of ${formatINR(aov)}, you need around ${formatNumber(dailyTarget / aov)} orders per day.`;
+    } else {
+      msg += " Add Average Order Value (AOV) to estimate required orders per day.";
+    }
+
+    interpretation.textContent = msg;
+    resultBox.style.display = "block";
+  }
+
+  function reset(){
+    monthlyTargetEl.value = "";
+    workingDaysEl.value = "";
+    weeksInMonthEl.value = "";
+    aovEl.value = "";
+
+    resultBox.style.display = "none";
+    dailyValue.textContent = "—";
+    weeklyValue.textContent = "—";
+    ordersValue.textContent = "—";
+    interpretation.textContent = "—";
+  }
+
+  calcBtn.addEventListener("click", calculate);
+  resetBtn.addEventListener("click", reset);
+
+  [monthlyTargetEl, workingDaysEl, weeksInMonthEl, aovEl].forEach(el => {
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") calculate();
+    });
+  });
+</script>
+
+</body>
+</html>

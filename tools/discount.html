@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Discount Calculator – Vizbix</title>
+  <meta name="description" content="Calculate final price after discount, discount amount, and effective savings." />
+
+ <!-- FAVICON -->
+  <link rel="icon" type="image/png" href="favicon.png">
+  <link rel="apple-touch-icon" href="favicon.png">
+
+  <style>
+    :root{
+      --bg:#ffffff; --text:#0f172a; --muted:#64748b; --border:#e5e7eb;
+      --card:#f8fafc; --radius:16px; --shadow: 0 10px 30px rgba(2,6,23,.06);
+    }
+    *{ box-sizing:border-box; font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif; }
+    body{ margin:0; background:var(--bg); color:var(--text); }
+    header{ border-bottom:1px solid var(--border); padding:14px 18px; text-align:center; }
+    header a{ text-decoration:none; color:var(--text); font-weight:800; }
+    main{ max-width: 900px; margin:0 auto; padding: 24px 16px 60px; }
+
+    h1{ margin: 12px 0 8px; font-size: clamp(24px, 3vw, 36px); }
+    p{ margin:0 0 18px; color:var(--muted); line-height:1.6; }
+
+    .box{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    label{ font-size: 13px; color: var(--muted); display:block; margin-bottom:6px; }
+    input, select{
+      width:100%;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      font-size: 16px;
+      outline: none;
+      background: #fff;
+    }
+    input:focus, select:focus{ border-color:#cbd5e1; }
+
+    .actions{
+      display:flex;
+      gap: 10px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    button{
+      padding: 12px 14px;
+      border-radius: 12px;
+      border: 1px solid #111827;
+      background:#111827;
+      color:#fff;
+      font-weight:700;
+      cursor:pointer;
+      font-size: 14px;
+    }
+    .ghost{
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .result{
+      margin-top: 14px;
+      padding: 14px;
+      border-radius: 14px;
+      border: 1px dashed var(--border);
+      background:#fff;
+    }
+    .result h2{ margin:0 0 8px; font-size: 18px; }
+    .numbers{ display:flex; gap: 18px; flex-wrap:wrap; }
+    .metric{ min-width: 200px; }
+    .metric .k{ font-size:12px; color: var(--muted); }
+    .metric .v{ font-size: 20px; font-weight:800; margin-top:4px; }
+
+    .note{
+      margin-top: 10px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+
+    .mini{
+      margin-top: 16px;
+      padding: 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+    }
+    .mini h3{
+      margin: 0 0 8px;
+      font-size: 14px;
+    }
+    .mini ul{
+      margin: 0;
+      padding-left: 18px;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+    }
+
+    @media (max-width: 640px){
+      .grid{ grid-template-columns: 1fr; }
+      .metric{ min-width: 160px; }
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <a href="../index.html">Vizbix</a>
+</header>
+
+<main>
+  <h1>Discount Calculator</h1>
+  <p>
+    Calculate the final price after discount, the discount amount, and how much you save.
+    Useful for offers, sales campaigns, and pricing decisions.
+  </p>
+
+  <div class="box">
+    <div class="grid">
+      <div>
+        <label for="originalPrice">Original Price (₹)</label>
+        <input id="originalPrice" type="number" inputmode="decimal" placeholder="e.g. 999" />
+      </div>
+
+      <div>
+        <label for="discountType">Discount Type</label>
+        <select id="discountType">
+          <option value="percent">Percentage (%)</option>
+          <option value="flat">Flat amount (₹)</option>
+        </select>
+      </div>
+
+      <div>
+        <label for="discountValue">Discount Value</label>
+        <input id="discountValue" type="number" inputmode="decimal" placeholder="e.g. 20 or 150" />
+      </div>
+
+      <div>
+        <label for="maxDiscount">Maximum Discount (Optional) (₹)</label>
+        <input id="maxDiscount" type="number" inputmode="decimal" placeholder="e.g. 300" />
+      </div>
+    </div>
+
+    <div class="actions">
+      <button id="calcBtn">Calculate</button>
+      <button class="ghost" id="resetBtn" type="button">Reset</button>
+    </div>
+
+    <div class="result" id="resultBox" style="display:none;">
+      <h2>Result</h2>
+
+      <div class="numbers">
+        <div class="metric">
+          <div class="k">Final Price</div>
+          <div class="v" id="finalPriceValue">—</div>
+        </div>
+
+        <div class="metric">
+          <div class="k">Discount Amount</div>
+          <div class="v" id="discountAmountValue">—</div>
+        </div>
+
+        <div class="metric">
+          <div class="k">You Save</div>
+          <div class="v" id="youSaveValue">—</div>
+        </div>
+      </div>
+
+      <div class="note" id="interpretation">—</div>
+    </div>
+
+    <div class="mini">
+      <h3>How discount is calculated</h3>
+      <ul>
+        <li><b>Percentage discount</b>: Discount = Price × (Discount% ÷ 100)</li>
+        <li><b>Flat discount</b>: Discount = Flat amount</li>
+        <li><b>Final Price</b> = Original Price − Discount</li>
+      </ul>
+    </div>
+  </div>
+
+  <p style="margin-top:18px;">
+    Tip: Always check your profit margin before running heavy discounts.
+  </p>
+</main>
+
+<script>
+  const originalPriceEl = document.getElementById("originalPrice");
+  const discountTypeEl = document.getElementById("discountType");
+  const discountValueEl = document.getElementById("discountValue");
+  const maxDiscountEl = document.getElementById("maxDiscount");
+
+  const calcBtn = document.getElementById("calcBtn");
+  const resetBtn = document.getElementById("resetBtn");
+
+  const resultBox = document.getElementById("resultBox");
+  const finalPriceValue = document.getElementById("finalPriceValue");
+  const discountAmountValue = document.getElementById("discountAmountValue");
+  const youSaveValue = document.getElementById("youSaveValue");
+  const interpretation = document.getElementById("interpretation");
+
+  function formatINR(num){
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      maximumFractionDigits: 2
+    }).format(num);
+  }
+
+  function calculate(){
+    const originalPrice = parseFloat(originalPriceEl.value);
+    const discountValue = parseFloat(discountValueEl.value);
+    const maxDiscount = parseFloat(maxDiscountEl.value || "0");
+    const type = discountTypeEl.value;
+
+    if (isNaN(originalPrice) || originalPrice <= 0){
+      alert("Please enter a valid Original Price (> 0).");
+      return;
+    }
+
+    if (isNaN(discountValue) || discountValue < 0){
+      alert("Please enter a valid Discount Value.");
+      return;
+    }
+
+    let discountAmount = 0;
+
+    if (type === "percent"){
+      discountAmount = originalPrice * (discountValue / 100);
+    } else {
+      discountAmount = discountValue;
+    }
+
+    // Apply max discount cap if provided
+    if (maxDiscount > 0 && discountAmount > maxDiscount){
+      discountAmount = maxDiscount;
+    }
+
+    // Prevent discount more than price
+    if (discountAmount > originalPrice){
+      discountAmount = originalPrice;
+    }
+
+    const finalPrice = originalPrice - discountAmount;
+
+    finalPriceValue.textContent = formatINR(finalPrice);
+    discountAmountValue.textContent = formatINR(discountAmount);
+    youSaveValue.textContent = formatINR(discountAmount);
+
+    let msg = "";
+    if (finalPrice === 0){
+      msg = "Final price becomes ₹0. This is a 100% discount.";
+    } else if (type === "percent" && discountValue >= 50){
+      msg = "High discount. Make sure your margin can handle this offer.";
+    } else {
+      msg = "Looks good. Double-check profit margin and competitor pricing.";
+    }
+
+    interpretation.textContent = msg;
+    resultBox.style.display = "block";
+  }
+
+  function reset(){
+    originalPriceEl.value = "";
+    discountValueEl.value = "";
+    maxDiscountEl.value = "";
+    discountTypeEl.value = "percent";
+
+    resultBox.style.display = "none";
+    finalPriceValue.textContent = "—";
+    discountAmountValue.textContent = "—";
+    youSaveValue.textContent = "—";
+    interpretation.textContent = "—";
+  }
+
+  calcBtn.addEventListener("click", calculate);
+  resetBtn.addEventListener("click", reset);
+
+  // Press Enter to calculate
+  [originalPriceEl, discountValueEl, maxDiscountEl].forEach(el => {
+    el.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") calculate();
+    });
+  });
+</script>
+
+</body>
+</html>

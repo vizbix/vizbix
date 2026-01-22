@@ -1,0 +1,600 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>All Tools – Vizbix</title>
+  <meta name="description" content="Browse all Vizbix business calculators in one place." />
+
+  <!-- FAVICON -->
+  <link rel="icon" type="image/png" href="../favicon.png">
+  <link rel="apple-touch-icon" href="../favicon.png">
+
+  <style>
+    :root{
+      --bg:#ffffff;
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e5e7eb;
+      --card:#f8fafc;
+      --radius:16px;
+      --shadow: 0 10px 30px rgba(2,6,23,.06);
+      --max: 1100px;
+    }
+
+    *{ box-sizing:border-box; font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif; }
+    html, body{ margin:0; padding:0; background:var(--bg); color:var(--text); }
+
+    /* HEADER */
+    header{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255,255,255,0.88);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+
+    .nav{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 10px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 14px;
+    }
+
+    .brand{
+      display:flex;
+      flex-direction:column;
+      line-height: 1.05;
+    }
+    .brand a{
+      text-decoration:none;
+      color: var(--text);
+      font-weight: 900;
+      letter-spacing: 0.2px;
+      font-size: 20px;
+    }
+    .tagline{
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    /* MENU BUTTON */
+    .menu-btn{
+      width: 42px;
+      height: 42px;
+      border: 1px solid var(--border);
+      background: #fff;
+      border-radius: 12px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      box-shadow: 0 6px 18px rgba(2,6,23,0.05);
+      transition: transform .12s ease;
+      flex-shrink: 0;
+    }
+    .menu-btn:active{ transform: translateY(1px); }
+
+    .menu-icon{
+      width: 18px;
+      height: 14px;
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+    }
+    .menu-icon span{
+      height: 2px;
+      width: 100%;
+      background: var(--text);
+      border-radius: 999px;
+      display:block;
+    }
+
+    /* OVERLAY */
+    .overlay{
+      position: fixed;
+      inset: 0;
+      background: rgba(2,6,23,0.45);
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity .2s ease;
+      z-index: 80;
+    }
+    .overlay.show{
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    /* SLIDE MENU */
+    .drawer{
+      position: fixed;
+      top: 0;
+      right: 0;
+      height: 100%;
+      width: min(320px, 88vw);
+      background: #fff;
+      border-left: 1px solid var(--border);
+      box-shadow: -20px 0 50px rgba(2,6,23,0.12);
+      transform: translateX(105%);
+      transition: transform .22s ease;
+      z-index: 90;
+      padding: 18px;
+      display:flex;
+      flex-direction:column;
+      gap: 14px;
+    }
+    .drawer.open{
+      transform: translateX(0);
+    }
+
+    .drawer-top{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid var(--border);
+    }
+    .drawer-title{
+      font-weight: 900;
+      letter-spacing: 0.2px;
+      font-size: 16px;
+      color: var(--text);
+    }
+    .close-btn{
+      width: 40px;
+      height: 40px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #fff;
+      cursor: pointer;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .close-btn:hover{ background: var(--card); }
+
+    .drawer-links{
+      display:flex;
+      flex-direction:column;
+      gap: 8px;
+      padding-top: 6px;
+    }
+    .drawer-links a{
+      text-decoration:none;
+      color: var(--text);
+      font-weight: 700;
+      padding: 12px 12px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      background: #fff;
+      transition: background .15s ease, transform .15s ease;
+    }
+    .drawer-links a:hover{
+      background: var(--card);
+      transform: translateY(-1px);
+    }
+
+    .drawer-note{
+      margin-top: auto;
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.5;
+    }
+
+    /* PAGE */
+    main{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 22px 16px 70px;
+    }
+
+    h1{
+      margin: 10px 0 8px;
+      font-size: clamp(26px, 3vw, 40px);
+      letter-spacing: -0.02em;
+    }
+    p{
+      margin: 0 0 18px;
+      color: var(--muted);
+      line-height: 1.7;
+      max-width: 75ch;
+    }
+
+    .searchWrap{
+      margin-top: 14px;
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 14px;
+    }
+
+    .searchRow{
+      display:flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .searchRow input{
+      flex: 1;
+      min-width: 220px;
+      padding: 12px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      font-size: 15px;
+      outline: none;
+      background: #fff;
+    }
+    .searchRow input:focus{ border-color:#cbd5e1; }
+
+    .chips{
+      display:flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      margin-top: 10px;
+    }
+
+    .chip{
+      padding: 8px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--muted);
+      font-size: 12px;
+      cursor:pointer;
+      user-select:none;
+    }
+    .chip.active{
+      border-color:#111827;
+      color:#111827;
+      font-weight:700;
+    }
+
+    .grid{
+      margin-top: 18px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+
+    .card{
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+      gap: 10px;
+      text-decoration:none;
+      color: inherit;
+      background: #fff;
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 6px 18px rgba(2,6,23,.04);
+      transition: transform .12s ease, box-shadow .12s ease;
+      min-height: 120px;
+    }
+    .card:hover{
+      transform: translateY(-2px);
+      box-shadow: 0 14px 28px rgba(2,6,23,.08);
+    }
+
+    .title{
+      font-weight: 800;
+      font-size: 15px;
+      margin: 0;
+    }
+    .desc{
+      margin: 6px 0 0;
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.5;
+    }
+    .meta{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      margin-top: 10px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .pill{
+      padding: 6px 10px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: var(--card);
+      color: var(--text);
+      font-weight: 700;
+      font-size: 12px;
+    }
+
+    .empty{
+      margin-top: 16px;
+      padding: 16px;
+      border-radius: 16px;
+      border: 1px dashed var(--border);
+      color: var(--muted);
+      background: #fff;
+      display:none;
+    }
+
+    /* FOOTER */
+    footer{
+      border-top: 1px solid var(--border);
+      padding: 22px 18px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+    .footer-inner{
+      max-width: var(--max);
+      margin: 0 auto;
+      display:flex;
+      justify-content:space-between;
+      gap: 12px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .footer-links a{
+      color: var(--muted);
+      text-decoration:none;
+      margin-right: 14px;
+    }
+    .footer-links a:hover{ color: var(--text); }
+
+    @media (max-width: 980px){
+      .grid{ grid-template-columns: repeat(2, 1fr); }
+    }
+    @media (max-width: 640px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- OVERLAY -->
+  <div class="overlay" id="overlay"></div>
+
+  <!-- DRAWER MENU -->
+  <aside class="drawer" id="drawer" aria-hidden="true">
+    <div class="drawer-top">
+      <div class="drawer-title">Menu</div>
+      <button class="close-btn" id="closeBtn" aria-label="Close menu">✕</button>
+    </div>
+
+    <nav class="drawer-links">
+      <a href="../index.html">Home</a>
+      <a href="index.html">All Tools</a>
+      <a href="../blog.html">Blog</a>
+      <a href="../about.html">About</a>
+      <a href="../privacy.html">Privacy Policy</a>
+      <a href="../disclaimer.html">Disclaimer</a>
+    </nav>
+
+    <div class="drawer-note">
+      Tip: Press <b>Esc</b> to close menu.
+    </div>
+  </aside>
+
+  <header>
+    <div class="nav">
+      <div class="brand">
+        <a href="../index.html">Vizbix</a>
+        <div class="tagline">Free tools for business owners</div>
+      </div>
+
+      <!-- MENU BUTTON -->
+      <button class="menu-btn" id="menuBtn" aria-label="Open menu">
+        <div class="menu-icon" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+      </button>
+    </div>
+  </header>
+
+  <main>
+    <h1>All Tools</h1>
+    <p>Browse all Vizbix calculators. Use search or filter by category.</p>
+
+    <div class="searchWrap">
+      <div class="searchRow">
+        <input id="search" type="search" placeholder="Search tools (profit, gst, discount, roi...)"/>
+      </div>
+
+      <div class="chips">
+        <div class="chip active" data-filter="all">All</div>
+        <div class="chip" data-filter="pricing">Pricing</div>
+        <div class="chip" data-filter="profit">Profit</div>
+        <div class="chip" data-filter="tax">Tax</div>
+        <div class="chip" data-filter="planning">Planning</div>
+      </div>
+    </div>
+
+    <div class="grid" id="toolsGrid">
+
+      <a class="card" href="profit-margin.html" data-cat="profit pricing">
+        <div>
+          <p class="title">Profit Margin Calculator</p>
+          <p class="desc">Calculate profit and profit margin using revenue and costs.</p>
+        </div>
+        <div class="meta">
+          <span>Profit</span>
+          <span class="pill">Open →</span>
+        </div>
+      </a>
+
+      <a class="card" href="break-even.html" data-cat="profit planning">
+        <div>
+          <p class="title">Break-even Calculator</p>
+          <p class="desc">Find break-even units and revenue using fixed & variable costs.</p>
+        </div>
+        <div class="meta">
+          <span>Planning</span>
+          <span class="pill">Open →</span>
+        </div>
+      </a>
+
+      <a class="card" href="roi.html" data-cat="profit planning">
+        <div>
+          <p class="title">ROI Calculator</p>
+          <p class="desc">Measure return on investment for ads, inventory, or equipment.</p>
+        </div>
+        <div class="meta">
+          <span>Profit</span>
+          <span class="pill">Open →</span>
+        </div>
+      </a>
+
+      <a class="card" href="markup.html" data-cat="pricing profit">
+        <div>
+          <p class="title">Markup Calculator</p>
+          <p class="desc">Set selling price using cost and markup percentage.</p>
+        </div>
+        <div class="meta">
+          <span>Pricing</span>
+          <span class="pill">Open →</span>
+        </div>
+      </a>
+
+      <a class="card" href="discount.html" data-cat="pricing">
+        <div>
+          <p class="title">Discount Calculator</p>
+          <p class="desc">Calculate final price and savings for flat or % discounts.</p>
+        </div>
+        <div class="meta">
+          <span>Pricing</span>
+          <span class="pill">Open →</span>
+        </div>
+      </a>
+
+      <a class="card" href="gst.html" data-cat="tax pricing">
+        <div>
+          <p class="title">GST Calculator</p>
+          <p class="desc">Add GST to base price or remove GST from inclusive price.</p>
+        </div>
+        <div class="meta">
+          <span>Tax</span>
+          <span class="pill">Open →</span>
+        </div>
+      </a>
+
+      <a class="card" href="monthly-target.html" data-cat="planning">
+        <div>
+          <p class="title">Monthly Revenue Target</p>
+          <p class="desc">Break your monthly target into daily goals and orders needed.</p>
+        </div>
+        <div class="meta">
+          <span>Planning</span>
+          <span class="pill">Open →</span>
+        </div>
+      </a>
+
+      <a class="card" href="cash-runway.html" data-cat="planning profit">
+        <div>
+          <p class="title">Cash Runway Calculator</p>
+          <p class="desc">Estimate how many months your cash will last at current burn.</p>
+        </div>
+        <div class="meta">
+          <span>Planning</span>
+          <span class="pill">Open →</span>
+        </div>
+      </a>
+
+    </div>
+
+    <div class="empty" id="emptyState">
+      No tools found. Try a different search keyword.
+    </div>
+  </main>
+
+  <footer>
+    <div class="footer-inner">
+      <div>© 2026 Vizbix</div>
+      <div class="footer-links">
+        <a href="../about.html">About</a>
+        <a href="../blog.html">Blog</a>
+        <a href="../disclaimer.html">Disclaimer</a>
+        <a href="../privacy.html">Privacy Policy</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // MENU OPEN/CLOSE
+    const menuBtn = document.getElementById("menuBtn");
+    const closeBtn = document.getElementById("closeBtn");
+    const drawer = document.getElementById("drawer");
+    const overlay = document.getElementById("overlay");
+
+    function openMenu(){
+      drawer.classList.add("open");
+      overlay.classList.add("show");
+      drawer.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeMenu(){
+      drawer.classList.remove("open");
+      overlay.classList.remove("show");
+      drawer.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+    }
+
+    menuBtn.addEventListener("click", openMenu);
+    closeBtn.addEventListener("click", closeMenu);
+    overlay.addEventListener("click", closeMenu);
+
+    document.addEventListener("keydown", (e) => {
+      if(e.key === "Escape") closeMenu();
+    });
+
+    // TOOLS SEARCH + FILTER
+    const searchEl = document.getElementById("search");
+    const chips = Array.from(document.querySelectorAll(".chip"));
+    const cards = Array.from(document.querySelectorAll(".card"));
+    const emptyState = document.getElementById("emptyState");
+
+    let activeFilter = "all";
+
+    function applyFilters(){
+      const q = (searchEl.value || "").trim().toLowerCase();
+      let visibleCount = 0;
+
+      cards.forEach(card => {
+        const title = card.querySelector(".title")?.textContent.toLowerCase() || "";
+        const desc = card.querySelector(".desc")?.textContent.toLowerCase() || "";
+        const cats = (card.getAttribute("data-cat") || "").toLowerCase();
+
+        const matchesSearch = !q || title.includes(q) || desc.includes(q) || cats.includes(q);
+        const matchesFilter = activeFilter === "all" || cats.includes(activeFilter);
+
+        const show = matchesSearch && matchesFilter;
+        card.style.display = show ? "flex" : "none";
+
+        if(show) visibleCount++;
+      });
+
+      emptyState.style.display = visibleCount === 0 ? "block" : "none";
+    }
+
+    chips.forEach(chip => {
+      chip.addEventListener("click", () => {
+        chips.forEach(c => c.classList.remove("active"));
+        chip.classList.add("active");
+        activeFilter = chip.getAttribute("data-filter");
+        applyFilters();
+      });
+    });
+
+    searchEl.addEventListener("input", applyFilters);
+    applyFilters();
+  </script>
+
+</body>
+</html>
