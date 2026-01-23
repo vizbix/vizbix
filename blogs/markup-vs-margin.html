@@ -1,0 +1,322 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Markup vs Margin: Don’t Mix These Up | Vizbix</title>
+  <meta name="description" content="Most businesses lose money because they confuse markup and margin. Learn the difference with simple examples and pricing tips." />
+
+  <link rel="icon" type="image/png" href="../favicon.png" />
+
+  <style>
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:#ffffff;
+      color:#0f172a;
+      line-height:1.65;
+    }
+    .container{
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px 16px;
+      border-bottom:1px solid #e5e7eb;
+      position:sticky;
+      top:0;
+      background:#fff;
+      z-index:10;
+    }
+    .logo{
+      font-weight:700;
+      font-size:18px;
+      text-decoration:none;
+      color:#0f172a;
+    }
+    .nav a{
+      text-decoration:none;
+      color:#334155;
+      margin-left:14px;
+      font-size:14px;
+    }
+    .nav a:hover{ color:#0f172a; }
+
+    .meta{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      color:#64748b;
+      font-size:14px;
+      margin-top:12px;
+    }
+    .tag{
+      border:1px solid #e5e7eb;
+      padding:4px 10px;
+      border-radius:999px;
+      background:#f8fafc;
+      color:#0f172a;
+      font-size:13px;
+    }
+
+    h1{
+      font-size:34px;
+      line-height:1.2;
+      margin:14px 0 10px;
+      letter-spacing:-0.02em;
+    }
+    .subtitle{
+      font-size:17px;
+      color:#475569;
+      margin:0 0 22px;
+    }
+    h2{
+      margin-top:28px;
+      font-size:22px;
+      letter-spacing:-0.01em;
+    }
+    h3{
+      margin-top:18px;
+      font-size:18px;
+    }
+
+    .box{
+      background:#f8fafc;
+      border:1px solid #e5e7eb;
+      padding:14px 16px;
+      border-radius:12px;
+      margin:14px 0;
+      font-weight:600;
+      color:#0f172a;
+    }
+
+    .danger{
+      background:#fef2f2;
+      border:1px solid #fecaca;
+      padding:14px 16px;
+      border-radius:12px;
+      margin:14px 0;
+      color:#7f1d1d;
+      font-weight:700;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin:14px 0;
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      overflow:hidden;
+    }
+    th, td{
+      padding:12px 10px;
+      border-bottom:1px solid #e5e7eb;
+      text-align:left;
+      font-size:14px;
+    }
+    th{
+      background:#f8fafc;
+      font-weight:700;
+    }
+
+    ul{ padding-left:18px; }
+
+    a{ color:#2563eb; text-decoration:none; }
+    a:hover{ text-decoration:underline; }
+
+    .cta{
+      margin-top:26px;
+      padding:16px;
+      border:1px solid #e5e7eb;
+      border-radius:14px;
+      background:#ffffff;
+    }
+    .cta strong{
+      display:block;
+      margin-bottom:6px;
+      font-size:16px;
+    }
+
+    .footer{
+      border-top:1px solid #e5e7eb;
+      margin-top:40px;
+      padding-top:18px;
+      color:#64748b;
+      font-size:14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="topbar">
+    <a class="logo" href="index.html">Vizbix</a>
+    <div class="nav">
+      <a href="tools/index.html">Tools</a>
+      <a href="blogs.html">Blogs</a>
+      <a href="about.html">About</a>
+    </div>
+  </div>
+
+  <main class="container">
+
+    <div class="meta">
+      <span class="tag">Pricing</span>
+      <span>6 min read</span>
+      <span>Jan 2026</span>
+    </div>
+
+    <h1>Markup vs Margin: Don’t Mix These Up</h1>
+    <p class="subtitle">
+      Most businesses lose money because they calculate profit wrong. The biggest mistake?
+      Confusing <strong>markup</strong> with <strong>margin</strong>.
+    </p>
+
+    <p>
+      If you price products using the wrong number, you might think you’re making “30% profit”…
+      but in reality you’re making far less.
+    </p>
+
+    <h2>Quick definitions (simple)</h2>
+
+    <div class="box">
+      Markup = Profit ÷ Cost<br/>
+      Margin = Profit ÷ Selling Price
+    </div>
+
+    <p>
+      Both are useful, but they are NOT the same.
+    </p>
+
+    <h2>One simple example</h2>
+    <p>
+      Let’s say:
+    </p>
+    <ul>
+      <li>Cost price = ₹100</li>
+      <li>Selling price = ₹150</li>
+      <li>Profit = ₹50</li>
+    </ul>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Metric</th>
+          <th>Formula</th>
+          <th>Answer</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Markup</strong></td>
+          <td>₹50 ÷ ₹100</td>
+          <td><strong>50%</strong></td>
+        </tr>
+        <tr>
+          <td><strong>Margin</strong></td>
+          <td>₹50 ÷ ₹150</td>
+          <td><strong>33.33%</strong></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>
+      Same product. Same profit. But two different percentages.
+      That’s why mixing them up creates pricing mistakes.
+    </p>
+
+    <h2>The common mistake (that kills profit)</h2>
+    <p>
+      Many small business owners say:
+      <em>“I want 30% profit. So I’ll add 30% on cost.”</em>
+    </p>
+
+    <div class="danger">
+      Adding 30% on cost gives you 30% MARKUP — not 30% MARGIN.
+    </div>
+
+    <p>
+      If your goal is <strong>30% margin</strong>, your markup needs to be higher than 30%.
+      Otherwise your net profit will be lower than expected.
+    </p>
+
+    <h2>How to convert markup ↔ margin</h2>
+
+    <h3>Markup → Margin</h3>
+    <div class="box">
+      Margin % = Markup % ÷ (100 + Markup %)
+    </div>
+
+    <p>
+      Example: Markup = 50%<br/>
+      Margin = 50 ÷ 150 = 33.33%
+    </p>
+
+    <h3>Margin → Markup</h3>
+    <div class="box">
+      Markup % = Margin % ÷ (100 − Margin %)
+    </div>
+
+    <p>
+      Example: Margin = 30%<br/>
+      Markup = 30 ÷ 70 = 42.86%
+    </p>
+
+    <h2>Which one should you use in business?</h2>
+    <p>
+      Simple rule:
+    </p>
+    <ul>
+      <li><strong>Use Markup</strong> when you’re setting a selling price from cost.</li>
+      <li><strong>Use Margin</strong> when you’re checking business profitability.</li>
+    </ul>
+
+    <p>
+      Why margin matters more for profit tracking:
+      because your rent, salaries, marketing, and taxes come from your selling price revenue.
+    </p>
+
+    <h2>Real-world pricing tip</h2>
+    <p>
+      If you sell on platforms (Amazon/Flipkart/Swiggy/Zomato) or do shipping,
+      your real cost is not just product cost.
+    </p>
+
+    <div class="box">
+      True Cost = Product cost + packaging + delivery + platform fee + payment fee + returns risk
+    </div>
+
+    <p>
+      Always calculate markup/margin on the <strong>true cost</strong>.
+      Otherwise you’ll feel like “sales are high” but cash is not growing.
+    </p>
+
+    <h2>Use the calculator (fast)</h2>
+    <p>
+      If you want a quick selling price using markup, try:
+      <a href="tools/markup.html">Markup Calculator</a>
+    </p>
+    <p>
+      And to check your real margin:
+      <a href="../tools/profit-margin.html">Profit Margin Calculator</a>
+    </p>
+
+    <div class="cta">
+      <strong>Want pricing help based on your actual numbers?</strong>
+      If you share your product cost + selling price + expenses, you can get a clean pricing and margin plan using
+      <a href="https://knownaxis.com" target="_blank" rel="noopener">Known Axis</a>.
+    </div>
+
+    <div class="footer">
+      <a href="../blogs.html">← Back to Blogs</a>
+    </div>
+
+  </main>
+
+</body>
+</html>

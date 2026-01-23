@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Discounting Without Killing Profit | Vizbix</title>
+  <meta name="description" content="Learn how to run discounts safely, avoid margin loss, and use smarter offers like bundles and thresholds." />
+
+  <link rel="icon" type="image/png" href="../favicon.png" />
+
+  <style>
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background:#ffffff;
+      color:#0f172a;
+      line-height:1.65;
+    }
+    .container{
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+    .topbar{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding:14px 16px;
+      border-bottom:1px solid #e5e7eb;
+      position:sticky;
+      top:0;
+      background:#fff;
+      z-index:10;
+    }
+    .logo{
+      font-weight:700;
+      font-size:18px;
+      text-decoration:none;
+      color:#0f172a;
+    }
+    .nav a{
+      text-decoration:none;
+      color:#334155;
+      margin-left:14px;
+      font-size:14px;
+    }
+    .nav a:hover{ color:#0f172a; }
+
+    .meta{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      color:#64748b;
+      font-size:14px;
+      margin-top:12px;
+    }
+    .tag{
+      border:1px solid #e5e7eb;
+      padding:4px 10px;
+      border-radius:999px;
+      background:#f8fafc;
+      color:#0f172a;
+      font-size:13px;
+    }
+
+    h1{
+      font-size:34px;
+      line-height:1.2;
+      margin:14px 0 10px;
+      letter-spacing:-0.02em;
+    }
+    .subtitle{
+      font-size:17px;
+      color:#475569;
+      margin:0 0 22px;
+    }
+
+    h2{
+      margin-top:28px;
+      font-size:22px;
+      letter-spacing:-0.01em;
+    }
+    h3{
+      margin-top:18px;
+      font-size:18px;
+    }
+
+    .box{
+      background:#f8fafc;
+      border:1px solid #e5e7eb;
+      padding:14px 16px;
+      border-radius:12px;
+      margin:14px 0;
+      font-weight:600;
+      color:#0f172a;
+    }
+
+    .warn{
+      background:#fef2f2;
+      border:1px solid #fecaca;
+      padding:14px 16px;
+      border-radius:12px;
+      margin:14px 0;
+      color:#7f1d1d;
+      font-weight:800;
+    }
+
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin:14px 0;
+      border:1px solid #e5e7eb;
+      border-radius:12px;
+      overflow:hidden;
+    }
+    th, td{
+      padding:12px 10px;
+      border-bottom:1px solid #e5e7eb;
+      text-align:left;
+      font-size:14px;
+      vertical-align:top;
+    }
+    th{
+      background:#f8fafc;
+      font-weight:700;
+    }
+
+    ul{ padding-left:18px; }
+
+    a{ color:#2563eb; text-decoration:none; }
+    a:hover{ text-decoration:underline; }
+
+    .cta{
+      margin-top:26px;
+      padding:16px;
+      border:1px solid #e5e7eb;
+      border-radius:14px;
+      background:#ffffff;
+    }
+    .cta strong{
+      display:block;
+      margin-bottom:6px;
+      font-size:16px;
+    }
+
+    .footer{
+      border-top:1px solid #e5e7eb;
+      margin-top:40px;
+      padding-top:18px;
+      color:#64748b;
+      font-size:14px;
+    }
+  </style>
+</head>
+
+<body>
+
+  <div class="topbar">
+    <a class="logo" href="index.html">Vizbix</a>
+    <div class="nav">
+      <a href="tools/index.html">Tools</a>
+      <a href="blogs.html">Blogs</a>
+      <a href="about.html">About</a>
+    </div>
+  </div>
+
+  <main class="container">
+
+    <div class="meta">
+      <span class="tag">Sales</span>
+      <span>4 min read</span>
+      <span>Jan 2026</span>
+    </div>
+
+    <h1>Discounting Without Killing Profit</h1>
+    <p class="subtitle">
+      Discounts can increase orders fast — but they can also destroy margins quietly.
+      Here’s how to discount safely like a smart business owner.
+    </p>
+
+    <p>
+      Most businesses use discounts for one reason: to get more sales.
+      But the real goal should be: <strong>more profit</strong>, not just more orders.
+    </p>
+
+    <h2>Step 1: Know your real profit per order</h2>
+    <p>
+      Before running any offer, you should know how much you earn from 1 order after costs.
+      Your “true cost” is usually higher than you think.
+    </p>
+
+    <div class="box">
+      True Cost = Product cost + packaging + delivery + platform fee + payment fee + returns risk
+    </div>
+
+    <p>
+      If you discount without knowing this, you might sell more and still lose money.
+    </p>
+
+    <h2>Why discounts hurt more than you think</h2>
+    <p>
+      Discounts reduce your selling price, but most costs stay the same.
+      That means your profit drops faster than the discount percentage.
+    </p>
+
+    <div class="warn">
+      A 20% discount can reduce your profit by 50%+ (depending on your margin).
+    </div>
+
+    <h2>Simple example</h2>
+    <p>
+      Suppose:
+    </p>
+    <ul>
+      <li>Selling price = ₹1,000</li>
+      <li>True cost = ₹750</li>
+      <li>Profit = ₹250</li>
+    </ul>
+
+    <p>
+      Now you give a 20% discount:
+    </p>
+    <ul>
+      <li>New selling price = ₹800</li>
+      <li>True cost stays = ₹750</li>
+      <li>New profit = ₹50</li>
+    </ul>
+
+    <div class="box">
+      Discount = 20% → Profit drops from ₹250 to ₹50 (80% profit drop)
+    </div>
+
+    <h2>When discounts make sense</h2>
+    <p>
+      Discounts are not always bad. They are useful when used for a clear reason:
+    </p>
+    <ul>
+      <li><strong>Clearing old stock</strong> (end of season, slow-moving items)</li>
+      <li><strong>Increasing repeat purchase</strong> (coupon for returning customers)</li>
+      <li><strong>Increasing AOV</strong> (discount above a cart value)</li>
+      <li><strong>Launching a new product</strong> (small first-week offer)</li>
+    </ul>
+
+    <h2>Smarter discount types (better than flat % off)</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Offer Type</th>
+          <th>Example</th>
+          <th>Why it’s safer</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td><strong>Threshold discount</strong></td>
+          <td>₹100 off above ₹999</td>
+          <td>Increases cart value</td>
+        </tr>
+        <tr>
+          <td><strong>Bundle offer</strong></td>
+          <td>Buy 2, save 10%</td>
+          <td>Higher profit per order</td>
+        </tr>
+        <tr>
+          <td><strong>Free shipping</strong></td>
+          <td>Free delivery above ₹799</td>
+          <td>Feels valuable, reduces discount pressure</td>
+        </tr>
+        <tr>
+          <td><strong>Gift with purchase</strong></td>
+          <td>Free sample above ₹999</td>
+          <td>Higher perceived value, less margin loss</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h2>When you should avoid discounts</h2>
+    <ul>
+      <li>Your margin is already low</li>
+      <li>Your delivery cost is high</li>
+      <li>You have frequent returns/refunds</li>
+      <li>You’re discounting only because competitors do it</li>
+      <li>You are using discounts to “force sales” instead of improving product value</li>
+    </ul>
+
+    <h2>Quick rule to stay safe</h2>
+    <p>
+      Before running an offer, ask:
+    </p>
+    <div class="box">
+      After discount, will my profit per order still be healthy?
+    </div>
+
+    <p>
+      If profit becomes too small, you’ll get busy but won’t grow.
+    </p>
+
+    <h2>Use the discount calculator (fast)</h2>
+    <p>
+      Use this tool to check final price after discount:
+      <a href="../tools/discount.html">Discount Calculator</a>
+    </p>
+
+    <div class="cta">
+      <strong>Want to know the “safe discount” for your products?</strong>
+      If you share your costs, selling prices, and expenses,
+      <a href="https://knownaxis.com" target="_blank" rel="noopener">Known Axis</a>
+      can help you identify which products can handle discounts and which ones should never be discounted.
+    </div>
+
+    <div class="footer">
+      <a href="../blogs.html">← Back to Blogs</a>
+    </div>
+
+  </main>
+
+</body>
+</html>
