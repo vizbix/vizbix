@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Free Business Templates | Vizbix</title>
+  <meta name="description" content="Free Excel and Google Sheets templates to track profit, cash flow, and business health." />
+
+  <link rel="icon" type="image/png" href="favicon.png">
+
+  <style>
+    :root{
+      --text:#0f172a;
+      --muted:#64748b;
+      --border:#e5e7eb;
+      --card:#ffffff;
+      --shadow: 0 12px 30px rgba(2, 6, 23, 0.08);
+      --radius:18px;
+      --max:1100px;
+      --primary:#000000; /* buttons now black */
+    }
+
+    *{
+      box-sizing:border-box;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+    }
+
+    html, body{
+      margin:0;
+      padding:0;
+      color:var(--text);
+      background:#f7f9fc;
+    }
+
+    /* HEADER */
+    header{
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      background: rgba(255,255,255,0.85);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid rgba(229,231,235,0.8);
+    }
+
+    .nav{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 10px 18px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex-direction:column;
+      text-align:center;
+      position: relative;
+    }
+
+    .brand{
+      font-weight: 900;
+      font-size: 20px;
+    }
+
+    .tagline{
+      font-size: 12px;
+      color: var(--muted);
+      margin-top: 2px;
+    }
+
+    .menu-btn{
+      position:absolute;
+      right:18px;
+      top:50%;
+      transform: translateY(-50%);
+      width:42px;
+      height:42px;
+      border:1px solid var(--border);
+      background:#fff;
+      border-radius:14px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      cursor:pointer;
+      box-shadow: var(--shadow);
+    }
+
+    .menu-icon{
+      width:18px;
+      height:12px;
+      position:relative;
+    }
+
+    .menu-icon span{
+      position:absolute;
+      left:0;
+      right:0;
+      height:2px;
+      background: var(--text);
+      border-radius: 10px;
+    }
+
+    .menu-icon span:nth-child(1){ top:0; }
+    .menu-icon span:nth-child(2){ top:5px; }
+    .menu-icon span:nth-child(3){ bottom:0; }
+
+    /* DRAWER */
+    .drawer-overlay{
+      position:fixed;
+      inset:0;
+      background: rgba(2,6,23,0.55);
+      opacity:0;
+      pointer-events:none;
+      transition: opacity .2s ease;
+      z-index: 90;
+    }
+
+    .drawer{
+      position:fixed;
+      top:0;
+      right:0;
+      height:100%;
+      width:min(340px, 88vw);
+      background:#fff;
+      border-left:1px solid var(--border);
+      box-shadow: -10px 0 30px rgba(2,6,23,.14);
+      transform: translateX(105%);
+      transition: transform .25s ease;
+      z-index: 100;
+      display:flex;
+      flex-direction:column;
+    }
+
+    .drawer.open{ transform: translateX(0); }
+    .drawer-overlay.open{ opacity:1; pointer-events:auto; }
+
+    .drawer-head{
+      padding:16px;
+      border-bottom:1px solid var(--border);
+      display:flex;
+      justify-content:space-between;
+    }
+
+    .drawer-title{ font-weight:900; }
+
+    .drawer-body{ padding:16px; }
+
+    .drawer-links{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+    }
+
+    .drawer-links a{
+      text-decoration:none;
+      color: var(--text);
+      border:1px solid var(--border);
+      background: #f8fafc;
+      padding:12px;
+      border-radius:16px;
+      font-weight:800;
+      font-size:14px;
+      display:flex;
+      justify-content:space-between;
+    }
+
+    /* MAIN */
+    main{
+      max-width: var(--max);
+      margin: 0 auto;
+      padding: 30px 18px 80px;
+    }
+
+    h1{
+      font-size: clamp(28px, 3.2vw, 44px);
+      margin-bottom: 10px;
+    }
+
+    .intro{
+      color: var(--muted);
+      max-width: 70ch;
+      font-size: 16px;
+    }
+
+    h2{
+      font-size:22px;
+      margin-bottom:16px;
+    }
+
+    /* SEARCH + FILTER BAR */
+    .tools-bar{
+      display:flex;
+      gap:12px;
+      margin-bottom:24px;
+      flex-wrap:wrap;
+    }
+
+    .tools-bar input,
+    .tools-bar select{
+      padding:12px 14px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      font-size:14px;
+    }
+
+    .advanced-btn{
+      padding:12px 14px;
+      border-radius:10px;
+      border:1px solid var(--border);
+      background:#fff;
+      font-weight:700;
+      cursor:pointer;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 24px;
+    }
+
+    .card{
+      background:#fff;
+      border-radius:18px;
+      padding:24px;
+      box-shadow: var(--shadow);
+      display:flex;
+      flex-direction:column;
+      justify-content:space-between;
+    }
+
+    .card h3{
+      margin:0 0 8px;
+      font-size:20px;
+    }
+
+    .card p{
+      margin:0;
+      color: var(--muted);
+      font-size:15px;
+      line-height:1.5;
+    }
+
+    .meta{
+      margin-top:14px;
+      font-size:14px;
+      color:#475569;
+      line-height:1.6;
+    }
+
+    .btn{
+      margin-top:22px;
+      display:inline-block;
+      background:var(--primary);
+      color:#fff;
+      padding:14px 18px;
+      border-radius:10px;
+      text-decoration:none;
+      font-weight:700;
+      text-align:center;
+    }
+
+    .btn.secondary{
+      background:#e5e7eb;
+      color:#111827;
+    }
+
+    footer{
+      border-top:1px solid var(--border);
+      padding:22px 18px;
+      font-size:13px;
+      color: var(--muted);
+      text-align:center;
+      background:#fff;
+    }
+  </style>
+</head>
+
+<body>
+
+<header>
+  <div class="nav">
+    <div class="brand">Vizbix</div>
+    <div class="tagline">Free tools for business owners</div>
+
+    <button class="menu-btn" id="menuBtn">
+      <div class="menu-icon">
+        <span></span><span></span><span></span>
+      </div>
+    </button>
+  </div>
+</header>
+
+<div class="drawer-overlay" id="overlay"></div>
+
+<aside class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div class="drawer-title">Menu</div>
+    <button id="closeBtn">✕</button>
+  </div>
+  <div class="drawer-body">
+    <div class="drawer-links">
+      <a href="index.html">Home <span>Start</span></a>
+      <a href="free-tools.html">Templates <span>Advanced</span></a>
+      <a href="tools/index.html">All Tools <span>Calculators</span></a>
+      <a href="blogs.html">Blog <span>Guides</span></a>
+      <a href="about.html">About <span>Vizbix</span></a>
+    </div>
+  </div>
+</aside>
+
+<main>
+  <h1>Free Business Templates</h1>
+  <p class="intro">
+    Simple Excel and Google Sheets templates to help you understand your numbers,
+    stay in control of cash, and review your business every month.
+  </p>
+
+  <section style="margin-top:40px;">
+    <h2>Start Here</h2>
+
+    <div class="tools-bar">
+      <input type="text" id="searchInput" placeholder="Search templates">
+      <select id="filterSelect">
+        <option value="all">All</option>
+        <option value="money">Money & Profit</option>
+        <option value="cash">Cash Flow & Costs</option>
+        <option value="cash">Sales & Revenue</option>
+        <option value="cash">Pricing & Products</option>
+        <option value="cash">Founder Clarity & Planning</option>
+      </select>
+    </div>
+
+    <!-- MONEY & PROFIT -->
+  <h2>Money & Profit</h2>
+  <div class="grid">
+    <div class="card"><h3>Expense vs Revenue Comparison</h3><p>Compare money earned vs spent.</p><a class="btn" href="Free-Templates/MONEY-AND-PROFIT/Vizbix_Expense_vs_Revenue_Comparison.xlsx">Download</a></div>
+    <div class="card"><h3>Fixed vs Variable Cost Breakdown</h3><p>Understand cost structure.</p><a class="btn" href="Free-Templates/MONEY-AND-PROFIT/Vizbix_Fixed_vs_Variable_Cost_Breakdown.xlsx">Download</a></div>
+    <div class="card"><h3>Monthly Business Health Tracker</h3><p>Monthly financial snapshot.</p><a class="btn" href="Free-Templates/MONEY-AND-PROFIT/Vizbix_Monthly_Business_Health_Tracker_Premium.xlsx">Download</a></div>
+    <div class="card"><h3>Monthly Cost Ratio Tracker</h3><p>Expense ratios clarity.</p><a class="btn" href="Free-Templates/MONEY-AND-PROFIT/Vizbix_Monthly_Cost_Ratio_Tracker.xlsx">Download</a></div>
+    <div class="card"><h3>Monthly Profit Margin Tracker</h3><p>Track margins monthly.</p><a class="btn" href="Free-Templates/MONEY-AND-PROFIT/Vizbix_Monthly_Profit_Margin_Tracker.xlsx">Download</a></div>
+    <div class="card"><h3>Monthly Profit Trend Tracker</h3><p>Profit direction over time.</p><a class="btn" href="Free-Templates/MONEY-AND-PROFIT/Vizbix_Monthly_Profit_Trend_Tracker.xlsx">Download</a></div>
+    <div class="card"><h3>Profit Improvement Planner</h3><p>Plan margin improvements.</p><a class="btn" href="Free-Templates/MONEY-AND-PROFIT/Vizbix_Profit_Improvement_Planner.xlsx">Download</a></div>
+    <div class="card"><h3>Profit Leak Identifier</h3><p>Spot hidden losses.</p><a class="btn" href="Free-Templates/MONEY-AND-PROFIT/Vizbix_Profit_Leak_Identifier.xlsx">Download</a></div>
+    <div class="card"><h3>Simple Income Statement</h3><p>Non-accounting P&L.</p><a class="btn" href="Free-Templates/MONEY-AND-PROFIT/Vizbix_Simple_Income_Statement.xlsx">Download</a></div>
+    <div class="card"><h3>Yearly Profit Summary</h3><p>Annual profit overview.</p><a class="btn" href="Free-Templates/MONEY-AND-PROFIT/Vizbix_Yearly_Profit_Summary.xlsx">Download</a></div>
+  </div>
+
+  <!-- CASH FLOW -->
+  <h2>Cash Flow & Costs</h2>
+  <div class="grid">
+    <div class="card"><h3>Burn Rate Calculator</h3><p>Monthly burn clarity.</p><a class="btn" href="Free-Templates/CASH-FLOW-AND-COSTS/Vizbix_Burn_Rate_Calculator_Non_Startup.xlsx">Download</a></div>
+    <div class="card"><h3>Cash Runway Tracker</h3><p>How long cash lasts.</p><a class="btn" href="Free-Templates/CASH-FLOW-AND-COSTS/Vizbix_Cash_Runway_Tracker_Simple.xlsx">Download</a></div>
+    <div class="card"><h3>Cash Shortfall Warning</h3><p>Early cash alerts.</p><a class="btn" href="Free-Templates/CASH-FLOW-AND-COSTS/Vizbix_Cash_Shortfall_Early_Warning.xlsx">Download</a></div>
+    <div class="card"><h3>Emergency Cash Planning</h3><p>Worst-case prep.</p><a class="btn" href="Free-Templates/CASH-FLOW-AND-COSTS/Vizbix_Emergency_Cash_Planning_Sheet.xlsx">Download</a></div>
+    <div class="card"><h3>Expense Cleanup Sheet</h3><p>Cut / keep / reduce.</p><a class="btn" href="Free-Templates/CASH-FLOW-AND-COSTS/Vizbix_Expense_Cleanup_Sheet.xlsx">Download</a></div>
+    <div class="card"><h3>Monthly Cash Flow Tracker</h3><p>Money in vs out.</p><a class="btn" href="Free-Templates/CASH-FLOW-AND-COSTS/Vizbix_Monthly_Cash_Flow_Tracker_Premium.xlsx">Download</a></div>
+    <div class="card"><h3>Monthly Savings Target</h3><p>Savings discipline.</p><a class="btn" href="Free-Templates/CASH-FLOW-AND-COSTS/Vizbix_Monthly_Savings_Target_Sheet.xlsx">Download</a></div>
+    <div class="card"><h3>Receivables & Payables</h3><p>Who owes whom.</p><a class="btn" href="Free-Templates/CASH-FLOW-AND-COSTS/Vizbix_Receivables_Payables_Tracker.xlsx">Download</a></div>
+    <div class="card"><h3>Upcoming Payments Planner</h3><p>Avoid surprises.</p><a class="btn" href="Free-Templates/CASH-FLOW-AND-COSTS/Vizbix_Upcoming_Payments_Planner.xlsx">Download</a></div>
+    <div class="card"><h3>Weekly Cash In-Out</h3><p>Weekly cash view.</p><a class="btn" href="Free-Templates/CASH-FLOW-AND-COSTS/Vizbix_Weekly_Cash_In_Out_Tracker.xlsx">Download</a></div>
+  </div>
+
+  <!-- SALES -->
+  <h2>Sales & Revenue</h2>
+  <div class="grid">
+    <div class="card"><h3>AOV Tracker</h3><p>Average order value.</p><a class="btn" href="Free-Templates/SALES-AND-REVENUE/Vizbix_AOV_Tracker.xlsx">Download</a></div>
+    <div class="card"><h3>Best & Worst Sales Days</h3><p>Spot patterns.</p><a class="btn" href="Free-Templates/SALES-AND-REVENUE/Vizbix_Best_Worst_Sales_Days_Tracker.xlsx">Download</a></div>
+    <div class="card"><h3>Lost Sales Log</h3><p>Missed opportunities.</p><a class="btn" href="Free-Templates/SALES-AND-REVENUE/Vizbix_Lost_Sales_Missed_Opportunities_Log.xlsx">Download</a></div>
+    <div class="card"><h3>Monthly Sales Performance</h3><p>Sales review.</p><a class="btn" href="Free-Templates/SALES-AND-REVENUE/Vizbix_Monthly_Sales_Performance_Sheet.xlsx">Download</a></div>
+    <div class="card"><h3>Repeat Customer Tracker</h3><p>Retention insight.</p><a class="btn" href="Free-Templates/SALES-AND-REVENUE/Vizbix_Repeat_Customer_Tracking_Sheet.xlsx">Download</a></div>
+    <div class="card"><h3>Revenue by Channel</h3><p>Channel mix.</p><a class="btn" href="Free-Templates/SALES-AND-REVENUE/Vizbix_Revenue_by_Channel.xlsx">Download</a></div>
+    <div class="card"><h3>Revenue by Customer Type</h3><p>Customer mix.</p><a class="btn" href="Free-Templates/SALES-AND-REVENUE/Vizbix_Revenue_by_Customer_Type.xlsx">Download</a></div>
+    <div class="card"><h3>Revenue Concentration Risk</h3><p>Top-customer risk.</p><a class="btn" href="Free-Templates/SALES-AND-REVENUE/Vizbix_Revenue_Concentration_Risk_Sheet.xlsx">Download</a></div>
+    <div class="card"><h3>Sales Target vs Actual</h3><p>Goal tracking.</p><a class="btn" href="Free-Templates/SALES-AND-REVENUE/Vizbix_Sales_Target_vs_Actual_Tracker.xlsx">Download</a></div>
+    <div class="card"><h3>Weekly Sales Tracker</h3><p>Weekly momentum.</p><a class="btn" href="Free-Templates/SALES-AND-REVENUE/Vizbix_Weekly_Sales_Tracker.xlsx">Download</a></div>
+  </div>
+
+  <!-- PRICING -->
+  <h2>Pricing & Products</h2>
+  <div class="grid">
+    <div class="card"><h3>Break-Even Calculator</h3><p>Know survival point.</p><a class="btn" href="Free-Templates/PRICING-AND-PRODUCTS/Vizbix_Break_Even_Calculator_Sheet.xlsx">Download</a></div>
+    <div class="card"><h3>Cost-Plus Pricing</h3><p>Simple pricing logic.</p><a class="btn" href="Free-Templates/PRICING-AND-PRODUCTS/Vizbix_Cost_Plus_Pricing_Template.xlsx">Download</a></div>
+    <div class="card"><h3>Discount Impact</h3><p>True cost of discounts.</p><a class="btn" href="Free-Templates/PRICING-AND-PRODUCTS/Vizbix_Discount_Impact_Calculator.xlsx">Download</a></div>
+    <div class="card"><h3>Low-Margin Product Detector</h3><p>Find weak products.</p><a class="btn" href="Free-Templates/PRICING-AND-PRODUCTS/Vizbix_Low_Margin_Product_Detector.xlsx">Download</a></div>
+    <div class="card"><h3>Minimum Viable Price</h3><p>Pricing floor.</p><a class="btn" href="Free-Templates/PRICING-AND-PRODUCTS/Vizbix_Minimum_Viable_Price_Sheet.xlsx">Download</a></div>
+    <div class="card"><h3>Price Increase Simulator</h3><p>Profit impact.</p><a class="btn" href="Free-Templates/PRICING-AND-PRODUCTS/Vizbix_Price_Increase_Impact_Simulator.xlsx">Download</a></div>
+    <div class="card"><h3>Product Mix Optimization</h3><p>Best product mix.</p><a class="btn" href="Free-Templates/PRICING-AND-PRODUCTS/Vizbix_Product_Mix_Optimization_Sheet.xlsx">Download</a></div>
+    <div class="card"><h3>Product Profitability</h3><p>Product margins.</p><a class="btn" href="Free-Templates/PRICING-AND-PRODUCTS/Vizbix_Product_Wise_Profitability_Tracker.xlsx">Download</a></div>
+    <div class="card"><h3>Service Pricing Sanity</h3><p>Pricing check.</p><a class="btn" href="Free-Templates/PRICING-AND-PRODUCTS/Vizbix_Service_Pricing_Sanity_Check.xlsx">Download</a></div>
+    <div class="card"><h3>Simple Pricing Calculator</h3><p>Quick pricing math.</p><a class="btn" href="Free-Templates/PRICING-AND-PRODUCTS/Vizbix_Simple_Pricing_Calculator.xlsx">Download</a></div>
+  </div>
+
+  <!-- FOUNDER -->
+  <h2>Founder Clarity & Planning</h2>
+  <div class="grid">
+    <div class="card"><h3>90-Day Focus Planner</h3><p>Execution focus.</p><a class="btn" href="Free-Templates/FOUNDER-CLARITY-AND-PLANNING/Vizbix_90_Day_Focus_Planner.xlsx">Download</a></div>
+    <div class="card"><h3>Business Goal Breakdown</h3><p>Big goals → actions.</p><a class="btn" href="Free-Templates/FOUNDER-CLARITY-AND-PLANNING/Vizbix_Business_Goal_Breakdown_Sheet.xlsx">Download</a></div>
+    <div class="card"><h3>Business Health Scorecard</h3><p>Self-assessment.</p><a class="btn" href="Free-Templates/FOUNDER-CLARITY-AND-PLANNING/Vizbix_Business_Health_Self_Assessment_Scorecard.xlsx">Download</a></div>
+    <div class="card"><h3>Decision Log</h3><p>Learn from decisions.</p><a class="btn" href="Free-Templates/FOUNDER-CLARITY-AND-PLANNING/Vizbix_Decision_Log.xlsx">Download</a></div>
+    <div class="card"><h3>Expense Justification</h3><p>Cost discipline.</p><a class="btn" href="Free-Templates/FOUNDER-CLARITY-AND-PLANNING/Vizbix_Expense_Justification_Sheet.xlsx">Download</a></div>
+    <div class="card"><h3>Is My Business Growing?</h3><p>Growth diagnostic.</p><a class="btn" href="Free-Templates/FOUNDER-CLARITY-AND-PLANNING/Vizbix_Is_My_Business_Growing_Diagnostic.xlsx">Download</a></div>
+    <div class="card"><h3>KPI Selection Cheat Sheet</h3><p>Right metrics.</p><a class="btn" href="Free-Templates/FOUNDER-CLARITY-AND-PLANNING/Vizbix_KPI_Selection_Cheat_Sheet.xlsx">Download</a></div>
+    <div class="card"><h3>Monthly Founder Review</h3><p>Monthly clarity.</p><a class="btn" href="Free-Templates/FOUNDER-CLARITY-AND-PLANNING/Vizbix_Monthly_Founder_Review_Template.xlsx">Download</a></div>
+    <div class="card"><h3>One-Page Business Dashboard</h3><p>Manual dashboard.</p><a class="btn" href="Free-Templates/FOUNDER-CLARITY-AND-PLANNING/Vizbix_One_Page_Business_Dashboard.xlsx">Download</a></div>
+    <div class="card"><h3>Weekly Business Review</h3><p>Weekly reflection.</p><a class="btn" href="Free-Templates/FOUNDER-CLARITY-AND-PLANNING/Vizbix_Weekly_Business_Review_Sheet.xlsx">Download</a></div>
+  </div>
+
+</main>
+
+<footer>
+  Built by Vizbix — helping businesses turn numbers into clarity.
+</footer>
+
+<script>
+  const menuBtn = document.getElementById("menuBtn");
+  const drawer = document.getElementById("drawer");
+  const overlay = document.getElementById("overlay");
+  const closeBtn = document.getElementById("closeBtn");
+
+  menuBtn.onclick = () => {
+    drawer.classList.add("open");
+    overlay.classList.add("open");
+  };
+
+  closeBtn.onclick = overlay.onclick = () => {
+    drawer.classList.remove("open");
+    overlay.classList.remove("open");
+  };
+
+  const searchInput = document.getElementById("searchInput");
+  const filterSelect = document.getElementById("filterSelect");
+  const cards = document.querySelectorAll(".card");
+
+  function filterCards(){
+    const search = searchInput.value.toLowerCase();
+    const filter = filterSelect.value;
+
+    cards.forEach(card => {
+      const title = card.querySelector("h3").textContent.toLowerCase();
+      const category = card.dataset.category;
+
+      const show =
+        title.includes(search) &&
+        (filter === "all" || category === filter);
+
+      card.style.display = show ? "flex" : "none";
+    });
+  }
+
+  searchInput.addEventListener("input", filterCards);
+  filterSelect.addEventListener("change", filterCards);
+</script>
+
+</body>
+</html>
