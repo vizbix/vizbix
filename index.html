@@ -12,47 +12,59 @@
 
   <style>
     :root{
-      --bg:#ffffff;
       --text:#0f172a;
       --muted:#64748b;
       --border:#e5e7eb;
-      --card:#f8fafc;
-      --shadow: 0 10px 30px rgba(2, 6, 23, 0.06);
-      --radius:16px;
+      --card:#ffffff;
+      --shadow: 0 12px 30px rgba(2, 6, 23, 0.08);
+      --radius:18px;
       --max:1100px;
     }
 
-    *{ box-sizing:border-box; font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif; }
-    html, body{ margin:0; padding:0; background:var(--bg); color:var(--text); }
+    *{
+      box-sizing:border-box;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Inter, sans-serif;
+    }
 
+    html, body{
+      margin:0;
+      padding:0;
+      color:var(--text);
+      background:#ffffff; /* WHITE ONLY */
+      min-height:100%;
+    }
+
+    /* =========================
+       HEADER
+    ========================= */
     header{
       position: sticky;
       top: 0;
       z-index: 50;
       background: rgba(255,255,255,0.85);
       backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border);
+      border-bottom: 1px solid rgba(229,231,235,0.8);
     }
 
-    /* HEADER COMPACT */
     .nav{
       max-width: var(--max);
       margin: 0 auto;
-      padding: 8px 18px;
+      padding: 10px 18px;
       display:flex;
       align-items:center;
       justify-content:center;
       flex-direction:column;
-      gap: 0px;
       text-align:center;
-      position: relative; /* for menu button */
+      position: relative;
     }
+
     .brand{
-      font-weight: 800;
+      font-weight: 900;
       letter-spacing: 0.2px;
       font-size: 20px;
       line-height: 1.05;
     }
+
     .tagline{
       font-size: 12px;
       color: var(--muted);
@@ -68,22 +80,26 @@
       transform: translateY(-50%);
       width:42px;
       height:42px;
-      border:1px solid var(--border);
+      border:1px solid rgba(229,231,235,0.9);
       background:#fff;
-      border-radius:12px;
+      border-radius:14px;
       display:flex;
       align-items:center;
       justify-content:center;
       cursor:pointer;
-      box-shadow: var(--shadow);
+      box-shadow: 0 10px 22px rgba(2, 6, 23, 0.08);
     }
-    .menu-btn:active{ transform: translateY(-50%) scale(0.98); }
+
+    .menu-btn:active{
+      transform: translateY(-50%) scale(0.98);
+    }
 
     .menu-icon{
       width:18px;
       height:12px;
       position:relative;
     }
+
     .menu-icon span{
       position:absolute;
       left:0;
@@ -92,11 +108,14 @@
       background: var(--text);
       border-radius: 10px;
     }
+
     .menu-icon span:nth-child(1){ top:0; }
     .menu-icon span:nth-child(2){ top:5px; opacity:0.9; }
     .menu-icon span:nth-child(3){ bottom:0; }
 
-    /* DRAWER */
+    /* =========================
+       DRAWER
+    ========================= */
     .drawer-overlay{
       position:fixed;
       inset:0;
@@ -115,7 +134,7 @@
       width:min(340px, 88vw);
       background:#fff;
       border-left:1px solid var(--border);
-      box-shadow: -10px 0 30px rgba(2,6,23,.12);
+      box-shadow: -10px 0 30px rgba(2,6,23,.14);
       transform: translateX(105%);
       transition: transform .25s ease;
       z-index: 100;
@@ -147,7 +166,7 @@
     .drawer-close{
       width:38px;
       height:38px;
-      border-radius:12px;
+      border-radius:14px;
       border:1px solid var(--border);
       background:#fff;
       cursor:pointer;
@@ -172,14 +191,14 @@
     .drawer-links a{
       text-decoration:none;
       color: var(--text);
-      border:1px solid var(--border);
-      background: var(--card);
+      border:1px solid rgba(229,231,235,0.9);
+      background: #f8fafc;
       padding:12px 12px;
-      border-radius:14px;
+      border-radius:16px;
       display:flex;
       align-items:center;
       justify-content:space-between;
-      font-weight:700;
+      font-weight:800;
       font-size:14px;
     }
 
@@ -198,53 +217,81 @@
       line-height:1.5;
     }
 
-    /* MAIN COMPACT */
+    /* =========================
+       MAIN + HERO
+    ========================= */
     main{
       max-width: var(--max);
       margin: 0 auto;
-      padding: 6px 18px 80px;
+      padding: 10px 18px 80px;
     }
 
-    /* HERO COMPACT */
     .hero{
-      padding: 4px 0 6px;
+      padding: 12px 0 6px;
     }
+
+    .hero-badge{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:8px 12px;
+      border-radius:999px;
+      border:1px solid rgba(229,231,235,0.9);
+      background: rgba(255,255,255,0.95);
+      color: var(--muted);
+      font-size: 13px;
+      font-weight: 700;
+      box-shadow: 0 10px 22px rgba(2,6,23,0.05);
+    }
+
     .hero h1{
-      font-size: clamp(28px, 3.2vw, 44px);
-      margin: 4px 0 10px;
-      letter-spacing: -0.02em;
+      font-size: clamp(30px, 3.4vw, 48px);
+      margin: 14px 0 10px;
+      letter-spacing: -0.03em;
+      line-height: 1.05;
     }
+
     .hero p{
-      margin: 0 0 14px;
+      margin: 0 0 16px;
       color: var(--muted);
       font-size: clamp(14px, 1.4vw, 18px);
       max-width: 64ch;
+      line-height: 1.55;
     }
 
     .search-wrap{
       margin-top: 10px;
       width: 100%;
     }
+
     .search{
       width: 100%;
       display:flex;
       gap: 10px;
       align-items:center;
-      padding: 12px;
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      background: #fff;
-      box-shadow: var(--shadow);
+      padding: 12px 14px;
+      border: 1px solid rgba(229,231,235,0.9);
+      border-radius: 18px;
+      background: rgba(255,255,255,0.95);
+      box-shadow: 0 14px 32px rgba(2, 6, 23, 0.08);
     }
+
+    .search svg{
+      width:18px;
+      height:18px;
+      opacity:0.75;
+    }
+
     .search input{
       width: 100%;
       border: 0;
       outline: none;
       font-size: 16px;
-      padding: 10px 10px;
+      padding: 10px 6px;
       background: transparent;
       color: var(--text);
     }
+
     .search .hint{
       font-size: 13px;
       color: var(--muted);
@@ -252,7 +299,7 @@
       display:none;
     }
 
-    section{ margin-top: 18px; }
+    section{ margin-top: 20px; }
 
     .section-title{
       display:flex;
@@ -261,16 +308,21 @@
       gap: 10px;
       margin-bottom: 12px;
     }
+
     .section-title h2{
       font-size: 22px;
       margin: 0;
       letter-spacing: -0.01em;
     }
+
     .section-title span{
       color: var(--muted);
       font-size: 13px;
     }
 
+    /* =========================
+       GRID + CARDS
+    ========================= */
     .grid{
       display:grid;
       grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -278,34 +330,39 @@
     }
 
     .card{
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
+      background: rgba(255,255,255,0.98);
+      border: 1px solid rgba(229,231,235,0.9);
+      border-radius: 18px;
       padding: 16px;
-      transition: transform .15s ease, background .15s ease, border-color .15s ease;
-      min-height: 120px;
+      transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+      min-height: 126px;
       display:flex;
       flex-direction:column;
       justify-content:space-between;
       text-decoration:none;
       color: inherit;
+      box-shadow: 0 12px 26px rgba(2, 6, 23, 0.05);
     }
+
     .card:hover{
-      transform: translateY(-2px);
-      background:#ffffff;
-      border-color:#dbe3ef;
+      transform: translateY(-3px);
+      box-shadow: 0 18px 40px rgba(2, 6, 23, 0.10);
+      border-color: rgba(148,163,184,0.45);
     }
+
     .card h3{
       margin: 0 0 6px;
       font-size: 16px;
       letter-spacing: -0.01em;
     }
+
     .card p{
       margin: 0;
       color: var(--muted);
       font-size: 13px;
       line-height: 1.35;
     }
+
     .pill{
       margin-top: 12px;
       display:inline-flex;
@@ -313,25 +370,32 @@
       gap: 6px;
       font-size: 12px;
       color: var(--muted);
+      font-weight: 700;
     }
 
+    /* =========================
+       ABOUT SECTION
+    ========================= */
     .about{
       margin-top: 54px;
       padding: 54px 16px;
-      border-top: 1px solid var(--border);
+      border-top: 1px solid rgba(229,231,235,0.9);
     }
+
     .about-inner{
       max-width: 920px;
       margin: 0 auto;
       text-align:center;
     }
+
     .about small{
       display:block;
-      font-weight: 700;
+      font-weight: 800;
       color: var(--text);
       margin-bottom: 12px;
       font-size: 14px;
     }
+
     .about p{
       margin: 0 auto 26px;
       color: var(--muted);
@@ -339,35 +403,44 @@
       font-size: 15px;
       max-width: 86ch;
     }
+
     .about h3{
       margin: 0 auto;
       font-size: clamp(22px, 3.2vw, 42px);
       letter-spacing: -0.03em;
       line-height: 1.1;
-      max-width: 24ch;
+      max-width: 26ch;
     }
+
     .btn{
       margin-top: 28px;
       display:inline-flex;
       align-items:center;
       gap: 10px;
       padding: 12px 16px;
-      border-radius: 12px;
+      border-radius: 14px;
       border: 1px solid #111827;
       background: #111827;
       color: #fff;
       text-decoration:none;
-      font-weight: 700;
+      font-weight: 800;
       font-size: 14px;
+      box-shadow: 0 14px 30px rgba(17,24,39,0.18);
     }
+
     .btn:active{ transform: translateY(1px); }
 
+    /* =========================
+       FOOTER
+    ========================= */
     footer{
-      border-top: 1px solid var(--border);
+      border-top: 1px solid rgba(229,231,235,0.9);
       padding: 22px 18px;
       color: var(--muted);
       font-size: 13px;
+      background: rgba(255,255,255,0.95);
     }
+
     .footer-inner{
       max-width: var(--max);
       margin: 0 auto;
@@ -376,26 +449,32 @@
       gap: 12px;
       flex-wrap:wrap;
     }
+
     .footer-links a{
       color: var(--muted);
       text-decoration:none;
       margin-right: 14px;
+      font-weight: 600;
     }
+
     .footer-links a:hover{ color: var(--text); }
 
+    /* =========================
+       RESPONSIVE
+    ========================= */
     @media (max-width: 980px){
       .grid{ grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .search .hint{ display:block; }
     }
+
     @media (max-width: 520px){
       .grid{ grid-template-columns: 1fr; }
-      .nav{ padding: 8px 14px; }
+      .nav{ padding: 10px 14px; }
       .menu-btn{ right:14px; }
-      main{ padding: 6px 14px 60px; }
+      main{ padding: 10px 14px 60px; }
       section{ margin-top: 16px; }
-      .hero{ padding-top: 2px; }
-      .hero h1{ margin-top: 2px; }
-      .search{ padding: 10px; }
+      .hero{ padding-top: 8px; }
+      .search{ padding: 10px 12px; }
       .search input{ font-size: 15px; }
       .about{ padding: 44px 10px; }
     }
@@ -435,11 +514,10 @@
     <div class="drawer-body">
       <div class="drawer-links">
         <a href="index.html">Home <span>Start here</span></a>
+        <a href="free-tools.html">Templates <span>Advanced</span></a>
         <a href="tools/index.html">All Tools <span>Calculators</span></a>
         <a href="blogs.html">Blog <span>Tips & guides</span></a>
         <a href="about.html">About <span>Why Vizbix</span></a>
-        <a href="privacy.html">Privacy <span>Policy</span></a>
-        <a href="disclaimer.html">Disclaimer <span>Important</span></a>
       </div>
 
       <div class="drawer-mini">
@@ -450,13 +528,23 @@
 
   <main>
     <section class="hero">
+      <div class="hero-badge">⚡ Fast + Simple Business Calculators</div>
+
       <h1>Free Tools for Business Owners</h1>
-      <p>Simple calculators to understand profit, pricing, costs, and growth — without complexity.</p>
+      <p>
+        Simple calculators to understand profit, pricing, costs, and growth — without complexity.
+        Use them in seconds and make clearer decisions.
+      </p>
 
       <div class="search-wrap">
         <div class="search">
-          <input type="text" placeholder="Search calculators… (profit, break-even, ROI, pricing)" />
-          <div class="hint">Press Enter</div>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+            <circle cx="11" cy="11" r="7"></circle>
+            <path d="M20 20l-3.5-3.5"></path>
+          </svg>
+
+          <input id="searchInput" type="text" placeholder="Search calculators… (profit, break-even, ROI, pricing)" />
+          <div class="hint">Type to filter</div>
         </div>
       </div>
     </section>
@@ -464,11 +552,11 @@
     <section>
       <div class="section-title">
         <h2>Popular Calculators</h2>
-        <span>8 tools to start with</span>
+        <span id="toolCount">8 tools to start with</span>
       </div>
 
-      <div class="grid">
-        <a class="card" href="tools/profit-margin.html">
+      <div class="grid" id="toolsGrid">
+        <a class="card" href="tools/profit-margin.html" data-title="profit margin calculator revenue costs margin">
           <div>
             <h3>Profit Margin Calculator</h3>
             <p>Find your profit margin using revenue and costs.</p>
@@ -476,7 +564,7 @@
           <div class="pill">Profit & Margins →</div>
         </a>
 
-        <a class="card" href="tools/break-even.html">
+        <a class="card" href="tools/break-even.html" data-title="break-even calculator breakeven fixed cost contribution margin">
           <div>
             <h3>Break-even Calculator</h3>
             <p>Know how many sales you need to cover all costs.</p>
@@ -484,7 +572,7 @@
           <div class="pill">Pricing & Break-even →</div>
         </a>
 
-        <a class="card" href="tools/roi.html">
+        <a class="card" href="tools/roi.html" data-title="roi calculator return on investment marketing">
           <div>
             <h3>ROI Calculator</h3>
             <p>Measure whether an investment is worth it.</p>
@@ -492,7 +580,7 @@
           <div class="pill">ROI & Growth →</div>
         </a>
 
-        <a class="card" href="tools/markup.html">
+        <a class="card" href="tools/markup.html" data-title="markup calculator pricing selling price cost">
           <div>
             <h3>Markup Calculator</h3>
             <p>Set selling price using cost and desired markup.</p>
@@ -500,7 +588,7 @@
           <div class="pill">Pricing →</div>
         </a>
 
-        <a class="card" href="tools/discount.html">
+        <a class="card" href="tools/discount.html" data-title="discount calculator offer price percentage">
           <div>
             <h3>Discount Calculator</h3>
             <p>Calculate final price after discounts and offers.</p>
@@ -508,7 +596,7 @@
           <div class="pill">Sales →</div>
         </a>
 
-        <a class="card" href="tools/gst.html">
+        <a class="card" href="tools/gst.html" data-title="gst calculator tax billing inclusive exclusive">
           <div>
             <h3>GST Calculator</h3>
             <p>Add or remove GST to get correct billing totals.</p>
@@ -516,7 +604,7 @@
           <div class="pill">Billing →</div>
         </a>
 
-        <a class="card" href="tools/monthly-target.html">
+        <a class="card" href="tools/monthly-target.html" data-title="monthly revenue target calculator daily weekly goals">
           <div>
             <h3>Monthly Revenue Target</h3>
             <p>Break a monthly target into daily/weekly goals.</p>
@@ -524,7 +612,7 @@
           <div class="pill">Sales & Revenue →</div>
         </a>
 
-        <a class="card" href="tools/cash-runway.html">
+        <a class="card" href="tools/cash-runway.html" data-title="cash runway calculator burn rate survival months">
           <div>
             <h3>Cash Runway Calculator</h3>
             <p>Estimate how long your cash will last at current burn.</p>
@@ -536,17 +624,16 @@
 
     <section class="about">
       <div class="about-inner">
-        <small>About us</small>
+        <small>About Vizbix</small>
 
         <p>
-          A large part of running a business comes down to calculable decisions: pricing a product, planning expenses,
-          checking profit margins, and understanding when you’ll break even. Many owners don’t calculate these things
-          because it takes time, feels confusing, or the right tools aren’t available. And then decisions are made on
-          guesswork instead of clarity.
+          Most business decisions are actually simple math: pricing, margins, targets, break-even, and cash runway.
+          But many owners avoid calculating because it feels confusing or time-consuming.
+          Vizbix makes these numbers easy so you can take faster, smarter decisions.
         </p>
 
         <h3>
-          We build tools that make every business calculation easy for anyone to use.
+          Clear numbers. Better decisions. Less guesswork.
         </h3>
 
         <a class="btn" href="about.html">Read more about Vizbix →</a>
@@ -566,6 +653,7 @@
   </footer>
 
   <script>
+    // Drawer
     const menuBtn = document.getElementById("menuBtn");
     const drawer = document.getElementById("drawer");
     const overlay = document.getElementById("drawerOverlay");
@@ -590,7 +678,37 @@
     document.addEventListener("keydown", (e) => {
       if(e.key === "Escape") closeDrawer();
     });
+
+    // Search filter (live)
+    const searchInput = document.getElementById("searchInput");
+    const toolsGrid = document.getElementById("toolsGrid");
+    const toolCount = document.getElementById("toolCount");
+
+    function updateToolCount(visible, total){
+      toolCount.textContent = visible === total
+        ? `${total} tools to start with`
+        : `Showing ${visible} of ${total}`;
+    }
+
+    function filterTools(){
+      const q = (searchInput.value || "").trim().toLowerCase();
+      const cards = [...toolsGrid.querySelectorAll(".card")];
+      const total = cards.length;
+
+      let visible = 0;
+
+      cards.forEach(card => {
+        const hay = (card.getAttribute("data-title") || "").toLowerCase();
+        const match = hay.includes(q);
+        card.style.display = match ? "flex" : "none";
+        if(match) visible++;
+      });
+
+      updateToolCount(visible, total);
+    }
+
+    searchInput.addEventListener("input", filterTools);
+    updateToolCount(8, 8);
   </script>
 </body>
 </html>
-
