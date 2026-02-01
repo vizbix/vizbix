@@ -47,6 +47,7 @@ input{
   padding:10px;
   border-radius:10px;
   border:1px solid var(--border);
+  width:100%;
 }
 
 button{
@@ -81,7 +82,11 @@ button{
   font-weight:600;
 }
 
-.locked{filter:blur(6px);opacity:.5;pointer-events:none}
+.locked{
+  filter:blur(6px);
+  opacity:.5;
+  pointer-events:none;
+}
 
 table{
   width:100%;
@@ -120,6 +125,7 @@ td,th{
 <!-- RESULTS -->
 <div id="results" style="display:none">
 
+<!-- SUMMARY -->
 <div class="summary">
   <div class="card"><div>Profit</div><div id="profitCard" class="big"></div></div>
   <div class="card"><div>Revenue</div><div id="revenueCard" class="big"></div></div>
@@ -152,11 +158,11 @@ Export PDF
 </main>
 
 <script>
-const PRICE=29900;
-const KEY="rzp_live_SAbBHVMbGMv2xo";
-let chart;
+const PRICE = 29900;
+const KEY = "rzp_live_SAbBHVMbGMv2xo";
 
-const items=document.getElementById("items");
+let chart;
+const items = document.getElementById("items");
 
 /* ---------- ADD ROW ---------- */
 function addRow(){
@@ -171,7 +177,7 @@ d.innerHTML=`
 items.appendChild(d);
 }
 
-addRow();addRow();addRow();
+addRow(); addRow(); addRow();
 
 
 /* ---------- SAMPLE DATA ---------- */
@@ -215,7 +221,7 @@ const margin=(sell-cost)/sell;
 total+=profit;
 revenue+=sell*qty;
 
-data.push({name,profit,margin});
+data.push({name,sell,cost,qty,profit,margin});
 });
 
 window.data=data;
@@ -241,48 +247,14 @@ chart=new Chart(document.getElementById("chart"),{
 type:"bar",
 data:{
 labels:d.map(x=>x.name),
-datasets:[{data:d.map(x=>x.profit),backgroundColor:colors}]
+datasets:[{
+data:d.map(x=>x.profit),
+backgroundColor:colors,
+borderRadius:8
+}]
 },
 options:{plugins:{legend:{display:false}}}
 });
-}
-
-
-/* ---------- INSIGHTS ---------- */
-function generateInsights(d){
-
-const total = d.reduce((a,b)=>a+b.profit,0);
-
-const best = [...d].sort((a,b)=>b.profit-a.profit)[0];
-
-const monthly = total * 30;
-
-let html = "";
-
-/* 1 */
-html += `<div class="insight">
-Top profit product: <b>${best.name}</b>
-</div>`;
-
-/* 2 */
-html += `<div class="insight">
-Projected monthly profit: ₹${monthly}
-</div>`;
-
-/* 3 & 4 — price optimization per product */
-d.forEach(x=>{
-const suggested = Math.round(x.profit / x.qty + x.cost * 1.05);
-const newProfit = (suggested - x.cost) * x.qty;
-const extra = newProfit - x.profit;
-
-if(extra > 0){
-html += `<div class="insight">
-Increase ${x.name} price slightly → possible extra profit ₹${extra}
-</div>`;
-}
-});
-
-insights.innerHTML = html;
 }
 
 
@@ -290,8 +262,38 @@ insights.innerHTML = html;
 function generateTable(d){
 table.innerHTML="<tr><th>Product</th><th>Profit</th><th>Margin</th></tr>";
 d.forEach(x=>{
-table.innerHTML+=`<tr><td>${x.name}</td><td>₹${x.profit}</td><td>${(x.margin*100).toFixed(0)}%</td></tr>`;
+table.innerHTML+=`<tr>
+<td>${x.name}</td>
+<td>₹${x.profit}</td>
+<td>${(x.margin*100).toFixed(0)}%</td>
+</tr>`;
 });
+}
+
+
+/* ---------- INSIGHTS (4+ restored) ---------- */
+function generateInsights(d){
+
+const total = d.reduce((a,b)=>a+b.profit,0);
+const best = [...d].sort((a,b)=>b.profit-a.profit)[0];
+const monthly = total * 30;
+
+let html="";
+
+html += `<div class="insight">Top profit product: <b>${best.name}</b></div>`;
+html += `<div class="insight">Projected monthly profit: ₹${monthly}</div>`;
+
+d.forEach(x=>{
+const suggested = Math.round(x.sell*1.05);
+const newProfit = (suggested-x.cost)*x.qty;
+const extra = newProfit-x.profit;
+
+if(extra>0){
+html += `<div class="insight">Increase ${x.name} price to ₹${suggested} → extra ₹${extra}</div>`;
+}
+});
+
+insights.innerHTML=html;
 }
 
 
@@ -306,7 +308,7 @@ function pay(){unlock();}
 function verify(){unlock();}
 
 
-/* ---------- CLEAN PDF ---------- */
+/* ---------- PDF EXPORT ---------- */
 function downloadPDF(){
 
 const {jsPDF}=window.jspdf;
@@ -340,4 +342,3 @@ doc.save("vizbix-report.pdf");
 </script>
 </body>
 </html>
-
