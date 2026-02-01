@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
@@ -18,7 +18,7 @@ body{
 }
 
 main{
-  max-width:1000px;
+  max-width:1100px;
   margin:auto;
   padding:18px;
 }
@@ -35,6 +35,7 @@ main{
   display:grid;
   grid-template-columns:2fr 1fr 1fr 1fr auto;
   gap:8px;
+  margin-bottom:8px;
 }
 
 @media(max-width:640px){
@@ -62,6 +63,7 @@ button{
   font-size:30px;
   font-weight:900;
   text-align:center;
+  margin-bottom:12px;
 }
 
 .locked{
@@ -76,7 +78,7 @@ button{
   border-radius:12px;
   font-weight:700;
   text-align:center;
-  margin-bottom:10px;
+  margin-bottom:12px;
 }
 
 .insight{
@@ -84,7 +86,6 @@ button{
   padding:10px;
   border-radius:10px;
   margin-bottom:8px;
-  font-size:14px;
 }
 
 table{
@@ -104,12 +105,9 @@ td,th{
   flex-wrap:wrap;
   margin-top:12px;
 }
-
-.history-btn{
-  font-size:12px;
-}
 </style>
 </head>
+
 
 <body>
 <main>
@@ -124,6 +122,7 @@ td,th{
 <button class="dark" onclick="analyze()" style="margin-top:8px">Analyze Profit</button>
 
 </div>
+
 
 <div id="results" class="card" style="display:none">
 
@@ -140,7 +139,7 @@ td,th{
 
 <table id="table"></table>
 
-<canvas id="chart"></canvas>
+<canvas id="chart" style="margin-top:20px"></canvas>
 
 <div class="tools">
 <button class="light" onclick="downloadPDF()">Export PDF</button>
@@ -155,16 +154,19 @@ td,th{
 </main>
 
 
+
 <script>
 const workerURL = window.location.origin;
 const PRICE = 29900;
 const KEY = "rzp_live_SAbBHVMbGMv2xo";
 
 const items=document.getElementById("items");
-
 let chart;
+let insightsText=[];
+let currentData=[];
 
-/* ---------- rows ---------- */
+
+/* ---------------- ROWS ---------------- */
 function addRow(){
 const d=document.createElement("div");
 d.className="grid";
@@ -179,7 +181,8 @@ items.appendChild(d);
 addRow();addRow();addRow();
 
 
-/* ---------- analyze ---------- */
+
+/* ---------------- ANALYZE ---------------- */
 function analyze(){
 
 let data=[];
@@ -188,44 +191,56 @@ let total=0;
 document.querySelectorAll(".grid").forEach(r=>{
 const i=r.querySelectorAll("input");
 
-const name=i[0].value;
-const sell=+i[1].value;
-const cost=+i[2].value;
-const qty=+i[3].value;
+const name=i[0].value||"Product";
+const sell=+i[1].value||0;
+const cost=+i[2].value||0;
+const qty=+i[3].value||0;
 
 const profit=(sell-cost)*qty;
-const margin=(sell-cost)/sell;
+const margin=(sell-cost)/sell||0;
 
 total+=profit;
 
 data.push({name,profit,margin});
 });
 
-window.data=data;
+currentData=data;
 
 results.style.display="block";
 profitText.innerText="Estimated Profit: ₹ "+total;
 
 saveHistory(total);
 
+generateInsights(data,total);
 generateTable(data);
 generateChart(data);
 }
 
 
-/* ---------- insights ---------- */
-function generateInsights(d){
-const total=d.reduce((a,b)=>a+b.profit,0);
+
+/* ---------------- INSIGHTS ---------------- */
+function generateInsights(d,total){
+
 const best=[...d].sort((a,b)=>b.profit-a.profit)[0];
+const worst=[...d].sort((a,b)=>a.margin-b.margin)[0];
+const monthly=total*30;
+
+insightsText=[
+`${best.name} generates the highest profit`,
+`Projected monthly profit ≈ ₹${monthly}`,
+`Increase ${best.name} price slightly to grow profit`,
+`${worst.name} has lowest margin — optimize cost`
+];
 
 insights.innerHTML=`
-<div class="insight">📈 ${best.name} contributes most profit.</div>
-<div class="insight">📅 Monthly forecast ≈ ₹${total*30}</div>
+<div class="success">✅ Pro Unlocked</div>
+${insightsText.map(x=>`<div class="insight">• ${x}</div>`).join("")}
 `;
 }
 
 
-/* ---------- table ---------- */
+
+/* ---------------- TABLE ---------------- */
 function generateTable(d){
 table.innerHTML="<tr><th>Product</th><th>Profit</th><th>Margin</th></tr>";
 d.forEach(x=>{
@@ -234,7 +249,8 @@ table.innerHTML+=`<tr><td>${x.name}</td><td>₹${x.profit}</td><td>${(x.margin*1
 }
 
 
-/* ---------- chart with different colours ---------- */
+
+/* ---------------- CHART ---------------- */
 function generateChart(d){
 
 const colors=[
@@ -259,15 +275,16 @@ options:{plugins:{legend:{display:false}}}
 }
 
 
-/* ---------- unlock ---------- */
+
+/* ---------------- UNLOCK ---------------- */
 function unlock(){
 lockBox.innerHTML="<div class='success'>✅ Pro Unlocked</div>";
 proContent.classList.remove("locked");
-generateInsights(window.data);
 }
 
 
-/* ---------- verify ---------- */
+
+/* ---------------- VERIFY ---------------- */
 async function verify(){
 const r=await fetch(workerURL+"/check?email="+emailInput.value);
 const d=await r.json();
@@ -275,7 +292,8 @@ if(d.valid) unlock();
 }
 
 
-/* ---------- payment ---------- */
+
+/* ---------------- PAYMENT ---------------- */
 function pay(){
 new Razorpay({
 key:KEY,
@@ -288,25 +306,63 @@ handler:()=>setTimeout(verify,1000)
 }
 
 
-/* ---------- PDF FIXED ---------- */
-async function downloadPDF(){
-const { jsPDF } = window.jspdf;
-const doc = new jsPDF();
 
-doc.text("Vizbix Profit Report", 20, 20);
+/* ---------------- PDF (WITH CHART + INSIGHTS) ---------------- */
+async function downloadPDF(){
+
+const { jsPDF } = window.jspdf;
+const doc = new jsPDF({unit:"pt"});
 
 let y=40;
 
-window.data.forEach(x=>{
-doc.text(`${x.name} - ₹${x.profit}`, 20, y);
-y+=10;
+doc.setFontSize(20);
+doc.text("Vizbix Profit Report",40,y);
+
+y+=25;
+doc.setFontSize(11);
+doc.text(new Date().toLocaleString(),40,y);
+
+y+=30;
+
+const total=currentData.reduce((a,b)=>a+b.profit,0);
+
+doc.setFontSize(16);
+doc.text("Total Profit: ₹ "+total,40,y);
+
+y+=30;
+
+doc.setFontSize(12);
+doc.text("Insights",40,y);
+
+y+=20;
+
+insightsText.forEach(t=>{
+doc.text("• "+t,50,y);
+y+=16;
 });
+
+y+=20;
+
+doc.text("Products",40,y);
+y+=18;
+
+currentData.forEach(p=>{
+doc.text(`${p.name}   ₹${p.profit}   ${(p.margin*100).toFixed(0)}%`,40,y);
+y+=15;
+});
+
+y+=20;
+
+/* CHART IMAGE */
+const img=chart.toBase64Image();
+doc.addImage(img,"PNG",40,y,500,260);
 
 doc.save("vizbix-report.pdf");
 }
 
 
-/* ---------- SAVE HISTORY ---------- */
+
+/* ---------------- HISTORY ---------------- */
 function saveHistory(total){
 let history=JSON.parse(localStorage.getItem("vizbixHistory")||"[]");
 history.unshift({date:new Date().toLocaleString(),profit:total});
@@ -316,9 +372,8 @@ localStorage.setItem("vizbixHistory",JSON.stringify(history));
 
 function loadHistory(){
 let history=JSON.parse(localStorage.getItem("vizbixHistory")||"[]");
-
 historyList.innerHTML=history.map(h=>
-`<div class="history-btn">📅 ${h.date} → ₹${h.profit}</div>`
+`<div>📅 ${h.date} → ₹${h.profit}</div>`
 ).join("");
 }
 </script>
