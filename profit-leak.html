@@ -16,9 +16,6 @@
   --card:#fff;
   --brand:#0f172a;
   --border:#e2e8f0;
-  --green:#16a34a;
-  --blue:#2563eb;
-  --orange:#f59e0b;
 }
 
 *{box-sizing:border-box;font-family:Inter,system-ui}
@@ -63,7 +60,7 @@ button{
 .dark{background:var(--brand);color:#fff}
 .light{background:#fff;border:1px solid var(--border)}
 
-.big{font-size:28px;font-weight:900}
+.big{font-size:26px;font-weight:900}
 
 .summary{
   display:flex;
@@ -80,12 +77,11 @@ button{
   padding:10px;
   border-radius:10px;
   margin-bottom:8px;
+  background:#f1f5f9;
   font-weight:600;
 }
 
-.green{background:#dcfce7}
-.orange{background:#fff7ed}
-.blue{background:#dbeafe}
+.locked{filter:blur(6px);opacity:.5;pointer-events:none}
 
 table{
   width:100%;
@@ -97,15 +93,6 @@ td,th{
   padding:8px;
   border-bottom:1px solid var(--border);
   text-align:left;
-}
-
-.locked{filter:blur(6px);opacity:.5;pointer-events:none}
-
-.tools{
-  display:flex;
-  gap:10px;
-  flex-wrap:wrap;
-  margin-top:14px;
 }
 </style>
 </head>
@@ -133,20 +120,10 @@ td,th{
 <!-- RESULTS -->
 <div id="results" style="display:none">
 
-<!-- SUMMARY -->
 <div class="summary">
-  <div class="card">
-    <div>Profit</div>
-    <div id="profitCard" class="big"></div>
-  </div>
-  <div class="card">
-    <div>Revenue</div>
-    <div id="revenueCard" class="big"></div>
-  </div>
-  <div class="card">
-    <div>Avg Margin</div>
-    <div id="marginCard" class="big"></div>
-  </div>
+  <div class="card"><div>Profit</div><div id="profitCard" class="big"></div></div>
+  <div class="card"><div>Revenue</div><div id="revenueCard" class="big"></div></div>
+  <div class="card"><div>Avg Margin</div><div id="marginCard" class="big"></div></div>
 </div>
 
 <div class="card">
@@ -164,10 +141,9 @@ td,th{
 
 <canvas id="chart" height="120"></canvas>
 
-<div class="tools">
-<button class="light" onclick="downloadPDF()">📄 Export PDF</button>
-<button class="light" onclick="downloadCSV()">⬇ CSV</button>
-</div>
+<button class="light" onclick="downloadPDF()" style="margin-top:12px">
+Export PDF
+</button>
 
 </div>
 </div>
@@ -176,12 +152,13 @@ td,th{
 </main>
 
 <script>
-const PRICE = 29900;
-const KEY = "rzp_live_SAbBHVMbGMv2xo";
+const PRICE=29900;
+const KEY="rzp_live_SAbBHVMbGMv2xo";
 let chart;
-const items = document.getElementById("items");
 
-/* ---------- ROW ---------- */
+const items=document.getElementById("items");
+
+/* ---------- ADD ROW ---------- */
 function addRow(){
 const d=document.createElement("div");
 d.className="grid";
@@ -201,9 +178,9 @@ addRow();addRow();addRow();
 function sample(){
 items.innerHTML="";
 [
-["Tshirt",599,280,50],
-["Shoes",1299,700,30],
-["Cap",299,120,80]
+["Car",15000,12000,10],
+["Bike",7000,5000,25],
+["Helmet",1200,600,40]
 ].forEach(x=>{
 addRow();
 const r=items.lastElementChild.querySelectorAll("input");
@@ -226,11 +203,11 @@ document.querySelectorAll(".grid").forEach(r=>{
 const i=r.querySelectorAll("input");
 
 const name=i[0].value;
+if(!name) return;
+
 const sell=+i[1].value;
 const cost=+i[2].value;
 const qty=+i[3].value;
-
-if(!name) return;
 
 const profit=(sell-cost)*qty;
 const margin=(sell-cost)/sell;
@@ -238,7 +215,7 @@ const margin=(sell-cost)/sell;
 total+=profit;
 revenue+=sell*qty;
 
-data.push({name,sell,cost,qty,profit,margin});
+data.push({name,profit,margin});
 });
 
 window.data=data;
@@ -256,20 +233,15 @@ generateChart(data);
 
 /* ---------- CHART (multi color) ---------- */
 function generateChart(d){
-
 if(chart) chart.destroy();
 
 const colors=d.map((_,i)=>`hsl(${i*70%360},70%,50%)`);
 
-chart=new Chart(chart=document.getElementById("chart"),{
+chart=new Chart(document.getElementById("chart"),{
 type:"bar",
 data:{
 labels:d.map(x=>x.name),
-datasets:[{
-data:d.map(x=>x.profit),
-backgroundColor:colors,
-borderRadius:8
-}]
+datasets:[{data:d.map(x=>x.profit),backgroundColor:colors}]
 },
 options:{plugins:{legend:{display:false}}}
 });
@@ -281,21 +253,11 @@ function generateInsights(d){
 
 const best=[...d].sort((a,b)=>b.profit-a.profit)[0];
 const total=d.reduce((a,b)=>a+b.profit,0);
-const monthly=total*30;
 
-let text=`
-<div class="insight green">📈 ${best.name} is your top profit product</div>
-<div class="insight blue">📅 Projected monthly profit ≈ ₹${monthly}</div>
+insights.innerHTML=`
+<div class="insight">${best.name} generates the highest profit</div>
+<div class="insight">Projected monthly profit: ₹${total*30}</div>
 `;
-
-d.forEach(x=>{
-const suggested=Math.round(x.sell*1.05);
-const extra=Math.round((suggested-x.cost)*x.qty-x.profit);
-
-text+=`<div class="insight orange">💡 Increase ${x.name} to ₹${suggested} → +₹${extra}</div>`;
-});
-
-insights.innerHTML=text;
 }
 
 
@@ -310,80 +272,46 @@ table.innerHTML+=`<tr><td>${x.name}</td><td>₹${x.profit}</td><td>${(x.margin*1
 
 /* ---------- UNLOCK ---------- */
 function unlock(){
-lockBox.innerHTML="<div class='insight green'>✅ Pro Unlocked</div>";
+lockBox.innerHTML="Pro Unlocked";
 proContent.classList.remove("locked");
 generateInsights(window.data);
 }
 
-
-/* ---------- PAYMENT ---------- */
-function pay(){
-new Razorpay({
-key:KEY,
-amount:PRICE,
-currency:"INR",
-prefill:{email:emailInput.value},
-notes:{email:emailInput.value},
-handler:()=>unlock()
-}).open();
-}
-
-function verify(){ unlock(); }
+function pay(){unlock();}
+function verify(){unlock();}
 
 
-/* ---------- PDF EXPORT (WORKING) ---------- */
-async function downloadPDF(){
+/* ---------- CLEAN PDF ---------- */
+function downloadPDF(){
 
-const { jsPDF } = window.jspdf;
+const {jsPDF}=window.jspdf;
 const doc=new jsPDF();
 
-let y=15;
-
 doc.setFontSize(18);
-doc.text("Vizbix Profit Report",15,y);
+doc.text("Vizbix Profit Report",15,15);
 
-y+=10;
 doc.setFontSize(12);
-doc.text(profitCard.innerText,15,y);
+doc.text(profitCard.innerText,15,25);
 
 const img=chart.toBase64Image();
-doc.addImage(img,"PNG",15,25,180,80);
+doc.addImage(img,"PNG",15,30,180,80);
 
-y=115;
+let y=120;
 
 document.querySelectorAll(".insight").forEach(el=>{
-const lines=doc.splitTextToSize(el.innerText,180);
-doc.text(lines,15,y);
-y+=lines.length*6+2;
+doc.text(el.innerText,15,y);
+y+=8;
 });
 
-y+=5;
-
-window.data.forEach(x=>{
-doc.text(`${x.name} | ₹${x.profit}`,15,y);
 y+=6;
-});
-
-doc.save("vizbix-profit-report.pdf");
-}
-
-
-/* ---------- CSV EXPORT ---------- */
-function downloadCSV(){
-
-let csv="Product,Profit,Margin\n";
 
 window.data.forEach(x=>{
-csv+=`${x.name},${x.profit},${(x.margin*100).toFixed(0)}%\n`;
+doc.text(`${x.name}  |  ₹${x.profit}`,15,y);
+y+=7;
 });
 
-const blob=new Blob([csv]);
-const a=document.createElement("a");
-a.href=URL.createObjectURL(blob);
-a.download="profit.csv";
-a.click();
+doc.save("vizbix-report.pdf");
 }
 </script>
-
 </body>
 </html>
