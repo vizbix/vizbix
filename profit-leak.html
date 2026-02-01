@@ -251,13 +251,38 @@ options:{plugins:{legend:{display:false}}}
 /* ---------- INSIGHTS ---------- */
 function generateInsights(d){
 
-const best=[...d].sort((a,b)=>b.profit-a.profit)[0];
-const total=d.reduce((a,b)=>a+b.profit,0);
+const total = d.reduce((a,b)=>a+b.profit,0);
 
-insights.innerHTML=`
-<div class="insight">${best.name} generates the highest profit</div>
-<div class="insight">Projected monthly profit: ₹${total*30}</div>
-`;
+const best = [...d].sort((a,b)=>b.profit-a.profit)[0];
+
+const monthly = total * 30;
+
+let html = "";
+
+/* 1 */
+html += `<div class="insight">
+Top profit product: <b>${best.name}</b>
+</div>`;
+
+/* 2 */
+html += `<div class="insight">
+Projected monthly profit: ₹${monthly}
+</div>`;
+
+/* 3 & 4 — price optimization per product */
+d.forEach(x=>{
+const suggested = Math.round(x.profit / x.qty + x.cost * 1.05);
+const newProfit = (suggested - x.cost) * x.qty;
+const extra = newProfit - x.profit;
+
+if(extra > 0){
+html += `<div class="insight">
+Increase ${x.name} price slightly → possible extra profit ₹${extra}
+</div>`;
+}
+});
+
+insights.innerHTML = html;
 }
 
 
@@ -315,3 +340,4 @@ doc.save("vizbix-report.pdf");
 </script>
 </body>
 </html>
+
