@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+<title>Profit Leak Finder – Vizbix</title>
+
+<script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+
+<style>
+:root{
+  --text:#0f172a;
+  --muted:#64748b;
+  --border:#e5e7eb;
+  --soft:#f8fafc;
+  --brand:#111827;
+  --radius:16px;
+  --max:720px;
+}
+
+*{box-sizing:border-box;font-family:system-ui,-apple-system,Inter,sans-serif}
+body{margin:0;background:#fff;color:var(--text)}
+
+header{
+  padding:16px;
+  border-bottom:1px solid var(--border);
+  font-weight:900;
+  font-size:20px;
+}
+
+main{
+  max-width:var(--max);
+  margin:auto;
+  padding:24px 16px 80px;
+}
+
+.card{
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  padding:16px;
+  box-shadow:0 8px 22px rgba(0,0,0,.05);
+  margin-bottom:16px;
+}
+
+input{
+  width:100%;
+  padding:12px;
+  border:1px solid var(--border);
+  border-radius:12px;
+  margin-bottom:10px;
+}
+
+.item{
+  background:var(--soft);
+  border-radius:12px;
+  padding:10px;
+  margin-bottom:10px;
+}
+
+.btn{
+  width:100%;
+  padding:13px;
+  border-radius:14px;
+  font-weight:800;
+  cursor:pointer;
+  border:0;
+  margin-top:8px;
+}
+
+.btn-dark{background:var(--brand);color:#fff}
+.btn-light{background:#fff;border:1px solid var(--border)}
+
+.results{display:none}
+
+.success{
+  margin-top:12px;
+  background:#ecfdf5;
+  padding:12px;
+  border-radius:12px;
+  font-weight:700;
+}
+</style>
+</head>
+
+<body>
+
+<header>Vizbix</header>
+
+<main>
+
+<div class="card">
+
+  <input id="emailInput" placeholder="Enter your email">
+
+  <div id="items"></div>
+
+  <button class="btn btn-light" id="addRow">+ Add Product</button>
+  <button class="btn btn-dark" id="analyzeBtn">Analyze Profit</button>
+
+</div>
+
+<div class="card results" id="results">
+
+  <h3 id="profitText"></h3>
+
+  <div id="lockBox">
+    <button class="btn btn-dark" id="payBtn">Unlock Pro – ₹1</button>
+    <button class="btn btn-light" id="verifyBtn">Verify Access</button>
+  </div>
+
+</div>
+
+</main>
+
+
+<script>
+const workerURL = "https://vizbix-api.vizbixhq.workers.dev";
+const RAZORPAY_KEY = "rzp_live_SAbBHVMbGMv2xo";
+
+
+/* ---------- rows ---------- */
+const items = document.getElementById("items");
+
+function addRow(){
+  const div=document.createElement("div");
+  div.className="item";
+
+  div.innerHTML=`
+    <input placeholder="Product">
+    <input type="number" placeholder="Selling price">
+    <input type="number" placeholder="Cost price">
+    <input type="number" placeholder="Quantity">
+    <button class="btn btn-light remove">Remove</button>
+  `;
+
+  div.querySelector(".remove").onclick=()=>div.remove();
+  items.appendChild(div);
+}
+addRow();
+document.getElementById("addRow").onclick=addRow;
+
+
+/* ---------- analyze ---------- */
+document.getElementById("analyzeBtn").onclick=()=>{
+  let profit=0;
+
+  document.querySelectorAll(".item").forEach(d=>{
+    const i=d.querySelectorAll("input");
+    profit+=(+i[1].value-+i[2].value)*(+i[3].value);
+  });
+
+  document.getElementById("profitText").innerText =
+    "Estimated Profit: ₹ "+profit.toFixed(0);
+
+  document.getElementById("results").style.display="block";
+};
+
+
+/* ---------- unlock ---------- */
+function unlock(expiry){
+
+  const date=new Date(expiry).toLocaleDateString();
+
+  const box=document.getElementById("lockBox");
+
+  box.innerHTML = `
+    <div class="success">
+      ✅ Pro unlocked<br>
+      Active till: ${date}
+    </div>
+  `;
+}
+
+
+/* ---------- verify ---------- */
+async function verify(){
+
+  const email=document.getElementById("emailInput").value.trim().toLowerCase();
+
+  if(!email){
+    alert("Enter email first");
+    return;
+  }
+
+  // ⭐ IMPORTANT FIX
+  // Always show results section
+  document.getElementById("results").style.display="block";
+
+  try{
+    const r=await fetch(workerURL+"/check?email="+encodeURIComponent(email));
+    const data=await r.json();
+
+    console.log("VERIFY:", data);
+
+    if(data.valid){
+      unlock(data.expiry);
+    } else {
+      alert("No active plan found.");
+    }
+
+  }catch(e){
+    alert("Network error");
+  }
+}
+
+document.getElementById("verifyBtn").onclick=verify;
+
+
+/* ---------- pay (auto unlock) ---------- */
+document.getElementById("payBtn").onclick=()=>{
+
+  const email=document.getElementById("emailInput").value.trim();
+
+  if(!email){
+    alert("Enter email first");
+    return;
+  }
+
+  const rzp=new Razorpay({
+  key:RAZORPAY_KEY,
+  amount:100,
+  currency:"INR",
+  name:"Vizbix",
+  description:"30 days Pro access",
+  prefill:{email},
+
+  notes:{
+    email: email   // ⭐ VERY IMPORTANT
+  },
+
+    handler:()=>{
+      // auto verify after payment
+      setTimeout(verify,1500);
+    }
+  });
+
+  rzp.open();
+};
+</script>
+
+
+</body>
+</html>
