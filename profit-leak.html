@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
@@ -8,31 +8,27 @@
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 <style>
-:root{
-  --bg:#f6f7fb;
-  --card:#fff;
-  --brand:#0f172a;
-  --border:#e2e8f0;
-  --green:#16a34a;
-  --orange:#f59e0b;
-  --blue:#2563eb;
+body{
+  margin:0;
+  font-family:Inter,system-ui;
+  background:#f6f7fb;
 }
 
-*{box-sizing:border-box;font-family:Inter,system-ui}
-body{margin:0;background:var(--bg)}
-main{max-width:1000px;margin:auto;padding:18px}
-
-h1{text-align:center;font-weight:900;margin-bottom:20px}
+main{
+  max-width:1000px;
+  margin:auto;
+  padding:18px;
+}
 
 .card{
-  background:var(--card);
-  border-radius:18px;
+  background:#fff;
+  border-radius:16px;
   padding:18px;
-  margin-bottom:18px;
-  box-shadow:0 10px 30px rgba(0,0,0,.05);
+  margin-bottom:16px;
+  box-shadow:0 10px 25px rgba(0,0,0,.05);
 }
 
 .grid{
@@ -48,53 +44,69 @@ h1{text-align:center;font-weight:900;margin-bottom:20px}
 input{
   padding:10px;
   border-radius:10px;
-  border:1px solid var(--border);
-  width:100%;
+  border:1px solid #e2e8f0;
 }
 
 button{
-  padding:12px;
-  border-radius:12px;
-  font-weight:700;
+  padding:10px 12px;
+  border-radius:10px;
+  font-weight:600;
   cursor:pointer;
   border:0;
 }
 
-.dark{background:var(--brand);color:#fff}
-.light{background:#fff;border:1px solid var(--border)}
+.dark{background:#0f172a;color:#fff}
+.light{background:#fff;border:1px solid #e2e8f0}
 
-.big{font-size:32px;font-weight:900;text-align:center}
-
-.locked{filter:blur(6px);opacity:.4;pointer-events:none}
-
-.insight{
-  padding:12px;
-  border-radius:12px;
-  margin-bottom:8px;
-  font-weight:600;
+.big{
+  font-size:30px;
+  font-weight:900;
+  text-align:center;
 }
 
-.green{background:#dcfce7}
-.orange{background:#fff7ed}
-.blue{background:#dbeafe}
+.locked{
+  filter:blur(6px);
+  opacity:.4;
+  pointer-events:none;
+}
+
+.success{
+  background:#dcfce7;
+  padding:12px;
+  border-radius:12px;
+  font-weight:700;
+  text-align:center;
+  margin-bottom:10px;
+}
+
+.insight{
+  background:#f8fafc;
+  padding:10px;
+  border-radius:10px;
+  margin-bottom:8px;
+  font-size:14px;
+}
 
 table{
   width:100%;
   border-collapse:collapse;
   margin-top:12px;
 }
+
 td,th{
   padding:8px;
-  border-bottom:1px solid var(--border);
+  border-bottom:1px solid #e2e8f0;
 }
-
-canvas{margin-top:20px}
 
 .tools{
   display:flex;
-  gap:10px;
+  gap:8px;
   flex-wrap:wrap;
   margin-top:12px;
+}
+
+.history-btn{
+  font-size:12px;
 }
 </style>
 </head>
@@ -102,19 +114,17 @@ canvas{margin-top:20px}
 <body>
 <main>
 
-<h1>Vizbix • Profit Insights</h1>
-
-<!-- INPUT -->
 <div class="card">
+
 <input id="emailInput" placeholder="Email for Pro insights" style="margin-bottom:12px">
 
 <div id="items"></div>
 
 <button class="light" onclick="addRow()">+ Add Product</button>
-<button class="dark" onclick="analyze()" style="margin-top:10px">Analyze Profit</button>
+<button class="dark" onclick="analyze()" style="margin-top:8px">Analyze Profit</button>
+
 </div>
 
-<!-- RESULTS -->
 <div id="results" class="card" style="display:none">
 
 <div id="profitText" class="big"></div>
@@ -133,23 +143,28 @@ canvas{margin-top:20px}
 <canvas id="chart"></canvas>
 
 <div class="tools">
-<button class="light" onclick="downloadPDF()">📄 Export PDF</button>
+<button class="light" onclick="downloadPDF()">Export PDF</button>
+<button class="light" onclick="loadHistory()">History</button>
 </div>
+
+<div id="historyList"></div>
 
 </div>
 </div>
 
 </main>
 
+
 <script>
 const workerURL = window.location.origin;
 const PRICE = 29900;
 const KEY = "rzp_live_SAbBHVMbGMv2xo";
 
-const items = document.getElementById("items");
+const items=document.getElementById("items");
+
 let chart;
 
-/* add row */
+/* ---------- rows ---------- */
 function addRow(){
 const d=document.createElement("div");
 d.className="grid";
@@ -161,10 +176,10 @@ d.innerHTML=`
 <button onclick="this.parentElement.remove()">✕</button>`;
 items.appendChild(d);
 }
-addRow(); addRow(); addRow();
+addRow();addRow();addRow();
 
 
-/* analyze */
+/* ---------- analyze ---------- */
 function analyze(){
 
 let data=[];
@@ -183,44 +198,34 @@ const margin=(sell-cost)/sell;
 
 total+=profit;
 
-data.push({name,sell,cost,qty,profit,margin});
+data.push({name,profit,margin});
 });
 
 window.data=data;
+
 results.style.display="block";
 profitText.innerText="Estimated Profit: ₹ "+total;
+
+saveHistory(total);
 
 generateTable(data);
 generateChart(data);
 }
 
 
-/* insights with auto price suggestions + forecast */
+/* ---------- insights ---------- */
 function generateInsights(d){
-
 const total=d.reduce((a,b)=>a+b.profit,0);
-
 const best=[...d].sort((a,b)=>b.profit-a.profit)[0];
 
-const monthly=total*30;
-
-let text=`
-<div class="insight green">📈 ${best.name} generates most profit. Focus marketing here.</div>
-<div class="insight blue">📅 At current sales, projected monthly profit ≈ ₹${monthly}</div>
+insights.innerHTML=`
+<div class="insight">📈 ${best.name} contributes most profit.</div>
+<div class="insight">📅 Monthly forecast ≈ ₹${total*30}</div>
 `;
-
-d.forEach(x=>{
-const suggested=x.sell*1.05;
-const extra=(suggested-x.cost)*x.qty - x.profit;
-
-text+=`<div class="insight orange">💡 Increase ${x.name} price to ₹${Math.round(suggested)} to earn ₹${Math.round(extra)} extra profit</div>`;
-});
-
-insights.innerHTML=text;
 }
 
 
-/* table */
+/* ---------- table ---------- */
 function generateTable(d){
 table.innerHTML="<tr><th>Product</th><th>Profit</th><th>Margin</th></tr>";
 d.forEach(x=>{
@@ -229,8 +234,14 @@ table.innerHTML+=`<tr><td>${x.name}</td><td>₹${x.profit}</td><td>${(x.margin*1
 }
 
 
-/* chart */
+/* ---------- chart with different colours ---------- */
 function generateChart(d){
+
+const colors=[
+"#2563eb","#16a34a","#f59e0b","#dc2626","#7c3aed",
+"#14b8a6","#e11d48","#0ea5e9","#a855f7","#22c55e"
+];
+
 if(chart) chart.destroy();
 
 chart=new Chart(document.getElementById("chart"),{
@@ -239,8 +250,8 @@ data:{
 labels:d.map(x=>x.name),
 datasets:[{
 data:d.map(x=>x.profit),
-backgroundColor:"rgba(15,23,42,.85)",
-borderRadius:10
+backgroundColor:d.map((_,i)=>colors[i%colors.length]),
+borderRadius:8
 }]
 },
 options:{plugins:{legend:{display:false}}}
@@ -248,15 +259,15 @@ options:{plugins:{legend:{display:false}}}
 }
 
 
-/* unlock */
+/* ---------- unlock ---------- */
 function unlock(){
-lockBox.innerHTML="<div class='insight green'>✅ Pro Unlocked</div>";
+lockBox.innerHTML="<div class='success'>✅ Pro Unlocked</div>";
 proContent.classList.remove("locked");
 generateInsights(window.data);
 }
 
 
-/* verify */
+/* ---------- verify ---------- */
 async function verify(){
 const r=await fetch(workerURL+"/check?email="+emailInput.value);
 const d=await r.json();
@@ -264,7 +275,7 @@ if(d.valid) unlock();
 }
 
 
-/* payment */
+/* ---------- payment ---------- */
 function pay(){
 new Razorpay({
 key:KEY,
@@ -277,23 +288,39 @@ handler:()=>setTimeout(verify,1000)
 }
 
 
-/* pdf export */
-function downloadPDF(){
-const {jsPDF}=window.jspdf;
-const doc=new jsPDF();
+/* ---------- PDF FIXED ---------- */
+async function downloadPDF(){
+const { jsPDF } = window.jspdf;
+const doc = new jsPDF();
 
-doc.text("Vizbix Profit Report",20,20);
+doc.text("Vizbix Profit Report", 20, 20);
 
 let y=40;
 
 window.data.forEach(x=>{
-doc.text(`${x.name}  |  Profit ₹${x.profit}`,20,y);
+doc.text(`${x.name} - ₹${x.profit}`, 20, y);
 y+=10;
 });
 
-doc.save("profit-report.pdf");
+doc.save("vizbix-report.pdf");
+}
+
+
+/* ---------- SAVE HISTORY ---------- */
+function saveHistory(total){
+let history=JSON.parse(localStorage.getItem("vizbixHistory")||"[]");
+history.unshift({date:new Date().toLocaleString(),profit:total});
+history=history.slice(0,5);
+localStorage.setItem("vizbixHistory",JSON.stringify(history));
+}
+
+function loadHistory(){
+let history=JSON.parse(localStorage.getItem("vizbixHistory")||"[]");
+
+historyList.innerHTML=history.map(h=>
+`<div class="history-btn">📅 ${h.date} → ₹${h.profit}</div>`
+).join("");
 }
 </script>
-
 </body>
 </html>
