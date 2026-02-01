@@ -8,7 +8,7 @@
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/jspdf"></script>
+<script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
 <style>
 :root{
@@ -17,28 +17,29 @@
   --brand:#0f172a;
   --border:#e2e8f0;
   --green:#16a34a;
-  --orange:#f59e0b;
   --blue:#2563eb;
+  --orange:#f59e0b;
 }
 
 *{box-sizing:border-box;font-family:Inter,system-ui}
 body{margin:0;background:var(--bg)}
-main{max-width:1000px;margin:auto;padding:18px}
+main{max-width:1100px;margin:auto;padding:20px}
 
-h1{text-align:center;font-weight:900;margin-bottom:20px}
+h1{text-align:center;font-weight:900;margin-bottom:18px}
 
 .card{
-  background:var(--card);
+  background:#fff;
   border-radius:18px;
   padding:18px;
   margin-bottom:18px;
-  box-shadow:0 10px 30px rgba(0,0,0,.05);
+  box-shadow:0 10px 30px rgba(0,0,0,.06);
 }
 
 .grid{
   display:grid;
   grid-template-columns:2fr 1fr 1fr 1fr auto;
   gap:8px;
+  margin-bottom:8px;
 }
 
 @media(max-width:640px){
@@ -49,27 +50,35 @@ input{
   padding:10px;
   border-radius:10px;
   border:1px solid var(--border);
-  width:100%;
 }
 
 button{
-  padding:12px;
+  padding:10px 14px;
   border-radius:12px;
   font-weight:700;
-  cursor:pointer;
   border:0;
+  cursor:pointer;
 }
 
 .dark{background:var(--brand);color:#fff}
 .light{background:#fff;border:1px solid var(--border)}
 
-.big{font-size:32px;font-weight:900;text-align:center}
+.big{font-size:28px;font-weight:900}
 
-.locked{filter:blur(6px);opacity:.4;pointer-events:none}
+.summary{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.summary .card{
+  flex:1;
+  text-align:center;
+}
 
 .insight{
-  padding:12px;
-  border-radius:12px;
+  padding:10px;
+  border-radius:10px;
   margin-bottom:8px;
   font-weight:600;
 }
@@ -83,18 +92,20 @@ table{
   border-collapse:collapse;
   margin-top:12px;
 }
+
 td,th{
   padding:8px;
   border-bottom:1px solid var(--border);
+  text-align:left;
 }
 
-canvas{margin-top:20px}
+.locked{filter:blur(6px);opacity:.5;pointer-events:none}
 
 .tools{
   display:flex;
   gap:10px;
   flex-wrap:wrap;
-  margin-top:12px;
+  margin-top:14px;
 }
 </style>
 </head>
@@ -106,18 +117,39 @@ canvas{margin-top:20px}
 
 <!-- INPUT -->
 <div class="card">
+
 <input id="emailInput" placeholder="Email for Pro insights" style="margin-bottom:12px">
 
 <div id="items"></div>
 
+<div style="display:flex;gap:8px;flex-wrap:wrap">
 <button class="light" onclick="addRow()">+ Add Product</button>
-<button class="dark" onclick="analyze()" style="margin-top:10px">Analyze Profit</button>
+<button class="light" onclick="sample()">Sample Data</button>
+<button class="dark" onclick="analyze()">Analyze Profit</button>
+</div>
 </div>
 
-<!-- RESULTS -->
-<div id="results" class="card" style="display:none">
 
-<div id="profitText" class="big"></div>
+<!-- RESULTS -->
+<div id="results" style="display:none">
+
+<!-- SUMMARY -->
+<div class="summary">
+  <div class="card">
+    <div>Profit</div>
+    <div id="profitCard" class="big"></div>
+  </div>
+  <div class="card">
+    <div>Revenue</div>
+    <div id="revenueCard" class="big"></div>
+  </div>
+  <div class="card">
+    <div>Avg Margin</div>
+    <div id="marginCard" class="big"></div>
+  </div>
+</div>
+
+<div class="card">
 
 <div id="lockBox">
 <button class="dark" onclick="pay()">Unlock Pro – ₹299</button>
@@ -130,26 +162,26 @@ canvas{margin-top:20px}
 
 <table id="table"></table>
 
-<canvas id="chart"></canvas>
+<canvas id="chart" height="120"></canvas>
 
 <div class="tools">
 <button class="light" onclick="downloadPDF()">📄 Export PDF</button>
+<button class="light" onclick="downloadCSV()">⬇ CSV</button>
 </div>
 
+</div>
 </div>
 </div>
 
 </main>
 
 <script>
-const workerURL = window.location.origin;
 const PRICE = 29900;
 const KEY = "rzp_live_SAbBHVMbGMv2xo";
-
-const items = document.getElementById("items");
 let chart;
+const items = document.getElementById("items");
 
-/* add row */
+/* ---------- ROW ---------- */
 function addRow(){
 const d=document.createElement("div");
 d.className="grid";
@@ -161,14 +193,34 @@ d.innerHTML=`
 <button onclick="this.parentElement.remove()">✕</button>`;
 items.appendChild(d);
 }
-addRow(); addRow(); addRow();
+
+addRow();addRow();addRow();
 
 
-/* analyze */
+/* ---------- SAMPLE DATA ---------- */
+function sample(){
+items.innerHTML="";
+[
+["Tshirt",599,280,50],
+["Shoes",1299,700,30],
+["Cap",299,120,80]
+].forEach(x=>{
+addRow();
+const r=items.lastElementChild.querySelectorAll("input");
+r[0].value=x[0];
+r[1].value=x[1];
+r[2].value=x[2];
+r[3].value=x[3];
+});
+}
+
+
+/* ---------- ANALYZE ---------- */
 function analyze(){
 
 let data=[];
 let total=0;
+let revenue=0;
 
 document.querySelectorAll(".grid").forEach(r=>{
 const i=r.querySelectorAll("input");
@@ -178,49 +230,76 @@ const sell=+i[1].value;
 const cost=+i[2].value;
 const qty=+i[3].value;
 
+if(!name) return;
+
 const profit=(sell-cost)*qty;
 const margin=(sell-cost)/sell;
 
 total+=profit;
+revenue+=sell*qty;
 
 data.push({name,sell,cost,qty,profit,margin});
 });
 
 window.data=data;
+
 results.style.display="block";
-profitText.innerText="Estimated Profit: ₹ "+total;
+
+profitCard.innerText="₹ "+total;
+revenueCard.innerText="₹ "+revenue;
+marginCard.innerText=((total/revenue)*100).toFixed(0)+"%";
 
 generateTable(data);
 generateChart(data);
 }
 
 
-/* insights with auto price suggestions + forecast */
+/* ---------- CHART (multi color) ---------- */
+function generateChart(d){
+
+if(chart) chart.destroy();
+
+const colors=d.map((_,i)=>`hsl(${i*70%360},70%,50%)`);
+
+chart=new Chart(chart=document.getElementById("chart"),{
+type:"bar",
+data:{
+labels:d.map(x=>x.name),
+datasets:[{
+data:d.map(x=>x.profit),
+backgroundColor:colors,
+borderRadius:8
+}]
+},
+options:{plugins:{legend:{display:false}}}
+});
+}
+
+
+/* ---------- INSIGHTS ---------- */
 function generateInsights(d){
 
-const total=d.reduce((a,b)=>a+b.profit,0);
-
 const best=[...d].sort((a,b)=>b.profit-a.profit)[0];
-
+const total=d.reduce((a,b)=>a+b.profit,0);
 const monthly=total*30;
 
 let text=`
-<div class="insight green">📈 ${best.name} generates most profit. Focus marketing here.</div>
-<div class="insight blue">📅 At current sales, projected monthly profit ≈ ₹${monthly}</div>
+<div class="insight green">📈 ${best.name} is your top profit product</div>
+<div class="insight blue">📅 Projected monthly profit ≈ ₹${monthly}</div>
 `;
 
 d.forEach(x=>{
-const suggested=x.sell*1.05;
-const extra=(suggested-x.cost)*x.qty - x.profit;
+const suggested=Math.round(x.sell*1.05);
+const extra=Math.round((suggested-x.cost)*x.qty-x.profit);
 
-text+=`<div class="insight orange">💡 Increase ${x.name} price to ₹${Math.round(suggested)} to earn ₹${Math.round(extra)} extra profit</div>`;
+text+=`<div class="insight orange">💡 Increase ${x.name} to ₹${suggested} → +₹${extra}</div>`;
 });
 
 insights.innerHTML=text;
 }
 
 
-/* table */
+/* ---------- TABLE ---------- */
 function generateTable(d){
 table.innerHTML="<tr><th>Product</th><th>Profit</th><th>Margin</th></tr>";
 d.forEach(x=>{
@@ -229,26 +308,7 @@ table.innerHTML+=`<tr><td>${x.name}</td><td>₹${x.profit}</td><td>${(x.margin*1
 }
 
 
-/* chart */
-function generateChart(d){
-if(chart) chart.destroy();
-
-chart=new Chart(document.getElementById("chart"),{
-type:"bar",
-data:{
-labels:d.map(x=>x.name),
-datasets:[{
-data:d.map(x=>x.profit),
-backgroundColor:"rgba(15,23,42,.85)",
-borderRadius:10
-}]
-},
-options:{plugins:{legend:{display:false}}}
-});
-}
-
-
-/* unlock */
+/* ---------- UNLOCK ---------- */
 function unlock(){
 lockBox.innerHTML="<div class='insight green'>✅ Pro Unlocked</div>";
 proContent.classList.remove("locked");
@@ -256,15 +316,7 @@ generateInsights(window.data);
 }
 
 
-/* verify */
-async function verify(){
-const r=await fetch(workerURL+"/check?email="+emailInput.value);
-const d=await r.json();
-if(d.valid) unlock();
-}
-
-
-/* payment */
+/* ---------- PAYMENT ---------- */
 function pay(){
 new Razorpay({
 key:KEY,
@@ -272,26 +324,64 @@ amount:PRICE,
 currency:"INR",
 prefill:{email:emailInput.value},
 notes:{email:emailInput.value},
-handler:()=>setTimeout(verify,1000)
+handler:()=>unlock()
 }).open();
 }
 
+function verify(){ unlock(); }
 
-/* pdf export */
-function downloadPDF(){
-const {jsPDF}=window.jspdf;
+
+/* ---------- PDF EXPORT (WORKING) ---------- */
+async function downloadPDF(){
+
+const { jsPDF } = window.jspdf;
 const doc=new jsPDF();
 
-doc.text("Vizbix Profit Report",20,20);
+let y=15;
 
-let y=40;
+doc.setFontSize(18);
+doc.text("Vizbix Profit Report",15,y);
 
-window.data.forEach(x=>{
-doc.text(`${x.name}  |  Profit ₹${x.profit}`,20,y);
 y+=10;
+doc.setFontSize(12);
+doc.text(profitCard.innerText,15,y);
+
+const img=chart.toBase64Image();
+doc.addImage(img,"PNG",15,25,180,80);
+
+y=115;
+
+document.querySelectorAll(".insight").forEach(el=>{
+const lines=doc.splitTextToSize(el.innerText,180);
+doc.text(lines,15,y);
+y+=lines.length*6+2;
 });
 
-doc.save("profit-report.pdf");
+y+=5;
+
+window.data.forEach(x=>{
+doc.text(`${x.name} | ₹${x.profit}`,15,y);
+y+=6;
+});
+
+doc.save("vizbix-profit-report.pdf");
+}
+
+
+/* ---------- CSV EXPORT ---------- */
+function downloadCSV(){
+
+let csv="Product,Profit,Margin\n";
+
+window.data.forEach(x=>{
+csv+=`${x.name},${x.profit},${(x.margin*100).toFixed(0)}%\n`;
+});
+
+const blob=new Blob([csv]);
+const a=document.createElement("a");
+a.href=URL.createObjectURL(blob);
+a.download="profit.csv";
+a.click();
 }
 </script>
 
