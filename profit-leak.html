@@ -115,7 +115,11 @@ input{
 
 
 <script>
-const workerURL = "https://vizbix.com/profit-leak ";
+/* ===============================
+   SAME DOMAIN API (important)
+=============================== */
+const workerURL = window.location.origin;
+
 const RAZORPAY_KEY = "rzp_live_SAbBHVMbGMv2xo";
 
 
@@ -159,12 +163,9 @@ document.getElementById("analyzeBtn").onclick=()=>{
 
 /* ---------- unlock ---------- */
 function unlock(expiry){
+  const date=new Date(Number(expiry)).toLocaleDateString();
 
-  const date=new Date(expiry).toLocaleDateString();
-
-  const box=document.getElementById("lockBox");
-
-  box.innerHTML = `
+  document.getElementById("lockBox").innerHTML = `
     <div class="success">
       ✅ Pro unlocked<br>
       Active till: ${date}
@@ -183,15 +184,11 @@ async function verify(){
     return;
   }
 
-  // ⭐ IMPORTANT FIX
-  // Always show results section
   document.getElementById("results").style.display="block";
 
   try{
     const r=await fetch(workerURL+"/check?email="+encodeURIComponent(email));
     const data=await r.json();
-
-    console.log("VERIFY:", data);
 
     if(data.valid){
       unlock(data.expiry);
@@ -207,7 +204,7 @@ async function verify(){
 document.getElementById("verifyBtn").onclick=verify;
 
 
-/* ---------- pay (auto unlock) ---------- */
+/* ---------- pay ---------- */
 document.getElementById("payBtn").onclick=()=>{
 
   const email=document.getElementById("emailInput").value.trim();
@@ -218,19 +215,18 @@ document.getElementById("payBtn").onclick=()=>{
   }
 
   const rzp=new Razorpay({
-  key:RAZORPAY_KEY,
-  amount:100,
-  currency:"INR",
-  name:"Vizbix",
-  description:"30 days Pro access",
-  prefill:{email},
+    key:RAZORPAY_KEY,
+    amount:100,
+    currency:"INR",
+    name:"Vizbix",
+    description:"30 days Pro access",
 
-  notes:{
-    email: email   // ⭐ VERY IMPORTANT
-  },
+    prefill:{email},
+
+    /* ⭐ CRITICAL: webhook needs this */
+    notes:{ email },
 
     handler:()=>{
-      // auto verify after payment
       setTimeout(verify,1500);
     }
   });
@@ -242,4 +238,3 @@ document.getElementById("payBtn").onclick=()=>{
 
 </body>
 </html>
-
