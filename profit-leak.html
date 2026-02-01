@@ -7,54 +7,43 @@
 <title>Profit Leak Finder – Vizbix</title>
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
 <style>
 :root{
-  --text:#0f172a;
-  --muted:#64748b;
+  --brand:#0f172a;
   --border:#e5e7eb;
   --soft:#f8fafc;
-  --brand:#111827;
-  --radius:16px;
-  --max:720px;
+  --green:#16a34a;
+  --orange:#f59e0b;
+  --red:#dc2626;
 }
 
-*{box-sizing:border-box;font-family:system-ui,-apple-system,Inter,sans-serif}
-body{margin:0;background:#fff;color:var(--text)}
+*{box-sizing:border-box;font-family:system-ui}
+body{margin:0;background:#f1f5f9}
+
+main{max-width:820px;margin:auto;padding:20px}
 
 header{
-  padding:16px;
-  border-bottom:1px solid var(--border);
   font-weight:900;
-  font-size:20px;
-}
-
-main{
-  max-width:var(--max);
-  margin:auto;
-  padding:24px 16px 80px;
+  font-size:22px;
+  text-align:center;
+  margin:20px 0;
 }
 
 .card{
-  border:1px solid var(--border);
-  border-radius:var(--radius);
-  padding:16px;
-  box-shadow:0 8px 22px rgba(0,0,0,.05);
-  margin-bottom:16px;
+  background:#fff;
+  border-radius:18px;
+  padding:18px;
+  margin-bottom:18px;
+  box-shadow:0 12px 30px rgba(0,0,0,.07);
 }
 
 input{
   width:100%;
   padding:12px;
+  border-radius:12px;
   border:1px solid var(--border);
-  border-radius:12px;
-  margin-bottom:10px;
-}
-
-.item{
-  background:var(--soft);
-  border-radius:12px;
-  padding:10px;
   margin-bottom:10px;
 }
 
@@ -62,7 +51,7 @@ input{
   width:100%;
   padding:13px;
   border-radius:14px;
-  font-weight:800;
+  font-weight:700;
   cursor:pointer;
   border:0;
   margin-top:8px;
@@ -71,43 +60,103 @@ input{
 .btn-dark{background:var(--brand);color:#fff}
 .btn-light{background:#fff;border:1px solid var(--border)}
 
+.item{
+  background:var(--soft);
+  padding:10px;
+  border-radius:12px;
+  margin-bottom:10px;
+}
+
 .results{display:none}
 
+.big-profit{
+  text-align:center;
+  font-size:32px;
+  font-weight:900;
+  margin:12px 0;
+}
+
+/* LOCK only insights */
+.locked{
+  filter:blur(6px);
+  opacity:.4;
+  pointer-events:none;
+}
+
 .success{
-  margin-top:12px;
-  background:#ecfdf5;
-  padding:12px;
+  background:#dcfce7;
+  padding:10px;
   border-radius:12px;
+  text-align:center;
   font-weight:700;
+  margin-bottom:10px;
+  animation:pop .4s ease;
+}
+
+@keyframes pop{
+  0%{transform:scale(.8);opacity:0}
+  100%{transform:scale(1);opacity:1}
+}
+
+/* table */
+table{
+  width:100%;
+  border-collapse:collapse;
+  margin-top:12px;
+}
+td,th{
+  padding:8px;
+  border-bottom:1px solid var(--border);
+  text-align:left;
+  font-size:14px;
+}
+
+.good{color:var(--green);font-weight:700}
+.mid{color:var(--orange);font-weight:700}
+.bad{color:var(--red);font-weight:700}
+
+canvas{
+  margin-top:18px;
 }
 </style>
 </head>
 
 <body>
 
-<header>Vizbix</header>
+<header>Vizbix • Profit Leak Finder</header>
 
 <main>
 
 <div class="card">
+<input id="emailInput" placeholder="Enter email for Pro insights">
 
-  <input id="emailInput" placeholder="Enter your email">
+<div id="items"></div>
 
-  <div id="items"></div>
-
-  <button class="btn btn-light" id="addRow">+ Add Product</button>
-  <button class="btn btn-dark" id="analyzeBtn">Analyze Profit</button>
-
+<button class="btn btn-light" id="addRow">+ Add Product</button>
+<button class="btn btn-dark" id="analyzeBtn">Analyze Profit</button>
 </div>
+
 
 <div class="card results" id="results">
 
-  <h3 id="profitText"></h3>
+<div id="profitText" class="big-profit"></div>
 
-  <div id="lockBox">
-    <button class="btn btn-dark" id="payBtn">Unlock Pro – ₹1</button>
-    <button class="btn btn-light" id="verifyBtn">Verify Access</button>
-  </div>
+<!-- CTA ALWAYS VISIBLE -->
+<div id="lockBox">
+  <button class="btn btn-dark" id="payBtn">Unlock Pro – ₹299</button>
+  <button class="btn btn-light" id="verifyBtn">Verify Access</button>
+</div>
+
+<!-- LOCKED CONTENT -->
+<div id="proContent" class="locked">
+
+<div id="insights"></div>
+
+<table id="table"></table>
+
+<canvas id="chart"></canvas>
+
+</div>
 
 </div>
 
@@ -115,126 +164,166 @@ input{
 
 
 <script>
-/* ===============================
-   SAME DOMAIN API (important)
-=============================== */
 const workerURL = window.location.origin;
-
 const RAZORPAY_KEY = "rzp_live_SAbBHVMbGMv2xo";
+const PRICE = 29900;
 
+const items=document.getElementById("items");
 
-/* ---------- rows ---------- */
-const items = document.getElementById("items");
-
+/* rows */
 function addRow(){
-  const div=document.createElement("div");
-  div.className="item";
+  const d=document.createElement("div");
+  d.className="item";
 
-  div.innerHTML=`
-    <input placeholder="Product">
-    <input type="number" placeholder="Selling price">
-    <input type="number" placeholder="Cost price">
-    <input type="number" placeholder="Quantity">
-    <button class="btn btn-light remove">Remove</button>
+  d.innerHTML=`
+  <input placeholder="Product">
+  <input type="number" placeholder="Selling">
+  <input type="number" placeholder="Cost">
+  <input type="number" placeholder="Qty">
+  <button class="btn btn-light remove">Remove</button>
   `;
 
-  div.querySelector(".remove").onclick=()=>div.remove();
-  items.appendChild(div);
+  d.querySelector(".remove").onclick=()=>d.remove();
+  items.appendChild(d);
 }
 addRow();
 document.getElementById("addRow").onclick=addRow;
 
 
-/* ---------- analyze ---------- */
+/* analyze */
 document.getElementById("analyzeBtn").onclick=()=>{
-  let profit=0;
 
-  document.querySelectorAll(".item").forEach(d=>{
-    const i=d.querySelectorAll("input");
-    profit+=(+i[1].value-+i[2].value)*(+i[3].value);
+  let profit=0;
+  let data=[];
+
+  document.querySelectorAll(".item").forEach(r=>{
+    const i=r.querySelectorAll("input");
+
+    const name=i[0].value||"Product";
+    const sell=+i[1].value;
+    const cost=+i[2].value;
+    const qty=+i[3].value;
+
+    const p=(sell-cost)*qty;
+    const margin=(sell-cost)/sell;
+
+    profit+=p;
+
+    data.push({name,sell,cost,qty,profit:p,margin});
   });
+
+  window.analysisData=data;
 
   document.getElementById("profitText").innerText =
     "Estimated Profit: ₹ "+profit.toFixed(0);
 
   document.getElementById("results").style.display="block";
+
+  generateTable(data);
+  generateChart(data);
 };
 
 
-/* ---------- unlock ---------- */
-function unlock(expiry){
-  const date=new Date(Number(expiry)).toLocaleDateString();
+/* colored table */
+function generateTable(data){
 
-  document.getElementById("lockBox").innerHTML = `
-    <div class="success">
-      ✅ Pro unlocked<br>
-      Active till: ${date}
-    </div>
+  const t=document.getElementById("table");
+  t.innerHTML="<tr><th>Product</th><th>Profit</th><th>Margin</th></tr>";
+
+  data.forEach(d=>{
+
+    let cls="bad";
+    if(d.margin>0.4) cls="good";
+    else if(d.margin>0.2) cls="mid";
+
+    t.innerHTML+=`
+    <tr>
+      <td>${d.name}</td>
+      <td>₹${d.profit}</td>
+      <td class="${cls}">${(d.margin*100).toFixed(0)}%</td>
+    </tr>`;
+  });
+}
+
+
+/* chart */
+let chart;
+
+function generateChart(data){
+
+  const ctx=document.getElementById("chart");
+
+  if(chart) chart.destroy();
+
+  chart=new Chart(ctx,{
+    type:"bar",
+    data:{
+      labels:data.map(d=>d.name),
+      datasets:[{
+        label:"Profit",
+        data:data.map(d=>d.profit)
+      }]
+    }
+  });
+}
+
+
+/* insights */
+function generateInsights(data){
+
+  const best=[...data].sort((a,b)=>b.profit-a.profit)[0];
+  const worst=[...data].sort((a,b)=>a.profit-b.profit)[0];
+
+  document.getElementById("insights").innerHTML=`
+    <div class="success">📈 Top: ${best.name}</div>
+    <div class="success">⚠️ Improve: ${worst.name}</div>
   `;
 }
 
 
-/* ---------- verify ---------- */
-async function verify(){
+/* unlock */
+function unlock(){
 
-  const email=document.getElementById("emailInput").value.trim().toLowerCase();
+  document.getElementById("lockBox").innerHTML=
+    `<div class="success">✅ Pro Unlocked</div>`;
 
-  if(!email){
-    alert("Enter email first");
-    return;
-  }
+  document.getElementById("proContent").classList.remove("locked");
 
-  document.getElementById("results").style.display="block";
-
-  try{
-    const r=await fetch(workerURL+"/check?email="+encodeURIComponent(email));
-    const data=await r.json();
-
-    if(data.valid){
-      unlock(data.expiry);
-    } else {
-      alert("No active plan found.");
-    }
-
-  }catch(e){
-    alert("Network error");
-  }
+  generateInsights(window.analysisData);
 }
 
-document.getElementById("verifyBtn").onclick=verify;
+
+/* verify */
+async function verify(){
+  const email=emailInput.value.trim();
+
+  const r=await fetch(workerURL+"/check?email="+encodeURIComponent(email));
+  const d=await r.json();
+
+  if(d.valid) unlock();
+  else alert("No active plan found.");
+}
+verifyBtn.onclick=verify;
 
 
-/* ---------- pay ---------- */
-document.getElementById("payBtn").onclick=()=>{
-
-  const email=document.getElementById("emailInput").value.trim();
-
-  if(!email){
-    alert("Enter email first");
-    return;
-  }
+/* payment */
+payBtn.onclick=()=>{
+  const email=emailInput.value.trim();
 
   const rzp=new Razorpay({
     key:RAZORPAY_KEY,
-    amount:100,
+    amount:PRICE,
     currency:"INR",
     name:"Vizbix",
-    description:"30 days Pro access",
-
+    description:"Profit Leak Finder Pro",
     prefill:{email},
-
-    /* ⭐ CRITICAL: webhook needs this */
-    notes:{ email },
-
-    handler:()=>{
-      setTimeout(verify,1500);
-    }
+    notes:{email},
+    handler:()=>setTimeout(verify,1200)
   });
 
   rzp.open();
 };
 </script>
-
 
 </body>
 </html>
