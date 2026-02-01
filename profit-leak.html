@@ -14,21 +14,21 @@
 body{
   margin:0;
   font-family:Inter,system-ui;
-  background:#f6f7fb;
+  background:#f3f4f6;
 }
 
 main{
-  max-width:1100px;
+  max-width:1000px;
   margin:auto;
-  padding:18px;
+  padding:16px;
 }
 
 .card{
   background:#fff;
   border-radius:16px;
-  padding:18px;
-  margin-bottom:16px;
-  box-shadow:0 10px 25px rgba(0,0,0,.05);
+  padding:16px;
+  margin-bottom:14px;
+  box-shadow:0 6px 18px rgba(0,0,0,.06);
 }
 
 .grid{
@@ -45,47 +45,48 @@ main{
 input{
   padding:10px;
   border-radius:10px;
-  border:1px solid #e2e8f0;
+  border:1px solid #e5e7eb;
 }
 
 button{
-  padding:10px 12px;
+  padding:10px;
   border-radius:10px;
+  border:0;
   font-weight:600;
   cursor:pointer;
-  border:0;
 }
 
-.dark{background:#0f172a;color:#fff}
-.light{background:#fff;border:1px solid #e2e8f0}
+.dark{background:#111827;color:#fff;width:100%}
+.light{background:#fff;border:1px solid #e5e7eb;width:100%}
 
 .big{
-  font-size:30px;
+  font-size:28px;
   font-weight:900;
   text-align:center;
-  margin-bottom:12px;
+  margin-bottom:14px;
 }
 
 .locked{
-  filter:blur(6px);
-  opacity:.4;
+  filter:blur(5px);
+  opacity:.35;
   pointer-events:none;
 }
 
 .success{
   background:#dcfce7;
-  padding:12px;
-  border-radius:12px;
-  font-weight:700;
+  padding:10px;
+  border-radius:10px;
   text-align:center;
-  margin-bottom:12px;
+  font-weight:700;
+  margin-bottom:10px;
 }
 
 .insight{
-  background:#f8fafc;
+  background:#f9fafb;
   padding:10px;
   border-radius:10px;
   margin-bottom:8px;
+  font-size:14px;
 }
 
 table{
@@ -96,30 +97,33 @@ table{
 
 td,th{
   padding:8px;
-  border-bottom:1px solid #e2e8f0;
+  border-bottom:1px solid #eee;
 }
 
 .tools{
   display:flex;
   gap:8px;
-  flex-wrap:wrap;
   margin-top:12px;
+  flex-wrap:wrap;
+}
+
+canvas{
+  max-height:280px;
 }
 </style>
 </head>
-
 
 <body>
 <main>
 
 <div class="card">
 
-<input id="emailInput" placeholder="Email for Pro insights" style="margin-bottom:12px">
+<input id="emailInput" placeholder="Email for Pro insights">
 
 <div id="items"></div>
 
 <button class="light" onclick="addRow()">+ Add Product</button>
-<button class="dark" onclick="analyze()" style="margin-top:8px">Analyze Profit</button>
+<button class="dark" onclick="analyze()">Analyze Profit</button>
 
 </div>
 
@@ -139,14 +143,11 @@ td,th{
 
 <table id="table"></table>
 
-<canvas id="chart" style="margin-top:20px"></canvas>
+<canvas id="chart"></canvas>
 
 <div class="tools">
 <button class="light" onclick="downloadPDF()">Export PDF</button>
-<button class="light" onclick="loadHistory()">History</button>
 </div>
-
-<div id="historyList"></div>
 
 </div>
 </div>
@@ -160,13 +161,12 @@ const workerURL = window.location.origin;
 const PRICE = 29900;
 const KEY = "rzp_live_SAbBHVMbGMv2xo";
 
-const items=document.getElementById("items");
 let chart;
-let insightsText=[];
 let currentData=[];
+let insightsText=[];
 
 
-/* ---------------- ROWS ---------------- */
+/* -------- rows -------- */
 function addRow(){
 const d=document.createElement("div");
 d.className="grid";
@@ -182,7 +182,7 @@ addRow();addRow();addRow();
 
 
 
-/* ---------------- ANALYZE ---------------- */
+/* -------- analyze -------- */
 function analyze(){
 
 let data=[];
@@ -200,16 +200,13 @@ const profit=(sell-cost)*qty;
 const margin=(sell-cost)/sell||0;
 
 total+=profit;
-
-data.push({name,profit,margin});
+data.push({name,profit,margin,sell});
 });
 
 currentData=data;
 
 results.style.display="block";
 profitText.innerText="Estimated Profit: ₹ "+total;
-
-saveHistory(total);
 
 generateInsights(data,total);
 generateTable(data);
@@ -218,29 +215,29 @@ generateChart(data);
 
 
 
-/* ---------------- INSIGHTS ---------------- */
+/* -------- smart insights (better sentences) -------- */
 function generateInsights(d,total){
 
 const best=[...d].sort((a,b)=>b.profit-a.profit)[0];
 const worst=[...d].sort((a,b)=>a.margin-b.margin)[0];
+
 const monthly=total*30;
 
 insightsText=[
-`${best.name} generates the highest profit`,
-`Projected monthly profit ≈ ₹${monthly}`,
-`Increase ${best.name} price slightly to grow profit`,
-`${worst.name} has lowest margin — optimize cost`
+`📈 ${best.name} generates most profit. Focus marketing here.`,
+`📅 At current sales, projected monthly profit ≈ ₹${monthly}`,
+`💡 Increasing ${best.name} price by ₹5–10 can boost profits instantly.`,
+`⚠️ ${worst.name} margin is low. Try reducing cost or raising price.`
 ];
 
-insights.innerHTML=`
-<div class="success">✅ Pro Unlocked</div>
-${insightsText.map(x=>`<div class="insight">• ${x}</div>`).join("")}
-`;
+insights.innerHTML=
+`<div class="success">✅ Pro Unlocked</div>`+
+insightsText.map(x=>`<div class="insight">${x}</div>`).join("");
 }
 
 
 
-/* ---------------- TABLE ---------------- */
+/* -------- table -------- */
 function generateTable(d){
 table.innerHTML="<tr><th>Product</th><th>Profit</th><th>Margin</th></tr>";
 d.forEach(x=>{
@@ -250,33 +247,37 @@ table.innerHTML+=`<tr><td>${x.name}</td><td>₹${x.profit}</td><td>${(x.margin*1
 
 
 
-/* ---------------- CHART ---------------- */
+/* -------- premium colorful chart -------- */
 function generateChart(d){
 
-const colors=[
-"#2563eb","#16a34a","#f59e0b","#dc2626","#7c3aed",
-"#14b8a6","#e11d48","#0ea5e9","#a855f7","#22c55e"
+const palette=[
+"#2563eb","#16a34a","#f59e0b","#ef4444",
+"#7c3aed","#14b8a6","#0ea5e9","#a855f7"
 ];
 
 if(chart) chart.destroy();
 
-chart=new Chart(document.getElementById("chart"),{
+chart=new Chart(chartCanvas,{
 type:"bar",
 data:{
 labels:d.map(x=>x.name),
 datasets:[{
 data:d.map(x=>x.profit),
-backgroundColor:d.map((_,i)=>colors[i%colors.length]),
-borderRadius:8
+backgroundColor:d.map((_,i)=>palette[i%palette.length]),
+borderRadius:10
 }]
 },
-options:{plugins:{legend:{display:false}}}
+options:{
+responsive:true,
+plugins:{legend:{display:false}},
+scales:{y:{beginAtZero:true}}
+}
 });
 }
 
 
 
-/* ---------------- UNLOCK ---------------- */
+/* -------- unlock -------- */
 function unlock(){
 lockBox.innerHTML="<div class='success'>✅ Pro Unlocked</div>";
 proContent.classList.remove("locked");
@@ -284,7 +285,7 @@ proContent.classList.remove("locked");
 
 
 
-/* ---------------- VERIFY ---------------- */
+/* -------- verify -------- */
 async function verify(){
 const r=await fetch(workerURL+"/check?email="+emailInput.value);
 const d=await r.json();
@@ -293,7 +294,7 @@ if(d.valid) unlock();
 
 
 
-/* ---------------- PAYMENT ---------------- */
+/* -------- payment -------- */
 function pay(){
 new Razorpay({
 key:KEY,
@@ -307,74 +308,26 @@ handler:()=>setTimeout(verify,1000)
 
 
 
-/* ---------------- PDF (WITH CHART + INSIGHTS) ---------------- */
-async function downloadPDF(){
+/* -------- pdf (with chart) -------- */
+function downloadPDF(){
 
 const { jsPDF } = window.jspdf;
-const doc = new jsPDF({unit:"pt"});
+const doc=new jsPDF();
 
-let y=40;
+let y=20;
 
-doc.setFontSize(20);
-doc.text("Vizbix Profit Report",40,y);
-
-y+=25;
-doc.setFontSize(11);
-doc.text(new Date().toLocaleString(),40,y);
-
-y+=30;
-
-const total=currentData.reduce((a,b)=>a+b.profit,0);
-
-doc.setFontSize(16);
-doc.text("Total Profit: ₹ "+total,40,y);
-
-y+=30;
-
-doc.setFontSize(12);
-doc.text("Insights",40,y);
-
-y+=20;
-
-insightsText.forEach(t=>{
-doc.text("• "+t,50,y);
-y+=16;
-});
-
-y+=20;
-
-doc.text("Products",40,y);
-y+=18;
+doc.text("Vizbix Profit Report",20,y);
+y+=10;
 
 currentData.forEach(p=>{
-doc.text(`${p.name}   ₹${p.profit}   ${(p.margin*100).toFixed(0)}%`,40,y);
-y+=15;
+doc.text(`${p.name} - ₹${p.profit}`,20,y);
+y+=8;
 });
 
-y+=20;
-
-/* CHART IMAGE */
 const img=chart.toBase64Image();
-doc.addImage(img,"PNG",40,y,500,260);
+doc.addImage(img,"PNG",15,y,180,90);
 
 doc.save("vizbix-report.pdf");
-}
-
-
-
-/* ---------------- HISTORY ---------------- */
-function saveHistory(total){
-let history=JSON.parse(localStorage.getItem("vizbixHistory")||"[]");
-history.unshift({date:new Date().toLocaleString(),profit:total});
-history=history.slice(0,5);
-localStorage.setItem("vizbixHistory",JSON.stringify(history));
-}
-
-function loadHistory(){
-let history=JSON.parse(localStorage.getItem("vizbixHistory")||"[]");
-historyList.innerHTML=history.map(h=>
-`<div>📅 ${h.date} → ₹${h.profit}</div>`
-).join("");
 }
 </script>
 </body>
