@@ -223,13 +223,9 @@ tr:last-child td { border-bottom: none; }
       <div class="brand">Vizbix<span>.</span></div>
       <div class="subtitle">E-commerce Intelligence Engine</div>
     </div>
-    <div style="display:flex; gap:8px; align-items:center;">
-  <span style="font-size:12px; color:var(--text-muted);">Auto-Save Active</span>
-
-  <button class="btn-secondary" onclick="login()">Login</button>
-  <button class="btn-secondary" onclick="loadHistory()">History</button>
-</div>
-
+    <div style="text-align:right">
+      <span style="font-size:12px; color:var(--text-muted);">Auto-Save Active</span>
+    </div>
   </header>
 
   <div class="card">
@@ -289,7 +285,9 @@ tr:last-child td { border-bottom: none; }
       <div id="proContent">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
           <h3 style="margin:0">Strategic Report</h3>
-          <button class="btn-secondary" style="padding:6px 12px; font-size:12px;" onclick="downloadPDF()">↓ Export Report</button>
+          <button class="btn-secondary" onclick="downloadPDF()">↓ Export</button>
+          <button class="btn-secondary" onclick="loadHistory()">📅 History</button>
+
         </div>
 
         <h3 style="margin-bottom:15px">Optimization Strategy</h3>
@@ -410,6 +408,8 @@ function sample(){
   ].forEach(x => createRow(x[0], x[1], x[2], x[3]));
   
   saveDraft(); // Save the sample data so it persists
+}
+
   analyze(); 
 }
 
@@ -458,6 +458,11 @@ function analyze(){
   generateTable(data);
   generateChart(data);
   generateInsights(data);
+  
+  if(loggedEmail){
+  saveReportToCloud(currentData);
+}
+
 }
 
 
@@ -576,80 +581,72 @@ function downloadPDF(){
   doc.save("vizbix-report.pdf");
 }
 
-  /* =================================================
-LOGIN + HISTORY (ADDED ONLY — DOES NOT TOUCH LOGIC)
-================================================= */
+  async function saveReportToCloud(data){
 
-let userToken = localStorage.getItem("vizbix_token");
-
-
-/* auto login */
-window.addEventListener("DOMContentLoaded", async () => {
-  if(!userToken) return;
-
-  try{
-    const r = await fetch(workerURL + "/me?token=" + userToken);
-    const d = await r.json();
-    if(d.ok){
-      document.querySelector("button[onclick='login()']").innerText = d.email;
-    }
-  }catch(e){}
-});
-
-
-/* login */
-async function login(){
-  const email = prompt("Enter email");
-  if(!email) return;
-
-  const r = await fetch(workerURL + "/login?email=" + email);
-  const d = await r.json();
-
-  if(d.ok){
-    userToken = d.token;
-    localStorage.setItem("vizbix_token", d.token);
-    document.querySelector("button[onclick='login()']").innerText = d.email;
-  }
+  await fetch(workerURL+"/save-report",{
+    method:"POST",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({
+      email: loggedEmail,
+      report: data
+    })
+  });
 }
 
+  async function loadHistory(){
 
-/* save report automatically after analyze */
-const oldAnalyze = analyze;
-analyze = function(){
-  oldAnalyze();
+  if(!loggedEmail) return alert("Login first");
 
-  if(userToken){
-    fetch(workerURL + "/saveHistory",{
-      method:"POST",
-      body: JSON.stringify({
-        token:userToken,
-        data: currentData
-      })
-    });
-  }
-};
-
-
-/* history */
-async function loadHistory(){
-  if(!userToken){
-    alert("Login first");
-    return;
-  }
-
-  const r = await fetch(workerURL + "/history?token=" + userToken);
+  const r = await fetch(workerURL+"/history?email="+loggedEmail);
   const d = await r.json();
 
-  if(!d.items.length){
-    alert("No saved reports");
+  const history = d.history || [];
+
+  if(history.length===0){
+    alert("No past reports yet");
     return;
   }
 
-  console.log("Saved reports:", d.items);
-  alert("Check console to view saved analyses");
+  let list = history.map((h,i)=>{
+
+    const profit = h.report.reduce((a,b)=>a+b.profit,0);
+
+    const date = new Date(h.date).toLocaleDateString();
+
+    return `
+      <div style="padding:10px;border-bottom:1px solid #eee;cursor:pointer"
+           onclick='loadReport(${JSON.stringify(h.report)})'>
+        📅 ${date} — ₹${profit}
+      </div>
+    `;
+  }).join("");
+
+  const box = document.createElement("div");
+  box.style="background:#fff;position:fixed;top:10%;left:50%;transform:translateX(-50%);width:300px;max-height:70vh;overflow:auto;border-radius:12px;box-shadow:0 10px 30px rgba(0,0,0,.2);padding:10px;z-index:9999";
+
+  box.innerHTML = "<b>Past Reports</b>"+list+"<br><button onclick='this.parentElement.remove()'>Close</button>";
+
+  document.body.appendChild(box);
+}
+
+  function loadReport(report){
+
+  items.innerHTML="";
+
+  report.forEach(x=>{
+    addRow();
+    const r = items.lastElementChild.querySelectorAll("input");
+    r[0].value=x.name;
+    r[1].value=x.sell;
+    r[2].value=x.cost;
+    r[3].value=x.qty;
+  });
+
+  analyze();
 }
 
 </script>
 </body>
 </html>
+
 
