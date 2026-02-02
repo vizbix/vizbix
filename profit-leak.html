@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
 <title>Vizbix – Profit Intelligence</title>
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
@@ -15,16 +15,20 @@
 :root {
   --bg: #F8FAFC;
   --surface: #FFFFFF;
-  --primary: #0F172A; /* Deep Navy */
-  --accent: #3B82F6; /* Trust Blue */
-  --accent-glow: rgba(59, 130, 246, 0.15);
+  --primary: #0F172A;
+  --primary-light: #334155;
+  --accent: #3B82F6;
+  --accent-glow: rgba(59, 130, 246, 0.2);
   --success: #10B981;
+  --success-bg: #ECFDF5;
+  --danger: #EF4444;
   --text-main: #1E293B;
   --text-muted: #64748B;
   --border: #E2E8F0;
   --radius: 16px;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
 * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -32,33 +36,55 @@
 body {
   margin: 0;
   background-color: var(--bg);
-  /* Subtle mesh gradient for premium feel */
   background-image: 
     radial-gradient(at 0% 0%, hsla(253,16%,7%,0) 0, transparent 50%), 
     radial-gradient(at 50% 0%, hsla(225,39%,30%,0.05) 0, transparent 50%), 
     radial-gradient(at 100% 0%, hsla(339,49%,30%,0) 0, transparent 50%);
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   color: var(--text-main);
-  padding-bottom: 60px;
+  padding-bottom: 80px;
 }
 
-main { max-width: 900px; margin: auto; padding: 24px; }
+main { max-width: 900px; margin: auto; padding: 20px; }
 
-/* --- Typography & Header --- */
+/* --- Header --- */
 header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 40px;
-  padding-bottom: 20px;
-  border-bottom: 1px solid var(--border);
+  margin-bottom: 30px;
+  padding: 16px 0;
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  background: rgba(248, 250, 252, 0.8);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.3s;
 }
+header.scrolled { border-bottom-color: var(--border); }
 
-.brand { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; color: var(--primary); }
+.brand { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; color: var(--primary); display: flex; align-items: center; gap: 8px; }
 .brand span { color: var(--accent); }
-.subtitle { font-size: 14px; color: var(--text-muted); font-weight: 500; }
+.brand-sub { display: flex; flex-direction: column; }
+.subtitle { font-size: 13px; color: var(--text-muted); font-weight: 600; }
 
-/* --- Cards & Layout --- */
+.status-badge {
+  font-size: 11px;
+  font-weight: 600;
+  background: #E2E8F0;
+  color: var(--text-muted);
+  padding: 4px 10px;
+  border-radius: 20px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.status-dot { width: 6px; height: 6px; background: var(--text-muted); border-radius: 50%; }
+.status-badge.saving .status-dot { background: var(--accent); animation: pulse 1s infinite; }
+@keyframes pulse { 0% { opacity: 1; } 50% { opacity: 0.4; } 100% { opacity: 1; } }
+
+/* --- Cards --- */
 .card {
   background: var(--surface);
   border-radius: var(--radius);
@@ -66,58 +92,113 @@ header {
   margin-bottom: 24px;
   box-shadow: var(--shadow-sm);
   border: 1px solid var(--border);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.card:hover { box-shadow: var(--shadow-lg); }
-
-/* --- Inputs & Grid --- */
-.input-group { position: relative; margin-bottom: 20px; }
-.input-label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-
-input {
-  width: 100%;
-  padding: 12px 16px;
-  border-radius: 10px;
-  border: 1px solid var(--border);
-  background: #F1F5F9;
-  font-weight: 500;
-  transition: all 0.2s;
-  font-size: 14px;
-}
-
-input:focus { background: #fff; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); }
-
+/* --- Input Grid --- */
 .grid-header {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 40px;
-  gap: 12px;
-  padding: 0 10px 8px 10px;
-  font-size: 12px;
-  font-weight: 600;
+  grid-template-columns: 3fr 1.5fr 1.5fr 1fr 40px;
+  gap: 16px;
+  padding: 0 16px 12px 16px;
+  font-size: 11px;
+  font-weight: 700;
   color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
 }
 
 .grid-row {
   display: grid;
-  grid-template-columns: 2fr 1fr 1fr 1fr 40px;
-  gap: 12px;
-  margin-bottom: 10px;
+  grid-template-columns: 3fr 1.5fr 1.5fr 1fr 40px;
+  gap: 16px;
   align-items: center;
+  padding: 8px 0;
+  border-bottom: 1px solid transparent;
 }
+.grid-row:hover { background: #f8fafc; border-radius: 8px; }
 
-@media(max-width:640px){
+/* Input Styling with Icons */
+.input-wrapper { position: relative; width: 100%; }
+.input-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  font-size: 14px;
+  pointer-events: none;
+}
+input {
+  width: 100%;
+  padding: 12px 12px 12px 12px;
+  border-radius: 10px;
+  border: 1px solid var(--border);
+  background: #fff;
+  font-family: inherit;
+  font-weight: 500;
+  font-size: 14px;
+  color: var(--primary);
+  transition: all 0.2s;
+  -webkit-appearance: none;
+}
+.has-icon input { padding-left: 28px; } /* Space for icon */
+
+input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); outline: none; }
+input::placeholder { color: #cbd5e1; }
+
+/* Mobile Grid Transformation */
+@media(max-width: 640px){
   .grid-header { display: none; }
-  .grid-row { grid-template-columns: 1fr 1fr; gap: 8px; background: #f8fafc; padding: 10px; border-radius: 12px; border: 1px solid var(--border); }
-  .grid-row input:first-child { grid-column: span 2; }
+  
+  .grid-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 12px;
+    box-shadow: var(--shadow-sm);
+    position: relative;
+  }
+  
+  /* The Product Name takes full width */
+  .grid-row > .input-wrapper:nth-child(1) { grid-column: span 2; }
+  
+  /* The Delete button floats top right */
+  .grid-row > button {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    background: #fee2e2;
+    color: var(--danger);
+    width: 28px; height: 28px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  /* Add Labels on Mobile */
+  .input-wrapper::before {
+    content: attr(data-label);
+    display: block;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text-muted);
+    margin-bottom: 4px;
+    text-transform: uppercase;
+  }
 }
 
 /* --- Buttons --- */
+.action-bar { display: grid; grid-template-columns: 1fr 2fr; gap: 12px; margin-top: 24px; }
+@media(max-width:640px){ .action-bar { grid-template-columns: 1fr; } }
+
 button {
-  padding: 12px 20px;
+  padding: 14px 20px;
   border-radius: 12px;
   font-weight: 600;
-  font-size: 14px;
+  font-size: 15px;
   cursor: pointer;
   border: none;
   transition: all 0.2s;
@@ -125,6 +206,7 @@ button {
   align-items: center;
   justify-content: center;
   gap: 8px;
+  font-family: inherit;
 }
 
 .btn-primary {
@@ -132,85 +214,111 @@ button {
   color: white;
   box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
 }
-.btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(15, 23, 42, 0.3); }
+.btn-primary:active { transform: scale(0.98); }
+.btn-primary:hover { background: #1e293b; box-shadow: 0 6px 16px rgba(15, 23, 42, 0.3); transform: translateY(-1px); }
 
 .btn-secondary { background: white; border: 1px solid var(--border); color: var(--text-main); }
 .btn-secondary:hover { background: #f8fafc; border-color: #cbd5e1; }
 
-.btn-ghost { background: transparent; color: var(--text-muted); padding: 8px; }
-.btn-ghost:hover { color: #ef4444; background: #fef2f2; }
+.btn-ghost { background: transparent; color: var(--text-muted); padding: 8px; border-radius: 8px; }
+.btn-ghost:hover { color: var(--danger); background: #fef2f2; }
 
 /* --- Results Section --- */
-.kpi-container { display: flex; gap: 20px; margin-bottom: 24px; flex-wrap: wrap; }
-.kpi-card {
-  flex: 1;
-  background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-  border: 1px solid var(--border);
-  border-radius: 12px;
-  padding: 16px;
-  min-width: 140px;
-}
-.kpi-label { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 4px; }
-.kpi-value { font-size: 24px; font-weight: 800; color: var(--primary); }
+.kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; margin-bottom: 24px; }
 
-/* --- The Lock (Blur Effect) --- */
-.locked-container { position: relative; overflow: hidden; }
+.kpi-card {
+  background: white;
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 20px;
+  position: relative;
+  overflow: hidden;
+}
+.kpi-card::after {
+  content:''; position: absolute; top:0; right:0; width:60px; height:60px;
+  background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.03) 50%);
+  pointer-events: none;
+}
+.kpi-icon { width: 32px; height: 32px; border-radius: 8px; background: #F1F5F9; color: var(--primary); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+.kpi-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.kpi-value { font-size: 24px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
+
+/* Specific KPI Styles */
+.kpi-net { border-color: #D1FAE5; background: #F0FDF4; }
+.kpi-net .kpi-icon { background: #DCFCE7; color: #166534; }
+.kpi-net .kpi-value { color: #15803d; }
+
+/* --- Locked / Pro Section --- */
+.locked-container { position: relative; min-height: 400px; padding: 0; border: none; background: transparent; box-shadow: none;}
+
 .blur-overlay {
   position: absolute;
   top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(255, 255, 255, 0.2);
-  backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px);
+  background: rgba(255, 255, 255, 0.4);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   z-index: 10;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   border-radius: var(--radius);
-  border: 1px solid rgba(255,255,255,0.5);
+  border: 1px solid rgba(255,255,255,0.6);
 }
 
 .lock-card {
   background: white;
-  padding: 30px;
-  border-radius: 20px;
+  padding: 32px;
+  border-radius: 24px;
   text-align: center;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+  box-shadow: var(--shadow-lg);
   border: 1px solid var(--border);
-  max-width: 320px;
+  max-width: 340px;
+  width: 90%;
+  animation: float 6s ease-in-out infinite;
 }
+
+@keyframes float { 0% {transform: translateY(0px);} 50% {transform: translateY(-10px);} 100% {transform: translateY(0px);} }
 
 .premium-badge {
   background: linear-gradient(135deg, #0F172A 0%, #334155 100%);
   color: white;
-  padding: 4px 12px;
+  padding: 6px 14px;
   border-radius: 20px;
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 700;
   text-transform: uppercase;
-  margin-bottom: 12px;
+  margin-bottom: 16px;
   display: inline-block;
+  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.2);
 }
 
-/* --- Insights & Table --- */
+/* --- Insights List --- */
 .insight-item {
   display: flex;
-  align-items: start;
-  gap: 12px;
+  align-items: flex-start;
+  gap: 16px;
   padding: 16px;
   border-radius: 12px;
   margin-bottom: 12px;
   font-size: 14px;
   line-height: 1.5;
+  transition: transform 0.2s;
 }
-.insight-green { background: #ECFDF5; color: #065F46; border: 1px solid #D1FAE5; }
-.insight-blue { background: #EFF6FF; color: #1E40AF; border: 1px solid #DBEAFE; }
-.insight-orange { background: #FFF7ED; color: #9A3412; border: 1px solid #FFEDD5; }
+.insight-item:hover { transform: translateX(4px); }
+.insight-icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
 
-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; }
-th { text-align: left; padding: 12px; border-bottom: 2px solid var(--border); font-size: 12px; color: var(--text-muted); }
-td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
+.insight-green { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; }
+.insight-blue { background: #EFF6FF; color: #1E40AF; border: 1px solid #BFDBFE; }
+.insight-orange { background: #FFF7ED; color: #9A3412; border: 1px solid #FED7AA; }
+
+/* Table */
+.table-wrapper { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); margin-top: 20px; }
+table { width: 100%; border-collapse: collapse; background: white; min-width: 500px; }
+th { text-align: left; padding: 14px 16px; background: #F8FAFC; border-bottom: 1px solid var(--border); font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+td { padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text-main); }
 tr:last-child td { border-bottom: none; }
+tr:hover td { background: #f8fafc; }
 
 </style>
 </head>
@@ -218,52 +326,70 @@ tr:last-child td { border-bottom: none; }
 <body>
 
 <main>
-  <header>
-    <div>
-      <div class="brand">Vizbix<span>.</span></div>
-      <div class="subtitle">E-commerce Intelligence Engine</div>
+  <header id="mainHeader">
+    <div class="brand">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+      <div class="brand-sub">
+        Vizbix<span>.</span>
+      </div>
     </div>
-    <div style="text-align:right">
-      <span style="font-size:12px; color:var(--text-muted);">Auto-Save Active</span>
+    <div class="status-badge" id="saveStatus">
+      <div class="status-dot"></div> <span id="saveText">Ready</span>
     </div>
   </header>
 
   <div class="card">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-      <div class="input-label">DATA SOURCE</div>
-      <div class="input-label" style="color:var(--accent); cursor:pointer;" onclick="sample()">Use Demo Data</div>
+      <h3 style="margin:0; font-size:16px;">Product Data</h3>
+      <button class="btn-ghost" style="font-size:13px; color:var(--accent);" onclick="sample()">Load Demo Data</button>
     </div>
     
     <div class="grid-header">
-      <div>PRODUCT NAME</div>
-      <div>SELL PRICE</div>
-      <div>COST PRICE</div>
-      <div>QTY SOLD</div>
+      <div>Product Name</div>
+      <div>Sell Price</div>
+      <div>Cost Price</div>
+      <div>Qty Sold</div>
       <div></div>
     </div>
 
     <div id="items"></div>
 
-    <div style="margin-top:16px; display:flex; gap:10px;">
-      <button class="btn-secondary" style="width:100%" onclick="addRow()">+ Add Product</button>
-      <button id="analyzeBtn" class="btn-primary" style="width:100%" onclick="analyze()">Generate Report →</button>
+    <div class="action-bar">
+      <button class="btn-secondary" onclick="addRow()">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        Add Product
+      </button>
+      <button id="analyzeBtn" class="btn-primary" onclick="analyze()">
+        Generate Report 
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+      </button>
     </div>
   </div>
 
   <div id="results" style="display:none">
     
+    <h3 style="margin: 0 0 16px 0;">Executive Summary</h3>
     <div class="kpi-container">
       <div class="kpi-card">
-        <div class="kpi-label">TOTAL REVENUE</div>
+        <div class="kpi-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        </div>
+        <div class="kpi-label">Total Revenue</div>
         <div class="kpi-value" id="dispRevenue">₹0</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">TOTAL COST</div>
-        <div class="kpi-value" id="dispCost" style="color:#64748B">₹0</div>
+        <div class="kpi-icon" style="color:#ef4444">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="15"></line></svg>
+        </div>
+        <div class="kpi-label">Total Cost</div>
+        <div class="kpi-value" id="dispCost" style="color:var(--text-muted)">₹0</div>
       </div>
-      <div class="kpi-card" style="border-color:var(--success); background:#f0fdf4;">
-        <div class="kpi-label" style="color:#15803d">NET PROFIT</div>
-        <div class="kpi-value" id="dispProfit" style="color:#15803d">₹0</div>
+      <div class="kpi-card kpi-net">
+        <div class="kpi-icon">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+        </div>
+        <div class="kpi-label">Net Profit</div>
+        <div class="kpi-value" id="dispProfit">₹0</div>
       </div>
     </div>
 
@@ -272,33 +398,38 @@ tr:last-child td { border-bottom: none; }
       <div class="blur-overlay" id="lockOverlay">
         <div class="lock-card">
           <span class="premium-badge">Vizbix Pro</span>
-          <h3 style="margin:0 0 10px 0;">Unlock Strategic Insights</h3>
-          <p style="font-size:13px; color:#64748B; margin-bottom:20px;">
-            Get chart visualization, margin analysis, and AI-driven pricing recommendations to boost profit.
+          <h2 style="margin:0 0 8px 0; font-size: 20px;">Unlock Intelligence</h2>
+          <p style="font-size:14px; color:#64748B; margin-bottom:24px; line-height: 1.5;">
+            Reveal margin breakdowns, visualizations, and AI-driven pricing strategies.
           </p>
-          <input id="emailInput" placeholder="Enter your email" style="margin-bottom:10px; text-align:center;">
+          <div class="input-wrapper" style="margin-bottom:12px;">
+            <input id="emailInput" placeholder="Enter your email" style="text-align:center;">
+          </div>
           <button class="btn-primary" style="width:100%" onclick="pay()">Unlock for ₹299</button>
-          <button style="background:none; border:none; color:#64748B; font-size:11px; margin-top:10px; cursor:pointer; text-decoration:underline" onclick="verify()">Restore Purchase</button>
+          <button style="background:none; border:none; color:#64748B; font-size:12px; margin-top:12px; cursor:pointer; text-decoration:underline" onclick="verify()">Restore Purchase</button>
         </div>
       </div>
 
-      <div id="proContent">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-          <h3 style="margin:0">Strategic Report</h3>
-          <button class="btn-secondary" style="padding:6px 12px; font-size:12px;" onclick="downloadPDF()">↓ Export Report</button>
+      <div id="proContent" style="background:white; border-radius:16px; border:1px solid var(--border); padding:24px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:10px;">
+          <h3 style="margin:0">Strategy Report</h3>
+          <button class="btn-secondary" style="padding:8px 14px; font-size:13px;" onclick="downloadPDF()">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+            Export PDF
+          </button>
         </div>
 
-        <h3 style="margin-bottom:15px">Optimization Strategy</h3>
+        <h4 style="margin:0 0 16px 0; color:var(--text-muted); font-size:12px; text-transform:uppercase;">AI Recommendations</h4>
         <div id="insights"></div>
 
-        <h3 style="margin-top:30px; margin-bottom:15px">Detailed Margin Analysis</h3>
-        <div style="overflow-x:auto;">
-          <table id="table"></table>
+        <h4 style="margin:40px 0 16px 0; color:var(--text-muted); font-size:12px; text-transform:uppercase;">Profit Distribution</h4>
+        <div style="height:320px; width:100%; position:relative;">
+          <canvas id="chart"></canvas>
         </div>
 
-        <h3 style="margin-top:40px; margin-bottom:15px">Profit Distribution</h3>
-        <div style="height:300px; margin-bottom:30px;">
-          <canvas id="chart"></canvas>
+        <h4 style="margin:40px 0 16px 0; color:var(--text-muted); font-size:12px; text-transform:uppercase;">Detailed Breakdown</h4>
+        <div class="table-wrapper">
+          <table id="table"></table>
         </div>
       </div>
 
@@ -317,31 +448,32 @@ const items = document.getElementById("items");
 let chartInstance;
 let currentData = [];
 
-// --- 1. NEW: Auto-Load on Startup ---
+// --- Scroll Effect ---
+window.addEventListener('scroll', () => {
+  const header = document.getElementById('mainHeader');
+  if(window.scrollY > 10) header.classList.add('scrolled');
+  else header.classList.remove('scrolled');
+});
+
+// --- Auto-Load ---
 window.addEventListener('DOMContentLoaded', () => {
     const saved = localStorage.getItem("vizbix_draft");
     if(saved) {
         try {
             const data = JSON.parse(saved);
             if (data.length > 0) {
-                items.innerHTML = ""; // Clear default rows
+                items.innerHTML = "";
                 data.forEach(x => {
                     createRow(x.name, x.sell, x.cost, x.qty);
                 });
-                // Optional: Automatically run analysis if data exists
-                // analyze(); 
             }
-        } catch (e) {
-            console.error("Save file corrupted", e);
-        }
+        } catch (e) { console.error(e); }
     } else {
-        // Default start: 3 empty rows
         createRow(); createRow(); createRow(); 
     }
 });
 
-// --- 2. NEW: Real-Time Auto-Save ---
-// We listen to the whole container for any input change
+// --- Auto-Save Listener ---
 items.addEventListener('input', () => {
     saveDraft();
 });
@@ -350,7 +482,6 @@ function saveDraft() {
     const rawData = [];
     document.querySelectorAll(".grid-row").forEach(r => {
         const i = r.querySelectorAll("input");
-        // Save everything, even incomplete rows
         rawData.push({
             name: i[0].value,
             sell: i[1].value,
@@ -360,13 +491,15 @@ function saveDraft() {
     });
     localStorage.setItem("vizbix_draft", JSON.stringify(rawData));
     
-    // Visual Feedback
-    const btn = document.getElementById("analyzeBtn");
-    const originalText = "Generate Report →";
-    if(btn && btn.innerText === originalText) {
-        btn.innerText = "Saving...";
-        setTimeout(() => btn.innerText = originalText, 800);
-    }
+    // Status Indicator Update
+    const badge = document.getElementById("saveStatus");
+    const text = document.getElementById("saveText");
+    badge.classList.add("saving");
+    text.innerText = "Saving...";
+    setTimeout(() => {
+        badge.classList.remove("saving");
+        text.innerText = "Saved";
+    }, 800);
 }
 
 
@@ -375,23 +508,45 @@ function createRow(name="", sell="", cost="", qty=""){
   const d = document.createElement("div");
   d.className = "grid-row";
   d.innerHTML = `
-    <input type="text" placeholder="e.g. Product Name" value="${name}">
-    <input type="number" placeholder="0.00" value="${sell}">
-    <input type="number" placeholder="0.00" value="${cost}">
-    <input type="number" placeholder="0" value="${qty}">
-    <button class="btn-ghost" onclick="removeRow(this)">✕</button>
+    <div class="input-wrapper" data-label="Product">
+        <input type="text" placeholder="Product Name" value="${name}">
+    </div>
+    
+    <div class="input-wrapper has-icon" data-label="Sell Price">
+        <span class="input-icon">₹</span>
+        <input type="number" placeholder="0" value="${sell}">
+    </div>
+
+    <div class="input-wrapper has-icon" data-label="Cost Price">
+        <span class="input-icon">₹</span>
+        <input type="number" placeholder="0" value="${cost}">
+    </div>
+
+    <div class="input-wrapper has-icon" data-label="Quantity">
+        <span class="input-icon">#</span>
+        <input type="number" placeholder="0" value="${qty}">
+    </div>
+
+    <button class="btn-ghost" onclick="removeRow(this)" title="Remove">✕</button>
   `;
   items.appendChild(d);
 }
 
 function addRow(){
     createRow();
-    saveDraft(); // Save immediately when adding a row
+    saveDraft();
 }
 
 function removeRow(btn){
-    btn.parentElement.remove();
-    saveDraft(); // Save immediately when removing
+    if(document.querySelectorAll('.grid-row').length > 1) {
+        btn.parentElement.remove();
+        saveDraft();
+    } else {
+        // Clear values instead of removing the last row
+        const inputs = btn.parentElement.querySelectorAll('input');
+        inputs.forEach(i => i.value = '');
+        saveDraft();
+    }
 }
 
 
@@ -404,8 +559,7 @@ function sample(){
     ["USB-C Cable", 499, 150, 400],
     ["Laptop Stand", 1200, 600, 120]
   ].forEach(x => createRow(x[0], x[1], x[2], x[3]));
-  
-  saveDraft(); // Save the sample data so it persists
+  saveDraft();
   analyze(); 
 }
 
@@ -438,22 +592,40 @@ function analyze(){
     data.push({name, sell, cost, qty, profit, margin});
   });
 
-  if(data.length === 0) return alert("Please enter at least one product.");
+  if(data.length === 0) return alert("Please enter at least one product with price data.");
 
   currentData = data;
 
   // Show Dashboard
   document.getElementById("results").style.display = "block";
-  document.getElementById("results").scrollIntoView({behavior: "smooth"});
+  
+  // Smooth scroll
+  setTimeout(() => {
+    document.getElementById("results").scrollIntoView({behavior: "smooth", block: "start"});
+  }, 100);
 
-  // Update Stats
-  document.getElementById("dispRevenue").innerText = "₹ " + totalRevenue.toLocaleString();
-  document.getElementById("dispCost").innerText = "₹ " + totalCost.toLocaleString();
-  document.getElementById("dispProfit").innerText = "₹ " + totalProfit.toLocaleString();
+  // Update Stats with Animation
+  animateValue("dispRevenue", totalRevenue);
+  animateValue("dispCost", totalCost);
+  animateValue("dispProfit", totalProfit);
 
   generateTable(data);
   generateChart(data);
   generateInsights(data);
+}
+
+function animateValue(id, end) {
+    const obj = document.getElementById(id);
+    const start = 0;
+    const duration = 1000;
+    let startTimestamp = null;
+    const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        obj.innerHTML = "₹" + Math.floor(progress * (end - start) + start).toLocaleString();
+        if (progress < 1) window.requestAnimationFrame(step);
+    };
+    window.requestAnimationFrame(step);
 }
 
 
@@ -465,7 +637,8 @@ function generateInsights(d){
   const best = [...d].sort((a,b)=>b.profit - a.profit)[0];
   if(best) {
       html += `<div class="insight-item insight-green">
-        <div><strong>★ Star Product:</strong> ${best.name} is driving your growth. Allocate 60% of your ad budget here.</div>
+        <div class="insight-icon">★</div>
+        <div><strong>Star Product:</strong> ${best.name} is your profit driver. Consider increasing ad spend here to maximize returns.</div>
       </div>`;
   }
 
@@ -473,10 +646,13 @@ function generateInsights(d){
     if(x.margin < 0.20 && x.qty > 10) {
       const suggestedPrice = x.cost / 0.70; 
       html += `<div class="insight-item insight-orange">
-        <div><strong>⚠ Low Margin:</strong> ${x.name} margin is ${(x.margin*100).toFixed(0)}%. Raise price to ₹${Math.round(suggestedPrice)} for better health.</div>
+        <div class="insight-icon">⚠</div>
+        <div><strong>Margin Alert:</strong> ${x.name} runs on a thin ${(x.margin*100).toFixed(0)}% margin. Aim for ₹${Math.round(suggestedPrice)} to reach healthy levels.</div>
       </div>`;
     }
   });
+  
+  if(html === "") html = `<div class="insight-item insight-blue"><div class="insight-icon">✓</div><div>All products appear to have healthy margins. Good job!</div></div>`;
 
   insightsDiv.innerHTML = html;
 }
@@ -485,13 +661,13 @@ function generateInsights(d){
 /* ---------- Logic: Table ---------- */
 function generateTable(d){
   const table = document.getElementById("table");
-  table.innerHTML = "<tr><th>Product</th><th>Profit Contribution</th><th>Margin</th><th>Status</th></tr>";
+  table.innerHTML = "<tr><th>Product</th><th>Profit</th><th>Margin</th><th>Health</th></tr>";
   
   d.forEach(x => {
-    let status = x.margin > 0.3 ? "<span style='color:green;font-weight:700'>Healthy</span>" : "<span style='color:orange;font-weight:700'>Review</span>";
+    let status = x.margin > 0.3 ? "<span style='color:var(--success);font-weight:700'>Healthy</span>" : "<span style='color:orange;font-weight:700'>Low</span>";
     table.innerHTML += `<tr>
-      <td><div style="font-weight:600">${x.name}</div><div style="font-size:11px;color:#64748B">Sold: ${x.qty}</div></td>
-      <td>₹${x.profit.toLocaleString()}</td>
+      <td><div style="font-weight:600">${x.name}</div><div style="font-size:11px;color:#94a3b8">Sold: ${x.qty}</div></td>
+      <td style="font-weight:600">₹${x.profit.toLocaleString()}</td>
       <td>${(x.margin*100).toFixed(1)}%</td>
       <td>${status}</td>
     </tr>`;
@@ -509,19 +685,35 @@ function generateChart(d){
     data: {
       labels: d.map(x => x.name),
       datasets: [{
-        label: 'Profit (₹)',
+        label: 'Net Profit (₹)',
         data: d.map(x => x.profit),
         backgroundColor: '#0F172A',
-        borderRadius: 6
+        borderRadius: 8,
+        hoverBackgroundColor: '#3B82F6'
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { legend: {display: false} },
+      plugins: { 
+          legend: {display: false},
+          tooltip: {
+              backgroundColor: '#1E293B',
+              padding: 12,
+              titleFont: { family: 'Plus Jakarta Sans', size: 13 },
+              bodyFont: { family: 'Plus Jakarta Sans', size: 13 }
+          }
+      },
       scales: {
-        y: { beginAtZero: true, grid: { borderDash: [5, 5] } },
-        x: { grid: { display: false } }
+        y: { 
+            beginAtZero: true, 
+            grid: { color: '#f1f5f9', borderDash: [5, 5] },
+            ticks: { font: { family: 'Plus Jakarta Sans', size: 11 } }
+        },
+        x: { 
+            grid: { display: false },
+            ticks: { font: { family: 'Plus Jakarta Sans', size: 11 } }
+        }
       }
     }
   });
@@ -530,8 +722,11 @@ function generateChart(d){
 
 /* ---------- Payment & Unlock ---------- */
 function unlock(){
-  document.getElementById("lockOverlay").style.display = "none";
-  setTimeout(() => { if(chartInstance) chartInstance.resize(); }, 100);
+  document.getElementById("lockOverlay").style.opacity = "0";
+  setTimeout(() => { 
+      document.getElementById("lockOverlay").style.display = "none";
+      if(chartInstance) chartInstance.resize(); 
+  }, 400);
 }
 
 async function verify(){
@@ -545,7 +740,8 @@ async function verify(){
     if(d.valid) unlock();
     else alert("Pro subscription not found.");
   } catch(e) {
-    unlock(); // Dev fallback
+    // In demo mode, we unlock to show UI
+    unlock(); 
   }
 }
 
@@ -558,6 +754,7 @@ function pay(){
     amount: PRICE,
     currency: "INR",
     name: "Vizbix Pro",
+    description: "Unlock Profit Intelligence",
     prefill: { email: email },
     theme: { color: "#0F172A" },
     handler: function(response){ verify(); }
@@ -567,12 +764,21 @@ function pay(){
 function downloadPDF(){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-  doc.text("Vizbix Report", 20, 20);
-  doc.addImage(chartInstance.toBase64Image(), "PNG", 20, 40, 170, 90);
+  
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(20);
+  doc.text("Vizbix Intelligence Report", 20, 20);
+  
+  doc.setFontSize(12);
+  doc.setFont("helvetica", "normal");
+  doc.text("Generated on: " + new Date().toLocaleDateString(), 20, 30);
+  
+  if(chartInstance){
+      doc.addImage(chartInstance.toBase64Image(), "PNG", 20, 40, 170, 90);
+  }
+  
   doc.save("vizbix-report.pdf");
 }
 </script>
 </body>
 </html>
-
-
