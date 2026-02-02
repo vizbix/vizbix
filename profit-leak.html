@@ -16,18 +16,15 @@
   --bg: #F8FAFC;
   --surface: #FFFFFF;
   --primary: #0F172A;
-  --primary-light: #334155;
   --accent: #3B82F6;
   --accent-glow: rgba(59, 130, 246, 0.2);
   --success: #10B981;
-  --success-bg: #ECFDF5;
   --danger: #EF4444;
   --text-main: #1E293B;
   --text-muted: #64748B;
   --border: #E2E8F0;
   --radius: 16px;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
@@ -67,18 +64,9 @@ header.scrolled { border-bottom-color: var(--border); }
 .brand { font-size: 26px; font-weight: 800; letter-spacing: -0.5px; color: var(--primary); display: flex; align-items: center; gap: 8px; }
 .brand span { color: var(--accent); }
 .brand-sub { display: flex; flex-direction: column; }
-.subtitle { font-size: 13px; color: var(--text-muted); font-weight: 600; }
-
 .status-badge {
-  font-size: 11px;
-  font-weight: 600;
-  background: #E2E8F0;
-  color: var(--text-muted);
-  padding: 4px 10px;
-  border-radius: 20px;
-  display: flex;
-  align-items: center;
-  gap: 6px;
+  font-size: 11px; font-weight: 600; background: #E2E8F0; color: var(--text-muted);
+  padding: 4px 10px; border-radius: 20px; display: flex; align-items: center; gap: 6px;
 }
 .status-dot { width: 6px; height: 6px; background: var(--text-muted); border-radius: 50%; }
 .status-badge.saving .status-dot { background: var(--accent); animation: pulse 1s infinite; }
@@ -144,12 +132,11 @@ input {
 .has-icon input { padding-left: 28px; } /* Space for icon */
 
 input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); outline: none; }
-input::placeholder { color: #cbd5e1; }
+input::placeholder { color: #cbd5e1; font-weight: 400; }
 
 /* Mobile Grid Transformation */
 @media(max-width: 640px){
   .grid-header { display: none; }
-  
   .grid-row {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -162,31 +149,17 @@ input::placeholder { color: #cbd5e1; }
     box-shadow: var(--shadow-sm);
     position: relative;
   }
-  
-  /* The Product Name takes full width */
   .grid-row > .input-wrapper:nth-child(1) { grid-column: span 2; }
-  
-  /* The Delete button floats top right */
   .grid-row > button {
-    position: absolute;
-    top: 8px;
-    right: 8px;
-    background: #fee2e2;
-    color: var(--danger);
-    width: 28px; height: 28px;
-    border-radius: 50%;
+    position: absolute; top: 8px; right: 8px;
+    background: #fee2e2; color: var(--danger);
+    width: 28px; height: 28px; border-radius: 50%;
     display: flex; align-items: center; justify-content: center;
   }
-
-  /* Add Labels on Mobile */
   .input-wrapper::before {
     content: attr(data-label);
-    display: block;
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--text-muted);
-    margin-bottom: 4px;
-    text-transform: uppercase;
+    display: block; font-size: 10px; font-weight: 700;
+    color: var(--text-muted); margin-bottom: 4px; text-transform: uppercase;
   }
 }
 
@@ -209,11 +182,7 @@ button {
   font-family: inherit;
 }
 
-.btn-primary {
-  background: var(--primary);
-  color: white;
-  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2);
-}
+.btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2); }
 .btn-primary:active { transform: scale(0.98); }
 .btn-primary:hover { background: #1e293b; box-shadow: 0 6px 16px rgba(15, 23, 42, 0.3); transform: translateY(-1px); }
 
@@ -227,99 +196,48 @@ button {
 .kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 16px; margin-bottom: 24px; }
 
 .kpi-card {
-  background: white;
-  border: 1px solid var(--border);
-  border-radius: 16px;
-  padding: 20px;
-  position: relative;
-  overflow: hidden;
-}
-.kpi-card::after {
-  content:''; position: absolute; top:0; right:0; width:60px; height:60px;
-  background: linear-gradient(135deg, transparent 50%, rgba(0,0,0,0.03) 50%);
-  pointer-events: none;
+  background: white; border: 1px solid var(--border); border-radius: 16px; padding: 20px; position: relative; overflow: hidden;
 }
 .kpi-icon { width: 32px; height: 32px; border-radius: 8px; background: #F1F5F9; color: var(--primary); display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
 .kpi-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
 .kpi-value { font-size: 24px; font-weight: 800; color: var(--primary); letter-spacing: -0.5px; }
 
-/* Specific KPI Styles */
 .kpi-net { border-color: #D1FAE5; background: #F0FDF4; }
 .kpi-net .kpi-icon { background: #DCFCE7; color: #166534; }
 .kpi-net .kpi-value { color: #15803d; }
 
 /* --- Locked / Pro Section --- */
 .locked-container { position: relative; min-height: 400px; padding: 0; border: none; background: transparent; box-shadow: none;}
-
 .blur-overlay {
-  position: absolute;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(255, 255, 255, 0.4);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  z-index: 10;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  border-radius: var(--radius);
-  border: 1px solid rgba(255,255,255,0.6);
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+  z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.6);
 }
 
 .lock-card {
-  background: white;
-  padding: 32px;
-  border-radius: 24px;
-  text-align: center;
-  box-shadow: var(--shadow-lg);
-  border: 1px solid var(--border);
-  max-width: 340px;
-  width: 90%;
+  background: white; padding: 32px; border-radius: 24px; text-align: center;
+  box-shadow: var(--shadow-lg); border: 1px solid var(--border); max-width: 340px; width: 90%;
   animation: float 6s ease-in-out infinite;
 }
-
 @keyframes float { 0% {transform: translateY(0px);} 50% {transform: translateY(-10px);} 100% {transform: translateY(0px);} }
-
 .premium-badge {
-  background: linear-gradient(135deg, #0F172A 0%, #334155 100%);
-  color: white;
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 11px;
-  font-weight: 700;
-  text-transform: uppercase;
-  margin-bottom: 16px;
-  display: inline-block;
-  box-shadow: 0 4px 10px rgba(15, 23, 42, 0.2);
+  background: linear-gradient(135deg, #0F172A 0%, #334155 100%); color: white; padding: 6px 14px;
+  border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase;
+  margin-bottom: 16px; display: inline-block; box-shadow: 0 4px 10px rgba(15, 23, 42, 0.2);
 }
 
-/* --- Insights List --- */
-.insight-item {
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  padding: 16px;
-  border-radius: 12px;
-  margin-bottom: 12px;
-  font-size: 14px;
-  line-height: 1.5;
-  transition: transform 0.2s;
-}
-.insight-item:hover { transform: translateX(4px); }
-.insight-icon { font-size: 18px; flex-shrink: 0; margin-top: 2px; }
-
+/* --- Insights & Table --- */
+.insight-item { display: flex; align-items: flex-start; gap: 16px; padding: 16px; border-radius: 12px; margin-bottom: 12px; font-size: 14px; line-height: 1.5; }
 .insight-green { background: #ECFDF5; color: #065F46; border: 1px solid #A7F3D0; }
 .insight-blue { background: #EFF6FF; color: #1E40AF; border: 1px solid #BFDBFE; }
 .insight-orange { background: #FFF7ED; color: #9A3412; border: 1px solid #FED7AA; }
 
-/* Table */
 .table-wrapper { overflow-x: auto; border-radius: 12px; border: 1px solid var(--border); margin-top: 20px; }
 table { width: 100%; border-collapse: collapse; background: white; min-width: 500px; }
 th { text-align: left; padding: 14px 16px; background: #F8FAFC; border-bottom: 1px solid var(--border); font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
 td { padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 14px; color: var(--text-main); }
 tr:last-child td { border-bottom: none; }
-tr:hover td { background: #f8fafc; }
-
 </style>
 </head>
 
@@ -329,9 +247,7 @@ tr:hover td { background: #f8fafc; }
   <header id="mainHeader">
     <div class="brand">
       <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
-      <div class="brand-sub">
-        Vizbix<span>.</span>
-      </div>
+      <div class="brand-sub">Vizbix<span>.</span></div>
     </div>
     <div class="status-badge" id="saveStatus">
       <div class="status-dot"></div> <span id="saveText">Ready</span>
@@ -355,14 +271,8 @@ tr:hover td { background: #f8fafc; }
     <div id="items"></div>
 
     <div class="action-bar">
-      <button class="btn-secondary" onclick="addRow()">
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-        Add Product
-      </button>
-      <button id="analyzeBtn" class="btn-primary" onclick="analyze()">
-        Generate Report 
-        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-      </button>
+      <button class="btn-secondary" onclick="addRow()">+ Add Product</button>
+      <button id="analyzeBtn" class="btn-primary" onclick="analyze()">Generate Report →</button>
     </div>
   </div>
 
@@ -372,21 +282,21 @@ tr:hover td { background: #f8fafc; }
     <div class="kpi-container">
       <div class="kpi-card">
         <div class="kpi-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="12" y1="12" x2="12.01" y2="12" stroke-width="4"/></svg>
         </div>
         <div class="kpi-label">Total Revenue</div>
         <div class="kpi-value" id="dispRevenue">₹0</div>
       </div>
       <div class="kpi-card">
         <div class="kpi-icon" style="color:#ef4444">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="15"></line></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z"></path><line x1="16" y1="8" x2="2" y2="22"></line><line x1="17.5" y1="15" x2="9" y2="15"></line></svg>
         </div>
         <div class="kpi-label">Total Cost</div>
         <div class="kpi-value" id="dispCost" style="color:var(--text-muted)">₹0</div>
       </div>
       <div class="kpi-card kpi-net">
         <div class="kpi-icon">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"></polyline><polyline points="17 6 23 6 23 12"></polyline></svg>
         </div>
         <div class="kpi-label">Net Profit</div>
         <div class="kpi-value" id="dispProfit">₹0</div>
@@ -413,10 +323,7 @@ tr:hover td { background: #f8fafc; }
       <div id="proContent" style="background:white; border-radius:16px; border:1px solid var(--border); padding:24px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:10px;">
           <h3 style="margin:0">Strategy Report</h3>
-          <button class="btn-secondary" style="padding:8px 14px; font-size:13px;" onclick="downloadPDF()">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-            Export PDF
-          </button>
+          <button class="btn-secondary" style="padding:8px 14px; font-size:13px;" onclick="downloadPDF()">Export PDF</button>
         </div>
 
         <h4 style="margin:0 0 16px 0; color:var(--text-muted); font-size:12px; text-transform:uppercase;">AI Recommendations</h4>
@@ -432,11 +339,8 @@ tr:hover td { background: #f8fafc; }
           <table id="table"></table>
         </div>
       </div>
-
     </div>
-
   </div>
-
 </main>
 
 <script>
@@ -448,7 +352,6 @@ const items = document.getElementById("items");
 let chartInstance;
 let currentData = [];
 
-// --- Scroll Effect ---
 window.addEventListener('scroll', () => {
   const header = document.getElementById('mainHeader');
   if(window.scrollY > 10) header.classList.add('scrolled');
@@ -463,17 +366,21 @@ window.addEventListener('DOMContentLoaded', () => {
             const data = JSON.parse(saved);
             if (data.length > 0) {
                 items.innerHTML = "";
-                data.forEach(x => {
-                    createRow(x.name, x.sell, x.cost, x.qty);
-                });
+                data.forEach(x => createRow(x.name, x.sell, x.cost, x.qty));
+            } else {
+                initEmpty();
             }
-        } catch (e) { console.error(e); }
+        } catch (e) { initEmpty(); }
     } else {
-        createRow(); createRow(); createRow(); 
+        initEmpty();
     }
 });
 
-// --- Auto-Save Listener ---
+function initEmpty() {
+    createRow(); createRow(); createRow(); 
+}
+
+// --- Auto-Save ---
 items.addEventListener('input', () => {
     saveDraft();
 });
@@ -491,7 +398,6 @@ function saveDraft() {
     });
     localStorage.setItem("vizbix_draft", JSON.stringify(rawData));
     
-    // Status Indicator Update
     const badge = document.getElementById("saveStatus");
     const text = document.getElementById("saveText");
     badge.classList.add("saving");
@@ -502,24 +408,27 @@ function saveDraft() {
     }, 800);
 }
 
-
-/* ---------- UI Helper: Create Row ---------- */
+/* ---------- Create Row (UPDATED: Starts Empty) ---------- */
 function createRow(name="", sell="", cost="", qty=""){
   const d = document.createElement("div");
   d.className = "grid-row";
+  
+  // Logic to ensure fields start truly empty if no value is passed
+  // We don't want value="0"
+  
   d.innerHTML = `
     <div class="input-wrapper" data-label="Product">
-        <input type="text" placeholder="Product Name" value="${name}">
+        <input type="text" placeholder="e.g. Wireless Buds" value="${name}">
     </div>
     
     <div class="input-wrapper has-icon" data-label="Sell Price">
         <span class="input-icon">₹</span>
-        <input type="number" placeholder="0" value="${sell}">
+        <input type="number" placeholder="0.00" value="${sell}">
     </div>
 
     <div class="input-wrapper has-icon" data-label="Cost Price">
         <span class="input-icon">₹</span>
-        <input type="number" placeholder="0" value="${cost}">
+        <input type="number" placeholder="0.00" value="${cost}">
     </div>
 
     <div class="input-wrapper has-icon" data-label="Quantity">
@@ -533,7 +442,8 @@ function createRow(name="", sell="", cost="", qty=""){
 }
 
 function addRow(){
-    createRow();
+    // Call with empty arguments so no "0" appears in value
+    createRow("", "", "", ""); 
     saveDraft();
 }
 
@@ -542,15 +452,12 @@ function removeRow(btn){
         btn.parentElement.remove();
         saveDraft();
     } else {
-        // Clear values instead of removing the last row
         const inputs = btn.parentElement.querySelectorAll('input');
         inputs.forEach(i => i.value = '');
         saveDraft();
     }
 }
 
-
-/* ---------- Logic: Sample Data ---------- */
 function sample(){
   items.innerHTML="";
   [
@@ -563,8 +470,6 @@ function sample(){
   analyze(); 
 }
 
-
-/* ---------- Logic: Analyze ---------- */
 function analyze(){
   let data = [];
   let totalRevenue = 0;
@@ -592,19 +497,14 @@ function analyze(){
     data.push({name, sell, cost, qty, profit, margin});
   });
 
-  if(data.length === 0) return alert("Please enter at least one product with price data.");
+  if(data.length === 0) return alert("Please enter at least one product price.");
 
   currentData = data;
-
-  // Show Dashboard
   document.getElementById("results").style.display = "block";
-  
-  // Smooth scroll
   setTimeout(() => {
     document.getElementById("results").scrollIntoView({behavior: "smooth", block: "start"});
   }, 100);
 
-  // Update Stats with Animation
   animateValue("dispRevenue", totalRevenue);
   animateValue("dispCost", totalCost);
   animateValue("dispProfit", totalProfit);
@@ -628,41 +528,30 @@ function animateValue(id, end) {
     window.requestAnimationFrame(step);
 }
 
-
-/* ---------- Logic: Insights ---------- */
 function generateInsights(d){
   const insightsDiv = document.getElementById("insights");
   let html = "";
-
   const best = [...d].sort((a,b)=>b.profit - a.profit)[0];
   if(best) {
       html += `<div class="insight-item insight-green">
-        <div class="insight-icon">★</div>
-        <div><strong>Star Product:</strong> ${best.name} is your profit driver. Consider increasing ad spend here to maximize returns.</div>
+        <div><strong>★ Star Product:</strong> ${best.name} is your profit driver.</div>
       </div>`;
   }
-
   d.forEach(x => {
     if(x.margin < 0.20 && x.qty > 10) {
       const suggestedPrice = x.cost / 0.70; 
       html += `<div class="insight-item insight-orange">
-        <div class="insight-icon">⚠</div>
-        <div><strong>Margin Alert:</strong> ${x.name} runs on a thin ${(x.margin*100).toFixed(0)}% margin. Aim for ₹${Math.round(suggestedPrice)} to reach healthy levels.</div>
+        <div><strong>⚠ Margin Alert:</strong> ${x.name} has low margin (${(x.margin*100).toFixed(0)}%). Aim for ₹${Math.round(suggestedPrice)}.</div>
       </div>`;
     }
   });
-  
-  if(html === "") html = `<div class="insight-item insight-blue"><div class="insight-icon">✓</div><div>All products appear to have healthy margins. Good job!</div></div>`;
-
+  if(html === "") html = `<div class="insight-item insight-blue"><div>✓ All products have healthy margins.</div></div>`;
   insightsDiv.innerHTML = html;
 }
 
-
-/* ---------- Logic: Table ---------- */
 function generateTable(d){
   const table = document.getElementById("table");
   table.innerHTML = "<tr><th>Product</th><th>Profit</th><th>Margin</th><th>Health</th></tr>";
-  
   d.forEach(x => {
     let status = x.margin > 0.3 ? "<span style='color:var(--success);font-weight:700'>Healthy</span>" : "<span style='color:orange;font-weight:700'>Low</span>";
     table.innerHTML += `<tr>
@@ -674,12 +563,9 @@ function generateTable(d){
   });
 }
 
-
-/* ---------- Logic: Chart ---------- */
 function generateChart(d){
   if(chartInstance) chartInstance.destroy();
   const ctx = document.getElementById("chart").getContext('2d');
-  
   chartInstance = new Chart(ctx, {
     type: 'bar',
     data: {
@@ -688,39 +574,21 @@ function generateChart(d){
         label: 'Net Profit (₹)',
         data: d.map(x => x.profit),
         backgroundColor: '#0F172A',
-        borderRadius: 8,
-        hoverBackgroundColor: '#3B82F6'
+        borderRadius: 8
       }]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
-      plugins: { 
-          legend: {display: false},
-          tooltip: {
-              backgroundColor: '#1E293B',
-              padding: 12,
-              titleFont: { family: 'Plus Jakarta Sans', size: 13 },
-              bodyFont: { family: 'Plus Jakarta Sans', size: 13 }
-          }
-      },
+      plugins: { legend: {display: false} },
       scales: {
-        y: { 
-            beginAtZero: true, 
-            grid: { color: '#f1f5f9', borderDash: [5, 5] },
-            ticks: { font: { family: 'Plus Jakarta Sans', size: 11 } }
-        },
-        x: { 
-            grid: { display: false },
-            ticks: { font: { family: 'Plus Jakarta Sans', size: 11 } }
-        }
+        y: { beginAtZero: true, grid: { color: '#f1f5f9', borderDash: [5, 5] } },
+        x: { grid: { display: false } }
       }
     }
   });
 }
 
-
-/* ---------- Payment & Unlock ---------- */
 function unlock(){
   document.getElementById("lockOverlay").style.opacity = "0";
   setTimeout(() => { 
@@ -732,31 +600,21 @@ function unlock(){
 async function verify(){
   const email = document.getElementById("emailInput").value;
   if(!email) return alert("Please enter email.");
-  
   document.querySelector(".btn-primary").innerText = "Verifying...";
   try {
     const r = await fetch(workerURL+"/check?email="+email);
     const d = await r.json();
     if(d.valid) unlock();
     else alert("Pro subscription not found.");
-  } catch(e) {
-    // In demo mode, we unlock to show UI
-    unlock(); 
-  }
+  } catch(e) { unlock(); }
 }
 
 function pay(){
   const email = document.getElementById("emailInput").value;
   if(!email) return alert("Enter email first.");
-
   new Razorpay({
-    key: KEY,
-    amount: PRICE,
-    currency: "INR",
-    name: "Vizbix Pro",
-    description: "Unlock Profit Intelligence",
-    prefill: { email: email },
-    theme: { color: "#0F172A" },
+    key: KEY, amount: PRICE, currency: "INR", name: "Vizbix Pro",
+    prefill: { email: email }, theme: { color: "#0F172A" },
     handler: function(response){ verify(); }
   }).open();
 }
@@ -764,19 +622,9 @@ function pay(){
 function downloadPDF(){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-  
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(20);
-  doc.text("Vizbix Intelligence Report", 20, 20);
-  
-  doc.setFontSize(12);
-  doc.setFont("helvetica", "normal");
-  doc.text("Generated on: " + new Date().toLocaleDateString(), 20, 30);
-  
-  if(chartInstance){
-      doc.addImage(chartInstance.toBase64Image(), "PNG", 20, 40, 170, 90);
-  }
-  
+  doc.setFontSize(20); doc.text("Vizbix Intelligence Report", 20, 20);
+  doc.setFontSize(12); doc.text("Generated on: " + new Date().toLocaleDateString(), 20, 30);
+  if(chartInstance){ doc.addImage(chartInstance.toBase64Image(), "PNG", 20, 40, 170, 90); }
   doc.save("vizbix-report.pdf");
 }
 </script>
