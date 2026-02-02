@@ -6,40 +6,43 @@
 
 <title>Vizbix – Profit Insights</title>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap" rel="stylesheet">
-
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
 <style>
 :root{
-  --bg:#f8fafc;
+  --bg:#f6f7fb;
   --card:#fff;
   --brand:#0f172a;
   --border:#e2e8f0;
+  --green:#16a34a;
+  --orange:#f59e0b;
+  --blue:#2563eb;
 }
 
 *{box-sizing:border-box;font-family:Inter,system-ui}
 body{margin:0;background:var(--bg)}
-main{max-width:1000px;margin:auto;padding:22px}
+main{max-width:1000px;margin:auto;padding:18px}
 
 h1{text-align:center;font-weight:900;margin-bottom:20px}
 
 .card{
   background:var(--card);
   border-radius:18px;
-  padding:22px;
+  padding:18px;
   margin-bottom:18px;
   box-shadow:0 10px 30px rgba(0,0,0,.05);
-  transition:.2s;
 }
-.card:hover{transform:translateY(-2px)}
 
 .grid{
   display:grid;
   grid-template-columns:2fr 1fr 1fr 1fr auto;
   gap:8px;
+}
+
+@media(max-width:640px){
+  .grid{grid-template-columns:1fr 1fr}
 }
 
 input{
@@ -69,15 +72,17 @@ button{
   border-radius:12px;
   margin-bottom:8px;
   font-weight:600;
-  background:#f1f5f9;
 }
+
+.green{background:#dcfce7}
+.orange{background:#fff7ed}
+.blue{background:#dbeafe}
 
 table{
   width:100%;
   border-collapse:collapse;
   margin-top:12px;
 }
-
 td,th{
   padding:8px;
   border-bottom:1px solid var(--border);
@@ -85,13 +90,12 @@ td,th{
 
 canvas{margin-top:20px}
 
-.history-item{
-  cursor:pointer;
-  font-size:14px;
-  padding:6px 0;
-  color:#475569;
+.tools{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+  margin-top:12px;
 }
-.history-item:hover{color:#000}
 </style>
 </head>
 
@@ -110,7 +114,6 @@ canvas{margin-top:20px}
 <button class="light" onclick="addRow()">+ Add Product</button>
 <button class="light" onclick="sample()">Sample Data</button>
 <button class="dark" onclick="analyze()" style="margin-top:10px">Analyze Profit</button>
-
 </div>
 
 
@@ -120,7 +123,8 @@ canvas{margin-top:20px}
 <div id="profitText" class="big"></div>
 
 <div id="lockBox">
-<button class="dark" onclick="unlock()">Unlock Pro – ₹299</button>
+<button class="dark" onclick="pay()">Unlock Pro – ₹299</button>
+<button class="light" onclick="verify()">Verify</button>
 </div>
 
 <div id="proContent" class="locked">
@@ -131,9 +135,9 @@ canvas{margin-top:20px}
 
 <canvas id="chart"></canvas>
 
-<button class="light" onclick="downloadPDF()" style="margin-top:12px">Export PDF</button>
-
-<div id="historyBox" style="margin-top:18px"></div>
+<div class="tools">
+<button class="light" onclick="downloadPDF()">Export PDF</button>
+</div>
 
 </div>
 </div>
@@ -141,8 +145,12 @@ canvas{margin-top:20px}
 </main>
 
 <script>
+const workerURL = window.location.origin;
+const PRICE = 29900;
+const KEY = "rzp_live_SAbBHVMbGMv2xo";
+
+const items = document.getElementById("items");
 let chart;
-const items=document.getElementById("items");
 
 
 /* ---------- add row ---------- */
@@ -158,7 +166,7 @@ d.innerHTML=`
 items.appendChild(d);
 }
 
-addRow();addRow();addRow();
+addRow(); addRow(); addRow();
 
 
 /* ---------- sample data ---------- */
@@ -189,8 +197,6 @@ document.querySelectorAll(".grid").forEach(r=>{
 const i=r.querySelectorAll("input");
 
 const name=i[0].value;
-if(!name) return;
-
 const sell=+i[1].value;
 const cost=+i[2].value;
 const qty=+i[3].value;
@@ -206,36 +212,10 @@ data.push({name,sell,cost,qty,profit,margin});
 window.data=data;
 
 results.style.display="block";
-profitText.innerText="Estimated Profit: ₹ "+total.toLocaleString("en-IN");
+profitText.innerText="Estimated Profit: ₹ "+total;
 
 generateTable(data);
 generateChart(data);
-
-saveReport(data);   // history
-}
-
-
-/* ---------- classy muted chart ---------- */
-function generateChart(d){
-if(chart) chart.destroy();
-
-const palette=[
-"#334155","#475569","#64748b",
-"#94a3b8","#0f172a","#1e293b","#374151"
-];
-
-chart=new Chart(document.getElementById("chart"),{
-type:"bar",
-data:{
-labels:d.map(x=>x.name),
-datasets:[{
-data:d.map(x=>x.profit),
-backgroundColor:d.map((_,i)=>palette[i%palette.length]),
-borderRadius:10
-}]
-},
-options:{plugins:{legend:{display:false}}}
-});
 }
 
 
@@ -244,116 +224,116 @@ function generateInsights(d){
 
 const total=d.reduce((a,b)=>a+b.profit,0);
 const best=[...d].sort((a,b)=>b.profit-a.profit)[0];
+const monthly=total*30;
 
 let text=`
-<div class="insight">Top product: ${best.name}</div>
-<div class="insight">Projected monthly profit: ₹${(total*30).toLocaleString("en-IN")}</div>
+<div class="insight green">${best.name} generates most profit. Focus marketing here.</div>
+<div class="insight blue">Projected monthly profit ≈ ₹${monthly}</div>
 `;
 
 d.forEach(x=>{
 const suggested=x.sell*1.05;
-const extra=(suggested-x.cost)*x.qty-x.profit;
-if(extra>0){
-text+=`<div class="insight">Raise ${x.name} to ₹${Math.round(suggested)} → extra ₹${Math.round(extra).toLocaleString("en-IN")}</div>`;
-}
+const extra=(suggested-x.cost)*x.qty - x.profit;
+
+text+=`
+<div class="insight orange">Increase ${x.name} price to ₹${Math.round(suggested)} to earn ₹${Math.round(extra)} extra profit</div>
+`;
 });
 
 insights.innerHTML=text;
 }
 
 
-/* ---------- table (highlight best) ---------- */
+/* ---------- table ---------- */
 function generateTable(d){
-
-const best=Math.max(...d.map(x=>x.profit));
-
 table.innerHTML="<tr><th>Product</th><th>Profit</th><th>Margin</th></tr>";
-
 d.forEach(x=>{
-table.innerHTML+=`
-<tr style="${x.profit===best?'background:#f1f5f9;font-weight:700':''}">
-<td>${x.name}</td>
-<td>₹${x.profit.toLocaleString("en-IN")}</td>
-<td>${(x.margin*100).toFixed(0)}%</td>
-</tr>`;
+table.innerHTML+=`<tr><td>${x.name}</td><td>₹${x.profit}</td><td>${(x.margin*100).toFixed(0)}%</td></tr>`;
+});
+}
+
+
+/* ---------- chart (multi color) ---------- */
+function generateChart(d){
+if(chart) chart.destroy();
+
+const palette=[
+  "#334155","#475569","#64748b",
+  "#94a3b8","#0f172a","#1e293b",
+  "#374151","#4b5563"
+];
+
+const colors=d.map((_,i)=>palette[i%palette.length]);
+
+chart=new Chart(document.getElementById("chart"),{
+type:"bar",
+data:{
+labels:d.map(x=>x.name),
+datasets:[{
+data:d.map(x=>x.profit),
+backgroundColor:colors,
+borderRadius:10
+}]
+},
+options:{plugins:{legend:{display:false}}}
 });
 }
 
 
 /* ---------- unlock ---------- */
 function unlock(){
-lockBox.innerHTML="Pro Unlocked";
+lockBox.innerHTML="<div class='insight green'>Pro Unlocked</div>";
 proContent.classList.remove("locked");
 generateInsights(window.data);
 }
 
 
-/* ---------- PDF export ---------- */
+/* ---------- verify ---------- */
+async function verify(){
+const r=await fetch(workerURL+"/check?email="+emailInput.value);
+const d=await r.json();
+if(d.valid) unlock();
+}
+
+
+/* ---------- payment ---------- */
+function pay(){
+new Razorpay({
+key:KEY,
+amount:PRICE,
+currency:"INR",
+prefill:{email:emailInput.value},
+notes:{email:emailInput.value},
+handler:()=>setTimeout(verify,1000)
+}).open();
+}
+
+
+/* ---------- PDF (chart + insights + table) ---------- */
 function downloadPDF(){
 
 const {jsPDF}=window.jspdf;
 const doc=new jsPDF();
 
 doc.text("Vizbix Profit Report",15,15);
-doc.text("Generated: "+new Date().toLocaleString(),15,22);
 
 const img=chart.toBase64Image();
-doc.addImage(img,"PNG",15,30,180,80);
+doc.addImage(img,"PNG",15,20,180,80);
 
-let y=120;
+let y=110;
 
 document.querySelectorAll(".insight").forEach(el=>{
 doc.text(el.innerText,15,y);
 y+=8;
 });
 
-doc.save("vizbix-report.pdf");
-}
-
-
-/* ---------- history (FREE localStorage) ---------- */
-function saveReport(data){
-
-const reports=JSON.parse(localStorage.getItem("vizbix_reports")||"[]");
-
-reports.unshift({
-date:new Date().toLocaleString(),
-data
+window.data.forEach(x=>{
+doc.text(`${x.name} | Profit ₹${x.profit}`,15,y);
+y+=7;
 });
 
-localStorage.setItem("vizbix_reports",JSON.stringify(reports.slice(0,10)));
-
-renderHistory();
+doc.save("profit-report.pdf");
 }
-
-function renderHistory(){
-
-const reports=JSON.parse(localStorage.getItem("vizbix_reports")||"[]");
-
-if(!reports.length) return;
-
-let html="<h3 style='margin-top:18px'>Previous Reports</h3>";
-
-reports.forEach((r,i)=>{
-html+=`<div class="history-item" onclick="loadReport(${i})">${r.date}</div>`;
-});
-
-historyBox.innerHTML=html;
-}
-
-function loadReport(i){
-
-const reports=JSON.parse(localStorage.getItem("vizbix_reports"));
-const r=reports[i];
-
-window.data=r.data;
-
-generateTable(r.data);
-generateChart(r.data);
-generateInsights(r.data);
-}
-
-renderHistory();
 </script>
 
 </body>
