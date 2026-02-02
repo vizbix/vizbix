@@ -283,14 +283,10 @@ tr:last-child td { border-bottom: none; }
         </div>
       </div>
 
-      <div id="proContent">
+     <div id="proContent">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-          <h3 style="margin:0">Profit Distribution</h3>
+          <h3 style="margin:0">Strategic Report</h3>
           <button class="btn-secondary" style="padding:6px 12px; font-size:12px;" onclick="downloadPDF()">↓ Export Report</button>
-        </div>
-        
-        <div style="height:300px; margin-bottom:30px;">
-          <canvas id="chart"></canvas>
         </div>
 
         <h3 style="margin-bottom:15px">Optimization Strategy</h3>
@@ -299,6 +295,11 @@ tr:last-child td { border-bottom: none; }
         <h3 style="margin-top:30px; margin-bottom:15px">Detailed Margin Analysis</h3>
         <div style="overflow-x:auto;">
           <table id="table"></table>
+        </div>
+
+        <h3 style="margin-top:40px; margin-bottom:15px">Profit Distribution</h3>
+        <div style="height:300px; margin-bottom:30px;">
+          <canvas id="chart"></canvas>
         </div>
       </div>
 
@@ -584,3 +585,4 @@ function downloadPDF(){
 </script>
 </body>
 </html>
+
