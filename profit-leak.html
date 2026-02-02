@@ -257,7 +257,13 @@ table.innerHTML+=`<tr><td>${x.name}</td><td>₹${x.profit}</td><td>${(x.margin*1
 function generateChart(d){
 if(chart) chart.destroy();
 
-const colors=d.map((_,i)=>`hsl(${i*70%360},70%,50%)`);
+const palette=[
+  "#334155","#475569","#64748b",
+  "#94a3b8","#0f172a","#1e293b",
+  "#374151","#4b5563"
+];
+
+const colors=d.map((_,i)=>palette[i%palette.length]);
 
 chart=new Chart(document.getElementById("chart"),{
 type:"bar",
@@ -332,3 +338,4 @@ doc.save("profit-report.pdf");
 
 </body>
 </html>
+
