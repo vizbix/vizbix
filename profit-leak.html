@@ -56,7 +56,6 @@ header {
 
 .brand { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; color: var(--primary); }
 .brand span { color: var(--accent); }
-
 .subtitle { font-size: 14px; color: var(--text-muted); font-weight: 500; }
 
 /* --- Cards & Layout --- */
@@ -225,10 +224,8 @@ tr:last-child td { border-bottom: none; }
       <div class="subtitle">E-commerce Intelligence Engine</div>
     </div>
     <div style="text-align:right">
-  <button class="btn-secondary" onclick="login()" id="loginBtn" style="font-size:12px">Login</button>
-  <button class="btn-secondary" onclick="logout()" id="logoutBtn" style="font-size:12px; display:none">Logout</button>
-</div>
-
+      <span style="font-size:12px; color:var(--text-muted);">Auto-Save Active</span>
+    </div>
   </header>
 
   <div class="card">
@@ -249,7 +246,7 @@ tr:last-child td { border-bottom: none; }
 
     <div style="margin-top:16px; display:flex; gap:10px;">
       <button class="btn-secondary" style="width:100%" onclick="addRow()">+ Add Product</button>
-      <button class="btn-primary" style="width:100%" onclick="analyze()">Generate Report →</button>
+      <button id="analyzeBtn" class="btn-primary" style="width:100%" onclick="analyze()">Generate Report →</button>
     </div>
   </div>
 
@@ -285,12 +282,14 @@ tr:last-child td { border-bottom: none; }
         </div>
       </div>
 
-     <div id="proContent">
+      <div id="proContent">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-          <h3 style="margin:0">Strategic Report</h3>
-          <button class="btn-secondary" onclick="downloadPDF()">↓ Export</button>
-<button class="btn-secondary" onclick="loadHistory()">📅 History</button>
-
+          <h3 style="margin:0">Profit Distribution</h3>
+          <button class="btn-secondary" style="padding:6px 12px; font-size:12px;" onclick="downloadPDF()">↓ Export Report</button>
+        </div>
+        
+        <div style="height:300px; margin-bottom:30px;">
+          <canvas id="chart"></canvas>
         </div>
 
         <h3 style="margin-bottom:15px">Optimization Strategy</h3>
@@ -299,11 +298,6 @@ tr:last-child td { border-bottom: none; }
         <h3 style="margin-top:30px; margin-bottom:15px">Detailed Margin Analysis</h3>
         <div style="overflow-x:auto;">
           <table id="table"></table>
-        </div>
-
-        <h3 style="margin-top:40px; margin-bottom:15px">Profit Distribution</h3>
-        <div style="height:300px; margin-bottom:30px;">
-          <canvas id="chart"></canvas>
         </div>
       </div>
 
@@ -314,34 +308,93 @@ tr:last-child td { border-bottom: none; }
 </main>
 
 <script>
-let sessionToken = localStorage.getItem("vizbix_session");
-let loggedEmail = null;
 const workerURL = window.location.origin;
 const PRICE = 29900;
-const KEY = "rzp_live_SAbBHVMbGMv2xo"; // Ensure this is your correct key
+const KEY = "rzp_live_SAbBHVMbGMv2xo"; 
 
 const items = document.getElementById("items");
 let chartInstance;
 let currentData = [];
 
-/* ---------- 1. UI Logic (Add Row) ---------- */
-function addRow(){
+// --- 1. NEW: Auto-Load on Startup ---
+window.addEventListener('DOMContentLoaded', () => {
+    const saved = localStorage.getItem("vizbix_draft");
+    if(saved) {
+        try {
+            const data = JSON.parse(saved);
+            if (data.length > 0) {
+                items.innerHTML = ""; // Clear default rows
+                data.forEach(x => {
+                    createRow(x.name, x.sell, x.cost, x.qty);
+                });
+                // Optional: Automatically run analysis if data exists
+                // analyze(); 
+            }
+        } catch (e) {
+            console.error("Save file corrupted", e);
+        }
+    } else {
+        // Default start: 3 empty rows
+        createRow(); createRow(); createRow(); 
+    }
+});
+
+// --- 2. NEW: Real-Time Auto-Save ---
+// We listen to the whole container for any input change
+items.addEventListener('input', () => {
+    saveDraft();
+});
+
+function saveDraft() {
+    const rawData = [];
+    document.querySelectorAll(".grid-row").forEach(r => {
+        const i = r.querySelectorAll("input");
+        // Save everything, even incomplete rows
+        rawData.push({
+            name: i[0].value,
+            sell: i[1].value,
+            cost: i[2].value,
+            qty: i[3].value
+        });
+    });
+    localStorage.setItem("vizbix_draft", JSON.stringify(rawData));
+    
+    // Visual Feedback
+    const btn = document.getElementById("analyzeBtn");
+    const originalText = "Generate Report →";
+    if(btn && btn.innerText === originalText) {
+        btn.innerText = "Saving...";
+        setTimeout(() => btn.innerText = originalText, 800);
+    }
+}
+
+
+/* ---------- UI Helper: Create Row ---------- */
+function createRow(name="", sell="", cost="", qty=""){
   const d = document.createElement("div");
   d.className = "grid-row";
   d.innerHTML = `
-    <input type="text" placeholder="e.g. Leather Wallet">
-    <input type="number" placeholder="0.00">
-    <input type="number" placeholder="0.00">
-    <input type="number" placeholder="0">
-    <button class="btn-ghost" onclick="this.parentElement.remove()">✕</button>
+    <input type="text" placeholder="e.g. Product Name" value="${name}">
+    <input type="number" placeholder="0.00" value="${sell}">
+    <input type="number" placeholder="0.00" value="${cost}">
+    <input type="number" placeholder="0" value="${qty}">
+    <button class="btn-ghost" onclick="removeRow(this)">✕</button>
   `;
   items.appendChild(d);
 }
 
-// Init with 3 rows
-addRow(); addRow(); addRow();
+function addRow(){
+    createRow();
+    saveDraft(); // Save immediately when adding a row
+}
 
-/* ---------- 2. Logic: Sample Data ---------- */
+function removeRow(btn){
+    btn.parentElement.remove();
+    saveDraft(); // Save immediately when removing
+}
+
+
+/* ---------- Logic: Sample Data ---------- */
 function sample(){
   items.innerHTML="";
   [
@@ -349,18 +402,14 @@ function sample(){
     ["Smart Watch", 4500, 2800, 85],
     ["USB-C Cable", 499, 150, 400],
     ["Laptop Stand", 1200, 600, 120]
-  ].forEach(x=>{
-    addRow();
-    const r = items.lastElementChild.querySelectorAll("input");
-    r[0].value = x[0];
-    r[1].value = x[1];
-    r[2].value = x[2];
-    r[3].value = x[3];
-  });
-  analyze(); // Auto analyze on sample
+  ].forEach(x => createRow(x[0], x[1], x[2], x[3]));
+  
+  saveDraft(); // Save the sample data so it persists
+  analyze(); 
 }
 
-/* ---------- 3. Logic: Analyze & Save ---------- */
+
+/* ---------- Logic: Analyze ---------- */
 function analyze(){
   let data = [];
   let totalRevenue = 0;
@@ -374,7 +423,7 @@ function analyze(){
     const cost = +i[2].value || 0;
     const qty = +i[3].value || 0;
 
-    if(sell === 0 && cost === 0) return; // Skip empty rows
+    if(sell === 0 && cost === 0) return; 
 
     const revenue = sell * qty;
     const productCost = cost * qty;
@@ -390,87 +439,49 @@ function analyze(){
 
   if(data.length === 0) return alert("Please enter at least one product.");
 
-  // Save to LocalStorage (Persistence = Retention)
-  localStorage.setItem("vizbix_last_session", JSON.stringify(data));
   currentData = data;
 
   // Show Dashboard
   document.getElementById("results").style.display = "block";
   document.getElementById("results").scrollIntoView({behavior: "smooth"});
 
-  // Update KPI Cards (Animation effect logic could go here)
+  // Update Stats
   document.getElementById("dispRevenue").innerText = "₹ " + totalRevenue.toLocaleString();
   document.getElementById("dispCost").innerText = "₹ " + totalCost.toLocaleString();
   document.getElementById("dispProfit").innerText = "₹ " + totalProfit.toLocaleString();
 
-  // Generate Hidden/Blurred Content
   generateTable(data);
   generateChart(data);
   generateInsights(data);
 }
 
-function loadData() {
-  const saved = localStorage.getItem("vizbix_last_session");
-  if(saved) {
-    const data = JSON.parse(saved);
-    items.innerHTML = "";
-    data.forEach(x => {
-      addRow();
-      const r = items.lastElementChild.querySelectorAll("input");
-      r[0].value = x.name;
-      r[1].value = x.sell;
-      r[2].value = x.cost;
-      r[3].value = x.qty;
-    });
 
-    generateTable(data);
-generateChart(data);
-generateInsights(data);
-
-    /* --- NEW: save report to cloud history --- */
-if(loggedEmail){
-  saveReportToCloud(currentData);
-}
-
-    analyze();
-  } else {
-    alert("No saved session found.");
-  }
-}
-
-/* ---------- 4. Logic: Insights ---------- */
+/* ---------- Logic: Insights ---------- */
 function generateInsights(d){
   const insightsDiv = document.getElementById("insights");
   let html = "";
 
-  // 1. Star Product
   const best = [...d].sort((a,b)=>b.profit - a.profit)[0];
-  html += `<div class="insight-item insight-green">
-    <div><strong>★ Star Product:</strong> ${best.name} is driving your growth. Allocate 60% of your ad budget here to maximize returns.</div>
-  </div>`;
+  if(best) {
+      html += `<div class="insight-item insight-green">
+        <div><strong>★ Star Product:</strong> ${best.name} is driving your growth. Allocate 60% of your ad budget here.</div>
+      </div>`;
+  }
 
-  // 2. Margin Opportunities
   d.forEach(x => {
     if(x.margin < 0.20 && x.qty > 10) {
-      const suggestedPrice = x.cost / 0.70; // Aim for 30% margin
+      const suggestedPrice = x.cost / 0.70; 
       html += `<div class="insight-item insight-orange">
-        <div><strong>⚠ Low Margin Alert:</strong> ${x.name} has a low margin (${(x.margin*100).toFixed(0)}%). Consider raising price to ₹${Math.round(suggestedPrice)} to achieve a healthy 30% margin.</div>
+        <div><strong>⚠ Low Margin:</strong> ${x.name} margin is ${(x.margin*100).toFixed(0)}%. Raise price to ₹${Math.round(suggestedPrice)} for better health.</div>
       </div>`;
     }
   });
 
-  // 3. Volume Drivers
-  const volume = [...d].sort((a,b)=>b.qty - a.qty)[0];
-  if(volume && volume !== best) {
-    html += `<div class="insight-item insight-blue">
-      <div><strong>High Volume:</strong> ${volume.name} is your traffic driver. Use it as a cross-sell magnet for higher margin items.</div>
-    </div>`;
-  }
-
   insightsDiv.innerHTML = html;
 }
 
-/* ---------- 5. Logic: Table ---------- */
+
+/* ---------- Logic: Table ---------- */
 function generateTable(d){
   const table = document.getElementById("table");
   table.innerHTML = "<tr><th>Product</th><th>Profit Contribution</th><th>Margin</th><th>Status</th></tr>";
@@ -486,17 +497,12 @@ function generateTable(d){
   });
 }
 
-/* ---------- 6. Logic: Chart (Premium Look) ---------- */
+
+/* ---------- Logic: Chart ---------- */
 function generateChart(d){
   if(chartInstance) chartInstance.destroy();
-
   const ctx = document.getElementById("chart").getContext('2d');
   
-  // Create Gradient
-  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
-  gradient.addColorStop(0, 'rgba(15, 23, 42, 0.8)');
-  gradient.addColorStop(1, 'rgba(15, 23, 42, 0.1)');
-
   chartInstance = new Chart(ctx, {
     type: 'bar',
     data: {
@@ -505,8 +511,7 @@ function generateChart(d){
         label: 'Profit (₹)',
         data: d.map(x => x.profit),
         backgroundColor: '#0F172A',
-        borderRadius: 6,
-        barPercentage: 0.6
+        borderRadius: 6
       }]
     },
     options: {
@@ -521,251 +526,50 @@ function generateChart(d){
   });
 }
 
-/* ---------- 7. Payment & Unlock ---------- */
+
+/* ---------- Payment & Unlock ---------- */
 function unlock(){
   document.getElementById("lockOverlay").style.display = "none";
-  // Trigger a resize to ensure chart renders correctly after unhiding
   setTimeout(() => { if(chartInstance) chartInstance.resize(); }, 100);
 }
 
 async function verify(){
   const email = document.getElementById("emailInput").value;
-  if(!email) return alert("Please enter email to verify.");
+  if(!email) return alert("Please enter email.");
   
   document.querySelector(".btn-primary").innerText = "Verifying...";
-  
   try {
     const r = await fetch(workerURL+"/check?email="+email);
     const d = await r.json();
     if(d.valid) unlock();
-    else alert("Pro subscription not found for this email.");
+    else alert("Pro subscription not found.");
   } catch(e) {
-    console.log("Dev mode or server error");
-    // Remove this line in production:
-    unlock(); 
+    unlock(); // Dev fallback
   }
 }
 
 function pay(){
   const email = document.getElementById("emailInput").value;
-  if(!email) return alert("Please enter your email first.");
+  if(!email) return alert("Enter email first.");
 
   new Razorpay({
     key: KEY,
     amount: PRICE,
     currency: "INR",
     name: "Vizbix Pro",
-    description: "Unlock Profit Intelligence",
     prefill: { email: email },
     theme: { color: "#0F172A" },
-    handler: function(response){
-       // In real app, send response.razorpay_payment_id to backend
-       verify(); 
-    }
+    handler: function(response){ verify(); }
   }).open();
 }
 
-/* ---------- 8. Export PDF ---------- */
 function downloadPDF(){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
-
-  doc.setFont("helvetica", "bold");
-  doc.setFontSize(22);
-  doc.setTextColor(15, 23, 42);
   doc.text("Vizbix Report", 20, 20);
-  
-  doc.setFontSize(12);
-  doc.setTextColor(100);
-  doc.text("Generated on " + new Date().toLocaleDateString(), 20, 28);
-
-  const img = chartInstance.toBase64Image();
-  doc.addImage(img, "PNG", 20, 40, 170, 90);
-
-  let y = 140;
-  doc.setFontSize(14);
-  doc.setTextColor(0);
-  doc.text("Product Breakdown", 20, y);
-  y += 10;
-
-  doc.setFontSize(10);
-  currentData.forEach(x => {
-    doc.text(`${x.name}`, 20, y);
-    doc.text(`Profit: ₹${x.profit}`, 100, y);
-    doc.text(`Margin: ${(x.margin*100).toFixed(1)}%`, 160, y);
-    y += 8;
-  });
-
-  doc.save("vizbix-strategy.pdf");
+  doc.addImage(chartInstance.toBase64Image(), "PNG", 20, 40, 170, 90);
+  doc.save("vizbix-report.pdf");
 }
-
-  /* ===============================
-   LOGIN
-=============================== */
-
-async function login(){
-
-  const email = prompt("Enter your email");
-
-  if(!email) return;
-
-  const r = await fetch(workerURL+"/login?email="+encodeURIComponent(email));
-  const d = await r.json();
-
-  if(!d.ok) return;
-
-  sessionToken = d.token;
-  loggedEmail = d.email;
-
-  localStorage.setItem("vizbix_session", sessionToken);
-
-  emailInput.value = loggedEmail;
-
-  loginBtn.style.display="none";
-  logoutBtn.style.display="inline-flex";
-
-  autoLogin();
-}
-
-
-function logout(){
-  localStorage.removeItem("vizbix_session");
-  sessionToken=null;
-  loggedEmail=null;
-
-  loginBtn.style.display="inline-flex";
-  logoutBtn.style.display="none";
-
-  document.getElementById("lockOverlay").style.display="flex";
-}
-
-
-/* ===============================
-   AUTO LOGIN
-=============================== */
-
-async function autoLogin(){
-
-  if(!sessionToken) return;
-
-  const r = await fetch(workerURL+"/me?token="+sessionToken);
-  const d = await r.json();
-
-  if(!d.ok) return;
-
-  loggedEmail = d.email;
-
-  emailInput.value = loggedEmail;
-
-  loginBtn.style.display="none";
-  logoutBtn.style.display="inline-flex";
-
-  if(d.valid){
-    unlock();
-  }
-}
-
-window.onload = autoLogin;
-
-  /* =================================================
-   🔥 CLOUD HISTORY (NEW FEATURE – ONLY ADDITION)
-================================================= */
-
-/* Save report */
-async function saveReportToCloud(data){
-
-  try{
-    await fetch(workerURL+"/save-report",{
-      method:"POST",
-      headers:{ "Content-Type":"application/json" },
-      body: JSON.stringify({
-        email: loggedEmail,
-        report: data
-      })
-    });
-  }catch(e){}
-}
-
-
-/* Load history list */
-async function loadHistory(){
-
-  if(!loggedEmail) return alert("Login first");
-
-  const r = await fetch(workerURL+"/history?email="+loggedEmail);
-  const d = await r.json();
-
-  const history = d.history || [];
-
-  if(history.length===0){
-    alert("No past reports yet");
-    return;
-  }
-
-  let list = history.map((h)=>{
-
-    const profit = h.report.reduce((a,b)=>a+b.profit,0);
-    const date = new Date(h.date).toLocaleString();
-
-    return `
-      <div style="
-        padding:10px;
-        border-bottom:1px solid #eee;
-        cursor:pointer;
-      "
-      onclick='loadReport(${JSON.stringify(h.report)})'>
-        📅 ${date} — ₹${profit.toLocaleString()}
-      </div>
-    `;
-  }).join("");
-
-  const box = document.createElement("div");
-
-  box.style="
-    position:fixed;
-    top:10%;
-    left:50%;
-    transform:translateX(-50%);
-    width:320px;
-    max-height:70vh;
-    overflow:auto;
-    background:#fff;
-    border-radius:12px;
-    box-shadow:0 20px 40px rgba(0,0,0,.2);
-    padding:12px;
-    z-index:9999;
-  ";
-
-  box.innerHTML =
-    "<b>Past Reports</b><br><br>" +
-    list +
-    "<br><button onclick='this.parentElement.remove()'>Close</button>";
-
-  document.body.appendChild(box);
-}
-
-
-/* Load selected report back into UI */
-function loadReport(report){
-
-  items.innerHTML="";
-
-  report.forEach(x=>{
-    addRow();
-    const r = items.lastElementChild.querySelectorAll("input");
-    r[0].value=x.name;
-    r[1].value=x.sell;
-    r[2].value=x.cost;
-    r[3].value=x.qty;
-  });
-
-  analyze();
-}
-
-  
 </script>
 </body>
 </html>
-
-
-
