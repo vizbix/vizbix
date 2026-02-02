@@ -285,7 +285,7 @@ tr:last-child td { border-bottom: none; }
       <button id="analyzeBtn" class="btn-primary" style="width:100%" onclick="analyze()">Generate Report →</button>
       
       <button id="saveCloudBtn" class="btn-secondary" style="display:none; width:40px;" onclick="saveToCloud()" title="Save to Cloud">
-        💾
+      💾
       </button>
     </div>
   </div>
@@ -404,9 +404,9 @@ function createRow(name="", sell="", cost="", qty=""){
   d.className = "grid-row";
   d.innerHTML = `
     <input type="text" placeholder="Product Name" value="${name}">
-    <input type="number" placeholder="0.00" value="${sell}">
-    <input type="number" placeholder="0.00" value="${cost}">
-    <input type="number" placeholder="0" value="${qty}">
+    <input type="number" placeholder="Sell" value="${sell}">
+    <input type="number" placeholder="Cost" value="${cost}">
+    <input type="number" placeholder="Quantity" value="${qty}">
     <button class="btn-ghost" onclick="removeRow(this)">✕</button>
   `;
   items.appendChild(d);
@@ -650,3 +650,4 @@ function downloadPDF(){
 </script>
 </body>
 </html>
+
