@@ -225,8 +225,10 @@ tr:last-child td { border-bottom: none; }
       <div class="subtitle">E-commerce Intelligence Engine</div>
     </div>
     <div style="text-align:right">
-      <button class="btn-secondary" onclick="loadData()" style="font-size:12px">↺ Restore Last Session</button>
-    </div>
+  <button class="btn-secondary" onclick="login()" id="loginBtn" style="font-size:12px">Login</button>
+  <button class="btn-secondary" onclick="logout()" id="logoutBtn" style="font-size:12px; display:none">Logout</button>
+</div>
+
   </header>
 
   <div class="card">
@@ -310,6 +312,8 @@ tr:last-child td { border-bottom: none; }
 </main>
 
 <script>
+let sessionToken = localStorage.getItem("vizbix_session");
+let loggedEmail = null;
 const workerURL = window.location.origin;
 const PRICE = 29900;
 const KEY = "rzp_live_SAbBHVMbGMv2xo"; // Ensure this is your correct key
@@ -582,7 +586,78 @@ function downloadPDF(){
 
   doc.save("vizbix-strategy.pdf");
 }
+
+  /* ===============================
+   LOGIN
+=============================== */
+
+async function login(){
+
+  const email = prompt("Enter your email");
+
+  if(!email) return;
+
+  const r = await fetch(workerURL+"/login?email="+encodeURIComponent(email));
+  const d = await r.json();
+
+  if(!d.ok) return;
+
+  sessionToken = d.token;
+  loggedEmail = d.email;
+
+  localStorage.setItem("vizbix_session", sessionToken);
+
+  emailInput.value = loggedEmail;
+
+  loginBtn.style.display="none";
+  logoutBtn.style.display="inline-flex";
+
+  autoLogin();
+}
+
+
+function logout(){
+  localStorage.removeItem("vizbix_session");
+  sessionToken=null;
+  loggedEmail=null;
+
+  loginBtn.style.display="inline-flex";
+  logoutBtn.style.display="none";
+
+  document.getElementById("lockOverlay").style.display="flex";
+}
+
+
+/* ===============================
+   AUTO LOGIN
+=============================== */
+
+async function autoLogin(){
+
+  if(!sessionToken) return;
+
+  const r = await fetch(workerURL+"/me?token="+sessionToken);
+  const d = await r.json();
+
+  if(!d.ok) return;
+
+  loggedEmail = d.email;
+
+  emailInput.value = loggedEmail;
+
+  loginBtn.style.display="none";
+  logoutBtn.style.display="inline-flex";
+
+  if(d.valid){
+    unlock();
+  }
+}
+
+window.onload = autoLogin;
+
+  
 </script>
 </body>
 </html>
+
 
