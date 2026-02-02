@@ -56,6 +56,7 @@ header {
 
 .brand { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; color: var(--primary); }
 .brand span { color: var(--accent); }
+
 .subtitle { font-size: 14px; color: var(--text-muted); font-weight: 500; }
 
 /* --- Cards & Layout --- */
@@ -224,7 +225,7 @@ tr:last-child td { border-bottom: none; }
       <div class="subtitle">E-commerce Intelligence Engine</div>
     </div>
     <div style="text-align:right">
-      <span style="font-size:12px; color:var(--text-muted);">Auto-Save Active</span>
+      <button class="btn-secondary" onclick="loadData()" style="font-size:12px">↺ Restore Last Session</button>
     </div>
   </header>
 
@@ -246,7 +247,7 @@ tr:last-child td { border-bottom: none; }
 
     <div style="margin-top:16px; display:flex; gap:10px;">
       <button class="btn-secondary" style="width:100%" onclick="addRow()">+ Add Product</button>
-      <button id="analyzeBtn" class="btn-primary" style="width:100%" onclick="analyze()">Generate Report →</button>
+      <button class="btn-primary" style="width:100%" onclick="analyze()">Generate Report →</button>
     </div>
   </div>
 
@@ -310,91 +311,30 @@ tr:last-child td { border-bottom: none; }
 <script>
 const workerURL = window.location.origin;
 const PRICE = 29900;
-const KEY = "rzp_live_SAbBHVMbGMv2xo"; 
+const KEY = "rzp_live_SAbBHVMbGMv2xo"; // Ensure this is your correct key
 
 const items = document.getElementById("items");
 let chartInstance;
 let currentData = [];
 
-// --- 1. NEW: Auto-Load on Startup ---
-window.addEventListener('DOMContentLoaded', () => {
-    const saved = localStorage.getItem("vizbix_draft");
-    if(saved) {
-        try {
-            const data = JSON.parse(saved);
-            if (data.length > 0) {
-                items.innerHTML = ""; // Clear default rows
-                data.forEach(x => {
-                    createRow(x.name, x.sell, x.cost, x.qty);
-                });
-                // Optional: Automatically run analysis if data exists
-                // analyze(); 
-            }
-        } catch (e) {
-            console.error("Save file corrupted", e);
-        }
-    } else {
-        // Default start: 3 empty rows
-        createRow(); createRow(); createRow(); 
-    }
-});
-
-// --- 2. NEW: Real-Time Auto-Save ---
-// We listen to the whole container for any input change
-items.addEventListener('input', () => {
-    saveDraft();
-});
-
-function saveDraft() {
-    const rawData = [];
-    document.querySelectorAll(".grid-row").forEach(r => {
-        const i = r.querySelectorAll("input");
-        // Save everything, even incomplete rows
-        rawData.push({
-            name: i[0].value,
-            sell: i[1].value,
-            cost: i[2].value,
-            qty: i[3].value
-        });
-    });
-    localStorage.setItem("vizbix_draft", JSON.stringify(rawData));
-    
-    // Visual Feedback
-    const btn = document.getElementById("analyzeBtn");
-    const originalText = "Generate Report →";
-    if(btn && btn.innerText === originalText) {
-        btn.innerText = "Saving...";
-        setTimeout(() => btn.innerText = originalText, 800);
-    }
-}
-
-
-/* ---------- UI Helper: Create Row ---------- */
-function createRow(name="", sell="", cost="", qty=""){
+/* ---------- 1. UI Logic (Add Row) ---------- */
+function addRow(){
   const d = document.createElement("div");
   d.className = "grid-row";
   d.innerHTML = `
-    <input type="text" placeholder="e.g. Product Name" value="${name}">
-    <input type="number" placeholder="0.00" value="${sell}">
-    <input type="number" placeholder="0.00" value="${cost}">
-    <input type="number" placeholder="0" value="${qty}">
-    <button class="btn-ghost" onclick="removeRow(this)">✕</button>
+    <input type="text" placeholder="e.g. Leather Wallet">
+    <input type="number" placeholder="0.00">
+    <input type="number" placeholder="0.00">
+    <input type="number" placeholder="0">
+    <button class="btn-ghost" onclick="this.parentElement.remove()">✕</button>
   `;
   items.appendChild(d);
 }
 
-function addRow(){
-    createRow();
-    saveDraft(); // Save immediately when adding a row
-}
+// Init with 3 rows
+addRow(); addRow(); addRow();
 
-function removeRow(btn){
-    btn.parentElement.remove();
-    saveDraft(); // Save immediately when removing
-}
-
-
-/* ---------- Logic: Sample Data ---------- */
+/* ---------- 2. Logic: Sample Data ---------- */
 function sample(){
   items.innerHTML="";
   [
@@ -402,14 +342,18 @@ function sample(){
     ["Smart Watch", 4500, 2800, 85],
     ["USB-C Cable", 499, 150, 400],
     ["Laptop Stand", 1200, 600, 120]
-  ].forEach(x => createRow(x[0], x[1], x[2], x[3]));
-  
-  saveDraft(); // Save the sample data so it persists
-  analyze(); 
+  ].forEach(x=>{
+    addRow();
+    const r = items.lastElementChild.querySelectorAll("input");
+    r[0].value = x[0];
+    r[1].value = x[1];
+    r[2].value = x[2];
+    r[3].value = x[3];
+  });
+  analyze(); // Auto analyze on sample
 }
 
-
-/* ---------- Logic: Analyze ---------- */
+/* ---------- 3. Logic: Analyze & Save ---------- */
 function analyze(){
   let data = [];
   let totalRevenue = 0;
@@ -423,7 +367,7 @@ function analyze(){
     const cost = +i[2].value || 0;
     const qty = +i[3].value || 0;
 
-    if(sell === 0 && cost === 0) return; 
+    if(sell === 0 && cost === 0) return; // Skip empty rows
 
     const revenue = sell * qty;
     const productCost = cost * qty;
@@ -439,49 +383,77 @@ function analyze(){
 
   if(data.length === 0) return alert("Please enter at least one product.");
 
+  // Save to LocalStorage (Persistence = Retention)
+  localStorage.setItem("vizbix_last_session", JSON.stringify(data));
   currentData = data;
 
   // Show Dashboard
   document.getElementById("results").style.display = "block";
   document.getElementById("results").scrollIntoView({behavior: "smooth"});
 
-  // Update Stats
+  // Update KPI Cards (Animation effect logic could go here)
   document.getElementById("dispRevenue").innerText = "₹ " + totalRevenue.toLocaleString();
   document.getElementById("dispCost").innerText = "₹ " + totalCost.toLocaleString();
   document.getElementById("dispProfit").innerText = "₹ " + totalProfit.toLocaleString();
 
+  // Generate Hidden/Blurred Content
   generateTable(data);
   generateChart(data);
   generateInsights(data);
 }
 
+function loadData() {
+  const saved = localStorage.getItem("vizbix_last_session");
+  if(saved) {
+    const data = JSON.parse(saved);
+    items.innerHTML = "";
+    data.forEach(x => {
+      addRow();
+      const r = items.lastElementChild.querySelectorAll("input");
+      r[0].value = x.name;
+      r[1].value = x.sell;
+      r[2].value = x.cost;
+      r[3].value = x.qty;
+    });
+    analyze();
+  } else {
+    alert("No saved session found.");
+  }
+}
 
-/* ---------- Logic: Insights ---------- */
+/* ---------- 4. Logic: Insights ---------- */
 function generateInsights(d){
   const insightsDiv = document.getElementById("insights");
   let html = "";
 
+  // 1. Star Product
   const best = [...d].sort((a,b)=>b.profit - a.profit)[0];
-  if(best) {
-      html += `<div class="insight-item insight-green">
-        <div><strong>★ Star Product:</strong> ${best.name} is driving your growth. Allocate 60% of your ad budget here.</div>
-      </div>`;
-  }
+  html += `<div class="insight-item insight-green">
+    <div><strong>★ Star Product:</strong> ${best.name} is driving your growth. Allocate 60% of your ad budget here to maximize returns.</div>
+  </div>`;
 
+  // 2. Margin Opportunities
   d.forEach(x => {
     if(x.margin < 0.20 && x.qty > 10) {
-      const suggestedPrice = x.cost / 0.70; 
+      const suggestedPrice = x.cost / 0.70; // Aim for 30% margin
       html += `<div class="insight-item insight-orange">
-        <div><strong>⚠ Low Margin:</strong> ${x.name} margin is ${(x.margin*100).toFixed(0)}%. Raise price to ₹${Math.round(suggestedPrice)} for better health.</div>
+        <div><strong>⚠ Low Margin Alert:</strong> ${x.name} has a low margin (${(x.margin*100).toFixed(0)}%). Consider raising price to ₹${Math.round(suggestedPrice)} to achieve a healthy 30% margin.</div>
       </div>`;
     }
   });
 
+  // 3. Volume Drivers
+  const volume = [...d].sort((a,b)=>b.qty - a.qty)[0];
+  if(volume && volume !== best) {
+    html += `<div class="insight-item insight-blue">
+      <div><strong>High Volume:</strong> ${volume.name} is your traffic driver. Use it as a cross-sell magnet for higher margin items.</div>
+    </div>`;
+  }
+
   insightsDiv.innerHTML = html;
 }
 
-
-/* ---------- Logic: Table ---------- */
+/* ---------- 5. Logic: Table ---------- */
 function generateTable(d){
   const table = document.getElementById("table");
   table.innerHTML = "<tr><th>Product</th><th>Profit Contribution</th><th>Margin</th><th>Status</th></tr>";
@@ -497,12 +469,17 @@ function generateTable(d){
   });
 }
 
-
-/* ---------- Logic: Chart ---------- */
+/* ---------- 6. Logic: Chart (Premium Look) ---------- */
 function generateChart(d){
   if(chartInstance) chartInstance.destroy();
+
   const ctx = document.getElementById("chart").getContext('2d');
   
+  // Create Gradient
+  const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+  gradient.addColorStop(0, 'rgba(15, 23, 42, 0.8)');
+  gradient.addColorStop(1, 'rgba(15, 23, 42, 0.1)');
+
   chartInstance = new Chart(ctx, {
     type: 'bar',
     data: {
@@ -511,7 +488,8 @@ function generateChart(d){
         label: 'Profit (₹)',
         data: d.map(x => x.profit),
         backgroundColor: '#0F172A',
-        borderRadius: 6
+        borderRadius: 6,
+        barPercentage: 0.6
       }]
     },
     options: {
@@ -526,49 +504,82 @@ function generateChart(d){
   });
 }
 
-
-/* ---------- Payment & Unlock ---------- */
+/* ---------- 7. Payment & Unlock ---------- */
 function unlock(){
   document.getElementById("lockOverlay").style.display = "none";
+  // Trigger a resize to ensure chart renders correctly after unhiding
   setTimeout(() => { if(chartInstance) chartInstance.resize(); }, 100);
 }
 
 async function verify(){
   const email = document.getElementById("emailInput").value;
-  if(!email) return alert("Please enter email.");
+  if(!email) return alert("Please enter email to verify.");
   
   document.querySelector(".btn-primary").innerText = "Verifying...";
+  
   try {
     const r = await fetch(workerURL+"/check?email="+email);
     const d = await r.json();
     if(d.valid) unlock();
-    else alert("Pro subscription not found.");
+    else alert("Pro subscription not found for this email.");
   } catch(e) {
-    unlock(); // Dev fallback
+    console.log("Dev mode or server error");
+    // Remove this line in production:
+    unlock(); 
   }
 }
 
 function pay(){
   const email = document.getElementById("emailInput").value;
-  if(!email) return alert("Enter email first.");
+  if(!email) return alert("Please enter your email first.");
 
   new Razorpay({
     key: KEY,
     amount: PRICE,
     currency: "INR",
     name: "Vizbix Pro",
+    description: "Unlock Profit Intelligence",
     prefill: { email: email },
     theme: { color: "#0F172A" },
-    handler: function(response){ verify(); }
+    handler: function(response){
+       // In real app, send response.razorpay_payment_id to backend
+       verify(); 
+    }
   }).open();
 }
 
+/* ---------- 8. Export PDF ---------- */
 function downloadPDF(){
   const { jsPDF } = window.jspdf;
   const doc = new jsPDF();
+
+  doc.setFont("helvetica", "bold");
+  doc.setFontSize(22);
+  doc.setTextColor(15, 23, 42);
   doc.text("Vizbix Report", 20, 20);
-  doc.addImage(chartInstance.toBase64Image(), "PNG", 20, 40, 170, 90);
-  doc.save("vizbix-report.pdf");
+  
+  doc.setFontSize(12);
+  doc.setTextColor(100);
+  doc.text("Generated on " + new Date().toLocaleDateString(), 20, 28);
+
+  const img = chartInstance.toBase64Image();
+  doc.addImage(img, "PNG", 20, 40, 170, 90);
+
+  let y = 140;
+  doc.setFontSize(14);
+  doc.setTextColor(0);
+  doc.text("Product Breakdown", 20, y);
+  y += 10;
+
+  doc.setFontSize(10);
+  currentData.forEach(x => {
+    doc.text(`${x.name}`, 20, y);
+    doc.text(`Profit: ₹${x.profit}`, 100, y);
+    doc.text(`Margin: ${(x.margin*100).toFixed(1)}%`, 160, y);
+    y += 8;
+  });
+
+  doc.save("vizbix-strategy.pdf");
 }
 </script>
 </body>
