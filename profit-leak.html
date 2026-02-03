@@ -25,6 +25,7 @@
   --border: #E2E8F0;
   --radius: 16px;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -341,12 +342,12 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
 
     <div id="items"></div>
 
-    <div style="margin-top:16px; display:flex; gap:10px;">
-      <button class="btn-secondary" style="width:100%" onclick="addRow()">+ Add Product</button>
-      <button id="analyzeBtn" class="btn-primary" style="width:100%" onclick="analyze()">Generate Report →</button>
+    <div style="margin-top:16px; display:flex; gap:10px; align-items: stretch;">
+      <button class="btn-secondary" style="flex:1;" onclick="addRow()">+ Add Product</button>
+      <button id="analyzeBtn" class="btn-primary" style="flex:2;" onclick="analyze()">Generate Report →</button>
       
-      <button id="saveCloudBtn" class="btn-secondary" style="display:none; width:100%" onclick="saveToCloud()" title="Save to Cloud">
-      💾
+      <button id="saveCloudBtn" class="btn-secondary" style="display:none; width:50px; flex-shrink:0; padding:0; align-items:center; justify-content:center;" onclick="saveToCloud()" title="Save to Cloud">
+      <span style="font-size:18px">💾</span>
       </button>
     </div>
   </div>
@@ -641,7 +642,10 @@ async function verify(inputEmail){
         document.getElementById("drawerProfile").style.display = "block";
 
         document.getElementById("historyBtn").style.display = "inline-flex";
-        document.getElementById("saveCloudBtn").style.display = "block";
+        
+        // Show Save button (display:flex to respect flex styling)
+        const saveBtn = document.getElementById("saveCloudBtn");
+        saveBtn.style.display = "flex";
         
         if(chartInstance) chartInstance.resize();
     } else {
@@ -665,7 +669,7 @@ async function saveToCloud() {
         }
     });
 
-    saveBtn.innerText = "⏳";
+    saveBtn.innerHTML = "<span style='animation:spin 1s linear infinite'>⏳</span>";
     
     try {
         await fetch(workerURL + "/save", {
@@ -673,11 +677,11 @@ async function saveToCloud() {
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ email: userEmail, data: rawData, date: new Date().toISOString() })
         });
-        saveBtn.innerText = "✅";
-        setTimeout(() => saveBtn.innerText = "💾", 1500);
+        saveBtn.innerHTML = "✅";
+        setTimeout(() => saveBtn.innerHTML = "<span style='font-size:18px'>💾</span>", 1500);
     } catch(e) {
         alert("Error saving data");
-        saveBtn.innerText = "💾";
+        saveBtn.innerHTML = "<span style='font-size:18px'>💾</span>";
     }
 }
 
