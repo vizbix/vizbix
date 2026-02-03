@@ -7,6 +7,7 @@
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -24,7 +25,6 @@
   --border: #E2E8F0;
   --radius: 16px;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -43,7 +43,7 @@ body {
 
 main { max-width: 900px; margin: auto; padding: 20px; }
 
-/* --- HEADER --- */
+/* --- HEADER STYLES --- */
 header {
   display: flex;
   justify-content: space-between;
@@ -62,13 +62,18 @@ header {
 
 .header-actions { display: flex; gap: 8px; align-items: center; }
 
-/* --- MOBILE OPTIMIZATIONS --- */
+/* --- MOBILE SPECIFIC FIXES (The Anti-Congestion Logic) --- */
 @media(max-width: 768px){
-    /* Hide specific elements to prevent congestion */
+    /* 1. Hide the long Tagline on mobile */
     .subtitle { display: none !important; }
+    
+    /* 2. Hide "History" text, show icon only */
     .btn-text-desktop { display: none !important; }
+    
+    /* 3. Hide Email in header (it moves to drawer) */
     .header-email-display { display: none !important; } 
     
+    /* 4. Tweak spacing */
     .header-actions { gap: 6px; }
     .brand { font-size: 20px; }
 }
@@ -117,6 +122,7 @@ header {
 
 .drawer-body { padding: 16px; overflow: auto; }
 
+/* Profile in Drawer (Visible only on Mobile when logged in) */
 .drawer-profile {
     background: #EFF6FF; border: 1px solid #DBEAFE;
     padding: 12px; border-radius: 12px; margin-bottom: 16px;
@@ -776,12 +782,34 @@ function pay(){
   }).open();
 }
 
-function downloadPDF(){
+async function downloadPDF() {
   const { jsPDF } = window.jspdf;
-  const doc = new jsPDF();
-  doc.text("Vizbix Report", 20, 20);
-  doc.addImage(chartInstance.toBase64Image(), "PNG", 20, 40, 170, 90);
-  doc.save("vizbix-report.pdf");
+  const element = document.getElementById("results");
+  const btn = document.querySelector("button[onclick='downloadPDF()']");
+  
+  // Visual Feedback
+  const originalText = btn.innerText;
+  btn.innerText = "Generating...";
+  
+  // Capture the entire 'results' section
+  const canvas = await html2canvas(element, {
+    scale: 2, 
+    backgroundColor: "#ffffff", 
+    useCORS: true 
+  });
+
+  // Convert to PDF
+  const imgData = canvas.toDataURL('image/png');
+  const pdf = new jsPDF('p', 'mm', 'a4');
+  const imgWidth = 210; 
+  const pageHeight = 297; 
+  const imgHeight = canvas.height * imgWidth / canvas.width;
+
+  pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+  pdf.save('Vizbix-Profit-Report.pdf');
+
+  // Reset Button
+  btn.innerText = originalText;
 }
 
 // 5. DRAWER LOGIC
