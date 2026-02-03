@@ -342,12 +342,12 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
 
     <div id="items"></div>
 
-    <div style="margin-top:16px; display:flex; gap:10px; align-items: stretch;">
-      <button class="btn-secondary" style="flex:1;" onclick="addRow()">+ Add Product</button>
-      <button id="analyzeBtn" class="btn-primary" style="flex:2;" onclick="analyze()">Generate Report →</button>
+    div style="margin-top:16px; display:flex; gap:10px;">
+      <button class="btn-secondary" style="width:100%" onclick="addRow()">+ Add Product</button>
+      <button id="analyzeBtn" class="btn-primary" style="width:100%" onclick="analyze()">Generate Report →</button>
       
-      <button id="saveCloudBtn" class="btn-secondary" style="display:none; width:50px; flex-shrink:0; padding:0; align-items:center; justify-content:center;" onclick="saveToCloud()" title="Save to Cloud">
-      <span style="font-size:18px">💾</span>
+      <button id="saveCloudBtn" class="btn-secondary" style="display:none; width:100%;" onclick="saveToCloud()" title="Save to Cloud">
+      💾
       </button>
     </div>
   </div>
@@ -788,3 +788,4 @@ document.addEventListener("keydown", (e) => {
 </script>
 </body>
 </html>
+
