@@ -225,6 +225,7 @@ button {
 .insight-green { background: #ECFDF5; color: #065F46; border: 1px solid #D1FAE5; }
 .insight-blue { background: #EFF6FF; color: #1E40AF; border: 1px solid #DBEAFE; }
 .insight-orange { background: #FFF7ED; color: #9A3412; border: 1px solid #FFEDD5; }
+.insight-gray { background: #F8FAFC; color: #475569; border: 1px solid #E2E8F0; }
 
 /* --- AI ANIMATION (NEW) --- */
 .ai-thinking {
@@ -471,17 +472,37 @@ function analyze(){
 function generateInsights(d){
   const div = document.getElementById("insights");
   let html = "";
+  let insightCount = 0;
   
-  // Standard Insights
-  const best = [...d].sort((a,b)=>b.profit - a.profit)[0];
-  if(best) html += `<div class="insight-item insight-green"><div><strong>★ Star Product:</strong> ${best.name} is driving growth.</div></div>`;
-  d.forEach(x => {
-    if(x.margin < 0.20 && x.qty > 10) {
-      html += `<div class="insight-item insight-orange"><div><strong>⚠ Low Margin:</strong> ${x.name} is only ${(x.margin*100).toFixed(0)}%. Consider price increase.</div></div>`;
-    }
+  // 1. Star Product (Highest Profit)
+  const bestProfit = [...d].sort((a,b)=>b.profit - a.profit)[0];
+  if(bestProfit) {
+      html += `<div class="insight-item insight-green"><div><strong>★ Star Product:</strong> ${bestProfit.name} generates the most profit (₹${bestProfit.profit.toLocaleString()}). Focus ad spend here.</div></div>`;
+      insightCount++;
+  }
+
+  // 2. Volume Leader (Highest Qty)
+  const bestQty = [...d].sort((a,b)=>b.qty - a.qty)[0];
+  if(bestQty && bestQty.name !== bestProfit?.name) { 
+       html += `<div class="insight-item insight-blue"><div><strong>📦 Volume Leader:</strong> ${bestQty.name} is your most popular item (${bestQty.qty} units). Consider bundling it with slower items.</div></div>`;
+       insightCount++;
+  }
+
+  // 3. Low Margin Alerts (Problem Child)
+  const lowMargin = d.filter(x => x.margin < 0.20);
+  lowMargin.forEach(x => {
+      if(insightCount < 4) { // Limit total to avoid huge lists
+          html += `<div class="insight-item insight-orange"><div><strong>⚠ Low Margin:</strong> ${x.name} is only ${(x.margin*100).toFixed(0)}%. Raise price or lower cost to improve health.</div></div>`;
+          insightCount++;
+      }
   });
 
-  // NEW: Add AI Button here
+  // 4. Fallback: If we don't have enough insights, add a generic positive one
+  if(insightCount < 3 && d.length > 0) {
+       html += `<div class="insight-item insight-gray"><div><strong>💡 Growth Tip:</strong> You have a healthy catalog. Consider testing a 10% price increase on your top sellers to boost net profit.</div></div>`;
+  }
+
+  // AI Button
   html += `
     <div id="aiContainer" style="margin-top:15px; border-top:1px dashed var(--border); padding-top:15px;">
         <button id="aiBtn" class="btn-secondary" style="width:100%; border-color:#818cf8; color:#4f46e5; background:#eef2ff;" onclick="askAI()">
