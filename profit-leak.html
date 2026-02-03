@@ -62,18 +62,12 @@ header {
 
 .header-actions { display: flex; gap: 8px; align-items: center; }
 
-/* --- MOBILE SPECIFIC FIXES (The Anti-Congestion Logic) --- */
+/* --- MOBILE OPTIMIZATIONS (Anti-Congestion) --- */
 @media(max-width: 768px){
-    /* 1. Hide the long Tagline on mobile */
     .subtitle { display: none !important; }
-    
-    /* 2. Hide "History" text, show icon only */
     .btn-text-desktop { display: none !important; }
-    
-    /* 3. Hide Email in header (it moves to drawer) */
     .header-email-display { display: none !important; } 
     
-    /* 4. Tweak spacing */
     .header-actions { gap: 6px; }
     .brand { font-size: 20px; }
 }
@@ -122,7 +116,6 @@ header {
 
 .drawer-body { padding: 16px; overflow: auto; }
 
-/* Profile in Drawer (Visible only on Mobile when logged in) */
 .drawer-profile {
     background: #EFF6FF; border: 1px solid #DBEAFE;
     padding: 12px; border-radius: 12px; margin-bottom: 16px;
@@ -235,7 +228,7 @@ button {
 }
 .history-item:hover { background: #F8FAFC; }
 
-/* --- Insights & AI (FIXED BUTTON VISIBILITY) --- */
+/* --- Insights & AI --- */
 .insight-item {
   display: flex; align-items: start; gap: 12px; padding: 14px;
   border-radius: 12px; margin-bottom: 10px; font-size: 13px; line-height: 1.5;
@@ -249,7 +242,6 @@ button {
   background: linear-gradient(90deg, #eff6ff 0%, #dbeafe 50%, #eff6ff 100%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
-  /* FIXED: Set a visible color so text is seen during loading */
   color: #1E40AF !important; 
   cursor: wait;
 }
@@ -415,7 +407,6 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
 </main>
 
 <script>
-// CLOUDFLARE WORKER URL
 const workerURL = "https://vizbix-api.vizbixhq.workers.dev";
 const PRICE = 29900;
 const KEY = "rzp_live_SAbBHVMbGMv2xo"; 
@@ -426,9 +417,7 @@ let currentData = [];
 let userEmail = localStorage.getItem("vizbix_email") || null;
 let isProUser = false;
 
-// --- 1. Startup Logic ---
 window.addEventListener('DOMContentLoaded', () => {
-    // Load local draft
     const saved = localStorage.getItem("vizbix_draft");
     if(saved) {
         try {
@@ -441,14 +430,9 @@ window.addEventListener('DOMContentLoaded', () => {
     } else {
         createRow(); createRow(); createRow(); 
     }
-
-    // Auto-login if email exists
-    if(userEmail) {
-        verify(userEmail);
-    }
+    if(userEmail) { verify(userEmail); }
 });
 
-// --- 2. Real-Time Local Save ---
 items.addEventListener('input', saveDraft);
 
 function saveDraft() {
@@ -465,7 +449,6 @@ function saveDraft() {
     localStorage.setItem("vizbix_draft", JSON.stringify(rawData));
 }
 
-/* ---------- UI Helper: Create Row ---------- */
 function createRow(name="", sell="", cost="", qty=""){
   const d = document.createElement("div");
   d.className = "grid-row";
@@ -482,14 +465,12 @@ function createRow(name="", sell="", cost="", qty=""){
 function addRow(){ createRow(); saveDraft(); }
 function removeRow(btn){ btn.parentElement.remove(); saveDraft(); }
 
-/* ---------- Logic: Sample Data ---------- */
 function sample(){
   items.innerHTML="";
   [["Wireless Earbuds", 2500, 1200, 140], ["Smart Watch", 4500, 2800, 85], ["USB-C Cable", 499, 150, 400]].forEach(x => createRow(x[0], x[1], x[2], x[3]));
   saveDraft(); analyze();
 }
 
-/* ---------- Logic: Analyze ---------- */
 function analyze(){
   let data = [];
   let totalRevenue = 0, totalCost = 0, totalProfit = 0;
@@ -524,41 +505,35 @@ function analyze(){
   generateInsights(data);
 }
 
-/* ---------- Logic: Insights/Table/Chart ---------- */
 function generateInsights(d){
   const div = document.getElementById("insights");
   let html = "";
   let insightCount = 0;
   
-  // 1. Star Product (Highest Profit)
   const bestProfit = [...d].sort((a,b)=>b.profit - a.profit)[0];
   if(bestProfit) {
       html += `<div class="insight-item insight-green"><div><strong>★ Star Product:</strong> ${bestProfit.name} generates the most profit (₹${bestProfit.profit.toLocaleString()}). Focus ad spend here.</div></div>`;
       insightCount++;
   }
 
-  // 2. Volume Leader (Highest Qty)
   const bestQty = [...d].sort((a,b)=>b.qty - a.qty)[0];
   if(bestQty && bestQty.name !== bestProfit?.name) { 
        html += `<div class="insight-item insight-blue"><div><strong>📦 Volume Leader:</strong> ${bestQty.name} is your most popular item (${bestQty.qty} units). Consider bundling it with slower items.</div></div>`;
        insightCount++;
   }
 
-  // 3. Low Margin Alerts (Problem Child)
   const lowMargin = d.filter(x => x.margin < 0.20);
   lowMargin.forEach(x => {
-      if(insightCount < 4) { // Limit total to avoid huge lists
+      if(insightCount < 4) {
           html += `<div class="insight-item insight-orange"><div><strong>⚠ Low Margin:</strong> ${x.name} is only ${(x.margin*100).toFixed(0)}%. Raise price or lower cost to improve health.</div></div>`;
           insightCount++;
       }
   });
 
-  // 4. Fallback: If we don't have enough insights, add a generic positive one
   if(insightCount < 3 && d.length > 0) {
        html += `<div class="insight-item insight-gray"><div><strong>💡 Growth Tip:</strong> You have a healthy catalog. Consider testing a 10% price increase on your top sellers to boost net profit.</div></div>`;
   }
 
-  // AI Button
   html += `
     <div id="aiContainer" style="margin-top:15px; border-top:1px dashed var(--border); padding-top:15px;">
         <button id="aiBtn" class="btn-secondary" style="width:100%; border-color:#818cf8; color:#4f46e5; background:#eef2ff;" onclick="askAI()">
@@ -593,18 +568,15 @@ function generateChart(d){
   });
 }
 
-/* ---------- NEW: AI FUNCTION ---------- */
 async function askAI() {
     if(!isProUser || !userEmail) return alert("Please Login (Pro Feature)");
     const btn = document.getElementById("aiBtn");
     const resultBox = document.getElementById("aiResult");
     
-    // Loading State
     btn.innerHTML = "✨ Strategizing...";
     btn.disabled = true;
     btn.classList.add("ai-thinking");
     
-    // Prepare Data
     const products = currentData.map(x => ({
         name: x.name, cost: x.cost, sell: x.sell, qty: x.qty
     }));
@@ -622,7 +594,6 @@ async function askAI() {
         if(d.ok) {
             btn.style.display = "none";
             resultBox.style.display = "block";
-            // Simple markdown formatting
             resultBox.innerHTML = "<strong>🤖 AI Consultant Strategy:</strong><br><br>" + 
                 d.response.replace(/\n/g, "<br>").replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
         } else {
@@ -638,9 +609,6 @@ async function askAI() {
     }
 }
 
-/* ---------- AUTH & CLOUD STORAGE ---------- */
-
-// 1. Login Flow
 function handleLoginClick() {
     const email = prompt("Please enter your email to login:");
     if(email) verify(email);
@@ -650,7 +618,6 @@ async function verify(inputEmail){
   const email = inputEmail || document.getElementById("emailInput").value;
   if(!email) return alert("Please enter email.");
   
-  // Visual feedback
   const loginBtn = document.getElementById("loginBtn");
   if(loginBtn) loginBtn.innerText = "Checking...";
 
@@ -659,21 +626,17 @@ async function verify(inputEmail){
     const d = await r.json();
     
     if(d.valid) {
-        // Success: Unlock Pro Features
         isProUser = true;
         userEmail = email;
         localStorage.setItem("vizbix_email", email);
         
-        // Update UI
         document.getElementById("lockOverlay").style.display = "none";
         document.getElementById("loginBtn").style.display = "none";
         
-        // Header Email (Desktop Only)
         const headerEmail = document.getElementById("userEmailHeader");
         headerEmail.innerText = email; 
         headerEmail.style.display = "block";
 
-        // Drawer Email (Mobile)
         document.getElementById("drawerEmailDisplay").innerText = email;
         document.getElementById("drawerProfile").style.display = "block";
 
@@ -690,12 +653,10 @@ async function verify(inputEmail){
   }
 }
 
-// 2. Save Analysis
 async function saveToCloud() {
     if(!isProUser || !userEmail) return alert("Login required");
     const saveBtn = document.getElementById("saveCloudBtn");
     
-    // Get current grid data
     const rawData = [];
     document.querySelectorAll(".grid-row").forEach(r => {
         const i = r.querySelectorAll("input");
@@ -720,7 +681,6 @@ async function saveToCloud() {
     }
 }
 
-// 3. History System
 function toggleHistory(show) {
     const modal = document.getElementById("historyModal");
     modal.style.display = show ? "flex" : "none";
@@ -733,7 +693,7 @@ async function fetchHistory() {
     
     try {
         const r = await fetch(workerURL + "/history?email=" + userEmail);
-        const historyData = await r.json(); // Expecting array: [{ id, date, data: [...] }]
+        const historyData = await r.json();
         
         if(historyData.length === 0) {
             list.innerHTML = "<p style='color:#64748B; text-align:center'>No saved history found.</p>";
@@ -771,7 +731,6 @@ function loadHistoryItem(data) {
     analyze();
 }
 
-// 4. Payment
 function pay(){
   const email = document.getElementById("emailInput").value;
   if(!email) return alert("Enter email first.");
@@ -786,33 +745,18 @@ async function downloadPDF() {
   const { jsPDF } = window.jspdf;
   const element = document.getElementById("results");
   const btn = document.querySelector("button[onclick='downloadPDF()']");
-  
-  // Visual Feedback
   const originalText = btn.innerText;
   btn.innerText = "Generating...";
-  
-  // Capture the entire 'results' section
-  const canvas = await html2canvas(element, {
-    scale: 2, 
-    backgroundColor: "#ffffff", 
-    useCORS: true 
-  });
-
-  // Convert to PDF
+  const canvas = await html2canvas(element, { scale: 2, backgroundColor: "#ffffff", useCORS: true });
   const imgData = canvas.toDataURL('image/png');
   const pdf = new jsPDF('p', 'mm', 'a4');
   const imgWidth = 210; 
-  const pageHeight = 297; 
   const imgHeight = canvas.height * imgWidth / canvas.width;
-
   pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
   pdf.save('Vizbix-Profit-Report.pdf');
-
-  // Reset Button
   btn.innerText = originalText;
 }
 
-// 5. DRAWER LOGIC
 const menuBtn = document.getElementById("menuBtn");
 const drawer = document.getElementById("drawer");
 const overlay = document.getElementById("drawerOverlay");
