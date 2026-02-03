@@ -226,6 +226,15 @@ button {
 .insight-blue { background: #EFF6FF; color: #1E40AF; border: 1px solid #DBEAFE; }
 .insight-orange { background: #FFF7ED; color: #9A3412; border: 1px solid #FFEDD5; }
 
+/* --- AI ANIMATION (NEW) --- */
+.ai-thinking {
+  background: linear-gradient(90deg, #eff6ff 0%, #dbeafe 50%, #eff6ff 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  color: transparent !important;
+}
+@keyframes shimmer { 0% {background-position: 100% 0} 100% {background-position: -100% 0} }
+
 table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; }
 th { text-align: left; padding: 12px; border-bottom: 2px solid var(--border); font-size: 12px; color: var(--text-muted); }
 td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
@@ -349,7 +358,8 @@ tr:last-child td { border-bottom: none; }
 </main>
 
 <script>
-const workerURL = window.location.origin; // Will update this after you give cloudflare code
+// UPDATED URL TO MATCH YOUR CLOUDFLARE WORKER
+const workerURL = "https://vizbix-api.vizbixhq.workers.dev";
 const PRICE = 29900;
 const KEY = "rzp_live_SAbBHVMbGMv2xo"; 
 
@@ -461,6 +471,8 @@ function analyze(){
 function generateInsights(d){
   const div = document.getElementById("insights");
   let html = "";
+  
+  // Standard Insights
   const best = [...d].sort((a,b)=>b.profit - a.profit)[0];
   if(best) html += `<div class="insight-item insight-green"><div><strong>★ Star Product:</strong> ${best.name} is driving growth.</div></div>`;
   d.forEach(x => {
@@ -468,6 +480,17 @@ function generateInsights(d){
       html += `<div class="insight-item insight-orange"><div><strong>⚠ Low Margin:</strong> ${x.name} is only ${(x.margin*100).toFixed(0)}%. Consider price increase.</div></div>`;
     }
   });
+
+  // NEW: Add AI Button here
+  html += `
+    <div id="aiContainer" style="margin-top:15px; border-top:1px dashed var(--border); padding-top:15px;">
+        <button id="aiBtn" class="btn-secondary" style="width:100%; border-color:#818cf8; color:#4f46e5; background:#eef2ff;" onclick="askAI()">
+            ✨ Ask AI Consultant for Strategy
+        </button>
+        <div id="aiResult" style="margin-top:15px; font-size:14px; line-height:1.6; color:#334155; display:none; background:white; padding:15px; border-radius:12px; border:1px solid #e2e8f0;"></div>
+    </div>
+  `;
+
   div.innerHTML = html;
 }
 
@@ -491,6 +514,51 @@ function generateChart(d){
     },
     options: { responsive: true, maintainAspectRatio: false, plugins: { legend: {display: false} }, scales: { y: { beginAtZero: true }, x: { grid: { display: false } } } }
   });
+}
+
+/* ---------- NEW: AI FUNCTION ---------- */
+async function askAI() {
+    if(!isProUser || !userEmail) return alert("Please Login (Pro Feature)");
+    const btn = document.getElementById("aiBtn");
+    const resultBox = document.getElementById("aiResult");
+    
+    // Loading State
+    btn.innerHTML = "✨ AI is analyzing...";
+    btn.disabled = true;
+    btn.classList.add("ai-thinking");
+    
+    // Prepare Data
+    const products = currentData.map(x => ({
+        name: x.name, cost: x.cost, sell: x.sell, qty: x.qty
+    }));
+
+    try {
+        const r = await fetch(workerURL + "/ai-analyze", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: userEmail, products: products })
+        });
+        
+        const d = await r.json();
+        btn.classList.remove("ai-thinking");
+        
+        if(d.ok) {
+            btn.style.display = "none";
+            resultBox.style.display = "block";
+            // Simple markdown formatting
+            resultBox.innerHTML = "<strong>🤖 AI Consultant Strategy:</strong><br><br>" + 
+                d.response.replace(/\n/g, "<br>").replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+        } else {
+            alert(d.error || "AI failed to respond");
+            btn.innerHTML = "✨ Retry AI Analysis";
+            btn.disabled = false;
+        }
+    } catch(e) {
+        btn.classList.remove("ai-thinking");
+        alert("Connection error");
+        btn.innerHTML = "✨ Retry AI Analysis";
+        btn.disabled = false;
+    }
 }
 
 /* ---------- AUTH & CLOUD STORAGE ---------- */
@@ -650,5 +718,3 @@ function downloadPDF(){
 </script>
 </body>
 </html>
-
-
