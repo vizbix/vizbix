@@ -43,7 +43,7 @@ body {
 
 main { max-width: 900px; margin: auto; padding: 20px; }
 
-/* --- HEADER STYLES --- */
+/* --- HEADER --- */
 header {
   display: flex;
   justify-content: space-between;
@@ -62,18 +62,13 @@ header {
 
 .header-actions { display: flex; gap: 8px; align-items: center; }
 
-/* --- MOBILE SPECIFIC FIXES --- */
+/* --- MOBILE OPTIMIZATIONS --- */
 @media(max-width: 768px){
-    /* 1. Hide the long Tagline */
+    /* Hide specific elements to prevent congestion */
     .subtitle { display: none !important; }
-    
-    /* 2. Hide "History" text, show icon only */
     .btn-text-desktop { display: none !important; }
-    
-    /* 3. Hide Email in header (it moves to drawer) */
     .header-email-display { display: none !important; } 
     
-    /* 4. Adjust spacing */
     .header-actions { gap: 6px; }
     .brand { font-size: 20px; }
 }
@@ -122,7 +117,6 @@ header {
 
 .drawer-body { padding: 16px; overflow: auto; }
 
-/* Drawer Profile Section (Visible on Mobile when logged in) */
 .drawer-profile {
     background: #EFF6FF; border: 1px solid #DBEAFE;
     padding: 12px; border-radius: 12px; margin-bottom: 16px;
@@ -235,7 +229,7 @@ button {
 }
 .history-item:hover { background: #F8FAFC; }
 
-/* --- Insights & AI --- */
+/* --- Insights & AI (FIXED BUTTON VISIBILITY) --- */
 .insight-item {
   display: flex; align-items: start; gap: 12px; padding: 14px;
   border-radius: 12px; margin-bottom: 10px; font-size: 13px; line-height: 1.5;
@@ -247,7 +241,11 @@ button {
 
 .ai-thinking {
   background: linear-gradient(90deg, #eff6ff 0%, #dbeafe 50%, #eff6ff 100%);
-  background-size: 200% 100%; animation: shimmer 1.5s infinite; color: transparent !important;
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  /* FIXED: Set a visible color so text is seen during loading */
+  color: #1E40AF !important; 
+  cursor: wait;
 }
 @keyframes shimmer { 0% {background-position: 100% 0} 100% {background-position: -100% 0} }
 
@@ -596,7 +594,7 @@ async function askAI() {
     const resultBox = document.getElementById("aiResult");
     
     // Loading State
-    btn.innerHTML = "✨ AI is analyzing...";
+    btn.innerHTML = "✨ Strategizing...";
     btn.disabled = true;
     btn.classList.add("ai-thinking");
     
