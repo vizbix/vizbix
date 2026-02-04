@@ -288,6 +288,7 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
     <div id="drawerProfile" class="drawer-profile" style="display:none;">
         <div class="drawer-profile-label">Signed in as</div>
         <div id="drawerEmailDisplay" class="drawer-profile-email"></div>
+        <div id="drawerExpiryDisplay" style="font-size:11px; color:#64748B; margin-top:4px;"></div>
     </div>
 
     <div class="drawer-links">
@@ -640,20 +641,46 @@ async function verify(inputEmail){
         userEmail = email;
         localStorage.setItem("vizbix_email", email);
         
+        // 1. Unlock UI
         document.getElementById("lockOverlay").style.display = "none";
         document.getElementById("loginBtn").style.display = "none";
         
+        // 2. Calculate Date
+        let dateStr = "";
+        if (d.expiry) {
+            const date = new Date(parseInt(d.expiry));
+            // Format: "6 Mar, 2026"
+            dateStr = date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
+        }
+
+        // 3. Update Desktop Header (Email + Date)
         const headerEmail = document.getElementById("userEmailHeader");
-        headerEmail.innerText = email; 
-        headerEmail.style.display = "block";
+        if(headerEmail) {
+            headerEmail.innerHTML = `<div>${email}</div><div style="font-size:10px; opacity:0.8; margin-top:2px;">Exp: ${dateStr}</div>`;
+            headerEmail.style.display = "block";
+        }
 
-        document.getElementById("drawerEmailDisplay").innerText = email;
-        document.getElementById("drawerProfile").style.display = "block";
+        // 4. Update Mobile Drawer (Email + Date)
+        const drawerEmail = document.getElementById("drawerEmailDisplay");
+        if(drawerEmail) drawerEmail.innerText = email;
 
+        const drawerExpiry = document.getElementById("drawerExpiryDisplay");
+        if(drawerExpiry && dateStr) {
+            drawerExpiry.innerText = "Plan expires: " + dateStr;
+        }
+        
+        // Show Profile Section in Drawer
+        const drawerProfile = document.getElementById("drawerProfile");
+        if(drawerProfile) drawerProfile.style.display = "block";
+
+        // 5. Show Pro Buttons
         document.getElementById("historyBtn").style.display = "inline-flex";
-        document.getElementById("saveCloudBtn").style.display = "block";
+        
+        const saveBtn = document.getElementById("saveCloudBtn");
+        if(saveBtn) saveBtn.style.display = "flex"; // Use flex to keep alignment
         
         if(chartInstance) chartInstance.resize();
+
     } else {
         alert("Pro subscription not found for " + email);
         if(loginBtn) loginBtn.innerText = "Login";
@@ -794,3 +821,4 @@ document.addEventListener("keydown", (e) => {
 </script>
 </body>
 </html>
+
