@@ -25,6 +25,7 @@
   --border: #E2E8F0;
   --radius: 16px;
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
 * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -211,6 +212,10 @@ button {
   text-transform: uppercase; margin-bottom: 12px; display: inline-block;
 }
 
+/* --- NEW FEATURE LIST CSS --- */
+.feature-list { text-align: left; margin: 15px 0 20px; padding: 0 10px; font-size: 13px; color: var(--text-muted); display: inline-block; }
+.feature-list div { margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+
 /* --- History Modal --- */
 .modal-overlay {
   position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -372,10 +377,15 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
       <div class="blur-overlay" id="lockOverlay">
         <div class="lock-card">
           <span class="premium-badge">Vizbix Pro</span>
-          <h3 style="margin:0 0 10px 0;">Unlock Strategic Insights</h3>
-          <p style="font-size:13px; color:#64748B; margin-bottom:20px;">
-            Get chart visualization, margin analysis, and AI-driven pricing recommendations.
-          </p>
+          <h3 style="margin:0 0 5px 0;">Unlock Strategic Insights</h3>
+          
+          <div class="feature-list">
+              <div>✅ <strong>AI Business Consultant</strong></div>
+              <div>✅ <strong>Unlimited Cloud History</strong></div>
+              <div>✅ <strong>Visual Charts & Graphs</strong></div>
+              <div>✅ <strong>PDF Report Export</strong></div>
+          </div>
+
           <input id="emailInput" placeholder="Enter your email" style="margin-bottom:10px; text-align:center;">
           <button class="btn-primary" style="width:100%" onclick="pay()">Unlock for ₹299</button>
           <button style="background:none; border:none; color:#64748B; font-size:11px; margin-top:10px; cursor:pointer; text-decoration:underline" onclick="verify(null)">Restore Purchase</button>
