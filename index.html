@@ -3,11 +3,9 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Vizbix – Free Tools for Business Owners</title>
-  <meta name="description" content="Free AI-powered profit margin calculator for Ecommerce, Dropshipping, Cloud Kitchens, and Salons. Stop guessing your profits—get instant AI pricing strategy and visualize hidden leaks." />
-  <meta name="keywords" content="dropshipping profit calculator, ecommerce margin tool, cloud kitchen calculator, salon margin tool, small business calculator, vizbix, pricing strategy, roas calculator" />
-  
-  <!-- FAVICON -->
+  <title>Vizbix – Profit Intelligence for Ecommerce, Dropshipping & Small Business</title>
+  <meta name="description" content="Free AI-powered profit margin calculator for Ecommerce, Dropshipping, Cloud Kitchens, and Salons. Stop guessing your profits." />
+
   <link rel="icon" type="image/png" href="favicon.png">
   <link rel="apple-touch-icon" href="favicon.png">
 
@@ -322,6 +320,52 @@
     }
 
     /* =========================
+       NEW: PRO TOOL CARD (ADDED)
+    ========================= */
+    .pro-card {
+      background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%);
+      border-radius: 20px;
+      padding: 24px;
+      color: white;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 20px;
+      box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.3);
+      transition: transform 0.2s ease;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 40px;
+    }
+    .pro-card:hover { transform: translateY(-3px); }
+    
+    .pro-badge {
+      background: rgba(59, 130, 246, 0.2);
+      color: #60A5FA;
+      font-size: 11px;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 20px;
+      border: 1px solid rgba(59, 130, 246, 0.4);
+      display: inline-block;
+      margin-bottom: 8px;
+    }
+
+    .pro-content h3 { margin: 0 0 6px; font-size: 18px; color: white; letter-spacing: -0.01em; }
+    .pro-content p { margin: 0; color: #94A3B8; font-size: 14px; line-height: 1.5; max-width: 500px; }
+    
+    .pro-icon {
+      width: 48px; height: 48px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 20px;
+      flex-shrink: 0;
+      color: white;
+    }
+
+    /* =========================
        GRID + CARDS
     ========================= */
     .grid{
@@ -478,6 +522,10 @@
       .search{ padding: 10px 12px; }
       .search input{ font-size: 15px; }
       .about{ padding: 44px 10px; }
+      
+      /* Mobile fix for pro card */
+      .pro-card { flex-direction: column; align-items: flex-start; }
+      .pro-icon { display: none; }
     }
   </style>
 </head>
@@ -486,9 +534,8 @@
   <header>
     <div class="nav">
       <div class="brand">Vizbix</div>
-      <div class="tagline">Free tools for business owners</div>
+      <div class="tagline">Profit Intelligence for Ecommerce, Dropshipping & Small Biz</div>
 
-      <!-- MENU BUTTON -->
       <button class="menu-btn" id="menuBtn" aria-label="Open menu">
         <div class="menu-icon" aria-hidden="true">
           <span></span><span></span><span></span>
@@ -497,10 +544,8 @@
     </div>
   </header>
 
-  <!-- OVERLAY -->
   <div class="drawer-overlay" id="drawerOverlay"></div>
 
-  <!-- DRAWER -->
   <aside class="drawer" id="drawer" aria-label="Site menu">
     <div class="drawer-head">
       <div class="drawer-title">Menu</div>
@@ -515,7 +560,11 @@
     <div class="drawer-body">
       <div class="drawer-links">
         <a href="index.html">Home <span>Start here</span></a>
-        <a href="profit-leak.html">Profit Optimizer <span>Pro Tool</span></a>
+        
+        <a href="profit-leak.html" style="background: #F0F9FF; border-color: #BAE6FD;">
+          Profit Optimizer <span style="background:#0F172A; color:white; padding:2px 6px; border-radius:6px; font-size:10px; letter-spacing:0.5px;">NEW</span>
+        </a>
+
         <a href="free-tools.html">Templates <span>Advanced</span></a>
         <a href="tools/index.html">All Tools <span>Calculators</span></a>
         <a href="blogs.html">Blog <span>Tips & guides</span></a>
@@ -534,7 +583,7 @@
 
       <h1>Free Tools for Business Owners</h1>
       <p>
-        Simple calculators to understand profit, pricing, costs, and growth — without complexity.
+        Simple calculators for <strong>ecommerce, dropshipping, cloud kitchens, and salons</strong> to understand profit, costs, and pricing.
         Use them in seconds and make clearer decisions.
       </p>
 
@@ -549,6 +598,21 @@
           <div class="hint">Type to filter</div>
         </div>
       </div>
+    </section>
+
+    <section>
+        <div class="section-title">
+            <h2>Featured Tool</h2>
+            <span>AI-Powered</span>
+        </div>
+        <a href="profit-leak.html" class="pro-card">
+            <div class="pro-content">
+                <div class="pro-badge">✨ VIZBIX PRO</div>
+                <h3>Profit Optimizer</h3>
+                <p>The only tool that uses <strong>AI</strong> to analyze your margins, find hidden leaks, and suggest pricing strategies. Save reports & track history.</p>
+            </div>
+            <div class="pro-icon">➔</div>
+        </a>
     </section>
 
     <section>
@@ -714,5 +778,3 @@
   </script>
 </body>
 </html>
-
-
