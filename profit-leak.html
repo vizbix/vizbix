@@ -796,7 +796,56 @@ function loadHistoryItem(data, savedMode) {
     toggleHistory(false); saveDraft(); analyze();
 }
 
-function pay(){ const email = document.getElementById("emailInput").value; if(!email) return alert("Email required"); new Razorpay({ key: KEY, amount: PRICE, currency: "INR", name: "Vizbix Pro", prefill: { email: email }, theme: { color: "#0F172A" }, handler: function(response){ verify(email); } }).open(); }
+function pay(){
+  const email = document.getElementById("emailInput").value;
+  if(!email) return alert("Email required");
+  
+  const options = {
+    key: KEY, // Your Public Key
+    amount: PRICE, 
+    currency: "INR", 
+    name: "Vizbix Pro", 
+    description: "30 Days Access",
+    prefill: { email: email }, 
+    theme: { color: "#0F172A" },
+    handler: async function(response){ 
+        // SECURITY UPDATE: Send Payment ID to Worker for verification
+        const btn = document.querySelector("button[onclick='pay()']");
+        const originalText = btn.innerText;
+        btn.innerText = "Verifying Payment...";
+        btn.disabled = true;
+
+        try {
+            const verifyReq = await fetch(workerURL + "/verify-payment", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    payment_id: response.razorpay_payment_id,
+                    email: email
+                })
+            });
+
+            const verifyData = await verifyReq.json();
+
+            if (verifyData.ok) {
+                alert("Payment Successful! Welcome to Pro.");
+                verify(email); // Refresh UI
+            } else {
+                alert("Verification Failed: " + (verifyData.error || "Unknown error"));
+                btn.innerText = originalText;
+                btn.disabled = false;
+            }
+        } catch (e) {
+            alert("Network error during verification. Please contact support.");
+            btn.innerText = originalText;
+            btn.disabled = false;
+        }
+    }
+  };
+
+  const rzp1 = new Razorpay(options);
+  rzp1.open();
+}
 
 async function downloadPDF() {
   const { jsPDF } = window.jspdf;
@@ -822,5 +871,6 @@ document.addEventListener("keydown", (e) => { if(e.key === "Escape") closeDrawer
 </script>
 </body>
 </html>
+
 
 
