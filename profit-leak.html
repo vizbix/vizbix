@@ -7,6 +7,8 @@
 
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
@@ -18,8 +20,8 @@
 :root {
   --bg: #F8FAFC;
   --surface: #FFFFFF;
-  --primary: #0F172A; 
-  --accent: #3B82F6; 
+  --primary: #0F172A; /* Deep Navy */
+  --accent: #3B82F6; /* Trust Blue */
   --accent-glow: rgba(59, 130, 246, 0.15);
   --success: #10B981;
   --text-main: #1E293B;
@@ -48,15 +50,24 @@ main { max-width: 900px; margin: auto; padding: 20px; }
 
 /* --- HEADER STYLES --- */
 header {
-  display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 30px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
-  position: relative; z-index: 50; height: 70px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 30px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+  position: relative;
+  z-index: 50;
+  height: 70px;
 }
+
 .brand { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--primary); }
 .brand span { color: var(--accent); }
 .subtitle { font-size: 13px; color: var(--text-muted); font-weight: 500; display: block; margin-top: 2px;}
+
 .header-actions { display: flex; gap: 8px; align-items: center; }
 
+/* --- MOBILE OPTIMIZATIONS (Anti-Congestion) --- */
 @media(max-width: 768px){
     .subtitle { display: none !important; }
     .btn-text-desktop { display: none !important; }
@@ -67,46 +78,97 @@ header {
 
 /* --- MENU DRAWER --- */
 .menu-btn {
-  width: 40px; height: 40px; border: 1px solid rgba(229,231,235,0.9);
-  background: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center;
-  cursor: pointer; box-shadow: 0 2px 5px rgba(2, 6, 23, 0.05); padding: 0; flex-shrink: 0;
+  width: 40px; height: 40px;
+  border: 1px solid rgba(229,231,235,0.9);
+  background: #fff;
+  border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(2, 6, 23, 0.05);
+  padding: 0;
+  flex-shrink: 0;
 }
 .menu-btn:active { transform: scale(0.96); }
+
 .menu-icon { width: 16px; height: 12px; position: relative; }
-.menu-icon span { position: absolute; left: 0; right: 0; height: 2px; background: var(--text-main); border-radius: 10px; }
+.menu-icon span {
+  position: absolute; left: 0; right: 0; height: 2px;
+  background: var(--text-main); border-radius: 10px;
+}
 .menu-icon span:nth-child(1) { top: 0; }
 .menu-icon span:nth-child(2) { top: 5px; opacity: 0.9; }
 .menu-icon span:nth-child(3) { bottom: 0; }
 
-.drawer-overlay { position: fixed; inset: 0; background: rgba(2,6,23,0.55); opacity: 0; pointer-events: none; transition: opacity .2s ease; z-index: 150; }
-.drawer { position: fixed; top: 0; right: 0; height: 100%; width: min(300px, 85vw); background: #fff; border-left: 1px solid var(--border); box-shadow: -10px 0 30px rgba(2,6,23,.14); transform: translateX(105%); transition: transform .25s ease; z-index: 160; display: flex; flex-direction: column; }
+.drawer-overlay {
+  position: fixed; inset: 0; background: rgba(2,6,23,0.55);
+  opacity: 0; pointer-events: none; transition: opacity .2s ease; z-index: 150;
+}
+.drawer {
+  position: fixed; top: 0; right: 0; height: 100%; width: min(300px, 85vw);
+  background: #fff; border-left: 1px solid var(--border);
+  box-shadow: -10px 0 30px rgba(2,6,23,.14);
+  transform: translateX(105%); transition: transform .25s ease;
+  z-index: 160; display: flex; flex-direction: column;
+}
 .drawer.open { transform: translateX(0); }
 .drawer-overlay.open { opacity: 1; pointer-events: auto; }
+
 .drawer-head { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
 .drawer-title { font-weight: 900; font-size: 16px; color: var(--primary); }
 .drawer-close { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border); background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;}
 .drawer-close svg { width: 18px; height: 18px; stroke: var(--text-main); }
+
 .drawer-body { padding: 16px; overflow: auto; }
-.drawer-profile { background: #EFF6FF; border: 1px solid #DBEAFE; padding: 12px; border-radius: 12px; margin-bottom: 16px; }
+
+.drawer-profile {
+    background: #EFF6FF; border: 1px solid #DBEAFE;
+    padding: 12px; border-radius: 12px; margin-bottom: 16px;
+}
 .drawer-profile-label { font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase; margin-bottom: 4px; }
 .drawer-profile-email { font-size: 13px; font-weight: 600; color: #1E40AF; word-break: break-all; }
+
 .drawer-links { display: flex; flex-direction: column; gap: 8px; }
-.drawer-links a { text-decoration: none; color: var(--text-main); border: 1px solid var(--border); background: #fff; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 14px; }
+.drawer-links a {
+  text-decoration: none; color: var(--text-main);
+  border: 1px solid var(--border);
+  background: #fff; padding: 12px;
+  border-radius: 12px; display: flex; align-items: center; justify-content: space-between;
+  font-weight: 600; font-size: 14px;
+}
 .drawer-links a:hover { background: #F8FAFC; }
 .drawer-mini { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 12px; line-height: 1.5; }
 
 /* --- Cards & Layout --- */
-.card { background: var(--surface); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.card {
+  background: var(--surface);
+  border-radius: var(--radius);
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--border);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
 
 /* --- Inputs & Grid --- */
 .input-group { position: relative; margin-bottom: 20px; }
 .input-label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-input { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: #F1F5F9; font-weight: 500; transition: all 0.2s; font-size: 14px; }
+input {
+  width: 100%; padding: 12px 14px; border-radius: 10px;
+  border: 1px solid var(--border); background: #F1F5F9;
+  font-weight: 500; transition: all 0.2s; font-size: 14px;
+}
 input:focus { background: #fff; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); }
 
-.grid-header { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 40px; gap: 10px; padding: 0 10px 8px 10px; font-size: 11px; font-weight: 600; color: var(--text-muted); }
-.grid-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 40px; gap: 10px; margin-bottom: 10px; align-items: center; }
+.grid-header {
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 40px;
+  gap: 10px; padding: 0 10px 8px 10px;
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+}
+.grid-row {
+  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 40px;
+  gap: 10px; margin-bottom: 10px; align-items: center;
+}
 
 @media(max-width:640px){
   .grid-header { display: none; }
@@ -115,14 +177,22 @@ input:focus { background: #fff; border-color: var(--accent); box-shadow: 0 0 0 4
 }
 
 /* --- Buttons --- */
-button { padding: 10px 16px; border-radius: 12px; font-weight: 600; font-size: 13px; cursor: pointer; border: none; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; }
+button {
+  padding: 10px 16px; border-radius: 12px; font-weight: 600; font-size: 13px;
+  cursor: pointer; border: none; transition: all 0.2s;
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+  white-space: nowrap;
+}
 .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2); }
 .btn-secondary { background: white; border: 1px solid var(--border); color: var(--text-main); }
 .btn-ghost { background: transparent; color: var(--text-muted); padding: 8px; }
 
 /* --- Results Section --- */
 .kpi-container { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
-.kpi-card { flex: 1; background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%); border: 1px solid var(--border); border-radius: 12px; padding: 14px; min-width: 130px; }
+.kpi-card {
+  flex: 1; background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
+  border: 1px solid var(--border); border-radius: 12px; padding: 14px; min-width: 130px;
+}
 .kpi-label { font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
 .kpi-value { font-size: 20px; font-weight: 800; color: var(--primary); white-space: nowrap; }
 
@@ -135,27 +205,65 @@ button { padding: 10px 16px; border-radius: 12px; font-weight: 600; font-size: 1
 .monthly-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 @media(max-width: 600px) { .monthly-inputs { grid-template-columns: 1fr; } }
 
+.info-box-small { background: #EFF6FF; border: 1px solid #DBEAFE; color: #1E40AF; padding: 10px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+
 /* --- Locked Content --- */
 .locked-container { position: relative; overflow: hidden; }
-.blur-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.5); }
-.lock-card { background: white; padding: 24px; border-radius: 20px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.1); border: 1px solid var(--border); max-width: 320px; width: 90%; }
-.premium-badge { background: linear-gradient(135deg, #0F172A 0%, #334155 100%); color: white; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-bottom: 12px; display: inline-block; }
+.blur-overlay {
+  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px); z-index: 10;
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.5);
+}
+.lock-card {
+  background: white; padding: 24px; border-radius: 20px; text-align: center;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.1); border: 1px solid var(--border); max-width: 320px; width: 90%;
+}
+.premium-badge {
+  background: linear-gradient(135deg, #0F172A 0%, #334155 100%); color: white;
+  padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 700;
+  text-transform: uppercase; margin-bottom: 12px; display: inline-block;
+}
+
+/* --- NEW FEATURE LIST CSS --- */
 .feature-list { text-align: left; margin: 15px 0 20px; padding: 0 10px; font-size: 13px; color: var(--text-muted); display: inline-block; }
 .feature-list div { margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
 
 /* --- History Modal --- */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 100; display: none; align-items: center; justify-content: center; }
-.modal-content { background: white; width: 90%; max-width: 500px; border-radius: 16px; padding: 24px; max-height: 80vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
-.history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--border); cursor: pointer; }
+.modal-overlay {
+  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+  background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
+  z-index: 100; display: none; align-items: center; justify-content: center;
+}
+.modal-content {
+  background: white; width: 90%; max-width: 500px;
+  border-radius: 16px; padding: 24px; max-height: 80vh; overflow-y: auto;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+.history-item {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 12px; border-bottom: 1px solid var(--border); cursor: pointer;
+}
 .history-item:hover { background: #F8FAFC; }
 
 /* --- Insights & AI --- */
-.insight-item { display: flex; align-items: start; gap: 12px; padding: 14px; border-radius: 12px; margin-bottom: 10px; font-size: 13px; line-height: 1.5; }
+.insight-item {
+  display: flex; align-items: start; gap: 12px; padding: 14px;
+  border-radius: 12px; margin-bottom: 10px; font-size: 13px; line-height: 1.5;
+}
 .insight-green { background: #ECFDF5; color: #065F46; border: 1px solid #D1FAE5; }
 .insight-blue { background: #EFF6FF; color: #1E40AF; border: 1px solid #DBEAFE; }
 .insight-orange { background: #FFF7ED; color: #9A3412; border: 1px solid #FFEDD5; }
 .insight-gray { background: #F8FAFC; color: #475569; border: 1px solid #E2E8F0; }
-.ai-thinking { background: linear-gradient(90deg, #eff6ff 0%, #dbeafe 50%, #eff6ff 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite; color: #1E40AF !important;  cursor: wait; }
+
+.ai-thinking {
+  background: linear-gradient(90deg, #eff6ff 0%, #dbeafe 50%, #eff6ff 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  color: #1E40AF !important; 
+  cursor: wait;
+}
 @keyframes shimmer { 0% {background-position: 100% 0} 100% {background-position: -100% 0} }
 
 table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; }
@@ -261,20 +369,19 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
     </div>
 
     <div id="monthlyInputs" style="display:none;">
-        <div class="monthly-inputs">
-            <div>
-                <label style="font-size:12px; font-weight:700; color:#64748B; margin-bottom:5px; display:block;">TOTAL MONTHLY SALES (₹)</label>
-                <input type="number" id="mSales" placeholder="e.g. 6500">
-            </div>
-            <div>
-                <label style="font-size:12px; font-weight:700; color:#64748B; margin-bottom:5px; display:block;">TOTAL EXPENSES (₹)</label>
-                <input type="number" id="mExpenses" placeholder="e.g. 3500">
-            </div>
-            <div style="grid-column: span 2;">
-                <label style="font-size:12px; font-weight:700; color:#64748B; margin-bottom:5px; display:block;">TOTAL ORDERS PER MONTH</label>
-                <input type="number" id="mOrders" placeholder="e.g. 18">
-            </div>
+        <div class="info-box-small">
+            <span style="font-size:16px;">💡</span> 
+            <div><strong>Pro Tip:</strong> Add 2–6 months of data for better AI insights.</div>
         </div>
+        <div class="grid-header">
+            <div>MONTH (Optional)</div>
+            <div>SALES (₹)</div>
+            <div>EXPENSES (₹)</div>
+            <div>ORDERS</div>
+            <div></div>
+        </div>
+        <div id="monthItems"></div>
+        <button class="btn-secondary" onclick="addMonthRow()" style="width:100%; margin-top:10px;">+ Add Month Data</button>
     </div>
 
     <div style="margin-top:16px; display:flex; gap:10px;">
@@ -290,15 +397,15 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
     
     <div class="kpi-container">
       <div class="kpi-card">
-        <div class="kpi-label">TOTAL REVENUE</div>
+        <div class="kpi-label" id="kpiRevLabel">TOTAL REVENUE</div>
         <div class="kpi-value" id="dispRevenue">₹0</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label">TOTAL COST</div>
+        <div class="kpi-label" id="kpiCostLabel">TOTAL COST</div>
         <div class="kpi-value" id="dispCost" style="color:#64748B">₹0</div>
       </div>
       <div class="kpi-card" style="border-color:var(--success); background:#f0fdf4;">
-        <div class="kpi-label" style="color:#15803d">NET PROFIT</div>
+        <div class="kpi-label" style="color:#15803d" id="kpiProfitLabel">NET PROFIT</div>
         <div class="kpi-value" id="dispProfit" style="color:#15803d">₹0</div>
       </div>
     </div>
@@ -310,7 +417,7 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
         </div>
         <div class="kpi-card" style="background:#EFF6FF; border-color:#DBEAFE">
             <div class="kpi-value" id="dispOrders">0</div>
-            <div class="kpi-label" style="color:#1E40AF">Orders / Month</div>
+            <div class="kpi-label" style="color:#1E40AF">Avg Monthly Orders</div>
         </div>
     </div>
 
@@ -349,8 +456,8 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
             </div>
         </div>
 
-        <h3 style="margin-top:40px; margin-bottom:15px">Profit Distribution</h3>
-        <div style="height:300px; margin-bottom:30px;">
+        <h3 style="margin-top:40px; margin-bottom:15px">Visual Breakdown</h3>
+        <div style="height:300px; margin-bottom:30px; position:relative;">
           <canvas id="chart"></canvas>
         </div>
       </div>
@@ -360,33 +467,31 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
 </main>
 
 <script>
+// --- CONFIG ---
 const workerURL = "https://vizbix-api.vizbixhq.workers.dev";
 const PRICE = 29900;
 const KEY = "rzp_live_SAbBHVMbGMv2xo"; 
 
+// --- STATE ---
 const items = document.getElementById("items");
+const monthItems = document.getElementById("monthItems");
 let chartInstance;
 let currentData = [];
+let monthlyStats = null; // Store stats for AI
 let userEmail = localStorage.getItem("vizbix_email") || null;
 let isProUser = false;
 let currentMode = 'product'; // 'product' or 'monthly'
 
+// --- INIT ---
+Chart.register(ChartDataLabels); // ENABLE DATA LABELS PLUGIN
+
 window.addEventListener('DOMContentLoaded', () => {
-    const saved = localStorage.getItem("vizbix_draft");
-    if(saved) {
-        try {
-            const data = JSON.parse(saved);
-            if (data.length > 0) {
-                items.innerHTML = "";
-                data.forEach(x => createRow(x.name, x.sell, x.cost, x.qty));
-            }
-        } catch (e) { console.error("Corrupted save"); }
-    } else {
-        createRow(); createRow(); createRow(); 
-    }
+    // Load drafts for both modes
+    loadDrafts();
     if(userEmail) { verify(userEmail); }
 });
 
+// --- MODE SWITCHING ---
 function setMode(mode) {
     currentMode = mode;
     document.getElementById('btnProduct').className = mode === 'product' ? 'mode-btn active' : 'mode-btn';
@@ -400,443 +505,340 @@ function setMode(mode) {
     if(sampleBtn) sampleBtn.style.display = mode === 'product' ? 'block' : 'none';
 }
 
-items.addEventListener('input', saveDraft);
-
-function saveDraft() {
-    const rawData = [];
-    document.querySelectorAll(".grid-row").forEach(r => {
-        const i = r.querySelectorAll("input");
-        rawData.push({
-            name: i[0].value,
-            sell: i[1].value,
-            cost: i[2].value,
-            qty: i[3].value
-        });
-    });
-    localStorage.setItem("vizbix_draft", JSON.stringify(rawData));
-}
-
-function createRow(name="", sell="", cost="", qty=""){
+// --- ROW MANAGEMENT ---
+function createRow(container, name="", val1="", val2="", val3="", isMonth=false){
   const d = document.createElement("div");
   d.className = "grid-row";
+  
+  // Custom placeholders based on mode
+  const p1 = isMonth ? "Month (e.g. Jan)" : "Product Name";
+  const p2 = isMonth ? "Sales ₹" : "Sell Price";
+  const p3 = isMonth ? "Expenses ₹" : "Cost Price";
+  const p4 = isMonth ? "Orders" : "Quantity";
+
   d.innerHTML = `
-    <input type="text" placeholder="Product Name" value="${name}">
-    <input type="number" placeholder="Sell" value="${sell}">
-    <input type="number" placeholder="Cost" value="${cost}">
-    <input type="number" placeholder="Quantity" value="${qty}">
-    <button class="btn-ghost" onclick="removeRow(this)">✕</button>
+    <input type="text" placeholder="${p1}" value="${name}">
+    <input type="number" placeholder="${p2}" value="${val1}">
+    <input type="number" placeholder="${p3}" value="${val2}">
+    <input type="number" placeholder="${p4}" value="${val3}">
+    <button class="btn-ghost" onclick="this.parentElement.remove(); saveDraft()">✕</button>
   `;
-  items.appendChild(d);
+  container.appendChild(d);
 }
 
-function addRow(){ createRow(); saveDraft(); }
-function removeRow(btn){ btn.parentElement.remove(); saveDraft(); }
+function addRow(){ createRow(items); saveDraft(); }
+function addMonthRow(){ createRow(monthItems, "", "", "", "", true); saveDraft(); }
+
+// --- DRAFTS ---
+function saveDraft() {
+    const prodData = scrapeRows(items);
+    const monthData = scrapeRows(monthItems);
+    localStorage.setItem("vizbix_draft", JSON.stringify(prodData));
+    localStorage.setItem("vizbix_draft_month", JSON.stringify(monthData));
+}
+
+function loadDrafts() {
+    const prodSaved = JSON.parse(localStorage.getItem("vizbix_draft") || "[]");
+    const monthSaved = JSON.parse(localStorage.getItem("vizbix_draft_month") || "[]");
+    
+    items.innerHTML = ""; monthItems.innerHTML = "";
+    
+    if(prodSaved.length > 0) prodSaved.forEach(x => createRow(items, x.n, x.v1, x.v2, x.v3));
+    else { addRow(); addRow(); }
+    
+    if(monthSaved.length > 0) monthSaved.forEach(x => createRow(monthItems, x.n, x.v1, x.v2, x.v3, true));
+    else { addMonthRow(); addMonthRow(); }
+}
+
+function scrapeRows(container) {
+    let data = [];
+    container.querySelectorAll(".grid-row").forEach(r => {
+        const i = r.querySelectorAll("input");
+        data.push({ n: i[0].value, v1: i[1].value, v2: i[2].value, v3: i[3].value });
+    });
+    return data;
+}
 
 function sample(){
   items.innerHTML="";
-  [["Wireless Earbuds", 2500, 1200, 140], ["Smart Watch", 4500, 2800, 85], ["USB-C Cable", 499, 150, 400]].forEach(x => createRow(x[0], x[1], x[2], x[3]));
+  [["Wireless Earbuds", 2500, 1200, 140], ["Smart Watch", 4500, 2800, 85], ["USB-C Cable", 499, 150, 400]].forEach(x => createRow(items, x[0], x[1], x[2], x[3]));
   saveDraft(); analyze();
 }
 
-// --- MAIN ANALYZE ROUTER ---
+// --- ANALYSIS MAIN ---
 function analyze(){
-    if(currentMode === 'monthly') {
-        analyzeMonthly();
-    } else {
-        analyzeProduct();
-    }
+    if(currentMode === 'monthly') analyzeMonthly();
+    else analyzeProduct();
 }
 
-// --- NEW: MONTHLY ANALYSIS LOGIC ---
+// --- MONTHLY ANALYSIS (Multi-Month Logic) ---
 function analyzeMonthly() {
-    const sales = Number(document.getElementById('mSales').value);
-    const expense = Number(document.getElementById('mExpenses').value);
-    const orders = Number(document.getElementById('mOrders').value);
-
-    if(!sales || !expense) return alert("Please enter Sales and Expenses");
-
-    const profit = sales - expense;
-    const margin = (profit / sales) * 100;
-    const aov = orders > 0 ? (sales / orders) : 0;
-
-    // Update KPIs
-    document.getElementById("results").style.display = "block";
-    document.getElementById("results").scrollIntoView({behavior: "smooth"});
+    let totalSales=0, totalExp=0, totalOrders=0, count=0;
     
-    document.getElementById("dispRevenue").innerText = "₹ " + sales.toLocaleString();
-    document.getElementById("dispCost").innerText = "₹ " + expense.toLocaleString();
-    document.getElementById("dispProfit").innerText = "₹ " + profit.toLocaleString();
+    monthItems.querySelectorAll(".grid-row").forEach(r => {
+        const i = r.querySelectorAll("input");
+        const s = Number(i[1].value)||0, e = Number(i[2].value)||0, o = Number(i[3].value)||0;
+        if(s>0 || e>0) { totalSales+=s; totalExp+=e; totalOrders+=o; count++; }
+    });
+
+    if(count === 0) return alert("Please enter data for at least one month.");
+
+    // Averages
+    const avgSales = totalSales / count;
+    const avgExp = totalExp / count;
+    const avgProfit = avgSales - avgExp;
+    const avgOrders = totalOrders > 0 ? (totalOrders / count) : 0;
+    const avgAOV = avgOrders > 0 ? (avgSales / avgOrders) : 0;
+    const margin = avgSales > 0 ? (avgProfit / avgSales * 100) : 0;
+
+    // Save for AI
+    monthlyStats = { avgSales, avgExp, avgProfit, avgOrders, avgAOV, margin, count };
+
+    // UI Updates
+    showResults();
+    document.getElementById("kpiRevLabel").innerText = "AVG MONTHLY SALES";
+    document.getElementById("kpiCostLabel").innerText = "AVG MONTHLY EXPENSES";
+    document.getElementById("kpiProfitLabel").innerText = "AVG MONTHLY PROFIT";
+    document.getElementById("dispRevenue").innerText = "₹ " + avgSales.toLocaleString(undefined, {maximumFractionDigits:0});
+    document.getElementById("dispCost").innerText = "₹ " + avgExp.toLocaleString(undefined, {maximumFractionDigits:0});
+    document.getElementById("dispProfit").innerText = "₹ " + avgProfit.toLocaleString(undefined, {maximumFractionDigits:0});
     
-    // Show Extra Monthly Metrics
     document.getElementById("monthlyMetrics").style.display = "flex";
-    document.getElementById("dispAOV").innerText = "₹ " + aov.toFixed(0);
-    document.getElementById("dispOrders").innerText = orders;
+    document.getElementById("dispAOV").innerText = "₹ " + avgAOV.toFixed(0);
+    document.getElementById("dispOrders").innerText = avgOrders.toFixed(1);
     
-    // Hide Table (Not relevant for monthly)
     document.getElementById("tableContainer").style.display = "none";
 
-    // Client-Style Insights Logic
+    generateMonthlyInsights(margin, avgOrders, avgAOV, count);
+    
+    // Pie Chart: Sales context (Blue) -> Expense (Orange) vs Profit (Green)
+    drawChart('pie', ['Expenses', 'Net Profit'], [avgExp, avgProfit], ['#F97316', '#10B981']);
+}
+
+function generateMonthlyInsights(margin, orders, aov, count) {
     const div = document.getElementById("insights");
     let advice = "";
     
-    if(orders < 15 && margin > 30) {
-        advice = `<strong>🚀 Action Plan:</strong> Your margin is healthy (${margin.toFixed(0)}%), but order volume is low. If you get just 1 extra order per week, your profit grows significantly without new expenses. Try bundling 2 items to increase AOV above ₹${(aov*1.2).toFixed(0)}.`;
+    if(orders < 15) {
+        advice = `<strong>🚀 Action Plan:</strong> Your margin is ${margin.toFixed(0)}% (Good), but order volume is low (${orders.toFixed(1)}/mo). If you get just 1 extra order per week, profit grows significantly. Try bundling items to boost AOV above ₹${(aov*1.2).toFixed(0)}.`;
     } else if (margin < 20) {
         advice = `<strong>⚠ Profit Warning:</strong> Your margin is tight (${margin.toFixed(0)}%). You need to either increase prices by 10% or reduce expenses to be sustainable.`;
     } else {
-        advice = `<strong>✅ Good Health:</strong> You have a steady flow. Focus on increasing Average Order Value (AOV) by upselling small items at checkout.`;
+        advice = `<strong>✅ Health Check:</strong> You have a steady flow. Focus on increasing Average Order Value (AOV) by upselling small items.`;
     }
 
     div.innerHTML = `
         <div class="insight-item insight-blue">
-            <div><strong>Key Observation:</strong> Your business runs on a <strong>${margin.toFixed(0)}% margin</strong>. ${advice}</div>
+            <div><strong>Overview (${count} months average):</strong> Your business runs on a <strong>${margin.toFixed(0)}% margin</strong>. ${advice}</div>
         </div>
-        
-        <div id="aiContainer" style="margin-top:15px; border-top:1px dashed var(--border); padding-top:15px;">
-            <button id="aiBtn" class="btn-secondary" style="width:100%; border-color:#818cf8; color:#4f46e5; background:#eef2ff;" onclick="askAI()">
-                ✨ Ask AI Consultant for Strategy
-            </button>
-            <div id="aiResult" style="margin-top:15px; font-size:14px; line-height:1.6; color:#334155; display:none; background:white; padding:15px; border-radius:12px; border:1px solid #e2e8f0;"></div>
-        </div>
+        ${getAiButtonHtml()}
     `;
-
-    // Pie Chart
-    if(chartInstance) chartInstance.destroy();
-    const ctx = document.getElementById("chart").getContext('2d');
-    chartInstance = new Chart(ctx, {
-        type: 'pie',
-        data: {
-            labels: ['Expenses', 'Net Profit'],
-            datasets: [{ 
-                data: [expense, profit], 
-                backgroundColor: ['#F87171', '#34D399'],
-                borderWidth: 1
-            }]
-        },
-        options: { responsive: true, maintainAspectRatio: false }
-    });
 }
 
-// --- ORIGINAL PRODUCT ANALYSIS LOGIC ---
+// --- PRODUCT ANALYSIS ---
 function analyzeProduct(){
-  let data = [];
-  let totalRevenue = 0, totalCost = 0, totalProfit = 0;
-
-  document.querySelectorAll(".grid-row").forEach(r => {
+  let data = []; let totalRevenue = 0, totalCost = 0, totalProfit = 0;
+  items.querySelectorAll(".grid-row").forEach(r => {
     const i = r.querySelectorAll("input");
-    const name = i[0].value || "Unnamed Product";
-    const sell = +i[1].value || 0, cost = +i[2].value || 0, qty = +i[3].value || 0;
-    if(sell === 0 && cost === 0) return; 
-
-    const revenue = sell * qty;
-    const pCost = cost * qty;
-    const profit = revenue - pCost;
-    const margin = sell > 0 ? ((sell - cost) / sell) : 0;
-
-    totalRevenue += revenue; totalCost += pCost; totalProfit += profit;
-    data.push({name, sell, cost, qty, profit, margin});
+    const name=i[0].value||"Item", sell=+i[1].value||0, cost=+i[2].value||0, qty=+i[3].value||0;
+    if(sell===0 && cost===0) return;
+    const rev=sell*qty, pc=cost*qty, prof=rev-pc;
+    totalRevenue+=rev; totalCost+=pc; totalProfit+=prof;
+    data.push({name, sell, cost, qty, profit:prof, margin: sell>0?((sell-cost)/sell):0});
   });
 
-  if(data.length === 0) return alert("Please enter at least one product.");
-  currentData = data;
-
-  document.getElementById("results").style.display = "block";
-  document.getElementById("results").scrollIntoView({behavior: "smooth"});
+  if(data.length===0) return alert("Please enter at least one product.");
+  currentData = data; 
   
-  // Hide Monthly Metrics
+  showResults();
+  document.getElementById("kpiRevLabel").innerText = "TOTAL REVENUE";
+  document.getElementById("kpiCostLabel").innerText = "TOTAL COST";
+  document.getElementById("kpiProfitLabel").innerText = "NET PROFIT";
   document.getElementById("monthlyMetrics").style.display = "none";
-  // Show Table
   document.getElementById("tableContainer").style.display = "block";
 
-  document.getElementById("dispRevenue").innerText = "₹ " + totalRevenue.toLocaleString();
-  document.getElementById("dispCost").innerText = "₹ " + totalCost.toLocaleString();
-  document.getElementById("dispProfit").innerText = "₹ " + totalProfit.toLocaleString();
+  document.getElementById("dispRevenue").innerText = "₹ "+totalRevenue.toLocaleString();
+  document.getElementById("dispCost").innerText = "₹ "+totalCost.toLocaleString();
+  document.getElementById("dispProfit").innerText = "₹ "+totalProfit.toLocaleString();
 
-  generateTable(data);
-  generateChart(data);
-  generateInsights(data);
+  generateTable(data); generateInsights(data);
+  drawChart('bar', data.map(x=>x.name), data.map(x=>x.profit), '#0F172A');
+}
+
+function showResults() {
+    document.getElementById("results").style.display = "block";
+    document.getElementById("results").scrollIntoView({behavior: "smooth"});
 }
 
 function generateInsights(d){
-  const div = document.getElementById("insights");
-  let html = "";
-  let insightCount = 0;
-   
+  const div = document.getElementById("insights"); let html = "", cnt = 0;
   const bestProfit = [...d].sort((a,b)=>b.profit - a.profit)[0];
-  if(bestProfit) {
-      html += `<div class="insight-item insight-green"><div><strong>★ Star Product:</strong> ${bestProfit.name} generates the most profit (₹${bestProfit.profit.toLocaleString()}). Focus ad spend here.</div></div>`;
-      insightCount++;
-  }
-
+  if(bestProfit) { html += `<div class="insight-item insight-green"><div><strong>★ Star Product:</strong> ${bestProfit.name} generates the most profit (₹${bestProfit.profit.toLocaleString()}). Focus ad spend here.</div></div>`; cnt++; }
   const bestQty = [...d].sort((a,b)=>b.qty - a.qty)[0];
-  if(bestQty && bestQty.name !== bestProfit?.name) { 
-       html += `<div class="insight-item insight-blue"><div><strong>📦 Volume Leader:</strong> ${bestQty.name} is your most popular item (${bestQty.qty} units). Consider bundling it with slower items.</div></div>`;
-       insightCount++;
-  }
-
-  const lowMargin = d.filter(x => x.margin < 0.20);
-  lowMargin.forEach(x => {
-      if(insightCount < 4) {
-          html += `<div class="insight-item insight-orange"><div><strong>⚠ Low Margin:</strong> ${x.name} is only ${(x.margin*100).toFixed(0)}%. Raise price or lower cost to improve health.</div></div>`;
-          insightCount++;
-      }
-  });
-
-  if(insightCount < 3 && d.length > 0) {
-       html += `<div class="insight-item insight-gray"><div><strong>💡 Growth Tip:</strong> You have a healthy catalog. Consider testing a 10% price increase on your top sellers to boost net profit.</div></div>`;
-  }
-
-  html += `
-    <div id="aiContainer" style="margin-top:15px; border-top:1px dashed var(--border); padding-top:15px;">
-        <button id="aiBtn" class="btn-secondary" style="width:100%; border-color:#818cf8; color:#4f46e5; background:#eef2ff;" onclick="askAI()">
-            ✨ Ask AI Consultant for Strategy
-        </button>
-        <div id="aiResult" style="margin-top:15px; font-size:14px; line-height:1.6; color:#334155; display:none; background:white; padding:15px; border-radius:12px; border:1px solid #e2e8f0;"></div>
-    </div>
-  `;
-
+  if(bestQty && bestQty.name !== bestProfit?.name) { html += `<div class="insight-item insight-blue"><div><strong>📦 Volume Leader:</strong> ${bestQty.name} is your most popular item (${bestQty.qty} units). Consider bundling it with slower items.</div></div>`; cnt++; }
+  d.filter(x => x.margin < 0.20).forEach(x => { if(cnt < 4) { html += `<div class="insight-item insight-orange"><div><strong>⚠ Low Margin:</strong> ${x.name} is only ${(x.margin*100).toFixed(0)}%. Raise price or lower cost to improve health.</div></div>`; cnt++; }});
+  if(cnt < 3 && d.length > 0) html += `<div class="insight-item insight-gray"><div><strong>💡 Growth Tip:</strong> You have a healthy catalog. Consider testing a 10% price increase on your top sellers to boost net profit.</div></div>`;
+  html += getAiButtonHtml();
   div.innerHTML = html;
 }
 
-function generateTable(d){
-  const t = document.getElementById("table");
-  t.innerHTML = "<tr><th>Product</th><th>Profit</th><th>Margin</th><th>Status</th></tr>";
-  d.forEach(x => {
-    let s = x.margin > 0.3 ? "<span style='color:green'>Healthy</span>" : "<span style='color:orange'>Review</span>";
-    t.innerHTML += `<tr><td><b>${x.name}</b><br><small style='color:#64748B'>Sold: ${x.qty}</small></td><td>₹${x.profit.toLocaleString()}</td><td>${(x.margin*100).toFixed(1)}%</td><td>${s}</td></tr>`;
-  });
+function getAiButtonHtml() {
+    return `<div id="aiContainer" style="margin-top:15px; border-top:1px dashed var(--border); padding-top:15px;"><button id="aiBtn" class="btn-secondary" style="width:100%; border-color:#818cf8; color:#4f46e5; background:#eef2ff;" onclick="askAI()">✨ Ask AI Consultant for Strategy</button><div id="aiResult" style="margin-top:15px; font-size:14px; line-height:1.6; color:#334155; display:none; background:white; padding:15px; border-radius:12px; border:1px solid #e2e8f0;"></div></div>`;
 }
 
-function generateChart(d){
-  if(chartInstance) chartInstance.destroy();
-  const ctx = document.getElementById("chart").getContext('2d');
-  chartInstance = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: d.map(x => x.name),
-      datasets: [{ label: 'Profit', data: d.map(x => x.profit), backgroundColor: '#0F172A', borderRadius: 6 }]
-    },
-    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: {display: false} }, scales: { y: { beginAtZero: true }, x: { grid: { display: false } } } }
-  });
+function generateTable(d){ const t = document.getElementById("table"); t.innerHTML = "<tr><th>Product</th><th>Profit</th><th>Margin</th><th>Status</th></tr>"; d.forEach(x => { t.innerHTML += `<tr><td><b>${x.name}</b><br><small style='color:#64748B'>Sold: ${x.qty}</small></td><td>₹${x.profit.toLocaleString()}</td><td>${(x.margin*100).toFixed(1)}%</td><td>${x.margin>0.3?"<span style='color:green'>Healthy</span>":"<span style='color:orange'>Review</span>"}</td></tr>`; }); }
+
+// --- UPDATED CHART FUNCTION (Aesthetics + Labels) ---
+function drawChart(type, labels, data, colors){ 
+  if(chartInstance) chartInstance.destroy(); 
+  const ctx = document.getElementById("chart").getContext('2d'); 
+  
+  const options = { 
+      responsive: true, maintainAspectRatio: false, 
+      plugins: { 
+          legend: { display: type === 'pie', position: 'bottom' },
+          datalabels: { // Labels on Chart Segments
+              color: type === 'pie' ? 'white' : '#64748B',
+              font: { weight: 'bold', size: 11 },
+              formatter: (value) => '₹' + value.toLocaleString(undefined, {maximumFractionDigits:0}),
+              anchor: type === 'pie' ? 'center' : 'end',
+              align: type === 'pie' ? 'center' : 'top',
+              offset: 4
+          }
+      } 
+  };
+  
+  if (type === 'bar') options.scales = { y: { beginAtZero: true }, x: { grid: { display: false } } };
+
+  chartInstance = new Chart(ctx, { 
+      type: type, 
+      data: { 
+          labels: labels, 
+          datasets: [{ label: 'Profit', data: data, backgroundColor: colors, borderRadius: 4, borderWidth: 0 }] 
+      }, 
+      options: options,
+      plugins: [ChartDataLabels] // Activate plugin
+  }); 
 }
 
+// --- UPDATED AI FUNCTION (Works for both modes) ---
 async function askAI() {
     if(!isProUser || !userEmail) return alert("Please Login (Pro Feature)");
-    const btn = document.getElementById("aiBtn");
-    const resultBox = document.getElementById("aiResult");
+    const btn = document.getElementById("aiBtn"); const box = document.getElementById("aiResult");
+    btn.innerHTML = "✨ Strategizing..."; btn.disabled = true; btn.classList.add("ai-thinking");
     
-    btn.innerHTML = "✨ Strategizing...";
-    btn.disabled = true;
-    btn.classList.add("ai-thinking");
-    
+    // Construct payload based on Mode
     let aiPayload = {};
-
-    if(currentMode === 'monthly') {
-        // Prepare Monthly Data for AI
-        const sales = document.getElementById('mSales').value;
-        const expenses = document.getElementById('mExpenses').value;
-        const orders = document.getElementById('mOrders').value;
+    
+    if (currentMode === 'monthly') {
+        if(!monthlyStats) return alert("Run analysis first.");
+        const s = monthlyStats;
+        // Format for existing AI Worker structure (sending summarized text)
         aiPayload = {
             email: userEmail,
-            summary: `Total Monthly Sales: ${sales}, Expenses: ${expenses}, Total Orders: ${orders}`,
-            mode: 'monthly'
+            mode: 'monthly',
+            summary: `Based on ${s.count} months average:\nAvg Monthly Sales: ₹${s.avgSales.toFixed(0)}, Avg Expenses: ₹${s.avgExp.toFixed(0)}, Avg Orders: ${s.avgOrders.toFixed(1)}, Gross Margin: ${s.margin.toFixed(1)}%.`
         };
     } else {
-        // Prepare Product Data for AI
-        const products = currentData.map(x => ({
-            name: x.name, cost: x.cost, sell: x.sell, qty: x.qty
-        }));
+        const products = currentData.map(x => ({ name: x.name, cost: x.cost, sell: x.sell, qty: x.qty }));
         aiPayload = { email: userEmail, products: products, mode: 'product' };
     }
 
     try {
-        const r = await fetch(workerURL + "/ai-analyze", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(aiPayload)
-        });
-        
-        const d = await r.json();
-        btn.classList.remove("ai-thinking");
-        
-        if(d.ok) {
-            btn.style.display = "none";
-            resultBox.style.display = "block";
-            resultBox.innerHTML = "<strong>🤖 AI Consultant Strategy:</strong><br><br>" + 
-                d.response.replace(/\n/g, "<br>").replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-        } else {
-            alert(d.error || "AI failed to respond");
-            btn.innerHTML = "✨ Retry AI Analysis";
-            btn.disabled = false;
-        }
-    } catch(e) {
-        btn.classList.remove("ai-thinking");
-        alert("Connection error");
-        btn.innerHTML = "✨ Retry AI Analysis";
-        btn.disabled = false;
-    }
+        const r = await fetch(workerURL + "/ai-analyze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(aiPayload) });
+        const d = await r.json(); btn.classList.remove("ai-thinking");
+        if(d.ok) { btn.style.display = "none"; box.style.display = "block"; box.innerHTML = "<strong>🤖 AI Consultant Strategy:</strong><br><br>" + d.response.replace(/\n/g, "<br>").replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"); } else { alert(d.error); btn.innerHTML = "✨ Retry"; btn.disabled = false; }
+    } catch(e) { btn.classList.remove("ai-thinking"); alert("Error"); btn.disabled = false; }
 }
 
-function handleLoginClick() {
-    const email = prompt("Please enter your email to login:");
-    if(email) verify(email);
-}
-
+function handleLoginClick() { const email = prompt("Please enter your email to login:"); if(email) verify(email); }
 async function verify(inputEmail){
-  const email = inputEmail || document.getElementById("emailInput").value;
-  if(!email) return alert("Please enter email.");
-   
-  const loginBtn = document.getElementById("loginBtn");
-  if(loginBtn) loginBtn.innerText = "Checking...";
-
+  const email = inputEmail || document.getElementById("emailInput").value; if(!email) return alert("Please enter email.");
+  const loginBtn = document.getElementById("loginBtn"); if(loginBtn) loginBtn.innerText = "Checking...";
   try {
-    const r = await fetch(workerURL+"/check?email="+email);
-    const d = await r.json();
-    
+    const r = await fetch(workerURL+"/check?email="+email); const d = await r.json();
     if(d.valid) {
-        isProUser = true;
-        userEmail = email;
-        localStorage.setItem("vizbix_email", email);
+        isProUser = true; userEmail = email; localStorage.setItem("vizbix_email", email);
+        document.getElementById("lockOverlay").style.display = "none"; document.getElementById("loginBtn").style.display = "none";
         
-        // 1. Unlock UI
-        document.getElementById("lockOverlay").style.display = "none";
-        document.getElementById("loginBtn").style.display = "none";
-        
-        // 2. Calculate Date
         let dateStr = "";
-        if (d.expiry) {
-            const date = new Date(parseInt(d.expiry));
-            // Format: "6 Mar, 2026"
-            dateStr = date.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' });
-        }
-
-        // 3. Update Desktop Header (Email + Date)
+        if(d.expiry) { const date = new Date(parseInt(d.expiry)); dateStr = date.toLocaleDateString(undefined, {day:'numeric', month:'short', year:'numeric'}); }
+        
         const headerEmail = document.getElementById("userEmailHeader");
-        if(headerEmail) {
-            headerEmail.innerHTML = `<div>${email}</div><div style="font-size:10px; opacity:0.8; margin-top:2px;">Exp: ${dateStr}</div>`;
-            headerEmail.style.display = "block";
-        }
+        headerEmail.innerHTML = `<div>${email}</div><div style="font-size:10px; opacity:0.8; margin-top:2px;">Exp: ${dateStr}</div>`;
+        headerEmail.style.display = "block";
 
-        // 4. Update Mobile Drawer (Email + Date)
-        const drawerEmail = document.getElementById("drawerEmailDisplay");
-        if(drawerEmail) drawerEmail.innerText = email;
-
+        document.getElementById("drawerEmailDisplay").innerText = email;
         const drawerExpiry = document.getElementById("drawerExpiryDisplay");
-        if(drawerExpiry && dateStr) {
-            drawerExpiry.innerText = "Plan expires: " + dateStr;
-        }
+        if(drawerExpiry) drawerExpiry.innerText = "Plan expires: " + dateStr;
         
-        // Show Profile Section in Drawer
-        const drawerProfile = document.getElementById("drawerProfile");
-        if(drawerProfile) drawerProfile.style.display = "block";
-
-        // 5. Show Pro Buttons
-        document.getElementById("historyBtn").style.display = "inline-flex";
-        
-        const saveBtn = document.getElementById("saveCloudBtn");
-        if(saveBtn) saveBtn.style.display = "flex"; // Use flex to keep alignment
-        
+        document.getElementById("drawerProfile").style.display = "block";
+        document.getElementById("historyBtn").style.display = "inline-flex"; document.getElementById("saveCloudBtn").style.display = "flex";
         if(chartInstance) chartInstance.resize();
-
-    } else {
-        alert("Pro subscription not found for " + email);
-        if(loginBtn) loginBtn.innerText = "Login";
-    }
-  } catch(e) {
-    console.log("Dev Mode: Skipping verify", e);
-  }
+    } else { alert("Pro subscription not found."); if(loginBtn) loginBtn.innerText = "Login"; }
+  } catch(e) { console.log(e); }
 }
 
+// --- UPDATED SAVE FUNCTION (Handles both modes) ---
 async function saveToCloud() {
-    if(!isProUser || !userEmail) return alert("Login required");
-    const saveBtn = document.getElementById("saveCloudBtn");
+    if(!isProUser) return alert("Login required"); const btn = document.getElementById("saveCloudBtn");
     
-    // Only saving product data for now in basic history
-    const rawData = [];
-    document.querySelectorAll(".grid-row").forEach(r => {
-        const i = r.querySelectorAll("input");
-        if(i[0].value) {
-             rawData.push({ name: i[0].value, sell: i[1].value, cost: i[2].value, qty: i[3].value });
-        }
-    });
-
-    saveBtn.innerText = "⏳";
-    
-    try {
-        await fetch(workerURL + "/save", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: userEmail, data: rawData, date: new Date().toISOString() })
-        });
-        saveBtn.innerText = "✅";
-        setTimeout(() => saveBtn.innerText = "💾", 1500);
-    } catch(e) {
-        alert("Error saving data");
-        saveBtn.innerText = "💾";
+    // Decide what data to save
+    let dataToSave = [];
+    if (currentMode === 'monthly') {
+        dataToSave = scrapeRows(monthItems);
+    } else {
+        dataToSave = scrapeRows(items);
     }
-}
-
-function toggleHistory(show) {
-    const modal = document.getElementById("historyModal");
-    modal.style.display = show ? "flex" : "none";
-    if(show && userEmail) fetchHistory();
-}
-
-async function fetchHistory() {
-    const list = document.getElementById("historyList");
-    list.innerHTML = "Loading...";
     
-    try {
-        const r = await fetch(workerURL + "/history?email=" + userEmail);
-        const historyData = await r.json();
-        
-        if(historyData.length === 0) {
-            list.innerHTML = "<p style='color:#64748B; text-align:center'>No saved history found.</p>";
-            return;
-        }
+    if(dataToSave.length === 0) return alert("Nothing to save!");
 
+    btn.innerHTML = "<span style='animation:spin 1s linear infinite'>⏳</span>";
+    try { 
+        await fetch(workerURL + "/save", { 
+            method: "POST", headers: { "Content-Type": "application/json" }, 
+            body: JSON.stringify({ email: userEmail, data: dataToSave, mode: currentMode, date: new Date().toISOString() }) 
+        }); 
+        btn.innerHTML = "✅"; setTimeout(() => btn.innerHTML = "<span style='font-size:18px'>💾</span>", 1500); 
+    } catch(e) { btn.innerHTML = "💾"; }
+}
+
+function toggleHistory(show) { document.getElementById("historyModal").style.display = show ? "flex" : "none"; if(show && userEmail) fetchHistory(); }
+async function fetchHistory() {
+    const list = document.getElementById("historyList"); list.innerHTML = "Loading...";
+    try {
+        const r = await fetch(workerURL + "/history?email=" + userEmail); const d = await r.json();
+        if(d.length === 0) { list.innerHTML = "<p style='color:#64748B; text-align:center'>No history.</p>"; return; }
         list.innerHTML = "";
-        historyData.forEach(item => {
-            const dateObj = new Date(item.date);
-            const dateStr = dateObj.toLocaleDateString() + " " + dateObj.toLocaleTimeString();
-            const itemCount = item.data.length;
-            
-            const div = document.createElement("div");
-            div.className = "history-item";
-            div.innerHTML = `
-                <div>
-                    <div style="font-weight:600; font-size:14px;">Analysis on ${dateStr}</div>
-                    <div style="font-size:12px; color:#64748B">${itemCount} Products</div>
-                </div>
-                <button class="btn-secondary" style="font-size:11px; padding:6px 10px;">Load</button>
-            `;
-            div.onclick = () => loadHistoryItem(item.data);
+        d.forEach(item => {
+            const dateStr = new Date(item.date).toLocaleDateString();
+            const modeLabel = item.mode === 'monthly' ? 'Monthly' : 'Product';
+            const div = document.createElement("div"); div.className = "history-item";
+            div.innerHTML = `<div><div style="font-weight:600; font-size:14px;">${dateStr}</div><div style="font-size:12px; color:#64748B">${item.data.length} Rows • ${modeLabel}</div></div><button class="btn-secondary" style="font-size:11px; padding:6px 10px;">Load</button>`;
+            div.onclick = () => loadHistoryItem(item.data, item.mode);
             list.appendChild(div);
         });
-    } catch(e) {
-        list.innerHTML = "Error fetching history.";
-    }
+    } catch(e) { list.innerHTML = "Error fetching history."; }
 }
 
-function loadHistoryItem(data) {
-    items.innerHTML = "";
-    data.forEach(x => createRow(x.name, x.sell, x.cost, x.qty));
-    toggleHistory(false);
-    // Switch to product mode when loading history
-    setMode('product');
-    saveDraft();
-    analyze();
+function loadHistoryItem(data, savedMode) {
+    // Switch to the correct mode first
+    const targetMode = savedMode || 'product'; // Default to product if old data
+    setMode(targetMode);
+    
+    const container = targetMode === 'monthly' ? monthItems : items;
+    container.innerHTML = "";
+    
+    data.forEach(x => {
+        // Handle legacy array format vs new object format
+        if(Array.isArray(x)) createRow(container, x[0], x[1], x[2], x[3], targetMode==='monthly'); // Legacy
+        else createRow(container, x.n, x.v1, x.v2, x.v3, targetMode==='monthly'); // New
+    });
+    
+    toggleHistory(false); saveDraft(); analyze();
 }
 
-function pay(){
-  const email = document.getElementById("emailInput").value;
-  if(!email) return alert("Enter email first.");
-  new Razorpay({
-    key: KEY, amount: PRICE, currency: "INR", name: "Vizbix Pro",
-    prefill: { email: email }, theme: { color: "#0F172A" },
-    handler: function(response){ verify(email); }
-  }).open();
-}
+function pay(){ const email = document.getElementById("emailInput").value; if(!email) return alert("Email required"); new Razorpay({ key: KEY, amount: PRICE, currency: "INR", name: "Vizbix Pro", prefill: { email: email }, theme: { color: "#0F172A" }, handler: function(response){ verify(email); } }).open(); }
 
 async function downloadPDF() {
   const { jsPDF } = window.jspdf;
@@ -854,30 +856,11 @@ async function downloadPDF() {
   btn.innerText = originalText;
 }
 
-const menuBtn = document.getElementById("menuBtn");
-const drawer = document.getElementById("drawer");
-const overlay = document.getElementById("drawerOverlay");
-const closeBtn = document.getElementById("drawerClose");
-
-function openDrawer(){
-  drawer.classList.add("open");
-  overlay.classList.add("open");
-  document.body.style.overflow = "hidden";
-}
-
-function closeDrawer(){
-  drawer.classList.remove("open");
-  overlay.classList.remove("open");
-  document.body.style.overflow = "";
-}
-
-if(menuBtn) menuBtn.addEventListener("click", openDrawer);
-if(closeBtn) closeBtn.addEventListener("click", closeDrawer);
-if(overlay) overlay.addEventListener("click", closeDrawer);
-
-document.addEventListener("keydown", (e) => {
-  if(e.key === "Escape") closeDrawer();
-});
+const menuBtn = document.getElementById("menuBtn"), drawer = document.getElementById("drawer"), overlay = document.getElementById("drawerOverlay"), closeBtn = document.getElementById("drawerClose");
+function openDrawer(){ drawer.classList.add("open"); overlay.classList.add("open"); document.body.style.overflow = "hidden"; }
+function closeDrawer(){ drawer.classList.remove("open"); overlay.classList.remove("open"); document.body.style.overflow = ""; }
+if(menuBtn) menuBtn.addEventListener("click", openDrawer); if(closeBtn) closeBtn.addEventListener("click", closeDrawer); if(overlay) overlay.addEventListener("click", closeDrawer);
+document.addEventListener("keydown", (e) => { if(e.key === "Escape") closeDrawer(); });
 </script>
 </body>
 </html>
