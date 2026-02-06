@@ -20,8 +20,8 @@
 :root {
   --bg: #F8FAFC;
   --surface: #FFFFFF;
-  --primary: #0F172A; /* Deep Navy */
-  --accent: #3B82F6; /* Trust Blue */
+  --primary: #0F172A; 
+  --accent: #3B82F6; 
   --accent-glow: rgba(59, 130, 246, 0.15);
   --success: #10B981;
   --text-main: #1E293B;
@@ -50,24 +50,15 @@ main { max-width: 900px; margin: auto; padding: 20px; }
 
 /* --- HEADER STYLES --- */
 header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 30px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--border);
-  position: relative;
-  z-index: 50;
-  height: 70px;
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 30px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
+  position: relative; z-index: 50; height: 70px;
 }
-
 .brand { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--primary); }
 .brand span { color: var(--accent); }
 .subtitle { font-size: 13px; color: var(--text-muted); font-weight: 500; display: block; margin-top: 2px;}
-
 .header-actions { display: flex; gap: 8px; align-items: center; }
 
-/* --- MOBILE OPTIMIZATIONS (Anti-Congestion) --- */
 @media(max-width: 768px){
     .subtitle { display: none !important; }
     .btn-text-desktop { display: none !important; }
@@ -78,97 +69,46 @@ header {
 
 /* --- MENU DRAWER --- */
 .menu-btn {
-  width: 40px; height: 40px;
-  border: 1px solid rgba(229,231,235,0.9);
-  background: #fff;
-  border-radius: 12px;
-  display: flex; align-items: center; justify-content: center;
-  cursor: pointer;
-  box-shadow: 0 2px 5px rgba(2, 6, 23, 0.05);
-  padding: 0;
-  flex-shrink: 0;
+  width: 40px; height: 40px; border: 1px solid rgba(229,231,235,0.9);
+  background: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; box-shadow: 0 2px 5px rgba(2, 6, 23, 0.05); padding: 0; flex-shrink: 0;
 }
 .menu-btn:active { transform: scale(0.96); }
-
 .menu-icon { width: 16px; height: 12px; position: relative; }
-.menu-icon span {
-  position: absolute; left: 0; right: 0; height: 2px;
-  background: var(--text-main); border-radius: 10px;
-}
+.menu-icon span { position: absolute; left: 0; right: 0; height: 2px; background: var(--text-main); border-radius: 10px; }
 .menu-icon span:nth-child(1) { top: 0; }
 .menu-icon span:nth-child(2) { top: 5px; opacity: 0.9; }
 .menu-icon span:nth-child(3) { bottom: 0; }
 
-.drawer-overlay {
-  position: fixed; inset: 0; background: rgba(2,6,23,0.55);
-  opacity: 0; pointer-events: none; transition: opacity .2s ease; z-index: 150;
-}
-.drawer {
-  position: fixed; top: 0; right: 0; height: 100%; width: min(300px, 85vw);
-  background: #fff; border-left: 1px solid var(--border);
-  box-shadow: -10px 0 30px rgba(2,6,23,.14);
-  transform: translateX(105%); transition: transform .25s ease;
-  z-index: 160; display: flex; flex-direction: column;
-}
+.drawer-overlay { position: fixed; inset: 0; background: rgba(2,6,23,0.55); opacity: 0; pointer-events: none; transition: opacity .2s ease; z-index: 150; }
+.drawer { position: fixed; top: 0; right: 0; height: 100%; width: min(300px, 85vw); background: #fff; border-left: 1px solid var(--border); box-shadow: -10px 0 30px rgba(2,6,23,.14); transform: translateX(105%); transition: transform .25s ease; z-index: 160; display: flex; flex-direction: column; }
 .drawer.open { transform: translateX(0); }
 .drawer-overlay.open { opacity: 1; pointer-events: auto; }
-
 .drawer-head { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
 .drawer-title { font-weight: 900; font-size: 16px; color: var(--primary); }
 .drawer-close { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border); background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;}
 .drawer-close svg { width: 18px; height: 18px; stroke: var(--text-main); }
-
 .drawer-body { padding: 16px; overflow: auto; }
-
-.drawer-profile {
-    background: #EFF6FF; border: 1px solid #DBEAFE;
-    padding: 12px; border-radius: 12px; margin-bottom: 16px;
-}
+.drawer-profile { background: #EFF6FF; border: 1px solid #DBEAFE; padding: 12px; border-radius: 12px; margin-bottom: 16px; }
 .drawer-profile-label { font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase; margin-bottom: 4px; }
 .drawer-profile-email { font-size: 13px; font-weight: 600; color: #1E40AF; word-break: break-all; }
-
 .drawer-links { display: flex; flex-direction: column; gap: 8px; }
-.drawer-links a {
-  text-decoration: none; color: var(--text-main);
-  border: 1px solid var(--border);
-  background: #fff; padding: 12px;
-  border-radius: 12px; display: flex; align-items: center; justify-content: space-between;
-  font-weight: 600; font-size: 14px;
-}
+.drawer-links a { text-decoration: none; color: var(--text-main); border: 1px solid var(--border); background: #fff; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 14px; }
 .drawer-links a:hover { background: #F8FAFC; }
 .drawer-mini { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 12px; line-height: 1.5; }
 
 /* --- Cards & Layout --- */
-.card {
-  background: var(--surface);
-  border-radius: var(--radius);
-  padding: 24px;
-  margin-bottom: 24px;
-  box-shadow: var(--shadow-sm);
-  border: 1px solid var(--border);
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-}
+.card { background: var(--surface); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); transition: transform 0.2s ease, box-shadow 0.2s ease; }
 
 /* --- Inputs & Grid --- */
 .input-group { position: relative; margin-bottom: 20px; }
 .input-label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-input {
-  width: 100%; padding: 12px 14px; border-radius: 10px;
-  border: 1px solid var(--border); background: #F1F5F9;
-  font-weight: 500; transition: all 0.2s; font-size: 14px;
-}
+input { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: #F1F5F9; font-weight: 500; transition: all 0.2s; font-size: 14px; }
 input:focus { background: #fff; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); }
 
-.grid-header {
-  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 40px;
-  gap: 10px; padding: 0 10px 8px 10px;
-  font-size: 11px; font-weight: 600; color: var(--text-muted);
-}
-.grid-row {
-  display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 40px;
-  gap: 10px; margin-bottom: 10px; align-items: center;
-}
+.grid-header { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 40px; gap: 10px; padding: 0 10px 8px 10px; font-size: 11px; font-weight: 600; color: var(--text-muted); }
+.grid-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 40px; gap: 10px; margin-bottom: 10px; align-items: center; }
 
 @media(max-width:640px){
   .grid-header { display: none; }
@@ -177,22 +117,14 @@ input:focus { background: #fff; border-color: var(--accent); box-shadow: 0 0 0 4
 }
 
 /* --- Buttons --- */
-button {
-  padding: 10px 16px; border-radius: 12px; font-weight: 600; font-size: 13px;
-  cursor: pointer; border: none; transition: all 0.2s;
-  display: inline-flex; align-items: center; justify-content: center; gap: 6px;
-  white-space: nowrap;
-}
+button { padding: 10px 16px; border-radius: 12px; font-weight: 600; font-size: 13px; cursor: pointer; border: none; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; }
 .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2); }
 .btn-secondary { background: white; border: 1px solid var(--border); color: var(--text-main); }
 .btn-ghost { background: transparent; color: var(--text-muted); padding: 8px; }
 
 /* --- Results Section --- */
 .kpi-container { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
-.kpi-card {
-  flex: 1; background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%);
-  border: 1px solid var(--border); border-radius: 12px; padding: 14px; min-width: 130px;
-}
+.kpi-card { flex: 1; background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%); border: 1px solid var(--border); border-radius: 12px; padding: 14px; min-width: 130px; }
 .kpi-label { font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
 .kpi-value { font-size: 20px; font-weight: 800; color: var(--primary); white-space: nowrap; }
 
@@ -205,65 +137,39 @@ button {
 .monthly-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 @media(max-width: 600px) { .monthly-inputs { grid-template-columns: 1fr; } }
 
+/* Info Box */
 .info-box-small { background: #EFF6FF; border: 1px solid #DBEAFE; color: #1E40AF; padding: 10px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
 
 /* --- Locked Content --- */
 .locked-container { position: relative; overflow: hidden; }
-.blur-overlay {
-  position: absolute; top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(12px);
-  -webkit-backdrop-filter: blur(12px); z-index: 10;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.5);
-}
-.lock-card {
-  background: white; padding: 24px; border-radius: 20px; text-align: center;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.1); border: 1px solid var(--border); max-width: 320px; width: 90%;
-}
-.premium-badge {
-  background: linear-gradient(135deg, #0F172A 0%, #334155 100%); color: white;
-  padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 700;
-  text-transform: uppercase; margin-bottom: 12px; display: inline-block;
-}
-
-/* --- NEW FEATURE LIST CSS --- */
+.blur-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.5); }
+.lock-card { background: white; padding: 24px; border-radius: 20px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.1); border: 1px solid var(--border); max-width: 320px; width: 90%; }
+.premium-badge { background: linear-gradient(135deg, #0F172A 0%, #334155 100%); color: white; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-bottom: 12px; display: inline-block; }
 .feature-list { text-align: left; margin: 15px 0 20px; padding: 0 10px; font-size: 13px; color: var(--text-muted); display: inline-block; }
 .feature-list div { margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
 
+/* --- Featured Tool Card --- */
+.pro-card { background: linear-gradient(135deg, #0F172A 0%, #1E293B 100%); border-radius: 20px; padding: 24px; color: white; text-decoration: none; display: flex; align-items: center; justify-content: space-between; gap: 20px; box-shadow: 0 20px 40px -10px rgba(15, 23, 42, 0.3); transition: transform 0.2s ease; position: relative; overflow: hidden; margin-bottom: 40px; }
+.pro-card:hover { transform: translateY(-3px); }
+.pro-badge { background: rgba(59, 130, 246, 0.2); color: #60A5FA; font-size: 11px; font-weight: 800; padding: 4px 10px; border-radius: 20px; border: 1px solid rgba(59, 130, 246, 0.4); display: inline-block; margin-bottom: 8px; }
+.pro-content h3 { margin: 0 0 6px; font-size: 18px; color: white; letter-spacing: -0.01em; }
+.pro-content p { margin: 0; color: #94A3B8; font-size: 14px; line-height: 1.5; max-width: 500px; }
+.pro-icon { width: 48px; height: 48px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; flex-shrink: 0; color: white; }
+@media (max-width: 520px){ .pro-card { flex-direction: column; align-items: flex-start; } .pro-icon { display: none; } }
+
 /* --- History Modal --- */
-.modal-overlay {
-  position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-  background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px);
-  z-index: 100; display: none; align-items: center; justify-content: center;
-}
-.modal-content {
-  background: white; width: 90%; max-width: 500px;
-  border-radius: 16px; padding: 24px; max-height: 80vh; overflow-y: auto;
-  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-}
-.history-item {
-  display: flex; justify-content: space-between; align-items: center;
-  padding: 12px; border-bottom: 1px solid var(--border); cursor: pointer;
-}
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 100; display: none; align-items: center; justify-content: center; }
+.modal-content { background: white; width: 90%; max-width: 500px; border-radius: 16px; padding: 24px; max-height: 80vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
+.history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--border); cursor: pointer; }
 .history-item:hover { background: #F8FAFC; }
 
 /* --- Insights & AI --- */
-.insight-item {
-  display: flex; align-items: start; gap: 12px; padding: 14px;
-  border-radius: 12px; margin-bottom: 10px; font-size: 13px; line-height: 1.5;
-}
+.insight-item { display: flex; align-items: start; gap: 12px; padding: 14px; border-radius: 12px; margin-bottom: 10px; font-size: 13px; line-height: 1.5; }
 .insight-green { background: #ECFDF5; color: #065F46; border: 1px solid #D1FAE5; }
 .insight-blue { background: #EFF6FF; color: #1E40AF; border: 1px solid #DBEAFE; }
 .insight-orange { background: #FFF7ED; color: #9A3412; border: 1px solid #FFEDD5; }
 .insight-gray { background: #F8FAFC; color: #475569; border: 1px solid #E2E8F0; }
-
-.ai-thinking {
-  background: linear-gradient(90deg, #eff6ff 0%, #dbeafe 50%, #eff6ff 100%);
-  background-size: 200% 100%;
-  animation: shimmer 1.5s infinite;
-  color: #1E40AF !important; 
-  cursor: wait;
-}
+.ai-thinking { background: linear-gradient(90deg, #eff6ff 0%, #dbeafe 50%, #eff6ff 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite; color: #1E40AF !important; cursor: wait; }
 @keyframes shimmer { 0% {background-position: 100% 0} 100% {background-position: -100% 0} }
 
 table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; }
@@ -286,64 +192,53 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
 </div>
 
 <div class="drawer-overlay" id="drawerOverlay"></div>
-
-<aside class="drawer" id="drawer" aria-label="Site menu">
+<aside class="drawer" id="drawer">
   <div class="drawer-head">
     <div class="drawer-title">Menu</div>
-    <button class="drawer-close" id="drawerClose" aria-label="Close menu">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-        <path d="M18 6L6 18"></path>
-        <path d="M6 6l12 12"></path>
-      </svg>
-    </button>
+    <button class="drawer-close" id="drawerClose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18"></path><path d="M6 6l12 12"></path></svg></button>
   </div>
-
   <div class="drawer-body">
     <div id="drawerProfile" class="drawer-profile" style="display:none;">
         <div class="drawer-profile-label">Signed in as</div>
         <div id="drawerEmailDisplay" class="drawer-profile-email"></div>
         <div id="drawerExpiryDisplay" style="font-size:11px; color:#64748B; margin-top:4px;"></div>
     </div>
-
     <div class="drawer-links">
       <a href="index.html">Home</a>
-      <a href="#" onclick="closeDrawer(); toggleHistory(true); return false;">
-          Saved History
-      </a>
+      <a href="#" onclick="closeDrawer(); toggleHistory(true); return false;">Saved History</a>
+      <a href="profit-leak.html" style="background: #F0F9FF; border-color: #BAE6FD;">Profit Optimizer <span style="background:#0F172A; color:white; padding:2px 6px; border-radius:6px; font-size:10px;">NEW</span></a>
       <a href="free-tools.html">Other Tools</a>
       <a href="about.html">About Vizbix</a>
     </div>
-    
-    <div class="drawer-mini">
-      Quick tools for business owners. Simple numbers → clear decisions.
-    </div>
+    <div class="drawer-mini">Vizbix: Simple numbers → clear decisions.</div>
   </div>
 </aside>
 
 <main>
   <header>
-    <div>
-      <div class="brand">Vizbix<span>.</span></div>
-      <div class="subtitle">E-commerce Intelligence Engine</div>
-    </div>
-    
+    <div><div class="brand">Vizbix<span>.</span></div><div class="subtitle">E-commerce Intelligence Engine</div></div>
     <div class="header-actions">
-        <button id="historyBtn" class="btn-secondary" style="display:none;" onclick="toggleHistory(true)">
-            <span style="font-size: 16px;">📂</span> 
-            <span class="btn-text-desktop">History</span>
-        </button>
-
+        <button id="historyBtn" class="btn-secondary" style="display:none;" onclick="toggleHistory(true)"><span style="font-size: 16px;">📂</span><span class="btn-text-desktop">History</span></button>
         <button id="loginBtn" class="btn-primary" onclick="handleLoginClick()">Login</button>
-        
         <div class="header-email-display" id="userEmailHeader" style="display:none; font-size:12px; font-weight:600; color:var(--primary); padding:6px 10px; background:white; border-radius:8px; border:1px solid var(--border);"></div>
-        
-        <button class="menu-btn" id="menuBtn" aria-label="Open menu">
-          <div class="menu-icon" aria-hidden="true">
-            <span></span><span></span><span></span>
-          </div>
-        </button>
+        <button class="menu-btn" id="menuBtn"><div class="menu-icon"><span></span><span></span><span></span></div></button>
     </div>
   </header>
+
+  <section>
+      <div style="display:flex; align-items:flex-end; justify-content:space-between; margin-bottom:12px;">
+          <h2 style="font-size:22px; margin:0;">Featured Tool</h2>
+          <span style="font-size:13px; color:var(--text-muted);">AI-Powered</span>
+      </div>
+      <a href="profit-leak.html" class="pro-card">
+          <div class="pro-content">
+              <div class="pro-badge">✨ VIZBIX PRO</div>
+              <h3>Profit Optimizer</h3>
+              <p>The only tool that uses <strong>AI</strong> to analyze your margins, find hidden leaks, and suggest pricing strategies.</p>
+          </div>
+          <div class="pro-icon">➔</div>
+      </a>
+  </section>
 
   <div class="card">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
@@ -371,7 +266,7 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
     <div id="monthlyInputs" style="display:none;">
         <div class="info-box-small">
             <span style="font-size:16px;">💡</span> 
-            <div><strong>Pro Tip:</strong> Add 2–6 months of data for better AI insights.</div>
+            <div><strong>Pro Tip:</strong> Add 2–6 months of data for the most accurate trend analysis.</div>
         </div>
         <div class="grid-header">
             <div>MONTH (Optional)</div>
@@ -384,12 +279,9 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
         <button class="btn-secondary" onclick="addMonthRow()" style="width:100%; margin-top:10px;">+ Add Month Data</button>
     </div>
 
-    <div style="margin-top:16px; display:flex; gap:10px;">
-      <button id="analyzeBtn" class="btn-primary" style="width:100%" onclick="analyze()">Generate Report →</button>
-      
-      <button id="saveCloudBtn" class="btn-secondary" style="display:none; width:48px; padding:0;" onclick="saveToCloud()" title="Save to Cloud">
-      💾
-      </button>
+    <div style="margin-top:16px; display:flex; gap:10px; align-items: stretch;">
+      <button id="analyzeBtn" class="btn-primary" style="flex:2;" onclick="analyze()">Generate Report →</button>
+      <button id="saveCloudBtn" class="btn-secondary" style="display:none; width:50px; flex-shrink:0; padding:0; align-items:center; justify-content:center;" onclick="saveToCloud()" title="Save to Cloud"><span style="font-size:18px">💾</span></button>
     </div>
   </div>
 
@@ -457,7 +349,7 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
         </div>
 
         <h3 style="margin-top:40px; margin-bottom:15px">Visual Breakdown</h3>
-        <div style="height:300px; margin-bottom:30px; position:relative;">
+        <div style="height:300px; margin-bottom:30px; position: relative;">
           <canvas id="chart"></canvas>
         </div>
       </div>
@@ -483,26 +375,35 @@ let isProUser = false;
 let currentMode = 'product'; // 'product' or 'monthly'
 
 // --- INIT ---
-Chart.register(ChartDataLabels); // ENABLE DATA LABELS PLUGIN
+Chart.register(ChartDataLabels); // Plugin for chart labels
 
 window.addEventListener('DOMContentLoaded', () => {
-    // Load drafts for both modes
     loadDrafts();
     if(userEmail) { verify(userEmail); }
 });
 
-// --- MODE SWITCHING ---
+// --- MODE SWITCHING (PREVENTS RESETTING REPORT) ---
 function setMode(mode) {
     currentMode = mode;
     document.getElementById('btnProduct').className = mode === 'product' ? 'mode-btn active' : 'mode-btn';
     document.getElementById('btnMonthly').className = mode === 'monthly' ? 'mode-btn active' : 'mode-btn';
     document.getElementById('productInputs').style.display = mode === 'product' ? 'block' : 'none';
     document.getElementById('monthlyInputs').style.display = mode === 'monthly' ? 'block' : 'none';
-    document.getElementById('results').style.display = 'none';
     
     // Toggle Sample button
-    const sampleBtn = document.querySelector(".input-label[onclick='sample()']");
-    if(sampleBtn) sampleBtn.style.display = mode === 'product' ? 'block' : 'none';
+    document.querySelector(".input-label[onclick='sample()']").style.display = mode === 'product' ? 'block' : 'none';
+
+    // SMART REPORT TOGGLE: Only show results if data exists for that mode
+    const resultsDiv = document.getElementById('results');
+    if (mode === 'monthly' && monthlyStats) {
+        resultsDiv.style.display = 'block';
+        analyzeMonthly(); // Refresh view
+    } else if (mode === 'product' && currentData.length > 0) {
+        resultsDiv.style.display = 'block';
+        analyzeProduct(); // Refresh view
+    } else {
+        resultsDiv.style.display = 'none';
+    }
 }
 
 // --- ROW MANAGEMENT ---
@@ -510,7 +411,7 @@ function createRow(container, name="", val1="", val2="", val3="", isMonth=false)
   const d = document.createElement("div");
   d.className = "grid-row";
   
-  // Custom placeholders based on mode
+  // Custom placeholders
   const p1 = isMonth ? "Month (e.g. Jan)" : "Product Name";
   const p2 = isMonth ? "Sales ₹" : "Sell Price";
   const p3 = isMonth ? "Expenses ₹" : "Cost Price";
@@ -591,7 +492,7 @@ function analyzeMonthly() {
     const avgAOV = avgOrders > 0 ? (avgSales / avgOrders) : 0;
     const margin = avgSales > 0 ? (avgProfit / avgSales * 100) : 0;
 
-    // Save for AI
+    // Save for AI/Switching
     monthlyStats = { avgSales, avgExp, avgProfit, avgOrders, avgAOV, margin, count };
 
     // UI Updates
@@ -606,9 +507,9 @@ function analyzeMonthly() {
     document.getElementById("monthlyMetrics").style.display = "flex";
     document.getElementById("dispAOV").innerText = "₹ " + avgAOV.toFixed(0);
     document.getElementById("dispOrders").innerText = avgOrders.toFixed(1);
-    
     document.getElementById("tableContainer").style.display = "none";
 
+    // Client-Style Insights (Formatted)
     generateMonthlyInsights(margin, avgOrders, avgAOV, count);
     
     // Pie Chart: Sales context (Blue) -> Expense (Orange) vs Profit (Green)
@@ -620,16 +521,20 @@ function generateMonthlyInsights(margin, orders, aov, count) {
     let advice = "";
     
     if(orders < 15) {
-        advice = `<strong>🚀 Action Plan:</strong> Your margin is ${margin.toFixed(0)}% (Good), but order volume is low (${orders.toFixed(1)}/mo). If you get just 1 extra order per week, profit grows significantly. Try bundling items to boost AOV above ₹${(aov*1.2).toFixed(0)}.`;
+        advice = `<strong>🚀 Action Plan:</strong><br>Your margin is ${margin.toFixed(0)}% (Good), but order volume is low (${orders.toFixed(1)}/mo). If you get just 1 extra order per week, profit grows significantly. Try bundling items to boost AOV above ₹${(aov*1.2).toFixed(0)}.`;
     } else if (margin < 20) {
-        advice = `<strong>⚠ Profit Warning:</strong> Your margin is tight (${margin.toFixed(0)}%). You need to either increase prices by 10% or reduce expenses to be sustainable.`;
+        advice = `<strong>⚠ Profit Warning:</strong><br>Your margin is tight (${margin.toFixed(0)}%). You need to either increase prices by 10% or reduce expenses to be sustainable.`;
     } else {
-        advice = `<strong>✅ Health Check:</strong> You have a steady flow. Focus on increasing Average Order Value (AOV) by upselling small items.`;
+        advice = `<strong>✅ Health Check:</strong><br>You have a steady flow. Focus on increasing Average Order Value (AOV) by upselling small items.`;
     }
 
     div.innerHTML = `
         <div class="insight-item insight-blue">
-            <div><strong>Overview (${count} months average):</strong> Your business runs on a <strong>${margin.toFixed(0)}% margin</strong>. ${advice}</div>
+            <div>
+                <strong>Key Observation (${count} months average):</strong><br>
+                Your business runs on a <strong>${margin.toFixed(0)}% margin</strong>.<br><br>
+                ${advice}
+            </div>
         </div>
         ${getAiButtonHtml()}
     `;
@@ -649,8 +554,8 @@ function analyzeProduct(){
 
   if(data.length===0) return alert("Please enter at least one product.");
   currentData = data; 
-  
   showResults();
+  
   document.getElementById("kpiRevLabel").innerText = "TOTAL REVENUE";
   document.getElementById("kpiCostLabel").innerText = "TOTAL COST";
   document.getElementById("kpiProfitLabel").innerText = "NET PROFIT";
