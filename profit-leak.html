@@ -516,30 +516,83 @@ function analyzeMonthly() {
     drawChart('pie', ['Expenses', 'Net Profit'], [avgExp, avgProfit], ['#F97316', '#10B981']);
 }
 
+// --- REPLACEMENT FUNCTION: EXPANDED MONTHLY INSIGHTS ---
 function generateMonthlyInsights(margin, orders, aov, count) {
     const div = document.getElementById("insights");
-    let advice = "";
-    
-    if(orders < 15) {
-        advice = `<strong>🚀 Action Plan:</strong><br>Your margin is ${margin.toFixed(0)}% (Good), but order volume is low (${orders.toFixed(1)}/mo). If you get just 1 extra order per week, profit grows significantly. Try bundling items to boost AOV above ₹${(aov*1.2).toFixed(0)}.`;
-    } else if (margin < 20) {
-        advice = `<strong>⚠ Profit Warning:</strong><br>Your margin is tight (${margin.toFixed(0)}%). You need to either increase prices by 10% or reduce expenses to be sustainable.`;
-    } else {
-        advice = `<strong>✅ Health Check:</strong><br>You have a steady flow. Focus on increasing Average Order Value (AOV) by upselling small items.`;
+    let statusTitle = "";
+    let statusColor = ""; // blue, green, orange, or red (custom class needed for red)
+    let strategies = [];
+
+    // --- LOGIC ENGINE: 5 SCENARIOS ---
+
+    // Scenario 1: Losing Money (Negative Margin)
+    if (margin <= 0) {
+        statusTitle = "🚨 CRITICAL: You are losing money on every sale.";
+        statusColor = "insight-orange"; // Using orange as 'warning' style
+        strategies = [
+            `<strong>Stop Ads Immediately:</strong> You are burning cash. Pause all paid marketing until you fix your unit economics.`,
+            `<strong>Price Audit:</strong> You need to raise prices by at least ${Math.abs(margin).toFixed(0)}% just to break even.`,
+            `<strong>Cost Cutting:</strong> Negotiate with your supplier or switch to cheaper packaging immediately.`
+        ];
+    } 
+    // Scenario 2: High Volume, Low Margin (The "Busy but Broke" Trap)
+    else if (orders > 30 && margin < 15) {
+        statusTitle = "⚠ High Activity, Low Profit (The 'Busy Trap')";
+        statusColor = "insight-orange";
+        strategies = [
+            `<strong>Price Hike Test:</strong> You have volume leverage. Increase prices by 5-10%. You might lose a few customers, but total profit will likely go <i>up</i>.`,
+            `<strong>Kill Low-Margin Best Sellers:</strong> If your most popular item has low margin, it is dragging you down. Bundle it with a high-margin accessory.`,
+            `<strong>Supplier Negotiation:</strong> Since you are ordering ${orders.toFixed(0)} times a month, demand a bulk discount from your vendor.`
+        ];
+    }
+    // Scenario 3: High Margin, Low Volume (The "Hidden Gem")
+    else if (margin > 25 && orders < 10) {
+        statusTitle = "💎 Hidden Gem: Great Product, Needs Eyes";
+        statusColor = "insight-blue";
+        strategies = [
+            `<strong>Aggressive Marketing:</strong> Your margins are healthy (${margin.toFixed(0)}%). You can afford to spend more on ads to acquire customers.`,
+            `<strong>Collect Social Proof:</strong> Email your ${orders.toFixed(0)} past customers personally. Ask for a photo review in exchange for a discount code.`,
+            `<strong>Micro-Influencers:</strong> Send free samples to small influencers. Your high margin covers the cost, and you need the visibility.`
+        ];
+    }
+    // Scenario 4: Healthy & Stable (The "Optimizer")
+    else if (margin >= 20 && orders >= 10) {
+        statusTitle = "✅ Healthy Business: Time to Maximize";
+        statusColor = "insight-green";
+        strategies = [
+            `<strong>Increase AOV:</strong> Your flow is steady. Add a "One-Click Upsell" at checkout (e.g., a ₹299 accessory) to boost revenue by 15% without new customers.`,
+            `<strong>Email Marketing:</strong> Don't just sell once. Send a "VIP Restock" or "New Arrival" email to your list this week.`,
+            `<strong>Loyalty Loop:</strong> Insert a "Thank You" card with a 10% off coupon for their <i>next</i> order inside the box.`
+        ];
+    }
+    // Scenario 5: The "Average" Trap (Middle ground)
+    else {
+        statusTitle = "⚖️ Stable but Stagnant";
+        statusColor = "insight-blue";
+        strategies = [
+            `<strong>Bundle Builder:</strong> Create a "Starter Kit" or "Gift Bundle" priced at ₹${(aov * 1.5).toFixed(0)}. This forces AOV up.`,
+            `<strong>Shipping Threshold:</strong> Set "Free Shipping" at ₹${(aov + 200).toFixed(0)} to encourage adding one more small item.`,
+            `<strong>Follow Up:</strong> Send a WhatsApp message 7 days after delivery asking "How was it?" to build trust for repeat sales.`
+        ];
     }
 
+    // --- HTML GENERATION ---
     div.innerHTML = `
-        <div class="insight-item insight-blue">
+        <div class="insight-item ${statusColor}">
             <div>
-                <strong>Key Observation (${count} months average):</strong><br>
-                Your business runs on a <strong>${margin.toFixed(0)}% margin</strong>.<br><br>
-                ${advice}
+                <div style="font-size:14px; font-weight:800; margin-bottom:8px;">${statusTitle}</div>
+                <div style="margin-bottom:12px;">Based on your average of <strong>${orders.toFixed(1)} orders/mo</strong> and <strong>${margin.toFixed(0)}% margin</strong>:</div>
+                
+                <ul style="margin:0; padding-left:18px; line-height:1.6;">
+                    <li style="margin-bottom:6px;">${strategies[0]}</li>
+                    <li style="margin-bottom:6px;">${strategies[1]}</li>
+                    <li>${strategies[2]}</li>
+                </ul>
             </div>
         </div>
-        ${getAiButtonHtml()}
+        ${getAiButtonHtml()} 
     `;
 }
-
 // --- PRODUCT ANALYSIS ---
 function analyzeProduct(){
   let data = []; let totalRevenue = 0, totalCost = 0, totalProfit = 0;
@@ -769,3 +822,4 @@ document.addEventListener("keydown", (e) => { if(e.key === "Escape") closeDrawer
 </script>
 </body>
 </html>
+
