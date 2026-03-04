@@ -11,69 +11,70 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 <link rel="icon" type="image/png" href="favicon.png">
 <link rel="apple-touch-icon" href="favicon.png">
 
 <style>
 :root {
-  --bg: #F3F4F6;
+  --bg: #F4F7F9;
   --surface: #FFFFFF;
-  --primary: #111827; 
-  --accent: #4F46E5; 
-  --accent-glow: rgba(79, 70, 229, 0.15);
-  --success: #10B981;
+  --primary: #0F172A; 
+  --accent: #2563EB; 
+  --accent-glow: rgba(37, 99, 235, 0.15);
+  --success: #059669;
   --danger: #EF4444;
-  --text-main: #1F2937;
-  --text-muted: #6B7280;
-  --border: #E5E7EB;
+  --text-main: #1E293B;
+  --text-muted: #64748B;
+  --border: #E2E8F0;
   --radius: 12px;
   --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
-  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05), 0 2px 4px -1px rgba(0,0,0,0.03);
-  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.05), 0 4px 6px -2px rgba(0,0,0,0.025);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.05);
 }
 
 * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
 
+/* FIX: Independent scrolling for desktop, natural scrolling for mobile */
 body {
   margin: 0;
   background-color: var(--bg);
-  font-family: 'Inter', system-ui, sans-serif;
+  font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   color: var(--text-main);
-  height: 100vh;
   display: flex;
   flex-direction: column;
-  overflow: hidden; /* Prevent body scroll, handle inside main */
+  height: 100vh;
+  overflow: hidden; 
 }
 
 /* --- TOP NAVBAR --- */
 .topbar {
   display: flex; justify-content: space-between; align-items: center;
-  padding: 12px 32px; background: var(--surface); border-bottom: 1px solid var(--border);
-  z-index: 50; height: 64px; flex-shrink: 0;
+  padding: 12px 24px; background: var(--surface); border-bottom: 1px solid var(--border);
+  z-index: 50; height: 70px; flex-shrink: 0;
 }
-.brand { font-size: 20px; font-weight: 800; letter-spacing: -0.5px; color: var(--primary); display: flex; align-items: center; gap: 8px;}
+.brand { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--primary); display: flex; align-items: center; gap: 8px;}
 .brand span { color: var(--accent); }
-.brand-badge { background: #EEF2FF; color: var(--accent); font-size: 10px; padding: 2px 6px; border-radius: 4px; font-weight: 700; text-transform: uppercase; }
-.header-actions { display: flex; gap: 12px; align-items: center; }
+.brand-badge { background: #EEF2FF; color: var(--accent); font-size: 10px; padding: 4px 8px; border-radius: 6px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-left: 4px;}
+.header-actions { display: flex; gap: 10px; align-items: center; }
 
-/* --- APP LAYOUT (Full Screen Split) --- */
+/* --- APP LAYOUT --- */
 .app-container {
   display: flex;
   flex: 1;
-  overflow: hidden;
+  overflow: hidden; /* Contains the scrollable children */
 }
 
 .input-panel {
-  width: 420px;
+  width: 440px;
   background: var(--surface);
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  overflow-y: auto;
+  overflow-y: auto; /* Scrolls independently */
   flex-shrink: 0;
   z-index: 10;
-  box-shadow: 2px 0 8px rgba(0,0,0,0.02);
+  padding-bottom: 40px;
 }
 
 .input-panel-header {
@@ -81,145 +82,196 @@ body {
   border-bottom: 1px solid var(--border);
   position: sticky;
   top: 0;
-  background: var(--surface);
+  background: rgba(255,255,255,0.95);
+  backdrop-filter: blur(8px);
   z-index: 5;
 }
 
-.input-panel-body {
-  padding: 24px;
-}
+.input-panel-body { padding: 24px; }
 
 .results-panel {
   flex: 1;
   background: var(--bg);
-  overflow-y: auto;
-  padding: 32px 40px;
-}
-
-/* Mobile adjustments */
-@media(max-width: 1024px){
-    .app-container { flex-direction: column; overflow-y: auto; }
-    .input-panel { width: 100%; border-right: none; border-bottom: 1px solid var(--border); box-shadow: none; overflow-y: visible; }
-    .results-panel { overflow-y: visible; padding: 20px; }
-    body { overflow: auto; }
-}
-
-@media(max-width: 768px){
-    .topbar { padding: 12px 16px; }
-    .btn-text-desktop, .header-email-display { display: none !important; } 
+  overflow-y: auto; /* Scrolls independently */
+  padding: 32px 40px 60px 40px;
 }
 
 /* --- UI ELEMENTS --- */
 .input-label { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-input { width: 100%; padding: 12px 14px; border-radius: 8px; border: 1px solid #D1D5DB; background: #FFFFFF; font-weight: 500; transition: all 0.2s; font-size: 14px; color: var(--text-main); font-family: inherit; }
-input::placeholder { color: #9CA3AF; font-weight: 400; }
+/* FIX: Added min-width: 0 and adjusted padding so text doesn't cut off */
+input { width: 100%; min-width: 0; padding: 12px 10px; border-radius: 8px; border: 1px solid #CBD5E1; background: #FFFFFF; font-weight: 500; transition: all 0.2s; font-size: 14px; color: var(--text-main); font-family: inherit; }
+input::placeholder { color: #94A3B8; font-weight: 400; }
 input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
 
-.grid-header { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 32px; gap: 8px; padding: 0 8px 8px 8px; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-.grid-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 32px; gap: 8px; margin-bottom: 8px; align-items: center; }
-
-@media(max-width:640px){
-  .grid-header { display: none; }
-  .grid-row { grid-template-columns: 1fr 1fr; gap: 8px; background: #F9FAFB; padding: 12px; border-radius: 12px; border: 1px solid var(--border); position: relative; }
-  .grid-row input:first-child { grid-column: span 2; }
-  .grid-row .btn-ghost { position: absolute; top: 8px; right: 8px; background: white; border: 1px solid var(--border); border-radius: 6px; width: 28px; height: 28px; padding: 0; }
-}
+/* FIX: Adjusted grid columns to give numbers more space */
+.grid-header { display: grid; grid-template-columns: 2fr 1.2fr 1.2fr 1.2fr 32px; gap: 8px; padding: 0 8px 8px 8px; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.grid-row { display: grid; grid-template-columns: 2fr 1.2fr 1.2fr 1.2fr 32px; gap: 8px; margin-bottom: 10px; align-items: center; }
 
 button { padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; border: none; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; font-family: inherit; }
-button:active { transform: scale(0.98); }
-.btn-primary { background: var(--primary); color: white; border: 1px solid transparent; }
-.btn-primary:hover { background: #1F2937; box-shadow: 0 4px 6px rgba(17, 24, 39, 0.1); }
-.btn-secondary { background: white; border: 1px solid #D1D5DB; color: var(--text-main); box-shadow: var(--shadow-sm); }
-.btn-secondary:hover { border-color: #9CA3AF; background: #F9FAFB; }
-.btn-ghost { background: transparent; color: #9CA3AF; padding: 6px; border-radius: 6px; }
+button:active { transform: scale(0.97); }
+.btn-primary { background: var(--primary); color: white; border: 1px solid transparent; box-shadow: 0 4px 10px rgba(15,23,42,0.15); }
+.btn-primary:hover { background: #1E293B; box-shadow: 0 6px 15px rgba(15,23,42,0.2); }
+.btn-secondary { background: white; border: 1px solid #CBD5E1; color: var(--text-main); box-shadow: var(--shadow-sm); }
+.btn-secondary:hover { border-color: #94A3B8; background: #F8FAFC; }
+.btn-ghost { background: transparent; color: #94A3B8; padding: 6px; border-radius: 6px; }
 .btn-ghost:hover { background: #FEE2E2; color: #EF4444; }
 
+/* --- MENU DRAWER --- */
+.menu-btn { width: 40px; height: 40px; border: 1px solid var(--border); background: var(--surface); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow-sm); padding: 0; flex-shrink: 0; transition: all 0.2s; }
+.menu-btn:hover { background: #F8FAFC; }
+.menu-icon { width: 16px; height: 12px; position: relative; }
+.menu-icon span { position: absolute; left: 0; right: 0; height: 2px; background: var(--text-main); border-radius: 10px; }
+.menu-icon span:nth-child(1) { top: 0; }
+.menu-icon span:nth-child(2) { top: 5px; opacity: 0.9; }
+.menu-icon span:nth-child(3) { bottom: 0; }
+
+.drawer-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity .3s ease; z-index: 150; }
+.drawer { position: fixed; top: 0; right: 0; height: 100%; width: min(320px, 85vw); background: var(--surface); border-left: 1px solid var(--border); box-shadow: -10px 0 40px rgba(0,0,0,.1); transform: translateX(105%); transition: transform .3s cubic-bezier(0.16, 1, 0.3, 1); z-index: 160; display: flex; flex-direction: column; }
+.drawer.open { transform: translateX(0); }
+.drawer-overlay.open { opacity: 1; pointer-events: auto; }
+.drawer-head { padding: 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.drawer-title { font-weight: 800; font-size: 18px; color: var(--primary); }
+.drawer-close { width: 36px; height: 36px; border-radius: 10px; border: none; background: #F1F5F9; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;}
+.drawer-close:hover { background: #E2E8F0; }
+.drawer-close svg { width: 18px; height: 18px; stroke: var(--text-main); }
+.drawer-body { padding: 24px; overflow: auto; }
+.drawer-profile { background: #F8FAFC; border: 1px solid var(--border); padding: 16px; border-radius: 16px; margin-bottom: 24px; }
+.drawer-profile-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+.drawer-profile-email { font-size: 14px; font-weight: 600; color: var(--primary); word-break: break-all; }
+.drawer-links { display: flex; flex-direction: column; gap: 10px; }
+.drawer-links a { text-decoration: none; color: var(--text-main); padding: 14px 16px; border-radius: 14px; display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 15px; border: 1px solid var(--border); transition: 0.2s; }
+.drawer-links a:hover { background: #F8FAFC; transform: translateX(4px); }
+
 /* --- TOGGLE SWITCH --- */
-.mode-switch-container { display: flex; background: #F3F4F6; padding: 4px; border-radius: 10px; border: 1px solid var(--border); }
-.mode-btn { flex: 1; padding: 8px; border: none; background: transparent; font-weight: 600; font-size: 13px; color: var(--text-muted); cursor: pointer; border-radius: 6px; transition: all 0.2s; }
+.mode-switch-container { display: flex; background: #E2E8F0; padding: 4px; border-radius: 10px; border: 1px solid var(--border); }
+.mode-btn { flex: 1; padding: 10px; border: none; background: transparent; font-weight: 600; font-size: 13px; color: var(--text-muted); cursor: pointer; border-radius: 6px; transition: all 0.2s; }
 .mode-btn:hover:not(.active) { color: var(--primary); }
-.mode-btn.active { background: white; color: var(--primary); box-shadow: var(--shadow-sm); font-weight: 600; }
+.mode-btn.active { background: white; color: var(--primary); box-shadow: var(--shadow-sm); font-weight: 700; }
 
 /* --- RESULTS PANEL STYLES --- */
 .dashboard-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; }
-.dashboard-title { font-size: 24px; font-weight: 700; color: var(--primary); margin: 0; letter-spacing: -0.5px; }
+.dashboard-title { font-size: 26px; font-weight: 800; color: var(--primary); margin: 0; letter-spacing: -0.5px; }
 
-.kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px; }
-.kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; box-shadow: var(--shadow-sm); }
-.kpi-label { font-size: 12px; font-weight: 600; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+.kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px; }
+.kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; box-shadow: var(--shadow-sm); }
+.kpi-label { font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
 .kpi-value { font-size: 32px; font-weight: 800; color: var(--primary); letter-spacing: -1px; }
 
 /* --- PRO SECTION --- */
-.pro-grid { display: grid; grid-template-columns: 1fr 350px; gap: 24px; align-items: start; }
+.pro-grid { display: grid; grid-template-columns: 1fr 380px; gap: 24px; align-items: start; }
 @media(max-width: 1200px) { .pro-grid { grid-template-columns: 1fr; } }
 
-.card { background: var(--surface); border-radius: var(--radius); padding: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); margin-bottom: 24px; }
-.card-title { font-size: 16px; font-weight: 700; margin: 0 0 16px 0; display: flex; justify-content: space-between; align-items: center; }
+.card { background: var(--surface); border-radius: 16px; padding: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); margin-bottom: 24px; }
+.card-title { font-size: 16px; font-weight: 700; margin: 0 0 20px 0; display: flex; justify-content: space-between; align-items: center; }
 
-/* --- SIMULATOR (New Feature) --- */
-.slider-group { margin-bottom: 16px; }
-.slider-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 8px; }
-.slider-val { color: var(--accent); background: #EEF2FF; padding: 2px 6px; border-radius: 4px; font-size: 11px; }
+/* --- SIMULATOR --- */
+.slider-group { margin-bottom: 20px; }
+.slider-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 12px; }
+.slider-val { color: var(--accent); background: #EEF2FF; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 700; }
 input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; padding: 0; margin: 0; border: none; box-shadow: none; }
 input[type=range]:focus { outline: none; box-shadow: none; }
-input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: #E5E7EB; border-radius: 3px; }
-input[type=range]::-webkit-slider-thumb { height: 16px; width: 16px; border-radius: 50%; background: var(--accent); cursor: pointer; -webkit-appearance: none; margin-top: -5px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
-.sim-result-box { background: #F8FAFC; border: 1px solid var(--border); padding: 16px; border-radius: 8px; margin-top: 20px; text-align: center; }
+input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: #E2E8F0; border-radius: 3px; }
+input[type=range]::-webkit-slider-thumb { height: 18px; width: 18px; border-radius: 50%; background: var(--accent); cursor: pointer; -webkit-appearance: none; margin-top: -6px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+.sim-result-box { background: #F8FAFC; border: 1px solid var(--border); padding: 20px; border-radius: 12px; margin-top: 24px; text-align: center; }
 .sim-diff { font-size: 13px; font-weight: 600; margin-top: 4px; }
 .diff-pos { color: var(--success); }
 .diff-neg { color: var(--danger); }
 
 /* --- Locked Content --- */
 .locked-container { position: relative; overflow: hidden; }
-.blur-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.lock-card { background: var(--surface); padding: 32px; border-radius: 16px; text-align: center; box-shadow: var(--shadow-lg); border: 1px solid var(--border); max-width: 380px; width: 90%; }
-.premium-badge { background: linear-gradient(135deg, #4F46E5 0%, #3B82F6 100%); color: white; padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; display: inline-block; }
-.feature-list { text-align: left; margin: 24px 0; font-size: 14px; display: flex; flex-direction: column; gap: 12px; font-weight: 500; color: var(--text-main); }
-.feature-list div { display: flex; align-items: center; gap: 12px; }
-.feature-list div::before { content: '✓'; display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: #D1FAE5; color: #059669; border-radius: 50%; font-size: 12px; font-weight: 800; }
+.blur-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(244, 247, 249, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.lock-card { background: var(--surface); padding: 32px; border-radius: 20px; text-align: center; box-shadow: var(--shadow-lg); border: 1px solid var(--border); max-width: 380px; width: 90%; }
+.premium-badge { background: linear-gradient(135deg, #2563EB 0%, #1E40AF 100%); color: white; padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; display: inline-block; box-shadow: 0 4px 10px rgba(37,99,235,0.2); }
 
 /* --- Insights & AI --- */
-.insight-item { padding: 16px; border-radius: 8px; margin-bottom: 12px; font-size: 14px; line-height: 1.5; background: var(--surface); border: 1px solid var(--border); border-left-width: 4px; }
+.insight-item { padding: 16px; border-radius: 12px; margin-bottom: 12px; font-size: 14px; line-height: 1.6; background: white; border: 1px solid var(--border); border-left-width: 4px; box-shadow: var(--shadow-sm); }
 .insight-green { border-left-color: #10B981; }
 .insight-blue { border-left-color: #3B82F6; }
 .insight-orange { border-left-color: #F59E0B; }
-.insight-gray { border-left-color: #9CA3AF; }
+.insight-gray { border-left-color: #94A3B8; }
 
-.ai-thinking { background: linear-gradient(90deg, #F3F4F6 0%, #E5E7EB 50%, #F3F4F6 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite; color: var(--text-muted) !important; border-color: transparent !important; cursor: wait; }
+.ai-thinking { background: linear-gradient(90deg, #F1F5F9 0%, #E2E8F0 50%, #F1F5F9 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite; color: var(--text-muted) !important; border-color: transparent !important; cursor: wait; }
 @keyframes shimmer { 0% {background-position: 100% 0} 100% {background-position: -100% 0} }
 
 /* --- Tables --- */
-.table-wrapper { border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
+.table-wrapper { border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
 table { width: 100%; border-collapse: collapse; background: white; }
-th { text-align: left; padding: 12px 16px; background: #F9FAFB; border-bottom: 1px solid var(--border); font-size: 11px; font-weight: 600; color: var(--text-muted); text-transform: uppercase; }
-td { padding: 12px 16px; border-bottom: 1px solid var(--border); font-size: 13px; font-weight: 500; }
+th { text-align: left; padding: 14px 16px; background: #F8FAFC; border-bottom: 1px solid var(--border); font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+td { padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 500; }
 tr:last-child td { border-bottom: none; }
+tr:hover td { background: #F8FAFC; }
 
-/* History Modal / Drawer styling omitted for brevity, keeping original logic */
-.drawer-overlay { position: fixed; inset: 0; background: rgba(17, 24, 39, 0.4); opacity: 0; pointer-events: none; transition: 0.2s; z-index: 150; }
-.drawer { position: fixed; top: 0; right: 0; height: 100%; width: 300px; background: var(--surface); border-left: 1px solid var(--border); box-shadow: -4px 0 15px rgba(0,0,0,.05); transform: translateX(100%); transition: 0.3s cubic-bezier(0.4, 0, 0.2, 1); z-index: 160; display: flex; flex-direction: column; }
-.drawer.open { transform: translateX(0); }
-.drawer-overlay.open { opacity: 1; pointer-events: auto; }
+/* --- Modals --- */
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 200; display: none; align-items: center; justify-content: center; }
+.modal-content { background: white; width: 90%; max-width: 500px; border-radius: 20px; padding: 28px; max-height: 80vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 1px solid rgba(255,255,255,0.2); }
+.history-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid var(--border); cursor: pointer; border-radius: 12px; border: 1px solid transparent; margin-bottom: 8px; transition: 0.2s; }
+.history-item:hover { background: #F8FAFC; border-color: var(--border); }
+
+/* --- RESPONSIVE FIXES --- */
+@media(max-width: 1024px){
+    body { height: auto; overflow: visible; display: block; }
+    .app-container { flex-direction: column; overflow: visible; display: block; }
+    .input-panel { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border); overflow: visible; padding-bottom: 24px; }
+    .results-panel { height: auto; overflow: visible; padding: 24px 20px; }
+}
+
+@media(max-width: 768px){
+    .btn-text-desktop, .header-email-display { display: none !important; } 
+    .dashboard-title { font-size: 22px; }
+}
+
+@media(max-width:640px){
+  .grid-header { display: none; }
+  .grid-row { grid-template-columns: 1fr 1fr; gap: 8px; background: #F8FAFC; padding: 16px; border-radius: 12px; border: 1px solid var(--border); position: relative; }
+  .grid-row input:first-child { grid-column: span 2; }
+  .grid-row .btn-ghost { position: absolute; top: 12px; right: 12px; background: white; border: 1px solid var(--border); border-radius: 8px; width: 32px; height: 32px; padding: 0; }
+}
 </style>
 </head>
 
 <body>
 
-<div id="historyModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:200; align-items:center; justify-content:center;">
-  <div style="background:white; width:90%; max-width:400px; padding:24px; border-radius:12px;">
-    <div style="display:flex; justify-content:space-between; margin-bottom:16px;"><h3 style="margin:0">History</h3><button onclick="toggleHistory(false)">✕</button></div>
+<div class="modal-overlay" id="historyModal">
+  <div class="modal-content">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+      <h3 style="margin:0; font-size: 20px; font-weight: 800; color: var(--primary);">Saved History</h3>
+      <button class="btn-ghost" onclick="toggleHistory(false)" style="background: #F1F5F9; color: var(--primary);">✕</button>
+    </div>
     <div id="historyList">Loading...</div>
   </div>
 </div>
 
+<div class="drawer-overlay" id="drawerOverlay"></div>
+<aside class="drawer" id="drawer">
+  <div class="drawer-head">
+    <div class="drawer-title">Menu</div>
+    <button class="drawer-close" id="drawerClose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18"></path><path d="M6 6l12 12"></path></svg></button>
+  </div>
+  <div class="drawer-body">
+    <div id="drawerProfile" class="drawer-profile" style="display:none;">
+        <div class="drawer-profile-label">Signed in as</div>
+        <div id="drawerEmailDisplay" class="drawer-profile-email"></div>
+        <div id="drawerExpiryDisplay" style="font-size:12px; color:var(--text-muted); margin-top:6px; font-weight: 500;"></div>
+    </div>
+    <div class="drawer-links">
+      <a href="index.html">Home</a>
+      <a href="#" onclick="closeDrawer(); toggleHistory(true); return false;">Saved History</a>
+      <a href="profit-leak.html" style="background: #EFF6FF; border-color: #DBEAFE; color: #1E40AF;">Profit Optimizer <span style="background:#2563EB; color:white; padding:4px 8px; border-radius:8px; font-size:10px; font-weight:800; letter-spacing: 0.5px;">NEW</span></a>
+      <a href="free-tools.html">Other Tools</a>
+      <a href="about.html">About Vizbix</a>
+    </div>
+  </div>
+</aside>
+
 <header class="topbar">
   <div class="brand">Vizbix <span>Pro</span> <span class="brand-badge">Optimizer</span></div>
   <div class="header-actions">
-      <button id="historyBtn" class="btn-secondary" style="display:none;" onclick="toggleHistory(true)">📂 <span class="btn-text-desktop">History</span></button>
-      <button id="saveCloudBtn" class="btn-secondary" style="display:none;" onclick="saveToCloud()" title="Save to Cloud">💾 <span class="btn-text-desktop">Save</span></button>
-      <div class="header-email-display" id="userEmailHeader" style="display:none; font-size:13px; font-weight:600; color:var(--text-muted);"></div>
+      <button id="historyBtn" class="btn-secondary" style="display:none;" onclick="toggleHistory(true)"><span style="font-size: 16px;">📂</span> <span class="btn-text-desktop">History</span></button>
+      <button id="saveCloudBtn" class="btn-secondary" style="display:none;" onclick="saveToCloud()" title="Save to Cloud"><span style="font-size: 16px;">💾</span> <span class="btn-text-desktop">Save</span></button>
+      <div class="header-email-display" id="userEmailHeader" style="display:none; font-size:13px; font-weight:600; color:var(--text-muted); padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px;"></div>
       <button id="loginBtn" class="btn-primary" onclick="handleLoginClick()">Login</button>
+      <button class="menu-btn" id="menuBtn"><div class="menu-icon"><span></span><span></span><span></span></div></button>
   </div>
 </header>
 
@@ -233,7 +285,7 @@ tr:last-child td { border-bottom: none; }
       </div>
       <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 16px;">
         <span class="input-label" style="margin:0;">Data Entry</span>
-        <span style="font-size:11px; font-weight:600; color:var(--accent); cursor:pointer;" onclick="sample()">Load Demo Data</span>
+        <span style="font-size:12px; font-weight:700; color:var(--accent); cursor:pointer;" onclick="sample()">Load Demo Data</span>
       </div>
     </div>
 
@@ -243,7 +295,7 @@ tr:last-child td { border-bottom: none; }
             <div>Name</div><div>Sell ₹</div><div>Cost ₹</div><div>Qty</div><div></div>
           </div>
           <div id="items"></div>
-          <button class="btn-secondary" onclick="addRow()" style="width:100%; margin-top:12px; border-style:dashed;">+ Add Product Row</button>
+          <button class="btn-secondary" onclick="addRow()" style="width:100%; margin-top:16px; border-style:dashed; border-width: 2px;">+ Add Product Row</button>
       </div>
 
       <div id="monthlyInputs" style="display:none;">
@@ -251,10 +303,10 @@ tr:last-child td { border-bottom: none; }
               <div>Month</div><div>Sales ₹</div><div>Exp ₹</div><div>Orders</div><div></div>
           </div>
           <div id="monthItems"></div>
-          <button class="btn-secondary" onclick="addMonthRow()" style="width:100%; margin-top:12px; border-style:dashed;">+ Add Month Row</button>
+          <button class="btn-secondary" onclick="addMonthRow()" style="width:100%; margin-top:16px; border-style:dashed; border-width: 2px;">+ Add Month Row</button>
       </div>
 
-      <button id="analyzeBtn" class="btn-primary" style="width:100%; margin-top:24px; padding: 12px; font-size: 14px;" onclick="analyze()">Run Analysis →</button>
+      <button id="analyzeBtn" class="btn-primary" style="width:100%; margin-top:28px; padding: 14px; font-size: 15px;" onclick="analyze()">Run Analysis →</button>
     </div>
   </aside>
 
@@ -274,20 +326,20 @@ tr:last-child td { border-bottom: none; }
         <div class="kpi-label" id="kpiCostLabel">Total Cost</div>
         <div class="kpi-value" id="dispCost" style="color:var(--text-muted)">₹0</div>
       </div>
-      <div class="kpi-card" style="border-top: 4px solid var(--success);">
-        <div class="kpi-label" style="color:var(--success)" id="kpiProfitLabel">Net Profit</div>
-        <div class="kpi-value" id="dispProfit" style="color:var(--success)">₹0</div>
+      <div class="kpi-card" style="background:#F0FDF4; border-color:#BBF7D0;">
+        <div class="kpi-label" style="color:#047857" id="kpiProfitLabel">Net Profit</div>
+        <div class="kpi-value" id="dispProfit" style="color:#047857">₹0</div>
       </div>
     </div>
 
     <div id="monthlyMetrics" class="kpi-container" style="display:none;">
-        <div class="kpi-card">
+        <div class="kpi-card" style="background:#F8FAFC; border-color:var(--border)">
             <div class="kpi-label">Avg Order Value</div>
-            <div class="kpi-value" id="dispAOV" style="font-size: 24px;">₹0</div>
+            <div class="kpi-value" id="dispAOV" style="font-size: 26px;">₹0</div>
         </div>
-        <div class="kpi-card">
+        <div class="kpi-card" style="background:#F8FAFC; border-color:var(--border)">
             <div class="kpi-label">Avg Monthly Orders</div>
-            <div class="kpi-value" id="dispOrders" style="font-size: 24px;">0</div>
+            <div class="kpi-value" id="dispOrders" style="font-size: 26px;">0</div>
         </div>
     </div>
 
@@ -295,19 +347,19 @@ tr:last-child td { border-bottom: none; }
       <div class="blur-overlay" id="lockOverlay">
         <div class="lock-card">
           <span class="premium-badge">Vizbix Pro ✨</span>
-          <h3 style="margin:0 0 8px 0; font-size: 20px;">Unlock Advanced Analytics</h3>
-          <p style="margin: 0 0 20px 0; font-size: 13px; color: var(--text-muted);">Predict margins, identify leaks, and generate AI strategies.</p>
+          <h3 style="margin:0 0 8px 0; font-size: 22px; font-weight: 800;">Unlock Advanced Analytics</h3>
+          <p style="margin: 0 0 24px 0; font-size: 14px; color: var(--text-muted);">Predict margins, identify leaks, and generate AI strategies.</p>
           
           <div class="feature-list">
-              <div><strong>"What-If" Profit Simulator</strong></div>
+              <div><strong>"What-If" Scenario Simulator</strong></div>
               <div><strong>AI Business Consultant</strong></div>
-              <div><strong>Detailed Margin Tables</strong></div>
               <div><strong>Unlimited Save History</strong></div>
+              <div><strong>PDF Report Exports</strong></div>
           </div>
 
           <input id="emailInput" placeholder="Enter your email" style="margin-bottom:12px; text-align:center;">
-          <button class="btn-primary" style="width:100%; padding: 12px;" onclick="pay()">Subscribe for ₹499/mo</button>
-          <button style="background:none; border:none; color:var(--text-muted); font-size:12px; margin-top:12px; cursor:pointer;" onclick="verify(null)">Restore Access</button>
+          <button class="btn-primary" style="width:100%; padding: 14px; font-size: 15px;" onclick="pay()">Subscribe for ₹499/mo</button>
+          <button style="background:none; border:none; color:var(--text-muted); font-size:12px; margin-top:16px; font-weight:600; cursor:pointer;" onclick="verify(null)">Restore Access</button>
         </div>
       </div>
 
@@ -316,7 +368,7 @@ tr:last-child td { border-bottom: none; }
         <div class="pro-main-col">
           <div class="card">
             <h3 class="card-title">Visual Breakdown</h3>
-            <div style="height:280px; position: relative;">
+            <div style="height:320px; position: relative;">
               <canvas id="chart"></canvas>
             </div>
           </div>
@@ -334,8 +386,8 @@ tr:last-child td { border-bottom: none; }
         <div class="pro-side-col">
           
           <div class="card" style="border-top: 4px solid var(--accent);">
-            <h3 class="card-title">Scenario Simulator <span style="font-size:10px; background:#EEF2FF; color:var(--accent); padding:2px 6px; border-radius:4px;">PRO</span></h3>
-            <p style="font-size: 12px; color: var(--text-muted); margin-top:0; margin-bottom:16px;">Adjust variables to forecast your profit.</p>
+            <h3 class="card-title">Scenario Simulator <span style="font-size:10px; background:#EEF2FF; color:var(--accent); padding:4px 8px; border-radius:6px;">PRO</span></h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-top:0; margin-bottom:20px;">Adjust variables to forecast your profit.</p>
             
             <div class="slider-group">
               <div class="slider-header">
@@ -355,7 +407,7 @@ tr:last-child td { border-bottom: none; }
 
             <div class="sim-result-box">
               <div style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Projected Profit</div>
-              <div style="font-size:24px; font-weight:800; color:var(--primary); margin: 4px 0;" id="simProjected">₹0</div>
+              <div style="font-size:28px; font-weight:800; color:var(--primary); margin: 4px 0;" id="simProjected">₹0</div>
               <div class="sim-diff" id="simDiff">Impact: ₹0</div>
             </div>
           </div>
@@ -418,6 +470,8 @@ window.addEventListener('DOMContentLoaded', () => {
             document.getElementById("loginBtn").innerText = "Logout";
             document.getElementById("userEmailHeader").style.display = "block";
             document.getElementById("userEmailHeader").innerText = userEmail;
+            document.getElementById("drawerEmailDisplay").innerText = userEmail;
+            document.getElementById("drawerProfile").style.display = "block";
             document.getElementById("emailInput").value = userEmail;
             document.getElementById("emailInput").style.display = "none"; 
             verify(userEmail);
@@ -434,6 +488,13 @@ window.handleLoginClick = function() {
     if(userEmail) { if(confirm("Log out?")) signOut(auth).then(() => window.location.href="index.html"); } 
     else { window.location.href = "index.html"; }
 };
+
+// --- DRAWER LOGIC ---
+const menuBtn = document.getElementById("menuBtn"), drawer = document.getElementById("drawer"), overlay = document.getElementById("drawerOverlay"), closeBtn = document.getElementById("drawerClose");
+window.openDrawer = function(){ drawer.classList.add("open"); overlay.classList.add("open"); };
+window.closeDrawer = function(){ drawer.classList.remove("open"); overlay.classList.remove("open"); };
+if(menuBtn) menuBtn.addEventListener("click", window.openDrawer); if(closeBtn) closeBtn.addEventListener("click", window.closeDrawer); if(overlay) overlay.addEventListener("click", window.closeDrawer);
+document.addEventListener("keydown", (e) => { if(e.key === "Escape") window.closeDrawer(); });
 
 // --- CORE LOGIC ---
 window.setMode = function(mode) {
@@ -503,7 +564,6 @@ window.analyzeMonthly = function() {
     const margin = avgSales > 0 ? (avgProfit / avgSales * 100) : 0;
     monthlyStats = { avgSales, avgExp, avgProfit, avgOrders, avgAOV, margin, count };
     
-    // Set Base for Simulator
     baseRevenueForSim = avgSales; baseCostForSim = avgExp; baseProfitForSim = avgProfit;
     updateSimulator();
 
@@ -515,7 +575,7 @@ window.analyzeMonthly = function() {
     document.getElementById("monthlyMetrics").style.display = "grid"; document.getElementById("dispAOV").innerText = "₹" + avgAOV.toFixed(0); document.getElementById("dispOrders").innerText = avgOrders.toFixed(1);
     document.getElementById("tableContainer").style.display = "none";
     window.generateMonthlyInsights(margin, avgOrders, avgAOV, count);
-    window.drawChart('pie', ['Expenses', 'Net Profit'], [avgExp, avgProfit], ['#E5E7EB', '#10B981']);
+    window.drawChart('pie', ['Expenses', 'Net Profit'], [avgExp, avgProfit], ['#E2E8F0', '#10B981']);
 };
 
 window.analyzeProduct = function(){
@@ -528,7 +588,6 @@ window.analyzeProduct = function(){
   if(data.length===0) return alert("Please enter product data.");
   currentData = data; 
   
-  // Set Base for Simulator
   baseRevenueForSim = totalRevenue; baseCostForSim = totalCost; baseProfitForSim = totalProfit;
   updateSimulator();
 
@@ -564,17 +623,14 @@ function updateSimulator() {
     const pChange = parseInt(simPrice.value);
     const cChange = parseInt(simCost.value);
     
-    // Update labels visually
     document.getElementById('priceLabel').innerText = (pChange > 0 ? "+" : "") + pChange + "%";
     document.getElementById('costLabel').innerText = (cChange > 0 ? "+" : "") + cChange + "%";
     
-    // Calculate new values
     const newRev = baseRevenueForSim * (1 + (pChange/100));
     const newCost = baseCostForSim * (1 + (cChange/100));
     const newProfit = newRev - newCost;
     const diff = newProfit - baseProfitForSim;
 
-    // Display
     document.getElementById('simProjected').innerText = "₹" + newProfit.toLocaleString(undefined, {maximumFractionDigits:0});
     const diffEl = document.getElementById('simDiff');
     if(diff > 0) { diffEl.innerText = "Impact: +₹" + diff.toLocaleString(undefined, {maximumFractionDigits:0}); diffEl.className = "sim-diff diff-pos"; }
@@ -582,38 +638,46 @@ function updateSimulator() {
     else { diffEl.innerText = "Impact: ₹0"; diffEl.className = "sim-diff"; }
 }
 
-// --- INSIGHTS & AI ---
+// --- FIX: RESTORED FULL INSIGHTS ---
 window.generateMonthlyInsights = function(margin, orders, aov, count) {
-    const div = document.getElementById("insights"); 
-    div.innerHTML = `<div class="insight-item insight-blue"><strong>Analysis:</strong> Based on ${count} months, your average margin is ${margin.toFixed(1)}%.</div>${window.getAiButtonHtml()}`;
+    const div = document.getElementById("insights"); let statusTitle = ""; let statusColor = ""; let strategies = [];
+    if (margin <= 0) { statusTitle = "🚨 CRITICAL: Losing money on sales."; statusColor = "insight-orange"; strategies = [`<strong>Stop Ads:</strong> Pause paid marketing until unit economics are fixed.`, `<strong>Price Audit:</strong> Raise prices to break even.`, `<strong>Cost Cutting:</strong> Negotiate with suppliers.`]; } 
+    else if (orders > 30 && margin < 15) { statusTitle = "⚠ High Activity, Low Profit"; statusColor = "insight-orange"; strategies = [`<strong>Price Hike Test:</strong> Increase prices by 5-10%.`, `<strong>Bundle:</strong> Bundle low-margin best sellers with high-margin accessories.`, `<strong>Negotiate:</strong> Demand bulk discount from vendors.`]; }
+    else if (margin > 25 && orders < 10) { statusTitle = "💎 Hidden Gem: Great Product"; statusColor = "insight-blue"; strategies = [`<strong>Aggressive Marketing:</strong> Spend more on ads.`, `<strong>Social Proof:</strong> Ask for photo reviews.`, `<strong>Influencers:</strong> Send free samples.`]; }
+    else if (margin >= 20 && orders >= 10) { statusTitle = "✅ Healthy Business"; statusColor = "insight-green"; strategies = [`<strong>Increase AOV:</strong> Add "One-Click Upsell" at checkout.`, `<strong>Email Marketing:</strong> Send "VIP Restock" emails.`, `<strong>Loyalty Loop:</strong> Insert 10% off coupons.`]; }
+    else { statusTitle = "⚖️ Stable but Stagnant"; statusColor = "insight-blue"; strategies = [`<strong>Bundle Builder:</strong> Create a Starter Kit.`, `<strong>Shipping Threshold:</strong> Set Free Shipping higher than AOV.`, `<strong>Follow Up:</strong> Send WhatsApp messages post-delivery.`]; }
+    div.innerHTML = `<div class="insight-item ${statusColor}"><div><div style="font-weight:800; color:var(--primary); margin-bottom:8px;">${statusTitle}</div><ul style="margin:0; padding-left:18px; color:var(--text-main)"><li style="margin-bottom:8px;">${strategies[0]}</li><li style="margin-bottom:8px;">${strategies[1]}</li><li>${strategies[2]}</li></ul></div></div>${window.getAiButtonHtml()}`;
 };
 
 window.generateInsights = function(d){
-  const div = document.getElementById("insights"); let html = "";
-  const bestProfit = [...d].sort((a,b)=>b.profit - a.profit)[0]; if(bestProfit) { html += `<div class="insight-item insight-green"><strong>Star Product:</strong> ${bestProfit.name} drives the highest margin.</div>`; }
-  d.filter(x => x.margin < 0.20).forEach(x => { html += `<div class="insight-item insight-orange"><strong>Leak Detected:</strong> ${x.name} margin is critically low (${(x.margin*100).toFixed(0)}%). Review supplier pricing immediately.</div>`; });
+  const div = document.getElementById("insights"); let html = "", cnt = 0;
+  const bestProfit = [...d].sort((a,b)=>b.profit - a.profit)[0]; if(bestProfit) { html += `<div class="insight-item insight-green"><div><strong style="color:var(--primary)">★ Star Product:</strong> ${bestProfit.name} generates the most profit (₹${bestProfit.profit.toLocaleString()}). Focus ad spend here.</div></div>`; cnt++; }
+  const bestQty = [...d].sort((a,b)=>b.qty - a.qty)[0]; if(bestQty && bestQty.name !== bestProfit?.name) { html += `<div class="insight-item insight-blue"><div><strong style="color:var(--primary)">📦 Volume Leader:</strong> ${bestQty.name} is your most popular item. Consider bundling it.</div></div>`; cnt++; }
+  d.filter(x => x.margin < 0.20).forEach(x => { if(cnt < 4) { html += `<div class="insight-item insight-orange"><div><strong style="color:var(--primary)">⚠ Low Margin:</strong> ${x.name} is only ${(x.margin*100).toFixed(0)}%. Raise price or lower cost.</div></div>`; cnt++; }});
+  if(cnt < 3 && d.length > 0) html += `<div class="insight-item insight-gray"><div><strong style="color:var(--primary)">💡 Growth Tip:</strong> Consider testing a 10% price increase on top sellers to boost net profit.</div></div>`;
   html += window.getAiButtonHtml(); div.innerHTML = html;
 };
 
-window.getAiButtonHtml = function() { return `<button id="aiBtn" class="btn-secondary" style="width:100%; border-color:#818CF8; color:#4F46E5; background:#EEF2FF; margin-top:12px;" onclick="window.askAI()">✨ Generate AI Strategy</button><div id="aiResult" style="margin-top:16px; font-size:13px; line-height:1.6; display:none;"></div>`; };
+window.getAiButtonHtml = function() { return `<button id="aiBtn" class="btn-secondary" style="width:100%; border-color:#93C5FD; color:#2563EB; background:#EFF6FF; margin-top:12px; padding: 12px;" onclick="window.askAI()">✨ Generate AI Strategy</button><div id="aiResult" style="margin-top:16px; font-size:13px; line-height:1.6; display:none;"></div>`; };
 
-window.generateTable = function(d){ const t = document.getElementById("table"); t.innerHTML = "<tr><th>Product</th><th>Profit</th><th>Margin</th><th>Status</th></tr>"; d.forEach(x => { t.innerHTML += `<tr><td><b>${x.name}</b><br><small style='color:var(--text-muted)'>Vol: ${x.qty}</small></td><td>₹${x.profit.toLocaleString()}</td><td>${(x.margin*100).toFixed(1)}%</td><td>${x.margin>0.3?"<span style='color:#059669; font-weight:700;'>Healthy</span>":"<span style='color:#D97706; font-weight:700;'>Check</span>"}</td></tr>`; }); };
+window.generateTable = function(d){ const t = document.getElementById("table"); t.innerHTML = "<tr><th>Product</th><th>Profit</th><th>Margin</th><th>Status</th></tr>"; d.forEach(x => { t.innerHTML += `<tr><td><b style="color:var(--primary)">${x.name}</b><br><small style='color:var(--text-muted)'>Vol: ${x.qty}</small></td><td>₹${x.profit.toLocaleString()}</td><td>${(x.margin*100).toFixed(1)}%</td><td>${x.margin>0.3?"<span style='color:#059669; font-weight:700;'>Healthy</span>":"<span style='color:#D97706; font-weight:700;'>Check</span>"}</td></tr>`; }); };
 
 window.drawChart = function(type, labels, data, colors){ 
   if(chartInstance) chartInstance.destroy(); 
   const ctx = document.getElementById("chart").getContext('2d'); 
-  chartInstance = new Chart(ctx, { type: type, data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderRadius: 4 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: {display: type==='pie'}, datalabels: { display: false } } } }); 
+  chartInstance = new Chart(ctx, { type: type, data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: {display: type==='pie', position: 'bottom'}, datalabels: { display: false } }, scales: type === 'bar' ? { x: { grid: { display: false } }, y: { beginAtZero: true, border: { dash: [4, 4] } } } : {} } }); 
 };
 
-// --- API CALLS ---
+// --- FIX: RESTORED FULL API / ACTION FUNCTIONS ---
 window.askAI = async function() {
     if(!isProUser || !userEmail) return alert("Pro Feature");
     const btn = document.getElementById("aiBtn"); const box = document.getElementById("aiResult");
     btn.innerHTML = "✨ Analyzing Data..."; btn.disabled = true; btn.classList.add("ai-thinking");
+    let aiPayload = currentMode === 'monthly' ? { email: userEmail, mode: 'monthly', summary: `Based on ${monthlyStats.count} months avg:\nSales: ₹${monthlyStats.avgSales.toFixed(0)}, Exp: ₹${monthlyStats.avgExp.toFixed(0)}, Margin: ${monthlyStats.margin.toFixed(1)}%.` } : { email: userEmail, products: currentData.map(x => ({ name: x.name, cost: x.cost, sell: x.sell, qty: x.qty })), mode: 'product' };
     try {
-        const r = await fetch(workerURL + "/ai-analyze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({email: userEmail, mode: currentMode}) });
+        const r = await fetch(workerURL + "/ai-analyze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(aiPayload) });
         const d = await r.json(); btn.classList.remove("ai-thinking");
-        if(d.ok) { btn.style.display = "none"; box.style.display = "block"; box.innerHTML = "<strong>🤖 Action Plan:</strong><br><br>" + d.response.replace(/\n/g, "<br>"); } else { alert(d.error); btn.innerHTML = "Retry AI"; btn.disabled = false; }
+        if(d.ok) { btn.style.display = "none"; box.style.display = "block"; box.innerHTML = "<strong>🤖 Action Plan:</strong><br><br>" + d.response.replace(/\n/g, "<br>").replace(/\*\*(.*?)\*\*/g, "<strong style='color:var(--primary)'>$1</strong>"); } else { alert(d.error); btn.innerHTML = "✨ Retry AI"; btn.disabled = false; }
     } catch(e) { btn.classList.remove("ai-thinking"); alert("Error"); btn.disabled = false; }
 };
 
@@ -623,6 +687,12 @@ window.verify = async function(email){
     if(d.valid) {
         isProUser = true; document.getElementById("lockOverlay").style.display = "none"; 
         document.getElementById("historyBtn").style.display = "inline-flex"; document.getElementById("saveCloudBtn").style.display = "flex";
+        
+        let dateStr = "";
+        if(d.expiry) { const date = new Date(parseInt(d.expiry)); dateStr = date.toLocaleDateString(undefined, {day:'numeric', month:'short', year:'numeric'}); }
+        const drawerExpiry = document.getElementById("drawerExpiryDisplay");
+        if(drawerExpiry) drawerExpiry.innerText = "Plan expires: " + dateStr;
+
         if(chartInstance) chartInstance.resize();
     } else { 
         document.getElementById("proContainer").classList.add("locked-container");
@@ -631,10 +701,71 @@ window.verify = async function(email){
   } catch(e) { console.log(e); }
 };
 
-window.saveToCloud = async function() { /* Unchanged */ };
-window.toggleHistory = function(show) { document.getElementById("historyModal").style.display = show ? "flex" : "none"; };
-window.pay = function() { alert("Razorpay mock initiated."); };
-window.downloadPDF = async function() { alert("PDF Download initiated."); };
+window.saveToCloud = async function() {
+    if(!isProUser) return alert("Login required"); const btn = document.getElementById("saveCloudBtn");
+    let dataToSave = currentMode === 'monthly' ? window.scrapeRows(monthItems) : window.scrapeRows(items);
+    if(dataToSave.length === 0) return alert("Nothing to save!");
+    btn.innerHTML = "<span style='animation:spin 1s linear infinite'>⏳</span>";
+    try { 
+        await fetch(workerURL + "/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: userEmail, data: dataToSave, mode: currentMode, date: new Date().toISOString() }) }); 
+        btn.innerHTML = "✅"; setTimeout(() => btn.innerHTML = "<span style='font-size:16px'>💾</span> <span class='btn-text-desktop'>Save</span>", 1500); 
+    } catch(e) { btn.innerHTML = "💾"; }
+};
+
+window.toggleHistory = function(show) { document.getElementById("historyModal").style.display = show ? "flex" : "none"; if(show && userEmail) window.fetchHistory(); };
+
+window.fetchHistory = async function() {
+    const list = document.getElementById("historyList"); list.innerHTML = "Loading...";
+    try {
+        const r = await fetch(workerURL + "/history?email=" + userEmail); const d = await r.json();
+        if(d.length === 0) { list.innerHTML = "<p style='color:var(--text-muted); text-align:center'>No history saved yet.</p>"; return; }
+        list.innerHTML = "";
+        d.forEach(item => {
+            const dateStr = new Date(item.date).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'}); const modeLabel = item.mode === 'monthly' ? 'Monthly Data' : 'Product Data';
+            const div = document.createElement("div"); div.className = "history-item";
+            div.innerHTML = `<div><div style="font-weight:700; font-size:15px; color:var(--primary);">${dateStr}</div><div style="font-size:13px; color:var(--text-muted); margin-top:4px;">${item.data.length} Rows • ${modeLabel}</div></div><button class="btn-secondary" style="font-size:12px; padding:8px 14px;">Load Data</button>`;
+            div.onclick = () => window.loadHistoryItem(item.data, item.mode);
+            list.appendChild(div);
+        });
+    } catch(e) { list.innerHTML = "Error fetching history."; }
+};
+
+window.loadHistoryItem = function(data, savedMode) {
+    const targetMode = savedMode || 'product'; window.setMode(targetMode);
+    const container = targetMode === 'monthly' ? monthItems : items; container.innerHTML = "";
+    data.forEach(x => { if(Array.isArray(x)) window.createRow(container, x[0], x[1], x[2], x[3], targetMode==='monthly'); else window.createRow(container, x.n, x.v1, x.v2, x.v3, targetMode==='monthly'); });
+    window.toggleHistory(false); window.saveDraft(); window.analyze();
+};
+
+window.pay = function(){
+  if(!userEmail) return alert("Please log in first to purchase.");
+  const options = {
+    key: KEY, amount: PRICE, currency: "INR", name: "Vizbix Pro", description: "Unlimited Business Intelligence",
+    prefill: { email: userEmail }, theme: { color: "#0F172A" },
+    handler: async function(response){ 
+        const btn = document.querySelector("button[onclick='pay()']"); const originalText = btn.innerText;
+        btn.innerText = "Verifying Payment..."; btn.disabled = true;
+        try {
+            const verifyReq = await fetch(workerURL + "/verify-payment", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ payment_id: response.razorpay_payment_id, email: userEmail }) });
+            const verifyData = await verifyReq.json();
+            if (verifyData.ok) { alert("Payment Successful! Welcome to Pro."); window.verify(userEmail); } 
+            else { alert("Verification Failed: " + (verifyData.error || "Unknown error")); btn.innerText = originalText; btn.disabled = false; }
+        } catch (e) { alert("Network error during verification."); btn.innerText = originalText; btn.disabled = false; }
+    }
+  };
+  const rzp1 = new Razorpay(options); rzp1.open();
+};
+
+window.downloadPDF = async function() {
+  const { jsPDF } = window.jspdf; const element = document.getElementById("results");
+  const btn = document.querySelector("button[onclick='downloadPDF()']"); const originalText = btn.innerText;
+  btn.innerText = "Generating PDF...";
+  const canvas = await html2canvas(element, { scale: 2, backgroundColor: "#F4F7F9", useCORS: true });
+  const imgData = canvas.toDataURL('image/png'); const pdf = new jsPDF('p', 'mm', 'a4');
+  const imgWidth = 210; const imgHeight = canvas.height * imgWidth / canvas.width;
+  pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight); pdf.save('Vizbix-Report.pdf');
+  btn.innerText = originalText;
+};
 </script>
 </body>
 </html>
