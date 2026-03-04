@@ -606,7 +606,7 @@ window.verify = async function(email){
         document.getElementById("lockOverlay").style.display = "flex";
         const btn = document.querySelector("button[onclick='pay()']");
         if(btn) {
-            btn.innerText = `Unlock Pro for ₹499`;
+            btn.innerText = `Unlock Pro for ₹1`;
             btn.onclick = window.pay; // Make sure it points to payment
         }
     }
@@ -688,6 +688,7 @@ document.addEventListener("keydown", (e) => { if(e.key === "Escape") window.clos
 </script>
 </body>
 </html>"
+
 
 
 
