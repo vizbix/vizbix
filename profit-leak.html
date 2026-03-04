@@ -334,7 +334,24 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
 
 </main>
 
-<script>
+<script type="module">
+// --- FIREBASE CONFIGURATION ---
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyBta1q-faAPdH23pUUwbpViDgTjARnkT6c",
+  authDomain: "vizbix.firebaseapp.com",
+  projectId: "vizbix",
+  storageBucket: "vizbix.firebasestorage.app",
+  messagingSenderId: "411791241138",
+  appId: "1:411791241138:web:850b987b66ec65a2d3feab",
+  measurementId: "G-9TN8W27X0X"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+
 // --- CONFIG ---
 const workerURL = "https://vizbix-api.vizbixhq.workers.dev";
 const PRICE = 49900;
@@ -345,507 +362,332 @@ const items = document.getElementById("items");
 const monthItems = document.getElementById("monthItems");
 let chartInstance;
 let currentData = [];
-let monthlyStats = null; // Store stats for AI
-let userEmail = localStorage.getItem("vizbix_email") || null;
+let monthlyStats = null;
+let userEmail = null;
 let isProUser = false;
-let currentMode = 'product'; // 'product' or 'monthly'
+let currentMode = 'product';
 
-// --- INIT ---
-Chart.register(ChartDataLabels); // Plugin for chart labels
+Chart.register(ChartDataLabels);
 
+// --- SECURE INITIALIZATION ---
 window.addEventListener('DOMContentLoaded', () => {
     loadDrafts();
-    if(userEmail) { verify(userEmail); }
+    
+    // Check Firebase for active session instead of just localStorage
+    onAuthStateChanged(auth, (user) => {
+        if (user) {
+            // USER IS SECURELY LOGGED IN
+            userEmail = user.email;
+            
+            // Update UI with their email
+            document.getElementById("loginBtn").style.display = "none";
+            document.getElementById("userEmailHeader").style.display = "block";
+            document.getElementById("userEmailHeader").innerText = userEmail;
+            document.getElementById("drawerEmailDisplay").innerText = userEmail;
+            document.getElementById("drawerProfile").style.display = "block";
+            
+            // Pre-fill the Razorpay email input (and hide it if you want)
+            document.getElementById("emailInput").value = userEmail;
+            document.getElementById("emailInput").style.display = "none"; // Hide it since we already know it
+
+            // Now check if they have paid
+            verify(userEmail);
+        } else {
+            // NOT LOGGED IN
+            userEmail = null;
+            isProUser = false;
+            
+            // Lock the UI
+            document.getElementById("proContainer").classList.add("locked-container");
+            document.getElementById("lockOverlay").style.display = "flex";
+            
+            // Change the Pay button to redirect to login
+            const payBtn = document.querySelector("button[onclick='pay()']");
+            if(payBtn) {
+                payBtn.innerText = "Log in to unlock Pro";
+                payBtn.onclick = () => window.location.href = "index.html"; // Send to landing page to login
+            }
+            
+            document.getElementById("emailInput").style.display = "none";
+            document.querySelector(".lock-card button:last-child").style.display = "none"; // Hide restore purchase
+        }
+    });
 });
 
-// --- MODE SWITCHING (PREVENTS RESETTING REPORT) ---
-function setMode(mode) {
+// Attach logout function to window
+window.handleLogout = function() {
+    signOut(auth).then(() => {
+        window.location.href = "index.html";
+    });
+};
+
+// Update the drawer "Login" button to function as Logout if logged in
+document.getElementById("loginBtn").addEventListener("click", () => {
+    if(userEmail) {
+        if(confirm("Are you sure you want to log out?")) window.handleLogout();
+    } else {
+        window.location.href = "index.html";
+    }
+});
+
+
+// --- ALL YOUR EXISTING FUNCTIONS BELOW (No changes needed here, just make them global) ---
+window.setMode = function(mode) {
     currentMode = mode;
     document.getElementById('btnProduct').className = mode === 'product' ? 'mode-btn active' : 'mode-btn';
     document.getElementById('btnMonthly').className = mode === 'monthly' ? 'mode-btn active' : 'mode-btn';
     document.getElementById('productInputs').style.display = mode === 'product' ? 'block' : 'none';
     document.getElementById('monthlyInputs').style.display = mode === 'monthly' ? 'block' : 'none';
-    
-    // Toggle Sample button
     document.querySelector(".input-label[onclick='sample()']").style.display = mode === 'product' ? 'block' : 'none';
-
-    // SMART REPORT TOGGLE: Only show results if data exists for that mode
     const resultsDiv = document.getElementById('results');
     if (mode === 'monthly' && monthlyStats) {
-        resultsDiv.style.display = 'block';
-        analyzeMonthly(); // Refresh view
+        resultsDiv.style.display = 'block'; analyzeMonthly();
     } else if (mode === 'product' && currentData.length > 0) {
-        resultsDiv.style.display = 'block';
-        analyzeProduct(); // Refresh view
+        resultsDiv.style.display = 'block'; analyzeProduct();
     } else {
         resultsDiv.style.display = 'none';
     }
-}
+};
 
-// --- ROW MANAGEMENT ---
-function createRow(container, name="", val1="", val2="", val3="", isMonth=false){
-  const d = document.createElement("div");
-  d.className = "grid-row";
-  
-  // Custom placeholders
+window.createRow = function(container, name="", val1="", val2="", val3="", isMonth=false){
+  const d = document.createElement("div"); d.className = "grid-row";
   const p1 = isMonth ? "Month (e.g. Jan)" : "Product Name";
   const p2 = isMonth ? "Sales ₹" : "Sell Price";
   const p3 = isMonth ? "Expenses ₹" : "Cost Price";
   const p4 = isMonth ? "Orders" : "Quantity";
-
   d.innerHTML = `
     <input type="text" placeholder="${p1}" value="${name}">
     <input type="number" placeholder="${p2}" value="${val1}">
     <input type="number" placeholder="${p3}" value="${val2}">
     <input type="number" placeholder="${p4}" value="${val3}">
-    <button class="btn-ghost" onclick="this.parentElement.remove(); saveDraft()">✕</button>
+    <button class="btn-ghost" onclick="this.parentElement.remove(); window.saveDraft()">✕</button>
   `;
   container.appendChild(d);
-}
+};
 
-function addRow(){ createRow(items); saveDraft(); }
-function addMonthRow(){ createRow(monthItems, "", "", "", "", true); saveDraft(); }
+window.addRow = function(){ window.createRow(items); window.saveDraft(); };
+window.addMonthRow = function(){ window.createRow(monthItems, "", "", "", "", true); window.saveDraft(); };
 
-// --- DRAFTS ---
-function saveDraft() {
-    const prodData = scrapeRows(items);
-    const monthData = scrapeRows(monthItems);
-    localStorage.setItem("vizbix_draft", JSON.stringify(prodData));
-    localStorage.setItem("vizbix_draft_month", JSON.stringify(monthData));
-}
+window.saveDraft = function() {
+    localStorage.setItem("vizbix_draft", JSON.stringify(window.scrapeRows(items)));
+    localStorage.setItem("vizbix_draft_month", JSON.stringify(window.scrapeRows(monthItems)));
+};
 
-function loadDrafts() {
+window.loadDrafts = function() {
     const prodSaved = JSON.parse(localStorage.getItem("vizbix_draft") || "[]");
     const monthSaved = JSON.parse(localStorage.getItem("vizbix_draft_month") || "[]");
-    
     items.innerHTML = ""; monthItems.innerHTML = "";
-    
-    if(prodSaved.length > 0) prodSaved.forEach(x => createRow(items, x.n, x.v1, x.v2, x.v3));
-    else { addRow(); addRow(); }
-    
-    if(monthSaved.length > 0) monthSaved.forEach(x => createRow(monthItems, x.n, x.v1, x.v2, x.v3, true));
-    else { addMonthRow(); addMonthRow(); }
-}
+    if(prodSaved.length > 0) prodSaved.forEach(x => window.createRow(items, x.n, x.v1, x.v2, x.v3)); else { window.addRow(); window.addRow(); }
+    if(monthSaved.length > 0) monthSaved.forEach(x => window.createRow(monthItems, x.n, x.v1, x.v2, x.v3, true)); else { window.addMonthRow(); window.addMonthRow(); }
+};
 
-function scrapeRows(container) {
+window.scrapeRows = function(container) {
     let data = [];
     container.querySelectorAll(".grid-row").forEach(r => {
         const i = r.querySelectorAll("input");
         data.push({ n: i[0].value, v1: i[1].value, v2: i[2].value, v3: i[3].value });
     });
     return data;
-}
+};
 
-function sample(){
+window.sample = function(){
   items.innerHTML="";
-  [["Wireless Earbuds", 2500, 1200, 140], ["Smart Watch", 4500, 2800, 85], ["USB-C Cable", 499, 150, 400]].forEach(x => createRow(items, x[0], x[1], x[2], x[3]));
-  saveDraft(); analyze();
-}
+  [["Wireless Earbuds", 2500, 1200, 140], ["Smart Watch", 4500, 2800, 85], ["USB-C Cable", 499, 150, 400]].forEach(x => window.createRow(items, x[0], x[1], x[2], x[3]));
+  window.saveDraft(); window.analyze();
+};
 
-// --- ANALYSIS MAIN ---
-function analyze(){
-    if(currentMode === 'monthly') analyzeMonthly();
-    else analyzeProduct();
-}
+window.analyze = function(){ if(currentMode === 'monthly') window.analyzeMonthly(); else window.analyzeProduct(); };
 
-// --- MONTHLY ANALYSIS (Multi-Month Logic) ---
-function analyzeMonthly() {
+window.analyzeMonthly = function() {
     let totalSales=0, totalExp=0, totalOrders=0, count=0;
-    
     monthItems.querySelectorAll(".grid-row").forEach(r => {
         const i = r.querySelectorAll("input");
         const s = Number(i[1].value)||0, e = Number(i[2].value)||0, o = Number(i[3].value)||0;
         if(s>0 || e>0) { totalSales+=s; totalExp+=e; totalOrders+=o; count++; }
     });
-
     if(count === 0) return alert("Please enter data for at least one month.");
-
-    // Averages
-    const avgSales = totalSales / count;
-    const avgExp = totalExp / count;
-    const avgProfit = avgSales - avgExp;
-    const avgOrders = totalOrders > 0 ? (totalOrders / count) : 0;
-    const avgAOV = avgOrders > 0 ? (avgSales / avgOrders) : 0;
+    const avgSales = totalSales / count; const avgExp = totalExp / count; const avgProfit = avgSales - avgExp;
+    const avgOrders = totalOrders > 0 ? (totalOrders / count) : 0; const avgAOV = avgOrders > 0 ? (avgSales / avgOrders) : 0;
     const margin = avgSales > 0 ? (avgProfit / avgSales * 100) : 0;
-
-    // Save for AI/Switching
     monthlyStats = { avgSales, avgExp, avgProfit, avgOrders, avgAOV, margin, count };
-
-    // UI Updates
-    showResults();
-    document.getElementById("kpiRevLabel").innerText = "AVG MONTHLY SALES";
-    document.getElementById("kpiCostLabel").innerText = "AVG MONTHLY EXPENSES";
-    document.getElementById("kpiProfitLabel").innerText = "AVG MONTHLY PROFIT";
+    window.showResults();
+    document.getElementById("kpiRevLabel").innerText = "AVG MONTHLY SALES"; document.getElementById("kpiCostLabel").innerText = "AVG MONTHLY EXPENSES"; document.getElementById("kpiProfitLabel").innerText = "AVG MONTHLY PROFIT";
     document.getElementById("dispRevenue").innerText = "₹ " + avgSales.toLocaleString(undefined, {maximumFractionDigits:0});
     document.getElementById("dispCost").innerText = "₹ " + avgExp.toLocaleString(undefined, {maximumFractionDigits:0});
     document.getElementById("dispProfit").innerText = "₹ " + avgProfit.toLocaleString(undefined, {maximumFractionDigits:0});
-    
-    document.getElementById("monthlyMetrics").style.display = "flex";
-    document.getElementById("dispAOV").innerText = "₹ " + avgAOV.toFixed(0);
-    document.getElementById("dispOrders").innerText = avgOrders.toFixed(1);
+    document.getElementById("monthlyMetrics").style.display = "flex"; document.getElementById("dispAOV").innerText = "₹ " + avgAOV.toFixed(0); document.getElementById("dispOrders").innerText = avgOrders.toFixed(1);
     document.getElementById("tableContainer").style.display = "none";
+    window.generateMonthlyInsights(margin, avgOrders, avgAOV, count);
+    window.drawChart('pie', ['Expenses', 'Net Profit'], [avgExp, avgProfit], ['#F97316', '#10B981']);
+};
 
-    // Client-Style Insights (Formatted)
-    generateMonthlyInsights(margin, avgOrders, avgAOV, count);
-    
-    // Pie Chart: Sales context (Blue) -> Expense (Orange) vs Profit (Green)
-    drawChart('pie', ['Expenses', 'Net Profit'], [avgExp, avgProfit], ['#F97316', '#10B981']);
-}
+window.generateMonthlyInsights = function(margin, orders, aov, count) {
+    const div = document.getElementById("insights"); let statusTitle = ""; let statusColor = ""; let strategies = [];
+    if (margin <= 0) { statusTitle = "🚨 CRITICAL: You are losing money on every sale."; statusColor = "insight-orange"; strategies = [`<strong>Stop Ads Immediately:</strong> You are burning cash. Pause all paid marketing until you fix your unit economics.`, `<strong>Price Audit:</strong> You need to raise prices by at least ${Math.abs(margin).toFixed(0)}% just to break even.`, `<strong>Cost Cutting:</strong> Negotiate with your supplier or switch to cheaper packaging immediately.`]; } 
+    else if (orders > 30 && margin < 15) { statusTitle = "⚠ High Activity, Low Profit (The 'Busy Trap')"; statusColor = "insight-orange"; strategies = [`<strong>Price Hike Test:</strong> You have volume leverage. Increase prices by 5-10%. You might lose a few customers, but total profit will likely go <i>up</i>.`, `<strong>Kill Low-Margin Best Sellers:</strong> If your most popular item has low margin, it is dragging you down. Bundle it with a high-margin accessory.`, `<strong>Supplier Negotiation:</strong> Since you are ordering ${orders.toFixed(0)} times a month, demand a bulk discount from your vendor.`]; }
+    else if (margin > 25 && orders < 10) { statusTitle = "💎 Hidden Gem: Great Product, Needs Eyes"; statusColor = "insight-blue"; strategies = [`<strong>Aggressive Marketing:</strong> Your margins are healthy (${margin.toFixed(0)}%). You can afford to spend more on ads to acquire customers.`, `<strong>Collect Social Proof:</strong> Email your ${orders.toFixed(0)} past customers personally. Ask for a photo review in exchange for a discount code.`, `<strong>Micro-Influencers:</strong> Send free samples to small influencers. Your high margin covers the cost, and you need the visibility.`]; }
+    else if (margin >= 20 && orders >= 10) { statusTitle = "✅ Healthy Business: Time to Maximize"; statusColor = "insight-green"; strategies = [`<strong>Increase AOV:</strong> Your flow is steady. Add a "One-Click Upsell" at checkout (e.g., a ₹299 accessory) to boost revenue by 15% without new customers.`, `<strong>Email Marketing:</strong> Don't just sell once. Send a "VIP Restock" or "New Arrival" email to your list this week.`, `<strong>Loyalty Loop:</strong> Insert a "Thank You" card with a 10% off coupon for their <i>next</i> order inside the box.`]; }
+    else { statusTitle = "⚖️ Stable but Stagnant"; statusColor = "insight-blue"; strategies = [`<strong>Bundle Builder:</strong> Create a "Starter Kit" or "Gift Bundle" priced at ₹${(aov * 1.5).toFixed(0)}. This forces AOV up.`, `<strong>Shipping Threshold:</strong> Set "Free Shipping" at ₹${(aov + 200).toFixed(0)} to encourage adding one more small item.`, `<strong>Follow Up:</strong> Send a WhatsApp message 7 days after delivery asking "How was it?" to build trust for repeat sales.`]; }
+    div.innerHTML = `<div class="insight-item ${statusColor}"><div><div style="font-size:14px; font-weight:800; margin-bottom:8px;">${statusTitle}</div><div style="margin-bottom:12px;">Based on your average of <strong>${orders.toFixed(1)} orders/mo</strong> and <strong>${margin.toFixed(0)}% margin</strong>:</div><ul style="margin:0; padding-left:18px; line-height:1.6;"><li style="margin-bottom:6px;">${strategies[0]}</li><li style="margin-bottom:6px;">${strategies[1]}</li><li>${strategies[2]}</li></ul></div></div>${window.getAiButtonHtml()}`;
+};
 
-function generateMonthlyInsights(margin, orders, aov, count) {
-    const div = document.getElementById("insights");
-    let statusTitle = "";
-    let statusColor = ""; // blue, green, orange, or red
-    let strategies = [];
-
-    // --- LOGIC ENGINE: 5 SCENARIOS ---
-
-    // Scenario 1: Losing Money (Negative Margin)
-    if (margin <= 0) {
-        statusTitle = "🚨 CRITICAL: You are losing money on every sale.";
-        statusColor = "insight-orange"; 
-        strategies = [
-            `<strong>Stop Ads Immediately:</strong> You are burning cash. Pause all paid marketing until you fix your unit economics.`,
-            `<strong>Price Audit:</strong> You need to raise prices by at least ${Math.abs(margin).toFixed(0)}% just to break even.`,
-            `<strong>Cost Cutting:</strong> Negotiate with your supplier or switch to cheaper packaging immediately.`
-        ];
-    } 
-    // Scenario 2: High Volume, Low Margin (The "Busy but Broke" Trap)
-    else if (orders > 30 && margin < 15) {
-        statusTitle = "⚠ High Activity, Low Profit (The 'Busy Trap')";
-        statusColor = "insight-orange";
-        strategies = [
-            `<strong>Price Hike Test:</strong> You have volume leverage. Increase prices by 5-10%. You might lose a few customers, but total profit will likely go <i>up</i>.`,
-            `<strong>Kill Low-Margin Best Sellers:</strong> If your most popular item has low margin, it is dragging you down. Bundle it with a high-margin accessory.`,
-            `<strong>Supplier Negotiation:</strong> Since you are ordering ${orders.toFixed(0)} times a month, demand a bulk discount from your vendor.`
-        ];
-    }
-    // Scenario 3: High Margin, Low Volume (The "Hidden Gem")
-    else if (margin > 25 && orders < 10) {
-        statusTitle = "💎 Hidden Gem: Great Product, Needs Eyes";
-        statusColor = "insight-blue";
-        strategies = [
-            `<strong>Aggressive Marketing:</strong> Your margins are healthy (${margin.toFixed(0)}%). You can afford to spend more on ads to acquire customers.`,
-            `<strong>Collect Social Proof:</strong> Email your ${orders.toFixed(0)} past customers personally. Ask for a photo review in exchange for a discount code.`,
-            `<strong>Micro-Influencers:</strong> Send free samples to small influencers. Your high margin covers the cost, and you need the visibility.`
-        ];
-    }
-    // Scenario 4: Healthy & Stable (The "Optimizer")
-    else if (margin >= 20 && orders >= 10) {
-        statusTitle = "✅ Healthy Business: Time to Maximize";
-        statusColor = "insight-green";
-        strategies = [
-            `<strong>Increase AOV:</strong> Your flow is steady. Add a "One-Click Upsell" at checkout (e.g., a ₹299 accessory) to boost revenue by 15% without new customers.`,
-            `<strong>Email Marketing:</strong> Don't just sell once. Send a "VIP Restock" or "New Arrival" email to your list this week.`,
-            `<strong>Loyalty Loop:</strong> Insert a "Thank You" card with a 10% off coupon for their <i>next</i> order inside the box.`
-        ];
-    }
-    // Scenario 5: The "Average" Trap (Middle ground)
-    else {
-        statusTitle = "⚖️ Stable but Stagnant";
-        statusColor = "insight-blue";
-        strategies = [
-            `<strong>Bundle Builder:</strong> Create a "Starter Kit" or "Gift Bundle" priced at ₹${(aov * 1.5).toFixed(0)}. This forces AOV up.`,
-            `<strong>Shipping Threshold:</strong> Set "Free Shipping" at ₹${(aov + 200).toFixed(0)} to encourage adding one more small item.`,
-            `<strong>Follow Up:</strong> Send a WhatsApp message 7 days after delivery asking "How was it?" to build trust for repeat sales.`
-        ];
-    }
-
-    // --- HTML GENERATION ---
-    div.innerHTML = `
-        <div class="insight-item ${statusColor}">
-            <div>
-                <div style="font-size:14px; font-weight:800; margin-bottom:8px;">${statusTitle}</div>
-                <div style="margin-bottom:12px;">Based on your average of <strong>${orders.toFixed(1)} orders/mo</strong> and <strong>${margin.toFixed(0)}% margin</strong>:</div>
-                
-                <ul style="margin:0; padding-left:18px; line-height:1.6;">
-                    <li style="margin-bottom:6px;">${strategies[0]}</li>
-                    <li style="margin-bottom:6px;">${strategies[1]}</li>
-                    <li>${strategies[2]}</li>
-                </ul>
-            </div>
-        </div>
-        ${getAiButtonHtml()} 
-    `;
-}
-
-// --- PRODUCT ANALYSIS ---
-function analyzeProduct(){
+window.analyzeProduct = function(){
   let data = []; let totalRevenue = 0, totalCost = 0, totalProfit = 0;
   items.querySelectorAll(".grid-row").forEach(r => {
-    const i = r.querySelectorAll("input");
-    const name=i[0].value||"Item", sell=+i[1].value||0, cost=+i[2].value||0, qty=+i[3].value||0;
-    if(sell===0 && cost===0) return;
-    const rev=sell*qty, pc=cost*qty, prof=rev-pc;
-    totalRevenue+=rev; totalCost+=pc; totalProfit+=prof;
+    const i = r.querySelectorAll("input"); const name=i[0].value||"Item", sell=+i[1].value||0, cost=+i[2].value||0, qty=+i[3].value||0;
+    if(sell===0 && cost===0) return; const rev=sell*qty, pc=cost*qty, prof=rev-pc; totalRevenue+=rev; totalCost+=pc; totalProfit+=prof;
     data.push({name, sell, cost, qty, profit:prof, margin: sell>0?((sell-cost)/sell):0});
   });
-
   if(data.length===0) return alert("Please enter at least one product.");
-  currentData = data; 
-  showResults();
-  
-  document.getElementById("kpiRevLabel").innerText = "TOTAL REVENUE";
-  document.getElementById("kpiCostLabel").innerText = "TOTAL COST";
-  document.getElementById("kpiProfitLabel").innerText = "NET PROFIT";
-  document.getElementById("monthlyMetrics").style.display = "none";
-  document.getElementById("tableContainer").style.display = "block";
+  currentData = data; window.showResults();
+  document.getElementById("kpiRevLabel").innerText = "TOTAL REVENUE"; document.getElementById("kpiCostLabel").innerText = "TOTAL COST"; document.getElementById("kpiProfitLabel").innerText = "NET PROFIT";
+  document.getElementById("monthlyMetrics").style.display = "none"; document.getElementById("tableContainer").style.display = "block";
+  document.getElementById("dispRevenue").innerText = "₹ "+totalRevenue.toLocaleString(); document.getElementById("dispCost").innerText = "₹ "+totalCost.toLocaleString(); document.getElementById("dispProfit").innerText = "₹ "+totalProfit.toLocaleString();
+  window.generateTable(data); window.generateInsights(data); window.drawChart('bar', data.map(x=>x.name), data.map(x=>x.profit), '#0F172A');
+};
 
-  document.getElementById("dispRevenue").innerText = "₹ "+totalRevenue.toLocaleString();
-  document.getElementById("dispCost").innerText = "₹ "+totalCost.toLocaleString();
-  document.getElementById("dispProfit").innerText = "₹ "+totalProfit.toLocaleString();
+window.showResults = function() { document.getElementById("results").style.display = "block"; document.getElementById("results").scrollIntoView({behavior: "smooth"}); };
 
-  generateTable(data); generateInsights(data);
-  drawChart('bar', data.map(x=>x.name), data.map(x=>x.profit), '#0F172A');
-}
-
-function showResults() {
-    document.getElementById("results").style.display = "block";
-    document.getElementById("results").scrollIntoView({behavior: "smooth"});
-}
-
-function generateInsights(d){
+window.generateInsights = function(d){
   const div = document.getElementById("insights"); let html = "", cnt = 0;
-  const bestProfit = [...d].sort((a,b)=>b.profit - a.profit)[0];
-  if(bestProfit) { html += `<div class="insight-item insight-green"><div><strong>★ Star Product:</strong> ${bestProfit.name} generates the most profit (₹${bestProfit.profit.toLocaleString()}). Focus ad spend here.</div></div>`; cnt++; }
-  const bestQty = [...d].sort((a,b)=>b.qty - a.qty)[0];
-  if(bestQty && bestQty.name !== bestProfit?.name) { html += `<div class="insight-item insight-blue"><div><strong>📦 Volume Leader:</strong> ${bestQty.name} is your most popular item (${bestQty.qty} units). Consider bundling it with slower items.</div></div>`; cnt++; }
+  const bestProfit = [...d].sort((a,b)=>b.profit - a.profit)[0]; if(bestProfit) { html += `<div class="insight-item insight-green"><div><strong>★ Star Product:</strong> ${bestProfit.name} generates the most profit (₹${bestProfit.profit.toLocaleString()}). Focus ad spend here.</div></div>`; cnt++; }
+  const bestQty = [...d].sort((a,b)=>b.qty - a.qty)[0]; if(bestQty && bestQty.name !== bestProfit?.name) { html += `<div class="insight-item insight-blue"><div><strong>📦 Volume Leader:</strong> ${bestQty.name} is your most popular item (${bestQty.qty} units). Consider bundling it with slower items.</div></div>`; cnt++; }
   d.filter(x => x.margin < 0.20).forEach(x => { if(cnt < 4) { html += `<div class="insight-item insight-orange"><div><strong>⚠ Low Margin:</strong> ${x.name} is only ${(x.margin*100).toFixed(0)}%. Raise price or lower cost to improve health.</div></div>`; cnt++; }});
   if(cnt < 3 && d.length > 0) html += `<div class="insight-item insight-gray"><div><strong>💡 Growth Tip:</strong> You have a healthy catalog. Consider testing a 10% price increase on your top sellers to boost net profit.</div></div>`;
-  html += getAiButtonHtml();
-  div.innerHTML = html;
-}
+  html += window.getAiButtonHtml(); div.innerHTML = html;
+};
 
-function getAiButtonHtml() {
-    return `<div id="aiContainer" style="margin-top:15px; border-top:1px dashed var(--border); padding-top:15px;"><button id="aiBtn" class="btn-secondary" style="width:100%; border-color:#818cf8; color:#4f46e5; background:#eef2ff;" onclick="askAI()">✨ Ask AI Consultant for Strategy</button><div id="aiResult" style="margin-top:15px; font-size:14px; line-height:1.6; color:#334155; display:none; background:white; padding:15px; border-radius:12px; border:1px solid #e2e8f0;"></div></div>`;
-}
+window.getAiButtonHtml = function() { return `<div id="aiContainer" style="margin-top:15px; border-top:1px dashed var(--border); padding-top:15px;"><button id="aiBtn" class="btn-secondary" style="width:100%; border-color:#818cf8; color:#4f46e5; background:#eef2ff;" onclick="window.askAI()">✨ Ask AI Consultant for Strategy</button><div id="aiResult" style="margin-top:15px; font-size:14px; line-height:1.6; color:#334155; display:none; background:white; padding:15px; border-radius:12px; border:1px solid #e2e8f0;"></div></div>`; };
+window.generateTable = function(d){ const t = document.getElementById("table"); t.innerHTML = "<tr><th>Product</th><th>Profit</th><th>Margin</th><th>Status</th></tr>"; d.forEach(x => { t.innerHTML += `<tr><td><b>${x.name}</b><br><small style='color:#64748B'>Sold: ${x.qty}</small></td><td>₹${x.profit.toLocaleString()}</td><td>${(x.margin*100).toFixed(1)}%</td><td>${x.margin>0.3?"<span style='color:green'>Healthy</span>":"<span style='color:orange'>Review</span>"}</td></tr>`; }); };
 
-function generateTable(d){ const t = document.getElementById("table"); t.innerHTML = "<tr><th>Product</th><th>Profit</th><th>Margin</th><th>Status</th></tr>"; d.forEach(x => { t.innerHTML += `<tr><td><b>${x.name}</b><br><small style='color:#64748B'>Sold: ${x.qty}</small></td><td>₹${x.profit.toLocaleString()}</td><td>${(x.margin*100).toFixed(1)}%</td><td>${x.margin>0.3?"<span style='color:green'>Healthy</span>":"<span style='color:orange'>Review</span>"}</td></tr>`; }); }
-
-// --- UPDATED CHART FUNCTION (Aesthetics + Labels) ---
-function drawChart(type, labels, data, colors){ 
+window.drawChart = function(type, labels, data, colors){ 
   if(chartInstance) chartInstance.destroy(); 
   const ctx = document.getElementById("chart").getContext('2d'); 
-  
-  const options = { 
-      responsive: true, maintainAspectRatio: false, 
-      plugins: { 
-          legend: { display: type === 'pie', position: 'bottom' },
-          datalabels: { // Labels on Chart Segments
-              color: type === 'pie' ? 'white' : '#64748B',
-              font: { weight: 'bold', size: 11 },
-              formatter: (value) => '₹' + value.toLocaleString(undefined, {maximumFractionDigits:0}),
-              anchor: type === 'pie' ? 'center' : 'end',
-              align: type === 'pie' ? 'center' : 'top',
-              offset: 4
-          }
-      } 
-  };
-  
+  const options = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: type === 'pie', position: 'bottom' }, datalabels: { color: type === 'pie' ? 'white' : '#64748B', font: { weight: 'bold', size: 11 }, formatter: (value) => '₹' + value.toLocaleString(undefined, {maximumFractionDigits:0}), anchor: type === 'pie' ? 'center' : 'end', align: type === 'pie' ? 'center' : 'top', offset: 4 } } };
   if (type === 'bar') options.scales = { y: { beginAtZero: true }, x: { grid: { display: false } } };
+  chartInstance = new Chart(ctx, { type: type, data: { labels: labels, datasets: [{ label: 'Profit', data: data, backgroundColor: colors, borderRadius: 4, borderWidth: 0 }] }, options: options, plugins: [ChartDataLabels] }); 
+};
 
-  chartInstance = new Chart(ctx, { 
-      type: type, 
-      data: { 
-          labels: labels, 
-          datasets: [{ label: 'Profit', data: data, backgroundColor: colors, borderRadius: 4, borderWidth: 0 }] 
-      }, 
-      options: options,
-      plugins: [ChartDataLabels] // Activate plugin
-  }); 
-}
-
-// --- UPDATED AI FUNCTION (Works for both modes) ---
-async function askAI() {
+window.askAI = async function() {
     if(!isProUser || !userEmail) return alert("Please Login (Pro Feature)");
     const btn = document.getElementById("aiBtn"); const box = document.getElementById("aiResult");
     btn.innerHTML = "✨ Strategizing..."; btn.disabled = true; btn.classList.add("ai-thinking");
-    
-    // Construct payload based on Mode
     let aiPayload = {};
-    
     if (currentMode === 'monthly') {
-        if(!monthlyStats) return alert("Run analysis first.");
-        const s = monthlyStats;
-        // Format for existing AI Worker structure (sending summarized text)
-        aiPayload = {
-            email: userEmail,
-            mode: 'monthly',
-            summary: `Based on ${s.count} months average:\nAvg Monthly Sales: ₹${s.avgSales.toFixed(0)}, Avg Expenses: ₹${s.avgExp.toFixed(0)}, Avg Orders: ${s.avgOrders.toFixed(1)}, Gross Margin: ${s.margin.toFixed(1)}%.`
-        };
-    } else {
-        const products = currentData.map(x => ({ name: x.name, cost: x.cost, sell: x.sell, qty: x.qty }));
-        aiPayload = { email: userEmail, products: products, mode: 'product' };
-    }
-
+        if(!monthlyStats) return alert("Run analysis first."); const s = monthlyStats;
+        aiPayload = { email: userEmail, mode: 'monthly', summary: `Based on ${s.count} months average:\nAvg Monthly Sales: ₹${s.avgSales.toFixed(0)}, Avg Expenses: ₹${s.avgExp.toFixed(0)}, Avg Orders: ${s.avgOrders.toFixed(1)}, Gross Margin: ${s.margin.toFixed(1)}%.` };
+    } else { aiPayload = { email: userEmail, products: currentData.map(x => ({ name: x.name, cost: x.cost, sell: x.sell, qty: x.qty })), mode: 'product' }; }
     try {
         const r = await fetch(workerURL + "/ai-analyze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(aiPayload) });
         const d = await r.json(); btn.classList.remove("ai-thinking");
         if(d.ok) { btn.style.display = "none"; box.style.display = "block"; box.innerHTML = "<strong>🤖 AI Consultant Strategy:</strong><br><br>" + d.response.replace(/\n/g, "<br>").replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"); } else { alert(d.error); btn.innerHTML = "✨ Retry"; btn.disabled = false; }
     } catch(e) { btn.classList.remove("ai-thinking"); alert("Error"); btn.disabled = false; }
-}
+};
 
-function handleLoginClick() { const email = prompt("Please enter your email to login:"); if(email) verify(email); }
-async function verify(inputEmail){
-  const email = inputEmail || document.getElementById("emailInput").value; if(!email) return alert("Please enter email.");
-  const loginBtn = document.getElementById("loginBtn"); if(loginBtn) loginBtn.innerText = "Checking...";
+window.verify = async function(email){
   try {
     const r = await fetch(workerURL+"/check?email="+email); const d = await r.json();
     if(d.valid) {
-        isProUser = true; userEmail = email; localStorage.setItem("vizbix_email", email);
-        document.getElementById("lockOverlay").style.display = "none"; document.getElementById("loginBtn").style.display = "none";
+        isProUser = true; 
+        document.getElementById("lockOverlay").style.display = "none"; 
         
         let dateStr = "";
         if(d.expiry) { const date = new Date(parseInt(d.expiry)); dateStr = date.toLocaleDateString(undefined, {day:'numeric', month:'short', year:'numeric'}); }
         
-        const headerEmail = document.getElementById("userEmailHeader");
-        headerEmail.innerHTML = `<div>${email}</div><div style="font-size:10px; opacity:0.8; margin-top:2px;">Exp: ${dateStr}</div>`;
-        headerEmail.style.display = "block";
-
-        document.getElementById("drawerEmailDisplay").innerText = email;
+        document.getElementById("userEmailHeader").innerHTML = `<div>${email}</div><div style="font-size:10px; opacity:0.8; margin-top:2px;">Pro Active</div>`;
         const drawerExpiry = document.getElementById("drawerExpiryDisplay");
         if(drawerExpiry) drawerExpiry.innerText = "Plan expires: " + dateStr;
         
-        document.getElementById("drawerProfile").style.display = "block";
         document.getElementById("historyBtn").style.display = "inline-flex"; document.getElementById("saveCloudBtn").style.display = "flex";
         if(chartInstance) chartInstance.resize();
-    } else { alert("Pro subscription not found."); if(loginBtn) loginBtn.innerText = "Login"; }
-  } catch(e) { console.log(e); }
-}
-
-// --- UPDATED SAVE FUNCTION (Handles both modes) ---
-async function saveToCloud() {
-    if(!isProUser) return alert("Login required"); const btn = document.getElementById("saveCloudBtn");
-    
-    // Decide what data to save
-    let dataToSave = [];
-    if (currentMode === 'monthly') {
-        dataToSave = scrapeRows(monthItems);
-    } else {
-        dataToSave = scrapeRows(items);
+    } else { 
+        // Logged in, but NOT a Pro user. Keep UI locked, but change button text.
+        document.getElementById("proContainer").classList.add("locked-container");
+        document.getElementById("lockOverlay").style.display = "flex";
+        const btn = document.querySelector("button[onclick='pay()']");
+        if(btn) {
+            btn.innerText = `Unlock Pro for ₹499`;
+            btn.onclick = window.pay; // Make sure it points to payment
+        }
     }
-    
-    if(dataToSave.length === 0) return alert("Nothing to save!");
+  } catch(e) { console.log(e); }
+};
 
+window.saveToCloud = async function() {
+    if(!isProUser) return alert("Login required"); const btn = document.getElementById("saveCloudBtn");
+    let dataToSave = currentMode === 'monthly' ? window.scrapeRows(monthItems) : window.scrapeRows(items);
+    if(dataToSave.length === 0) return alert("Nothing to save!");
     btn.innerHTML = "<span style='animation:spin 1s linear infinite'>⏳</span>";
     try { 
-        await fetch(workerURL + "/save", { 
-            method: "POST", headers: { "Content-Type": "application/json" }, 
-            body: JSON.stringify({ email: userEmail, data: dataToSave, mode: currentMode, date: new Date().toISOString() }) 
-        }); 
+        await fetch(workerURL + "/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: userEmail, data: dataToSave, mode: currentMode, date: new Date().toISOString() }) }); 
         btn.innerHTML = "✅"; setTimeout(() => btn.innerHTML = "<span style='font-size:18px'>💾</span>", 1500); 
     } catch(e) { btn.innerHTML = "💾"; }
-}
+};
 
-function toggleHistory(show) { document.getElementById("historyModal").style.display = show ? "flex" : "none"; if(show && userEmail) fetchHistory(); }
-async function fetchHistory() {
+window.toggleHistory = function(show) { document.getElementById("historyModal").style.display = show ? "flex" : "none"; if(show && userEmail) window.fetchHistory(); };
+window.fetchHistory = async function() {
     const list = document.getElementById("historyList"); list.innerHTML = "Loading...";
     try {
         const r = await fetch(workerURL + "/history?email=" + userEmail); const d = await r.json();
         if(d.length === 0) { list.innerHTML = "<p style='color:#64748B; text-align:center'>No history.</p>"; return; }
         list.innerHTML = "";
         d.forEach(item => {
-            const dateStr = new Date(item.date).toLocaleDateString();
-            const modeLabel = item.mode === 'monthly' ? 'Monthly' : 'Product';
+            const dateStr = new Date(item.date).toLocaleDateString(); const modeLabel = item.mode === 'monthly' ? 'Monthly' : 'Product';
             const div = document.createElement("div"); div.className = "history-item";
             div.innerHTML = `<div><div style="font-weight:600; font-size:14px;">${dateStr}</div><div style="font-size:12px; color:#64748B">${item.data.length} Rows • ${modeLabel}</div></div><button class="btn-secondary" style="font-size:11px; padding:6px 10px;">Load</button>`;
-            div.onclick = () => loadHistoryItem(item.data, item.mode);
+            div.onclick = () => window.loadHistoryItem(item.data, item.mode);
             list.appendChild(div);
         });
     } catch(e) { list.innerHTML = "Error fetching history."; }
-}
+};
 
-function loadHistoryItem(data, savedMode) {
-    // Switch to the correct mode first
-    const targetMode = savedMode || 'product'; // Default to product if old data
-    setMode(targetMode);
-    
-    const container = targetMode === 'monthly' ? monthItems : items;
-    container.innerHTML = "";
-    
-    data.forEach(x => {
-        // Handle legacy array format vs new object format
-        if(Array.isArray(x)) createRow(container, x[0], x[1], x[2], x[3], targetMode==='monthly'); // Legacy
-        else createRow(container, x.n, x.v1, x.v2, x.v3, targetMode==='monthly'); // New
-    });
-    
-    toggleHistory(false); saveDraft(); analyze();
-}
+window.loadHistoryItem = function(data, savedMode) {
+    const targetMode = savedMode || 'product'; window.setMode(targetMode);
+    const container = targetMode === 'monthly' ? monthItems : items; container.innerHTML = "";
+    data.forEach(x => { if(Array.isArray(x)) window.createRow(container, x[0], x[1], x[2], x[3], targetMode==='monthly'); else window.createRow(container, x.n, x.v1, x.v2, x.v3, targetMode==='monthly'); });
+    window.toggleHistory(false); window.saveDraft(); window.analyze();
+};
 
-function pay(){
-  const email = document.getElementById("emailInput").value;
-  if(!email) return alert("Email required");
+window.pay = function(){
+  if(!userEmail) return alert("Please log in first to purchase.");
   
   const options = {
-    key: KEY, // Your Public Key
-    amount: PRICE, 
-    currency: "INR", 
-    name: "Vizbix Pro", 
-    description: "30 Days Access",
-    prefill: { email: email }, 
-    theme: { color: "#0F172A" },
+    key: KEY, amount: PRICE, currency: "INR", name: "Vizbix Pro", description: "30 Days Access",
+    prefill: { email: userEmail }, theme: { color: "#0F172A" },
     handler: async function(response){ 
-        // SECURITY UPDATE: Send Payment ID to Worker for verification
-        const btn = document.querySelector("button[onclick='pay()']");
-        const originalText = btn.innerText;
-        btn.innerText = "Verifying Payment...";
-        btn.disabled = true;
-
+        const btn = document.querySelector("button[onclick='pay()']"); const originalText = btn.innerText;
+        btn.innerText = "Verifying Payment..."; btn.disabled = true;
         try {
-            const verifyReq = await fetch(workerURL + "/verify-payment", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    payment_id: response.razorpay_payment_id,
-                    email: email
-                })
-            });
-
+            const verifyReq = await fetch(workerURL + "/verify-payment", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ payment_id: response.razorpay_payment_id, email: userEmail }) });
             const verifyData = await verifyReq.json();
-
-            if (verifyData.ok) {
-                alert("Payment Successful! Welcome to Pro.");
-                verify(email); // Refresh UI
-            } else {
-                alert("Verification Failed: " + (verifyData.error || "Unknown error"));
-                btn.innerText = originalText;
-                btn.disabled = false;
-            }
-        } catch (e) {
-            alert("Network error during verification. Please contact support.");
-            btn.innerText = originalText;
-            btn.disabled = false;
-        }
+            if (verifyData.ok) { alert("Payment Successful! Welcome to Pro."); window.verify(userEmail); } 
+            else { alert("Verification Failed: " + (verifyData.error || "Unknown error")); btn.innerText = originalText; btn.disabled = false; }
+        } catch (e) { alert("Network error during verification."); btn.innerText = originalText; btn.disabled = false; }
     }
   };
+  const rzp1 = new Razorpay(options); rzp1.open();
+};
 
-  const rzp1 = new Razorpay(options);
-  rzp1.open();
-}
-
-async function downloadPDF() {
-  const { jsPDF } = window.jspdf;
-  const element = document.getElementById("results");
-  const btn = document.querySelector("button[onclick='downloadPDF()']");
-  const originalText = btn.innerText;
+window.downloadPDF = async function() {
+  const { jsPDF } = window.jspdf; const element = document.getElementById("results");
+  const btn = document.querySelector("button[onclick='downloadPDF()']"); const originalText = btn.innerText;
   btn.innerText = "Generating...";
   const canvas = await html2canvas(element, { scale: 2, backgroundColor: "#ffffff", useCORS: true });
-  const imgData = canvas.toDataURL('image/png');
-  const pdf = new jsPDF('p', 'mm', 'a4');
-  const imgWidth = 210; 
-  const imgHeight = canvas.height * imgWidth / canvas.width;
-  pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
-  pdf.save('Vizbix-Profit-Report.pdf');
+  const imgData = canvas.toDataURL('image/png'); const pdf = new jsPDF('p', 'mm', 'a4');
+  const imgWidth = 210; const imgHeight = canvas.height * imgWidth / canvas.width;
+  pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight); pdf.save('Vizbix-Profit-Report.pdf');
   btn.innerText = originalText;
-}
+};
 
+// --- Drawer Logic ---
 const menuBtn = document.getElementById("menuBtn"), drawer = document.getElementById("drawer"), overlay = document.getElementById("drawerOverlay"), closeBtn = document.getElementById("drawerClose");
-function openDrawer(){ drawer.classList.add("open"); overlay.classList.add("open"); document.body.style.overflow = "hidden"; }
-function closeDrawer(){ drawer.classList.remove("open"); overlay.classList.remove("open"); document.body.style.overflow = ""; }
-if(menuBtn) menuBtn.addEventListener("click", openDrawer); if(closeBtn) closeBtn.addEventListener("click", closeDrawer); if(overlay) overlay.addEventListener("click", closeDrawer);
-document.addEventListener("keydown", (e) => { if(e.key === "Escape") closeDrawer(); });
+window.openDrawer = function(){ drawer.classList.add("open"); overlay.classList.add("open"); document.body.style.overflow = "hidden"; };
+window.closeDrawer = function(){ drawer.classList.remove("open"); overlay.classList.remove("open"); document.body.style.overflow = ""; };
+if(menuBtn) menuBtn.addEventListener("click", window.openDrawer); if(closeBtn) closeBtn.addEventListener("click", window.closeDrawer); if(overlay) overlay.addEventListener("click", window.closeDrawer);
+document.addEventListener("keydown", (e) => { if(e.key === "Escape") window.closeDrawer(); });
 </script>
 </body>
 </html>"
+
 
 
