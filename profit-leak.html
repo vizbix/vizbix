@@ -8,28 +8,28 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/png" href="favicon.png">
-  <link rel="apple-touch-icon" href="favicon.png">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
 
 <style>
 :root {
-  --bg: #F8FAFC;
+  --bg: #F4F7F9; /* Softer SaaS background */
   --surface: #FFFFFF;
   --primary: #0F172A; 
-  --accent: #3B82F6; 
-  --accent-glow: rgba(59, 130, 246, 0.15);
-  --success: #10B981;
-  --text-main: #1E293B;
+  --accent: #2563EB; /* Slightly deeper, more professional blue */
+  --accent-glow: rgba(37, 99, 235, 0.15);
+  --success: #059669;
+  --text-main: #0F172A;
   --text-muted: #64748B;
   --border: #E2E8F0;
-  --radius: 16px;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --radius: 20px; /* Rounder, modern corners */
+  --shadow-sm: 0 2px 4px rgba(15, 23, 42, 0.04);
+  --shadow-md: 0 4px 12px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 20px 25px -5px rgba(15, 23, 42, 0.05), 0 8px 10px -6px rgba(15, 23, 42, 0.05);
 }
 
 * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
@@ -38,134 +38,155 @@ body {
   margin: 0;
   background-color: var(--bg);
   background-image: 
-    radial-gradient(at 0% 0%, hsla(253,16%,7%,0) 0, transparent 50%), 
-    radial-gradient(at 50% 0%, hsla(225,39%,30%,0.05) 0, transparent 50%), 
-    radial-gradient(at 100% 0%, hsla(339,49%,30%,0) 0, transparent 50%);
+    radial-gradient(at 0% 0%, hsla(220, 100%, 97%, 1) 0, transparent 50%), 
+    radial-gradient(at 100% 0%, hsla(210, 100%, 95%, 1) 0, transparent 50%);
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   color: var(--text-main);
-  padding-bottom: 60px;
+  padding-bottom: 80px;
+  line-height: 1.5;
 }
 
-main { max-width: 900px; margin: auto; padding: 20px; }
+main { max-width: 960px; margin: auto; padding: 0 24px; }
 
 /* --- HEADER STYLES --- */
 header {
   display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 30px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
-  position: relative; z-index: 50; height: 70px;
+  margin-bottom: 40px; padding: 20px 0; border-bottom: 1px solid rgba(226, 232, 240, 0.6);
+  position: sticky; top: 0; z-index: 50; 
+  background: rgba(244, 247, 249, 0.85);
+  backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px);
 }
-.brand { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--primary); }
+.brand { font-size: 24px; font-weight: 800; letter-spacing: -0.5px; color: var(--primary); }
 .brand span { color: var(--accent); }
 .subtitle { font-size: 13px; color: var(--text-muted); font-weight: 500; display: block; margin-top: 2px;}
-.header-actions { display: flex; gap: 8px; align-items: center; }
+.header-actions { display: flex; gap: 12px; align-items: center; }
 
 @media(max-width: 768px){
-    .subtitle { display: none !important; }
-    .btn-text-desktop { display: none !important; }
-    .header-email-display { display: none !important; } 
-    .header-actions { gap: 6px; }
-    .brand { font-size: 20px; }
+    .subtitle, .btn-text-desktop, .header-email-display { display: none !important; } 
+    .header-actions { gap: 8px; }
+    .brand { font-size: 22px; }
 }
 
 /* --- MENU DRAWER --- */
 .menu-btn {
-  width: 40px; height: 40px; border: 1px solid rgba(229,231,235,0.9);
-  background: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center;
-  cursor: pointer; box-shadow: 0 2px 5px rgba(2, 6, 23, 0.05); padding: 0; flex-shrink: 0;
+  width: 44px; height: 44px; border: 1px solid var(--border);
+  background: var(--surface); border-radius: 14px; display: flex; align-items: center; justify-content: center;
+  cursor: pointer; box-shadow: var(--shadow-sm); padding: 0; flex-shrink: 0; transition: all 0.2s;
 }
+.menu-btn:hover { background: #F8FAFC; }
 .menu-btn:active { transform: scale(0.96); }
-.menu-icon { width: 16px; height: 12px; position: relative; }
+.menu-icon { width: 18px; height: 14px; position: relative; }
 .menu-icon span { position: absolute; left: 0; right: 0; height: 2px; background: var(--text-main); border-radius: 10px; }
 .menu-icon span:nth-child(1) { top: 0; }
-.menu-icon span:nth-child(2) { top: 5px; opacity: 0.9; }
+.menu-icon span:nth-child(2) { top: 6px; opacity: 0.9; }
 .menu-icon span:nth-child(3) { bottom: 0; }
 
-.drawer-overlay { position: fixed; inset: 0; background: rgba(2,6,23,0.55); opacity: 0; pointer-events: none; transition: opacity .2s ease; z-index: 150; }
-.drawer { position: fixed; top: 0; right: 0; height: 100%; width: min(300px, 85vw); background: #fff; border-left: 1px solid var(--border); box-shadow: -10px 0 30px rgba(2,6,23,.14); transform: translateX(105%); transition: transform .25s ease; z-index: 160; display: flex; flex-direction: column; }
+.drawer-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity .3s ease; z-index: 150; }
+.drawer { position: fixed; top: 0; right: 0; height: 100%; width: min(320px, 85vw); background: var(--surface); border-left: 1px solid var(--border); box-shadow: -10px 0 40px rgba(0,0,0,.1); transform: translateX(105%); transition: transform .3s cubic-bezier(0.16, 1, 0.3, 1); z-index: 160; display: flex; flex-direction: column; }
 .drawer.open { transform: translateX(0); }
 .drawer-overlay.open { opacity: 1; pointer-events: auto; }
-.drawer-head { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-.drawer-title { font-weight: 900; font-size: 16px; color: var(--primary); }
-.drawer-close { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border); background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;}
+.drawer-head { padding: 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.drawer-title { font-weight: 800; font-size: 18px; color: var(--primary); }
+.drawer-close { width: 36px; height: 36px; border-radius: 10px; border: none; background: #F1F5F9; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;}
+.drawer-close:hover { background: #E2E8F0; }
 .drawer-close svg { width: 18px; height: 18px; stroke: var(--text-main); }
-.drawer-body { padding: 16px; overflow: auto; }
-.drawer-profile { background: #EFF6FF; border: 1px solid #DBEAFE; padding: 12px; border-radius: 12px; margin-bottom: 16px; }
-.drawer-profile-label { font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase; margin-bottom: 4px; }
-.drawer-profile-email { font-size: 13px; font-weight: 600; color: #1E40AF; word-break: break-all; }
-.drawer-links { display: flex; flex-direction: column; gap: 8px; }
-.drawer-links a { text-decoration: none; color: var(--text-main); border: 1px solid var(--border); background: #fff; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 14px; }
-.drawer-links a:hover { background: #F8FAFC; }
-.drawer-mini { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 12px; line-height: 1.5; }
+.drawer-body { padding: 24px; overflow: auto; }
+.drawer-profile { background: #F8FAFC; border: 1px solid var(--border); padding: 16px; border-radius: 16px; margin-bottom: 24px; }
+.drawer-profile-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.drawer-profile-email { font-size: 14px; font-weight: 600; color: var(--primary); word-break: break-all; }
+.drawer-links { display: flex; flex-direction: column; gap: 10px; }
+.drawer-links a { text-decoration: none; color: var(--text-main); padding: 14px 16px; border-radius: 14px; display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 15px; transition: 0.2s; border: 1px solid transparent; }
+.drawer-links a:hover { background: #F8FAFC; border-color: var(--border); transform: translateX(4px); }
+.drawer-mini { margin-top: auto; padding-top: 24px; color: var(--text-muted); font-size: 13px; font-weight: 500; }
 
 /* --- Cards & Layout --- */
-.card { background: var(--surface); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.card { background: var(--surface); border-radius: var(--radius); padding: 32px; margin-bottom: 24px; box-shadow: var(--shadow-md); border: 1px solid rgba(226, 232, 240, 0.8); transition: box-shadow 0.3s ease; }
+.card:hover { box-shadow: var(--shadow-lg); }
+@media(max-width: 640px){ .card { padding: 20px; } }
 
 /* --- Inputs & Grid --- */
-.input-group { position: relative; margin-bottom: 20px; }
-.input-label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
+.input-label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.8px; }
 
-input { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: #F1F5F9; font-weight: 500; transition: all 0.2s; font-size: 14px; }
-input:focus { background: #fff; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); }
+input { width: 100%; padding: 14px 16px; border-radius: 12px; border: 1px solid #CBD5E1; background: #FFFFFF; font-weight: 500; transition: all 0.2s; font-size: 15px; color: var(--text-main); box-shadow: var(--shadow-sm); font-family: inherit; }
+input::placeholder { color: #94A3B8; font-weight: 400; }
+input:focus { border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow), var(--shadow-sm); }
+input:hover:not(:focus) { border-color: #94A3B8; }
 
-.grid-header { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 40px; gap: 10px; padding: 0 10px 8px 10px; font-size: 11px; font-weight: 600; color: var(--text-muted); }
-.grid-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 40px; gap: 10px; margin-bottom: 10px; align-items: center; }
+.grid-header { display: grid; grid-template-columns: 2.5fr 1fr 1fr 1fr 40px; gap: 12px; padding: 0 12px 10px 12px; font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.grid-row { display: grid; grid-template-columns: 2.5fr 1fr 1fr 1fr 40px; gap: 12px; margin-bottom: 12px; align-items: center; }
 
 @media(max-width:640px){
   .grid-header { display: none; }
-  .grid-row { grid-template-columns: 1fr 1fr; gap: 8px; background: #fff; padding: 12px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
+  .grid-row { grid-template-columns: 1fr 1fr; gap: 10px; background: #F8FAFC; padding: 16px; border-radius: 16px; border: 1px solid var(--border); box-shadow: var(--shadow-sm); position: relative; }
   .grid-row input:first-child { grid-column: span 2; }
+  .grid-row .btn-ghost { position: absolute; top: 12px; right: 12px; background: white; border: 1px solid var(--border); border-radius: 8px; width: 32px; height: 32px; padding: 0; }
 }
 
 /* --- Buttons --- */
-button { padding: 10px 16px; border-radius: 12px; font-weight: 600; font-size: 13px; cursor: pointer; border: none; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; }
-.btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2); }
-.btn-secondary { background: white; border: 1px solid var(--border); color: var(--text-main); }
-.btn-ghost { background: transparent; color: var(--text-muted); padding: 8px; }
+button { padding: 12px 20px; border-radius: 12px; font-weight: 600; font-size: 14px; cursor: pointer; border: none; transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1); display: inline-flex; align-items: center; justify-content: center; gap: 8px; white-space: nowrap; font-family: inherit; }
+button:active { transform: scale(0.97); }
+.btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.15); border: 1px solid transparent; }
+.btn-primary:hover { background: #1E293B; box-shadow: 0 6px 16px rgba(15, 23, 42, 0.2); transform: translateY(-1px); }
+.btn-secondary { background: white; border: 1px solid #CBD5E1; color: var(--text-main); box-shadow: var(--shadow-sm); }
+.btn-secondary:hover { border-color: #94A3B8; background: #F8FAFC; }
+.btn-ghost { background: transparent; color: #94A3B8; padding: 8px; border-radius: 8px; }
+.btn-ghost:hover { background: #FEE2E2; color: #EF4444; }
 
-/* --- Results Section --- */
-.kpi-container { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
-.kpi-card { flex: 1; background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%); border: 1px solid var(--border); border-radius: 12px; padding: 14px; min-width: 130px; }
-.kpi-label { font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
-.kpi-value { font-size: 20px; font-weight: 800; color: var(--primary); white-space: nowrap; }
+/* --- Results Section (KPIs) --- */
+.kpi-container { display: flex; gap: 16px; margin-bottom: 32px; flex-wrap: wrap; }
+.kpi-card { flex: 1; background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 20px; min-width: 140px; box-shadow: var(--shadow-sm); position: relative; overflow: hidden; }
+.kpi-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: var(--border); }
+.kpi-card:nth-child(1)::before { background: var(--accent); }
+.kpi-card:nth-child(2)::before { background: #F59E0B; }
+.kpi-card:nth-child(3)::before { background: var(--success); }
 
-/* --- NEW: TOGGLE SWITCH --- */
-.mode-switch-container { display: flex; background: #F1F5F9; padding: 4px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border); }
-.mode-btn { flex: 1; padding: 10px; border: none; background: transparent; font-weight: 600; font-size: 13px; color: var(--text-muted); cursor: pointer; border-radius: 10px; transition: all 0.2s ease; }
-.mode-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+.kpi-label { font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; letter-spacing: 0.5px; }
+.kpi-value { font-size: 28px; font-weight: 800; color: var(--primary); white-space: nowrap; letter-spacing: -0.5px; }
 
-/* --- NEW: MONTHLY INPUTS --- */
-.monthly-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-@media(max-width: 600px) { .monthly-inputs { grid-template-columns: 1fr; } }
+/* --- TOGGLE SWITCH (Apple Segmented Control Style) --- */
+.mode-switch-container { display: flex; background: #E2E8F0; padding: 4px; border-radius: 14px; margin-bottom: 28px; box-shadow: inset 0 2px 4px rgba(0,0,0,0.04); }
+.mode-btn { flex: 1; padding: 12px; border: none; background: transparent; font-weight: 600; font-size: 14px; color: var(--text-muted); cursor: pointer; border-radius: 10px; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: none; }
+.mode-btn:hover:not(.active) { color: var(--primary); }
+.mode-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 8px rgba(0,0,0,0.08); font-weight: 700; }
 
 /* Info Box */
-.info-box-small { background: #EFF6FF; border: 1px solid #DBEAFE; color: #1E40AF; padding: 10px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+.info-box-small { background: #F0Fdf4; border: 1px solid #BBF7D0; color: #166534; padding: 14px 16px; border-radius: 12px; font-size: 13px; font-weight: 500; margin-bottom: 24px; display: flex; align-items: center; gap: 12px; box-shadow: var(--shadow-sm); }
 
-/* --- Locked Content --- */
+/* --- Locked Content (Premium Glassmorphism) --- */
 .locked-container { position: relative; overflow: hidden; }
-.blur-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.5); }
-.lock-card { background: white; padding: 24px; border-radius: 20px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.1); border: 1px solid var(--border); max-width: 320px; width: 90%; }
-.premium-badge { background: linear-gradient(135deg, #0F172A 0%, #334155 100%); color: white; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-bottom: 12px; display: inline-block; }
-.feature-list { text-align: left; margin: 15px 0 20px; padding: 0 10px; font-size: 13px; color: var(--text-muted); display: inline-block; }
-.feature-list div { margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
+.blur-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(248, 250, 252, 0.4); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.8); }
+.lock-card { background: linear-gradient(145deg, #ffffff 0%, #F8FAFC 100%); padding: 32px; border-radius: 24px; text-align: center; box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.15); border: 1px solid white; max-width: 340px; width: 90%; position: relative; }
+.premium-badge { background: linear-gradient(135deg, #0F172A 0%, #334155 100%); color: white; padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 16px; display: inline-block; box-shadow: 0 4px 10px rgba(15, 23, 42, 0.2); }
+.feature-list { text-align: left; margin: 20px 0 24px; font-size: 14px; color: var(--primary); display: flex; flex-direction: column; gap: 10px; font-weight: 500; }
+.feature-list div { display: flex; align-items: center; gap: 10px; }
+.feature-list div::before { content: '✓'; display: flex; align-items: center; justify-content: center; width: 20px; height: 20px; background: #E0E7FF; color: #4F46E5; border-radius: 50%; font-size: 10px; font-weight: 900; }
 
 /* --- History Modal --- */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 100; display: none; align-items: center; justify-content: center; }
-.modal-content { background: white; width: 90%; max-width: 500px; border-radius: 16px; padding: 24px; max-height: 80vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
-.history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--border); cursor: pointer; }
-.history-item:hover { background: #F8FAFC; }
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(6px); z-index: 200; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.2s; }
+.modal-overlay[style*="display: flex"] { opacity: 1; }
+.modal-content { background: white; width: 90%; max-width: 520px; border-radius: 24px; padding: 28px; max-height: 85vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.3); border: 1px solid rgba(255,255,255,0.2); }
+.history-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid var(--border); cursor: pointer; transition: 0.2s; border-radius: 12px; border: 1px solid transparent; margin-bottom: 8px; }
+.history-item:hover { background: #F8FAFC; border-color: var(--border); transform: translateX(4px); }
+.history-item:last-child { border-bottom-color: transparent; }
 
-/* --- Insights & AI --- */
-.insight-item { display: flex; align-items: start; gap: 12px; padding: 14px; border-radius: 12px; margin-bottom: 10px; font-size: 13px; line-height: 1.5; }
-.insight-green { background: #ECFDF5; color: #065F46; border: 1px solid #D1FAE5; }
-.insight-blue { background: #EFF6FF; color: #1E40AF; border: 1px solid #DBEAFE; }
-.insight-orange { background: #FFF7ED; color: #9A3412; border: 1px solid #FFEDD5; }
-.insight-gray { background: #F8FAFC; color: #475569; border: 1px solid #E2E8F0; }
-.ai-thinking { background: linear-gradient(90deg, #eff6ff 0%, #dbeafe 50%, #eff6ff 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite; color: #1E40AF !important; cursor: wait; }
+/* --- Insights & AI (SaaS Notification Style) --- */
+.insight-item { display: flex; align-items: start; gap: 12px; padding: 16px 20px; border-radius: 12px; margin-bottom: 12px; font-size: 14px; line-height: 1.6; background: white; box-shadow: var(--shadow-sm); border: 1px solid var(--border); position: relative; overflow: hidden; }
+.insight-item::before { content: ''; position: absolute; left: 0; top: 0; bottom: 0; width: 4px; }
+.insight-green::before { background: #10B981; }
+.insight-blue::before { background: #3B82F6; }
+.insight-orange::before { background: #F59E0B; }
+.insight-gray::before { background: #94A3B8; }
+
+.ai-thinking { background: linear-gradient(90deg, #F1F5F9 0%, #E2E8F0 50%, #F1F5F9 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite; color: #475569 !important; border-color: transparent !important; cursor: wait; }
 @keyframes shimmer { 0% {background-position: 100% 0} 100% {background-position: -100% 0} }
 
-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; }
-th { text-align: left; padding: 12px; border-bottom: 2px solid var(--border); font-size: 12px; color: var(--text-muted); }
-td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
+/* --- Tables --- */
+.table-wrapper { border: 1px solid var(--border); border-radius: 16px; overflow: hidden; box-shadow: var(--shadow-sm); }
+table { width: 100%; border-collapse: collapse; background: white; }
+th { text-align: left; padding: 16px; background: #F8FAFC; border-bottom: 1px solid var(--border); font-size: 12px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+td { padding: 16px; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 500; color: var(--primary); }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #F8FAFC; }
 
 </style>
 </head>
@@ -174,9 +195,9 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
 
 <div class="modal-overlay" id="historyModal">
   <div class="modal-content">
-    <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
-      <h3 style="margin:0">Saved Analysis History</h3>
-      <button class="btn-ghost" onclick="toggleHistory(false)">✕</button>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+      <h3 style="margin:0; font-size: 20px; font-weight: 800; color: var(--primary);">Saved History</h3>
+      <button class="btn-ghost" onclick="toggleHistory(false)" style="background: #F1F5F9; color: var(--primary);">✕</button>
     </div>
     <div id="historyList">Loading...</div>
   </div>
@@ -186,18 +207,18 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
 <aside class="drawer" id="drawer">
   <div class="drawer-head">
     <div class="drawer-title">Menu</div>
-    <button class="drawer-close" id="drawerClose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18"></path><path d="M6 6l12 12"></path></svg></button>
+    <button class="drawer-close" id="drawerClose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18"></path><path d="M6 6l12 12"></path></svg></button>
   </div>
   <div class="drawer-body">
     <div id="drawerProfile" class="drawer-profile" style="display:none;">
         <div class="drawer-profile-label">Signed in as</div>
         <div id="drawerEmailDisplay" class="drawer-profile-email"></div>
-        <div id="drawerExpiryDisplay" style="font-size:11px; color:#64748B; margin-top:4px;"></div>
+        <div id="drawerExpiryDisplay" style="font-size:12px; color:var(--text-muted); margin-top:6px; font-weight: 500;"></div>
     </div>
     <div class="drawer-links">
       <a href="index.html">Home</a>
       <a href="#" onclick="closeDrawer(); toggleHistory(true); return false;">Saved History</a>
-      <a href="profit-leak.html" style="background: #F0F9FF; border-color: #BAE6FD;">Profit Optimizer <span style="background:#0F172A; color:white; padding:2px 6px; border-radius:6px; font-size:10px;">NEW</span></a>
+      <a href="profit-leak.html" style="background: #EFF6FF; border-color: #DBEAFE; color: #1E40AF;">Profit Optimizer <span style="background:#2563EB; color:white; padding:4px 8px; border-radius:8px; font-size:10px; font-weight:800; letter-spacing: 0.5px;">NEW</span></a>
       <a href="free-tools.html">Other Tools</a>
       <a href="about.html">About Vizbix</a>
     </div>
@@ -207,19 +228,22 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
 
 <main>
   <header>
-    <div><div class="brand">Vizbix<span>.</span></div><div class="subtitle">E-commerce Intelligence Engine</div></div>
+    <div>
+      <div class="brand">Vizbix<span>.</span></div>
+      <div class="subtitle">E-commerce Intelligence Engine</div>
+    </div>
     <div class="header-actions">
         <button id="historyBtn" class="btn-secondary" style="display:none;" onclick="toggleHistory(true)"><span style="font-size: 16px;">📂</span><span class="btn-text-desktop">History</span></button>
         <button id="loginBtn" class="btn-primary" onclick="handleLoginClick()">Login</button>
-        <div class="header-email-display" id="userEmailHeader" style="display:none; font-size:12px; font-weight:600; color:var(--primary); padding:6px 10px; background:white; border-radius:8px; border:1px solid var(--border);"></div>
+        <div class="header-email-display" id="userEmailHeader" style="display:none; font-size:13px; font-weight:600; color:var(--primary); padding:10px 14px; background:white; border-radius:12px; border:1px solid #CBD5E1; box-shadow: var(--shadow-sm);"></div>
         <button class="menu-btn" id="menuBtn"><div class="menu-icon"><span></span><span></span><span></span></div></button>
     </div>
   </header>
 
   <div class="card">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-      <div class="input-label">DATA SOURCE</div>
-      <div class="input-label" style="color:var(--accent); cursor:pointer;" onclick="sample()">Use Demo Data</div>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+      <div class="input-label" style="margin: 0;">DATA SOURCE</div>
+      <div class="input-label" style="margin: 0; color:var(--accent); cursor:pointer; text-transform: none; letter-spacing: normal; font-weight: 600;" onclick="sample()">Fill Demo Data</div>
     </div>
     
     <div class="mode-switch-container">
@@ -236,12 +260,12 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
           <div></div>
         </div>
         <div id="items"></div>
-        <button class="btn-secondary" onclick="addRow()" style="width:100%; margin-top:10px;">+ Add Product</button>
+        <button class="btn-secondary" onclick="addRow()" style="width:100%; margin-top:16px; border-style: dashed; border-width: 2px;">+ Add Product</button>
     </div>
 
     <div id="monthlyInputs" style="display:none;">
         <div class="info-box-small">
-            <span style="font-size:16px;">💡</span> 
+            <span style="font-size:18px;">💡</span> 
             <div><strong>Pro Tip:</strong> Add 2–6 months of data for the most accurate trend analysis.</div>
         </div>
         <div class="grid-header">
@@ -252,12 +276,12 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
             <div></div>
         </div>
         <div id="monthItems"></div>
-        <button class="btn-secondary" onclick="addMonthRow()" style="width:100%; margin-top:10px;">+ Add Month Data</button>
+        <button class="btn-secondary" onclick="addMonthRow()" style="width:100%; margin-top:16px; border-style: dashed; border-width: 2px;">+ Add Month Data</button>
     </div>
 
-    <div style="margin-top:16px; display:flex; gap:10px; align-items: stretch;">
-      <button id="analyzeBtn" class="btn-primary" style="flex:2;" onclick="analyze()">Generate Report →</button>
-      <button id="saveCloudBtn" class="btn-secondary" style="display:none; width:50px; flex-shrink:0; padding:0; align-items:center; justify-content:center;" onclick="saveToCloud()" title="Save to Cloud"><span style="font-size:18px">💾</span></button>
+    <div style="margin-top:24px; display:flex; gap:12px; align-items: stretch;">
+      <button id="analyzeBtn" class="btn-primary" style="flex:2; font-size: 15px; padding: 14px;" onclick="analyze()">Generate Report →</button>
+      <button id="saveCloudBtn" class="btn-secondary" style="display:none; width:56px; flex-shrink:0; padding:0; align-items:center; justify-content:center;" onclick="saveToCloud()" title="Save to Cloud"><span style="font-size:20px">💾</span></button>
     </div>
   </div>
 
@@ -270,62 +294,65 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
       </div>
       <div class="kpi-card">
         <div class="kpi-label" id="kpiCostLabel">TOTAL COST</div>
-        <div class="kpi-value" id="dispCost" style="color:#64748B">₹0</div>
+        <div class="kpi-value" id="dispCost" style="color:var(--text-muted)">₹0</div>
       </div>
-      <div class="kpi-card" style="border-color:var(--success); background:#f0fdf4;">
-        <div class="kpi-label" style="color:#15803d" id="kpiProfitLabel">NET PROFIT</div>
-        <div class="kpi-value" id="dispProfit" style="color:#15803d">₹0</div>
+      <div class="kpi-card" style="background:#F0FDF4; border-color:#BBF7D0;">
+        <div class="kpi-label" style="color:#047857" id="kpiProfitLabel">NET PROFIT</div>
+        <div class="kpi-value" id="dispProfit" style="color:#047857">₹0</div>
       </div>
     </div>
 
     <div id="monthlyMetrics" class="kpi-container" style="display:none;">
-        <div class="kpi-card" style="background:#EFF6FF; border-color:#DBEAFE">
-            <div class="kpi-value" id="dispAOV">₹0</div>
-            <div class="kpi-label" style="color:#1E40AF">Avg Order Value</div>
+        <div class="kpi-card" style="background:#F8FAFC; border-color:var(--border)">
+            <div class="kpi-label" style="color:var(--text-muted)">Avg Order Value</div>
+            <div class="kpi-value" id="dispAOV" style="color:var(--primary); font-size: 24px;">₹0</div>
         </div>
-        <div class="kpi-card" style="background:#EFF6FF; border-color:#DBEAFE">
-            <div class="kpi-value" id="dispOrders">0</div>
-            <div class="kpi-label" style="color:#1E40AF">Avg Monthly Orders</div>
+        <div class="kpi-card" style="background:#F8FAFC; border-color:var(--border)">
+            <div class="kpi-label" style="color:var(--text-muted)">Avg Monthly Orders</div>
+            <div class="kpi-value" id="dispOrders" style="color:var(--primary); font-size: 24px;">0</div>
         </div>
     </div>
 
     <div class="card locked-container" id="proContainer">
       <div class="blur-overlay" id="lockOverlay">
         <div class="lock-card">
-          <span class="premium-badge">Vizbix Pro</span>
-          <h3 style="margin:0 0 5px 0;">Unlock Strategic Insights</h3>
+          <span class="premium-badge">Vizbix Pro ✨</span>
+          <h3 style="margin:0 0 8px 0; font-size: 22px; font-weight: 800; color: var(--primary);">Unlock Deep Insights</h3>
+          <p style="margin: 0 0 20px 0; font-size: 14px; color: var(--text-muted);">Take the guesswork out of your margins.</p>
           
           <div class="feature-list">
-              <div>✅ <strong>AI Business Consultant</strong></div>
-              <div>✅ <strong>Unlimited Cloud History</strong></div>
-              <div>✅ <strong>Visual Charts & Graphs</strong></div>
-              <div>✅ <strong>PDF Report Export</strong></div>
+              <div><strong>AI Business Consultant</strong></div>
+              <div><strong>Unlimited Cloud History</strong></div>
+              <div><strong>Visual Charts & Graphs</strong></div>
+              <div><strong>PDF Report Export</strong></div>
           </div>
 
-          <input id="emailInput" placeholder="Enter your email" style="margin-bottom:10px; text-align:center;">
-          <button class="btn-primary" style="width:100%" onclick="pay()">Unlock for ₹499</button>
-          <button style="background:none; border:none; color:#64748B; font-size:11px; margin-top:10px; cursor:pointer; text-decoration:underline" onclick="verify(null)">Restore Purchase</button>
+          <input id="emailInput" placeholder="Enter your email" style="margin-bottom:16px; text-align:center;">
+          <button class="btn-primary" style="width:100%; padding: 14px; font-size: 15px;" onclick="pay()">Unlock for ₹499</button>
+          <button style="background:none; border:none; color:var(--text-muted); font-size:12px; margin-top:16px; font-weight: 600; cursor:pointer; text-decoration:none; transition: 0.2s;" onmouseover="this.style.color='var(--primary)'" onmouseout="this.style.color='var(--text-muted)'" onclick="verify(null)">Restore Purchase</button>
         </div>
       </div>
 
       <div id="proContent">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-          <h3 style="margin:0">Strategic Report</h3>
-          <button class="btn-secondary" style="padding:6px 12px; font-size:12px;" onclick="downloadPDF()">↓ Export Report</button>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:28px;">
+          <h3 style="margin:0; font-size: 20px; font-weight: 800;">Strategic Report</h3>
+          <button class="btn-secondary" style="padding:8px 14px; font-size:13px;" onclick="downloadPDF()">↓ Export PDF</button>
         </div>
 
-        <h3 style="margin-bottom:15px">Optimization Strategy</h3>
+        <h3 style="margin-bottom:16px; font-size: 16px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Optimization Strategy</h3>
         <div id="insights"></div>
 
         <div id="tableContainer">
-            <h3 style="margin-top:30px; margin-bottom:15px">Detailed Margin Analysis</h3>
-            <div style="overflow-x:auto;">
-              <table id="table"></table>
+            <h3 style="margin-top:40px; margin-bottom:16px; font-size: 16px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Detailed Margin Analysis</h3>
+            <div class="table-wrapper">
+              <div style="overflow-x:auto;">
+                <table id="table"></table>
+              </div>
             </div>
         </div>
 
-        <h3 style="margin-top:40px; margin-bottom:15px">Visual Breakdown</h3>
-        <div style="height:300px; margin-bottom:30px; position: relative;">
+        <h3 style="margin-top:40px; margin-bottom:16px; font-size: 16px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Visual Breakdown</h3>
+        <div style="height:320px; margin-bottom:20px; position: relative; padding: 20px; border: 1px solid var(--border); border-radius: 16px; background: #F8FAFC;">
           <canvas id="chart"></canvas>
         </div>
       </div>
@@ -518,7 +545,7 @@ window.analyzeMonthly = function() {
     document.getElementById("monthlyMetrics").style.display = "flex"; document.getElementById("dispAOV").innerText = "₹ " + avgAOV.toFixed(0); document.getElementById("dispOrders").innerText = avgOrders.toFixed(1);
     document.getElementById("tableContainer").style.display = "none";
     window.generateMonthlyInsights(margin, avgOrders, avgAOV, count);
-    window.drawChart('pie', ['Expenses', 'Net Profit'], [avgExp, avgProfit], ['#F97316', '#10B981']);
+    window.drawChart('pie', ['Expenses', 'Net Profit'], [avgExp, avgProfit], ['#F1F5F9', '#10B981']);
 };
 
 window.generateMonthlyInsights = function(margin, orders, aov, count) {
@@ -528,7 +555,7 @@ window.generateMonthlyInsights = function(margin, orders, aov, count) {
     else if (margin > 25 && orders < 10) { statusTitle = "💎 Hidden Gem: Great Product, Needs Eyes"; statusColor = "insight-blue"; strategies = [`<strong>Aggressive Marketing:</strong> Your margins are healthy (${margin.toFixed(0)}%). You can afford to spend more on ads to acquire customers.`, `<strong>Collect Social Proof:</strong> Email your ${orders.toFixed(0)} past customers personally. Ask for a photo review in exchange for a discount code.`, `<strong>Micro-Influencers:</strong> Send free samples to small influencers. Your high margin covers the cost, and you need the visibility.`]; }
     else if (margin >= 20 && orders >= 10) { statusTitle = "✅ Healthy Business: Time to Maximize"; statusColor = "insight-green"; strategies = [`<strong>Increase AOV:</strong> Your flow is steady. Add a "One-Click Upsell" at checkout (e.g., a ₹299 accessory) to boost revenue by 15% without new customers.`, `<strong>Email Marketing:</strong> Don't just sell once. Send a "VIP Restock" or "New Arrival" email to your list this week.`, `<strong>Loyalty Loop:</strong> Insert a "Thank You" card with a 10% off coupon for their <i>next</i> order inside the box.`]; }
     else { statusTitle = "⚖️ Stable but Stagnant"; statusColor = "insight-blue"; strategies = [`<strong>Bundle Builder:</strong> Create a "Starter Kit" or "Gift Bundle" priced at ₹${(aov * 1.5).toFixed(0)}. This forces AOV up.`, `<strong>Shipping Threshold:</strong> Set "Free Shipping" at ₹${(aov + 200).toFixed(0)} to encourage adding one more small item.`, `<strong>Follow Up:</strong> Send a WhatsApp message 7 days after delivery asking "How was it?" to build trust for repeat sales.`]; }
-    div.innerHTML = `<div class="insight-item ${statusColor}"><div><div style="font-size:14px; font-weight:800; margin-bottom:8px;">${statusTitle}</div><div style="margin-bottom:12px;">Based on your average of <strong>${orders.toFixed(1)} orders/mo</strong> and <strong>${margin.toFixed(0)}% margin</strong>:</div><ul style="margin:0; padding-left:18px; line-height:1.6;"><li style="margin-bottom:6px;">${strategies[0]}</li><li style="margin-bottom:6px;">${strategies[1]}</li><li>${strategies[2]}</li></ul></div></div>${window.getAiButtonHtml()}`;
+    div.innerHTML = `<div class="insight-item ${statusColor}"><div><div style="font-size:15px; font-weight:800; color:var(--primary); margin-bottom:8px;">${statusTitle}</div><div style="margin-bottom:12px; color:var(--text-muted)">Based on your average of <strong>${orders.toFixed(1)} orders/mo</strong> and <strong>${margin.toFixed(0)}% margin</strong>:</div><ul style="margin:0; padding-left:18px; line-height:1.6; color:var(--text-main)"><li style="margin-bottom:8px;">${strategies[0]}</li><li style="margin-bottom:8px;">${strategies[1]}</li><li>${strategies[2]}</li></ul></div></div>${window.getAiButtonHtml()}`;
 };
 
 window.analyzeProduct = function(){
@@ -543,29 +570,29 @@ window.analyzeProduct = function(){
   document.getElementById("kpiRevLabel").innerText = "TOTAL REVENUE"; document.getElementById("kpiCostLabel").innerText = "TOTAL COST"; document.getElementById("kpiProfitLabel").innerText = "NET PROFIT";
   document.getElementById("monthlyMetrics").style.display = "none"; document.getElementById("tableContainer").style.display = "block";
   document.getElementById("dispRevenue").innerText = "₹ "+totalRevenue.toLocaleString(); document.getElementById("dispCost").innerText = "₹ "+totalCost.toLocaleString(); document.getElementById("dispProfit").innerText = "₹ "+totalProfit.toLocaleString();
-  window.generateTable(data); window.generateInsights(data); window.drawChart('bar', data.map(x=>x.name), data.map(x=>x.profit), '#0F172A');
+  window.generateTable(data); window.generateInsights(data); window.drawChart('bar', data.map(x=>x.name), data.map(x=>x.profit), '#2563EB');
 };
 
 window.showResults = function() { document.getElementById("results").style.display = "block"; document.getElementById("results").scrollIntoView({behavior: "smooth"}); };
 
 window.generateInsights = function(d){
   const div = document.getElementById("insights"); let html = "", cnt = 0;
-  const bestProfit = [...d].sort((a,b)=>b.profit - a.profit)[0]; if(bestProfit) { html += `<div class="insight-item insight-green"><div><strong>★ Star Product:</strong> ${bestProfit.name} generates the most profit (₹${bestProfit.profit.toLocaleString()}). Focus ad spend here.</div></div>`; cnt++; }
-  const bestQty = [...d].sort((a,b)=>b.qty - a.qty)[0]; if(bestQty && bestQty.name !== bestProfit?.name) { html += `<div class="insight-item insight-blue"><div><strong>📦 Volume Leader:</strong> ${bestQty.name} is your most popular item (${bestQty.qty} units). Consider bundling it with slower items.</div></div>`; cnt++; }
-  d.filter(x => x.margin < 0.20).forEach(x => { if(cnt < 4) { html += `<div class="insight-item insight-orange"><div><strong>⚠ Low Margin:</strong> ${x.name} is only ${(x.margin*100).toFixed(0)}%. Raise price or lower cost to improve health.</div></div>`; cnt++; }});
-  if(cnt < 3 && d.length > 0) html += `<div class="insight-item insight-gray"><div><strong>💡 Growth Tip:</strong> You have a healthy catalog. Consider testing a 10% price increase on your top sellers to boost net profit.</div></div>`;
+  const bestProfit = [...d].sort((a,b)=>b.profit - a.profit)[0]; if(bestProfit) { html += `<div class="insight-item insight-green"><div><strong style="color:var(--primary)">★ Star Product:</strong> ${bestProfit.name} generates the most profit (₹${bestProfit.profit.toLocaleString()}). Focus ad spend here.</div></div>`; cnt++; }
+  const bestQty = [...d].sort((a,b)=>b.qty - a.qty)[0]; if(bestQty && bestQty.name !== bestProfit?.name) { html += `<div class="insight-item insight-blue"><div><strong style="color:var(--primary)">📦 Volume Leader:</strong> ${bestQty.name} is your most popular item (${bestQty.qty} units). Consider bundling it with slower items.</div></div>`; cnt++; }
+  d.filter(x => x.margin < 0.20).forEach(x => { if(cnt < 4) { html += `<div class="insight-item insight-orange"><div><strong style="color:var(--primary)">⚠ Low Margin:</strong> ${x.name} is only ${(x.margin*100).toFixed(0)}%. Raise price or lower cost to improve health.</div></div>`; cnt++; }});
+  if(cnt < 3 && d.length > 0) html += `<div class="insight-item insight-gray"><div><strong style="color:var(--primary)">💡 Growth Tip:</strong> You have a healthy catalog. Consider testing a 10% price increase on your top sellers to boost net profit.</div></div>`;
   html += window.getAiButtonHtml(); div.innerHTML = html;
 };
 
-window.getAiButtonHtml = function() { return `<div id="aiContainer" style="margin-top:15px; border-top:1px dashed var(--border); padding-top:15px;"><button id="aiBtn" class="btn-secondary" style="width:100%; border-color:#818cf8; color:#4f46e5; background:#eef2ff;" onclick="window.askAI()">✨ Ask AI Consultant for Strategy</button><div id="aiResult" style="margin-top:15px; font-size:14px; line-height:1.6; color:#334155; display:none; background:white; padding:15px; border-radius:12px; border:1px solid #e2e8f0;"></div></div>`; };
-window.generateTable = function(d){ const t = document.getElementById("table"); t.innerHTML = "<tr><th>Product</th><th>Profit</th><th>Margin</th><th>Status</th></tr>"; d.forEach(x => { t.innerHTML += `<tr><td><b>${x.name}</b><br><small style='color:#64748B'>Sold: ${x.qty}</small></td><td>₹${x.profit.toLocaleString()}</td><td>${(x.margin*100).toFixed(1)}%</td><td>${x.margin>0.3?"<span style='color:green'>Healthy</span>":"<span style='color:orange'>Review</span>"}</td></tr>`; }); };
+window.getAiButtonHtml = function() { return `<div id="aiContainer" style="margin-top:20px; border-top:1px dashed #CBD5E1; padding-top:20px;"><button id="aiBtn" class="btn-secondary" style="width:100%; border-color:#93C5FD; color:#2563EB; background:#EFF6FF; padding: 14px;" onclick="window.askAI()">✨ Ask AI Consultant for Strategy</button><div id="aiResult" style="margin-top:16px; font-size:14px; line-height:1.6; color:var(--text-main); display:none; background:white; padding:20px; border-radius:16px; border:1px solid #E2E8F0; box-shadow: var(--shadow-sm);"></div></div>`; };
+window.generateTable = function(d){ const t = document.getElementById("table"); t.innerHTML = "<tr><th>Product</th><th>Profit</th><th>Margin</th><th>Status</th></tr>"; d.forEach(x => { t.innerHTML += `<tr><td><b style="color:var(--primary)">${x.name}</b><br><small style='color:var(--text-muted); font-weight: 500;'>Sold: ${x.qty}</small></td><td>₹${x.profit.toLocaleString()}</td><td>${(x.margin*100).toFixed(1)}%</td><td>${x.margin>0.3?"<span style='color:#059669; background:#D1FAE5; padding:4px 8px; border-radius:6px; font-size:12px; font-weight:700;'>Healthy</span>":"<span style='color:#D97706; background:#FEF3C7; padding:4px 8px; border-radius:6px; font-size:12px; font-weight:700;'>Review</span>"}</td></tr>`; }); };
 
 window.drawChart = function(type, labels, data, colors){ 
   if(chartInstance) chartInstance.destroy(); 
   const ctx = document.getElementById("chart").getContext('2d'); 
-  const options = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: type === 'pie', position: 'bottom' }, datalabels: { color: type === 'pie' ? 'white' : '#64748B', font: { weight: 'bold', size: 11 }, formatter: (value) => '₹' + value.toLocaleString(undefined, {maximumFractionDigits:0}), anchor: type === 'pie' ? 'center' : 'end', align: type === 'pie' ? 'center' : 'top', offset: 4 } } };
-  if (type === 'bar') options.scales = { y: { beginAtZero: true }, x: { grid: { display: false } } };
-  chartInstance = new Chart(ctx, { type: type, data: { labels: labels, datasets: [{ label: 'Profit', data: data, backgroundColor: colors, borderRadius: 4, borderWidth: 0 }] }, options: options, plugins: [ChartDataLabels] }); 
+  const options = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: type === 'pie', position: 'bottom', labels: { font: { family: "'Plus Jakarta Sans', sans-serif" } } }, datalabels: { color: type === 'pie' ? '#0F172A' : '#64748B', font: { weight: 'bold', size: 12, family: "'Plus Jakarta Sans', sans-serif" }, formatter: (value) => '₹' + value.toLocaleString(undefined, {maximumFractionDigits:0}), anchor: type === 'pie' ? 'end' : 'end', align: type === 'pie' ? 'end' : 'top', offset: 4 } } };
+  if (type === 'bar') options.scales = { y: { beginAtZero: true, grid: { color: '#F1F5F9' }, border: { dash: [4, 4] } }, x: { grid: { display: false } } };
+  chartInstance = new Chart(ctx, { type: type, data: { labels: labels, datasets: [{ label: 'Profit', data: data, backgroundColor: colors, borderRadius: 6, borderWidth: 0 }] }, options: options, plugins: [ChartDataLabels] }); 
 };
 
 window.askAI = async function() {
@@ -580,7 +607,7 @@ window.askAI = async function() {
     try {
         const r = await fetch(workerURL + "/ai-analyze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(aiPayload) });
         const d = await r.json(); btn.classList.remove("ai-thinking");
-        if(d.ok) { btn.style.display = "none"; box.style.display = "block"; box.innerHTML = "<strong>🤖 AI Consultant Strategy:</strong><br><br>" + d.response.replace(/\n/g, "<br>").replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"); } else { alert(d.error); btn.innerHTML = "✨ Retry"; btn.disabled = false; }
+        if(d.ok) { btn.style.display = "none"; box.style.display = "block"; box.innerHTML = "<strong style='font-size: 16px; color: var(--primary);'>🤖 AI Consultant Strategy:</strong><br><br>" + d.response.replace(/\n/g, "<br>").replace(/\*\*(.*?)\*\*/g, "<strong style='color: var(--primary)'>$1</strong>"); } else { alert(d.error); btn.innerHTML = "✨ Retry"; btn.disabled = false; }
     } catch(e) { btn.classList.remove("ai-thinking"); alert("Error"); btn.disabled = false; }
 };
 
@@ -594,7 +621,7 @@ window.verify = async function(email){
         let dateStr = "";
         if(d.expiry) { const date = new Date(parseInt(d.expiry)); dateStr = date.toLocaleDateString(undefined, {day:'numeric', month:'short', year:'numeric'}); }
         
-        document.getElementById("userEmailHeader").innerHTML = `<div>${email}</div><div style="font-size:10px; opacity:0.8; margin-top:2px;">Pro Active</div>`;
+        document.getElementById("userEmailHeader").innerHTML = `<div>${email}</div><div style="font-size:11px; opacity:0.8; margin-top:2px; color:var(--success);">Pro Active</div>`;
         const drawerExpiry = document.getElementById("drawerExpiryDisplay");
         if(drawerExpiry) drawerExpiry.innerText = "Plan expires: " + dateStr;
         
@@ -606,7 +633,7 @@ window.verify = async function(email){
         document.getElementById("lockOverlay").style.display = "flex";
         const btn = document.querySelector("button[onclick='pay()']");
         if(btn) {
-            btn.innerText = `Unlock Pro for ₹1`;
+            btn.innerText = `Unlock Pro for ₹499`;
             btn.onclick = window.pay; // Make sure it points to payment
         }
     }
@@ -620,7 +647,7 @@ window.saveToCloud = async function() {
     btn.innerHTML = "<span style='animation:spin 1s linear infinite'>⏳</span>";
     try { 
         await fetch(workerURL + "/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: userEmail, data: dataToSave, mode: currentMode, date: new Date().toISOString() }) }); 
-        btn.innerHTML = "✅"; setTimeout(() => btn.innerHTML = "<span style='font-size:18px'>💾</span>", 1500); 
+        btn.innerHTML = "✅"; setTimeout(() => btn.innerHTML = "<span style='font-size:20px'>💾</span>", 1500); 
     } catch(e) { btn.innerHTML = "💾"; }
 };
 
@@ -629,12 +656,12 @@ window.fetchHistory = async function() {
     const list = document.getElementById("historyList"); list.innerHTML = "Loading...";
     try {
         const r = await fetch(workerURL + "/history?email=" + userEmail); const d = await r.json();
-        if(d.length === 0) { list.innerHTML = "<p style='color:#64748B; text-align:center'>No history.</p>"; return; }
+        if(d.length === 0) { list.innerHTML = "<p style='color:var(--text-muted); text-align:center'>No history saved yet.</p>"; return; }
         list.innerHTML = "";
         d.forEach(item => {
-            const dateStr = new Date(item.date).toLocaleDateString(); const modeLabel = item.mode === 'monthly' ? 'Monthly' : 'Product';
+            const dateStr = new Date(item.date).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'}); const modeLabel = item.mode === 'monthly' ? 'Monthly Data' : 'Product Data';
             const div = document.createElement("div"); div.className = "history-item";
-            div.innerHTML = `<div><div style="font-weight:600; font-size:14px;">${dateStr}</div><div style="font-size:12px; color:#64748B">${item.data.length} Rows • ${modeLabel}</div></div><button class="btn-secondary" style="font-size:11px; padding:6px 10px;">Load</button>`;
+            div.innerHTML = `<div><div style="font-weight:700; font-size:15px; color:var(--primary);">${dateStr}</div><div style="font-size:13px; color:var(--text-muted); margin-top:4px;">${item.data.length} Rows • ${modeLabel}</div></div><button class="btn-secondary" style="font-size:12px; padding:8px 14px;">Load Data</button>`;
             div.onclick = () => window.loadHistoryItem(item.data, item.mode);
             list.appendChild(div);
         });
@@ -652,7 +679,7 @@ window.pay = function(){
   if(!userEmail) return alert("Please log in first to purchase.");
   
   const options = {
-    key: KEY, amount: PRICE, currency: "INR", name: "Vizbix Pro", description: "30 Days Access",
+    key: KEY, amount: PRICE, currency: "INR", name: "Vizbix Pro", description: "Unlimited Business Intelligence",
     prefill: { email: userEmail }, theme: { color: "#0F172A" },
     handler: async function(response){ 
         const btn = document.querySelector("button[onclick='pay()']"); const originalText = btn.innerText;
@@ -671,7 +698,7 @@ window.pay = function(){
 window.downloadPDF = async function() {
   const { jsPDF } = window.jspdf; const element = document.getElementById("results");
   const btn = document.querySelector("button[onclick='downloadPDF()']"); const originalText = btn.innerText;
-  btn.innerText = "Generating...";
+  btn.innerText = "Generating PDF...";
   const canvas = await html2canvas(element, { scale: 2, backgroundColor: "#ffffff", useCORS: true });
   const imgData = canvas.toDataURL('image/png'); const pdf = new jsPDF('p', 'mm', 'a4');
   const imgWidth = 210; const imgHeight = canvas.height * imgWidth / canvas.width;
@@ -687,11 +714,4 @@ if(menuBtn) menuBtn.addEventListener("click", window.openDrawer); if(closeBtn) c
 document.addEventListener("keydown", (e) => { if(e.key === "Escape") window.closeDrawer(); });
 </script>
 </body>
-</html>"
-
-
-
-
-
-
-
+</html>
