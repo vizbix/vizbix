@@ -35,7 +35,7 @@
 
 * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
 
-/* FIX: Independent scrolling for desktop, natural scrolling for mobile */
+/* MOBILE-FIRST BASE STYLES - Natural Scrolling */
 body {
   margin: 0;
   background-color: var(--bg);
@@ -43,8 +43,7 @@ body {
   color: var(--text-main);
   display: flex;
   flex-direction: column;
-  height: 100vh;
-  overflow: hidden; 
+  min-height: 100vh;
 }
 
 /* --- TOP NAVBAR --- */
@@ -52,61 +51,49 @@ body {
   display: flex; justify-content: space-between; align-items: center;
   padding: 12px 24px; background: var(--surface); border-bottom: 1px solid var(--border);
   z-index: 50; height: 70px; flex-shrink: 0;
+  position: sticky; top: 0;
 }
 .brand { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--primary); display: flex; align-items: center; gap: 8px;}
 .brand span { color: var(--accent); }
 .brand-badge { background: #EEF2FF; color: var(--accent); font-size: 10px; padding: 4px 8px; border-radius: 6px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-left: 4px;}
 .header-actions { display: flex; gap: 10px; align-items: center; }
 
-/* --- APP LAYOUT --- */
+/* --- APP LAYOUT (Mobile Default) --- */
 .app-container {
   display: flex;
+  flex-direction: column;
   flex: 1;
-  overflow: hidden; /* Contains the scrollable children */
 }
 
 .input-panel {
-  width: 440px;
+  width: 100%;
   background: var(--surface);
-  border-right: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  overflow-y: auto; /* Scrolls independently */
-  flex-shrink: 0;
   z-index: 10;
-  padding-bottom: 40px;
+  padding-bottom: 24px;
 }
 
 .input-panel-header {
   padding: 24px 24px 16px;
   border-bottom: 1px solid var(--border);
-  position: sticky;
-  top: 0;
-  background: rgba(255,255,255,0.95);
-  backdrop-filter: blur(8px);
-  z-index: 5;
+  background: var(--surface);
 }
 
 .input-panel-body { padding: 24px; }
 
 .results-panel {
-  flex: 1;
-  background: var(--bg);
-  overflow-y: auto; /* Scrolls independently */
-  padding: 32px 40px 60px 40px;
+  width: 100%;
+  padding: 24px 16px 60px 16px;
 }
 
 /* --- UI ELEMENTS --- */
 .input-label { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
 
-/* FIX: Added min-width: 0 and adjusted padding so text doesn't cut off */
 input { width: 100%; min-width: 0; padding: 12px 10px; border-radius: 8px; border: 1px solid #CBD5E1; background: #FFFFFF; font-weight: 500; transition: all 0.2s; font-size: 14px; color: var(--text-main); font-family: inherit; }
 input::placeholder { color: #94A3B8; font-weight: 400; }
 input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
-
-/* FIX: Adjusted grid columns to give numbers more space */
-.grid-header { display: grid; grid-template-columns: 2fr 1.2fr 1.2fr 1.2fr 32px; gap: 8px; padding: 0 8px 8px 8px; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
-.grid-row { display: grid; grid-template-columns: 2fr 1.2fr 1.2fr 1.2fr 32px; gap: 8px; margin-bottom: 10px; align-items: center; }
 
 button { padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; border: none; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; font-family: inherit; }
 button:active { transform: scale(0.97); }
@@ -150,18 +137,16 @@ button:active { transform: scale(0.97); }
 .mode-btn.active { background: white; color: var(--primary); box-shadow: var(--shadow-sm); font-weight: 700; }
 
 /* --- RESULTS PANEL STYLES --- */
-.dashboard-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; }
+.dashboard-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
 .dashboard-title { font-size: 26px; font-weight: 800; color: var(--primary); margin: 0; letter-spacing: -0.5px; }
 
-.kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px; }
+.kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
 .kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; box-shadow: var(--shadow-sm); }
 .kpi-label { font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
 .kpi-value { font-size: 32px; font-weight: 800; color: var(--primary); letter-spacing: -1px; }
 
 /* --- PRO SECTION --- */
-.pro-grid { display: grid; grid-template-columns: 1fr 380px; gap: 24px; align-items: start; }
-@media(max-width: 1200px) { .pro-grid { grid-template-columns: 1fr; } }
-
+.pro-grid { display: grid; grid-template-columns: 1fr; gap: 24px; align-items: start; }
 .card { background: var(--surface); border-radius: 16px; padding: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); margin-bottom: 24px; }
 .card-title { font-size: 16px; font-weight: 700; margin: 0 0 20px 0; display: flex; justify-content: space-between; align-items: center; }
 
@@ -208,24 +193,86 @@ tr:hover td { background: #F8FAFC; }
 .history-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid var(--border); cursor: pointer; border-radius: 12px; border: 1px solid transparent; margin-bottom: 8px; transition: 0.2s; }
 .history-item:hover { background: #F8FAFC; border-color: var(--border); }
 
-/* --- RESPONSIVE FIXES --- */
-@media(max-width: 1024px){
-    body { height: auto; overflow: visible; display: block; }
-    .app-container { flex-direction: column; overflow: visible; display: block; }
-    .input-panel { width: 100%; height: auto; border-right: none; border-bottom: 1px solid var(--border); overflow: visible; padding-bottom: 24px; }
-    .results-panel { height: auto; overflow: visible; padding: 24px 20px; }
+
+/* =========================================
+   RESPONSIVE BREAKPOINTS 
+========================================= */
+
+/* Mobile Input Grid Fix */
+.grid-header { display: none; }
+.grid-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  gap: 10px;
+  background: white;
+  padding: 16px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  position: relative;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 12px;
+}
+.grid-row input:first-child { grid-column: span 3; padding-right: 48px; } /* Leave space for delete btn */
+.grid-row .btn-ghost {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: #F8FAFC;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  width: 34px;
+  height: 34px;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
+/* Tablet & Mobile Tweaks */
 @media(max-width: 768px){
     .btn-text-desktop, .header-email-display { display: none !important; } 
+    .topbar { padding: 12px 16px; }
+    .brand { font-size: 20px; }
+    .brand-badge { display: none; }
     .dashboard-title { font-size: 22px; }
+    .card { padding: 16px; }
+    #chart { min-height: 250px; }
 }
 
-@media(max-width:640px){
-  .grid-header { display: none; }
-  .grid-row { grid-template-columns: 1fr 1fr; gap: 8px; background: #F8FAFC; padding: 16px; border-radius: 12px; border: 1px solid var(--border); position: relative; }
-  .grid-row input:first-child { grid-column: span 2; }
-  .grid-row .btn-ghost { position: absolute; top: 12px; right: 12px; background: white; border: 1px solid var(--border); border-radius: 8px; width: 32px; height: 32px; padding: 0; }
+/* DESKTOP SPLIT VIEW (Locked Scrolling Only for Big Screens) */
+@media(min-width: 1025px){
+  body { height: 100vh; overflow: hidden; }
+  
+  .app-container {
+    flex-direction: row;
+    height: calc(100vh - 70px);
+    overflow: hidden;
+  }
+  
+  .input-panel {
+    width: 440px;
+    border-right: 1px solid var(--border);
+    border-bottom: none;
+    overflow-y: auto;
+    height: 100%;
+  }
+  
+  .input-panel-header { position: sticky; top: 0; }
+  
+  .results-panel {
+    flex: 1;
+    overflow-y: auto;
+    height: 100%;
+    padding: 32px 40px 60px 40px;
+  }
+
+  /* Restore Desktop Grid for Inputs */
+  .grid-header { display: grid; grid-template-columns: 2fr 1.2fr 1.2fr 1.2fr 32px; gap: 8px; padding: 0 8px 8px 8px; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+  .grid-row { display: grid; grid-template-columns: 2fr 1.2fr 1.2fr 1.2fr 32px; gap: 8px; background: transparent; padding: 0; border: none; box-shadow: none; margin-bottom: 10px; align-items: center; }
+  .grid-row input:first-child { grid-column: span 1; padding-right: 10px; }
+  .grid-row .btn-ghost { position: relative; top: auto; right: auto; background: transparent; border: none; }
+  
+  .pro-grid { grid-template-columns: 1fr 380px; }
 }
 </style>
 </head>
@@ -514,9 +561,9 @@ window.createRow = function(container, name="", val1="", val2="", val3="", isMon
   const d = document.createElement("div"); d.className = "grid-row";
   d.innerHTML = `
     <input type="text" placeholder="${isMonth ? "Month" : "Product Name"}" value="${name}">
-    <input type="number" placeholder="0" value="${val1}">
-    <input type="number" placeholder="0" value="${val2}">
-    <input type="number" placeholder="0" value="${val3}">
+    <input type="number" placeholder="Sell Price" value="${val1}">
+    <input type="number" placeholder="Cost Price" value="${val2}">
+    <input type="number" placeholder="Quantity" value="${val3}">
     <button class="btn-ghost" onclick="this.parentElement.remove(); window.saveDraft()">✕</button>
   `;
   container.appendChild(d);
@@ -638,7 +685,7 @@ function updateSimulator() {
     else { diffEl.innerText = "Impact: ₹0"; diffEl.className = "sim-diff"; }
 }
 
-// --- FIX: RESTORED FULL INSIGHTS ---
+// --- INSIGHTS ---
 window.generateMonthlyInsights = function(margin, orders, aov, count) {
     const div = document.getElementById("insights"); let statusTitle = ""; let statusColor = ""; let strategies = [];
     if (margin <= 0) { statusTitle = "🚨 CRITICAL: Losing money on sales."; statusColor = "insight-orange"; strategies = [`<strong>Stop Ads:</strong> Pause paid marketing until unit economics are fixed.`, `<strong>Price Audit:</strong> Raise prices to break even.`, `<strong>Cost Cutting:</strong> Negotiate with suppliers.`]; } 
@@ -668,7 +715,7 @@ window.drawChart = function(type, labels, data, colors){
   chartInstance = new Chart(ctx, { type: type, data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: {display: type==='pie', position: 'bottom'}, datalabels: { display: false } }, scales: type === 'bar' ? { x: { grid: { display: false } }, y: { beginAtZero: true, border: { dash: [4, 4] } } } : {} } }); 
 };
 
-// --- FIX: RESTORED FULL API / ACTION FUNCTIONS ---
+// --- API FUNCTIONS ---
 window.askAI = async function() {
     if(!isProUser || !userEmail) return alert("Pro Feature");
     const btn = document.getElementById("aiBtn"); const box = document.getElementById("aiResult");
@@ -687,12 +734,10 @@ window.verify = async function(email){
     if(d.valid) {
         isProUser = true; document.getElementById("lockOverlay").style.display = "none"; 
         document.getElementById("historyBtn").style.display = "inline-flex"; document.getElementById("saveCloudBtn").style.display = "flex";
-        
         let dateStr = "";
         if(d.expiry) { const date = new Date(parseInt(d.expiry)); dateStr = date.toLocaleDateString(undefined, {day:'numeric', month:'short', year:'numeric'}); }
         const drawerExpiry = document.getElementById("drawerExpiryDisplay");
         if(drawerExpiry) drawerExpiry.innerText = "Plan expires: " + dateStr;
-
         if(chartInstance) chartInstance.resize();
     } else { 
         document.getElementById("proContainer").classList.add("locked-container");
