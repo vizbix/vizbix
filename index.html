@@ -208,6 +208,19 @@
       <button class="drawer-close" id="drawerClose">✕</button>
     </div>
     <div class="drawer-body">
+      
+      <div id="drawerProfile" style="display:none; background: #f8fafc; border: 1px solid var(--border); padding: 16px; border-radius: 12px; margin-bottom: 16px;">
+        <div style="font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px;">Signed in as</div>
+        <div id="drawerEmailDisplay" style="font-size: 14px; font-weight: 700; color: var(--dark); word-break: break-all; margin-bottom: 12px;"></div>
+        
+        <div style="background: white; border: 1px solid var(--border); padding: 10px; border-radius: 8px; margin-bottom: 12px;">
+            <div id="drawerPlanDisplay" style="font-size:13px; font-weight:800;">Loading Plan...</div>
+            <div id="drawerExpiryDisplay" style="font-size:12px; color:var(--text-muted); margin-top:2px;"></div>
+        </div>
+
+        <button onclick="handleLogout()" class="btn btn-secondary" style="width:100%; padding:8px; font-size:13px;">Log out</button>
+      </div>
+
       <div class="drawer-links">
         <a href="index.html">Home <span>Start here</span></a>
         <a href="profit-leak.html" style="background: #eff6ff; border-color: #bfdbfe;">
@@ -235,7 +248,8 @@
       </nav>
 
       <div class="nav-actions">
-        <button class="btn btn-secondary" onclick="openLogin()">Log in</button>
+        <button id="headerLoginBtn" class="btn btn-secondary" onclick="openLogin()">Log in</button>
+        
         <button class="menu-btn" id="menuBtn" aria-label="Open menu">
           <div class="menu-icon" aria-hidden="true">
             <span></span><span></span><span></span>
@@ -440,11 +454,11 @@
 
 
 <script type="module">
-    // 1. Import Firebase tools directly from Google
+    // 1. Import Firebase tools
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
-    import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, createUserWithEmailAndPassword, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    // 2. Your specific Vizbix project config
+    // 2. Your Config
     const firebaseConfig = {
       apiKey: "AIzaSyBta1q-faAPdH23pUUwbpViDgTjARnkT6c",
       authDomain: "vizbix.firebaseapp.com",
@@ -455,58 +469,105 @@
       measurementId: "G-9TN8W27X0X"
     };
 
-    // 3. Initialize Firebase
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
     const googleProvider = new GoogleAuthProvider();
+    const workerURL = "https://vizbix-api.vizbixhq.workers.dev"; // Your API
 
-    // 4. Attach functions to the window so your HTML buttons can trigger them
+    // 3. LISTEN FOR LOGIN STATE ON THE HOME PAGE
+    onAuthStateChanged(auth, async (user) => {
+        const loginBtn = document.getElementById("headerLoginBtn");
+        const drawerProfile = document.getElementById("drawerProfile");
+        
+        if (user) {
+            // --- USER IS LOGGED IN ---
+            // 1. Change Header Button
+            loginBtn.innerText = "Dashboard →";
+            loginBtn.onclick = () => window.location.href = "profit-leak.html";
+            loginBtn.className = "btn btn-primary"; // Make it blue
+            
+            // 2. Update Drawer Profile
+            drawerProfile.style.display = "block";
+            document.getElementById("drawerEmailDisplay").innerText = user.email;
+            
+            // 3. Fetch Plan Details from Cloudflare
+            try {
+                const r = await fetch(workerURL + "/check?email=" + user.email);
+                const d = await r.json();
+                
+                const planDisplay = document.getElementById("drawerPlanDisplay");
+                const expiryDisplay = document.getElementById("drawerExpiryDisplay");
+                
+                if (d.valid && d.expiry) {
+                    // Calculate days remaining
+                    const daysLeft = Math.ceil((Number(d.expiry) - Date.now()) / (1000 * 60 * 60 * 24));
+                    
+                    planDisplay.innerText = "Active Plan: Pro";
+                    planDisplay.style.color = "#10B981"; // Green
+                    
+                    if (daysLeft > 0) {
+                        expiryDisplay.innerText = `Next Renewal: ${daysLeft} days`;
+                    } else {
+                        expiryDisplay.innerText = "Expires today";
+                    }
+                } else {
+                    // Logged in, but hasn't paid
+                    planDisplay.innerText = "Active Plan: Free";
+                    planDisplay.style.color = "#0F172A";
+                    expiryDisplay.innerText = "Upgrade to unlock AI";
+                }
+            } catch(e) {
+                console.error("Failed to fetch plan data", e);
+            }
+            
+        } else {
+            // --- USER IS NOT LOGGED IN ---
+            loginBtn.innerText = "Log in";
+            loginBtn.onclick = () => openLogin();
+            loginBtn.className = "btn btn-secondary";
+            drawerProfile.style.display = "none";
+        }
+    });
+
+    // 4. Logout Function
+    window.handleLogout = function() {
+        signOut(auth).then(() => {
+            window.location.reload(); // Refresh page to reset UI
+        });
+    };
+
+    // 5. Login Functions (from modal)
     window.handleGoogleLogin = async function() {
       try {
-        const result = await signInWithPopup(auth, googleProvider);
-        localStorage.setItem("vizbix_email", result.user.email); // Save for the next page
-        window.location.href = "profit-leak.html"; // Redirect to Pro tool
-      } catch (error) {
-        console.error(error);
-        alert("Google Login Failed: " + error.message);
-      }
+        await signInWithPopup(auth, googleProvider);
+        window.location.href = "profit-leak.html"; 
+      } catch (error) { alert("Google Login Failed: " + error.message); }
     };
 
     window.handleEmailLogin = async function() {
       const e = document.getElementById('emailInput').value;
       const p = document.getElementById('passwordInput').value;
-      
       if(!e || !p) return alert("Please enter both email and password.");
-      
       try {
-        const result = await signInWithEmailAndPassword(auth, e, p);
-        localStorage.setItem("vizbix_email", result.user.email);
+        await signInWithEmailAndPassword(auth, e, p);
         window.location.href = "profit-leak.html";
-      } catch (error) {
-        console.error(error);
-        alert("Login failed. Please check your password or click Sign Up if you are new.");
-      }
+      } catch (error) { alert("Login failed. Check your password or sign up."); }
     };
 
     window.handleEmailSignUp = async function() {
       const e = document.getElementById('emailInput').value;
       const p = document.getElementById('passwordInput').value;
-      
       if(!e || !p) return alert("Please enter both email and password.");
-      if(p.length < 6) return alert("Password must be at least 6 characters long.");
-      
+      if(p.length < 6) return alert("Password must be at least 6 characters.");
       try {
-        const result = await createUserWithEmailAndPassword(auth, e, p);
-        localStorage.setItem("vizbix_email", result.user.email);
+        await createUserWithEmailAndPassword(auth, e, p);
         window.location.href = "profit-leak.html";
-      } catch (error) {
-        console.error(error);
-        alert("Sign Up failed: " + error.message);
-      }
+      } catch (error) { alert("Sign Up failed: " + error.message); }
     };
-  </script>  
+  </script>
 </body>
 </html>
+
 
 
 
