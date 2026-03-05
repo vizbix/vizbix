@@ -8,165 +8,269 @@
 <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/png" href="favicon.png">
-  <link rel="apple-touch-icon" href="favicon.png">
+<link rel="icon" type="image/png" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
 
 <style>
 :root {
-  --bg: #F8FAFC;
+  --bg: #F4F7F9;
   --surface: #FFFFFF;
   --primary: #0F172A; 
-  --accent: #3B82F6; 
-  --accent-glow: rgba(59, 130, 246, 0.15);
-  --success: #10B981;
+  --accent: #2563EB; 
+  --accent-glow: rgba(37, 99, 235, 0.15);
+  --success: #059669;
+  --danger: #EF4444;
   --text-main: #1E293B;
   --text-muted: #64748B;
   --border: #E2E8F0;
-  --radius: 16px;
-  --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  --radius: 12px;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.05);
+  --shadow-md: 0 4px 6px -1px rgba(0,0,0,0.05);
+  --shadow-lg: 0 10px 15px -3px rgba(0,0,0,0.05);
 }
 
 * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
 
-body {
+/* FIX 1: Restored natural body. No hidden overflows, no flex-traps. 
+   This guarantees your mouse wheel and trackpad will always scroll the page.
+*/
+html, body {
   margin: 0;
+  padding: 0;
   background-color: var(--bg);
-  background-image: 
-    radial-gradient(at 0% 0%, hsla(253,16%,7%,0) 0, transparent 50%), 
-    radial-gradient(at 50% 0%, hsla(225,39%,30%,0.05) 0, transparent 50%), 
-    radial-gradient(at 100% 0%, hsla(339,49%,30%,0) 0, transparent 50%);
   font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
   color: var(--text-main);
-  padding-bottom: 60px;
+  min-height: 100%;
 }
 
-main { max-width: 900px; margin: auto; padding: 20px; }
-
-/* --- HEADER STYLES --- */
-header {
+/* --- TOP NAVBAR --- */
+.topbar {
   display: flex; justify-content: space-between; align-items: center;
-  margin-bottom: 30px; padding-bottom: 16px; border-bottom: 1px solid var(--border);
-  position: relative; z-index: 50; height: 70px;
+  padding: 0 24px; background: rgba(255, 255, 255, 0.95); 
+  border-bottom: 1px solid var(--border);
+  z-index: 1000; height: 70px; 
+  position: fixed; top: 0; left: 0; right: 0;
+  backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);
 }
-.brand { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--primary); }
+.brand { font-size: 22px; font-weight: 800; letter-spacing: -0.5px; color: var(--primary); display: flex; align-items: center; gap: 8px;}
 .brand span { color: var(--accent); }
-.subtitle { font-size: 13px; color: var(--text-muted); font-weight: 500; display: block; margin-top: 2px;}
-.header-actions { display: flex; gap: 8px; align-items: center; }
+.brand-badge { background: #EEF2FF; color: var(--accent); font-size: 10px; padding: 4px 8px; border-radius: 6px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-left: 4px;}
+.header-actions { display: flex; gap: 10px; align-items: center; }
 
-@media(max-width: 768px){
-    .subtitle { display: none !important; }
-    .btn-text-desktop { display: none !important; }
-    .header-email-display { display: none !important; } 
-    .header-actions { gap: 6px; }
-    .brand { font-size: 20px; }
+/* --- APP LAYOUT SHELL --- */
+.app-container {
+  margin-top: 70px; /* Offset the fixed topbar */
+  display: flex;
+  flex-direction: column; /* Mobile Default */
+  width: 100%;
 }
 
-/* --- MENU DRAWER --- */
-.menu-btn {
-  width: 40px; height: 40px; border: 1px solid rgba(229,231,235,0.9);
-  background: #fff; border-radius: 12px; display: flex; align-items: center; justify-content: center;
-  cursor: pointer; box-shadow: 0 2px 5px rgba(2, 6, 23, 0.05); padding: 0; flex-shrink: 0;
+.input-panel {
+  width: 100%;
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding-bottom: 32px;
 }
-.menu-btn:active { transform: scale(0.96); }
+
+.input-panel-header {
+  padding: 24px 24px 16px;
+  border-bottom: 1px solid var(--border);
+  background: var(--surface);
+}
+
+.input-panel-body { padding: 24px; }
+
+.results-panel {
+  width: 100%;
+  padding: 24px;
+}
+
+/* --- DESKTOP LAYOUT (Sticky Sidebar + Natural Scroll) --- */
+@media (min-width: 1024px) {
+  .app-container {
+    flex-direction: row;
+  }
+  
+  .input-panel {
+    width: 380px;
+    position: fixed; /* Sidebar sticks to the left */
+    top: 70px;
+    bottom: 0;
+    left: 0;
+    overflow-y: auto; /* Internal scroll only for the inputs */
+    border-right: 1px solid var(--border);
+    border-bottom: none;
+    z-index: 10;
+  }
+  
+  .input-panel-header {
+    position: sticky; top: 0; z-index: 5;
+  }
+  
+  .results-panel {
+    margin-left: 380px; /* Push results to the right of the sidebar */
+    width: calc(100% - 380px);
+    padding: 40px;
+    min-height: calc(100vh - 70px);
+  }
+}
+
+/* --- UI ELEMENTS --- */
+.input-label { display: block; font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+
+input { width: 100%; min-width: 0; padding: 12px 10px; border-radius: 8px; border: 1px solid #CBD5E1; background: #FFFFFF; font-weight: 500; transition: all 0.2s; font-size: 14px; color: var(--text-main); font-family: inherit; }
+input::placeholder { color: #94A3B8; font-weight: 400; }
+input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-glow); }
+
+button { padding: 10px 16px; border-radius: 8px; font-weight: 600; font-size: 13px; cursor: pointer; border: none; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; font-family: inherit; }
+button:active { transform: scale(0.97); }
+.btn-primary { background: var(--primary); color: white; border: 1px solid transparent; box-shadow: 0 4px 10px rgba(15,23,42,0.15); }
+.btn-primary:hover { background: #1E293B; box-shadow: 0 6px 15px rgba(15,23,42,0.2); }
+.btn-secondary { background: white; border: 1px solid #CBD5E1; color: var(--text-main); box-shadow: var(--shadow-sm); }
+.btn-secondary:hover { border-color: #94A3B8; background: #F8FAFC; }
+.btn-ghost { background: transparent; color: #94A3B8; padding: 6px; border-radius: 6px; }
+.btn-ghost:hover { background: #FEE2E2; color: #EF4444; }
+
+/* --- INPUT GRID LOGIC --- */
+/* Desktop / Large Screens */
+.grid-header { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 32px; gap: 8px; padding: 0 8px 8px 8px; font-size: 10px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px; }
+.grid-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 32px; gap: 8px; margin-bottom: 10px; align-items: center; }
+
+/* FIX 2: Mobile/Tablet Inputs (Wrap nicely, prevent squishing) */
+@media(max-width: 768px) {
+  .grid-header { display: none; }
+  .grid-row {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    background: var(--surface); padding: 16px; 
+    border-radius: 12px; border: 1px solid var(--border); 
+    position: relative; box-shadow: var(--shadow-sm);
+  }
+  .grid-row input:first-child { width: 100%; padding-right: 48px; font-weight: 700; } /* Name takes full width */
+  .grid-row input:not(:first-child) { flex: 1; min-width: 70px; } /* Numbers sit side-by-side */
+  .grid-row .btn-ghost {
+    position: absolute; top: 10px; right: 10px;
+    background: #F8FAFC; border: 1px solid var(--border);
+    width: 32px; height: 32px; padding: 0;
+  }
+}
+
+/* --- TOGGLE SWITCH --- */
+.mode-switch-container { display: flex; background: #E2E8F0; padding: 4px; border-radius: 10px; border: 1px solid var(--border); }
+.mode-btn { flex: 1; padding: 10px; border: none; background: transparent; font-weight: 600; font-size: 13px; color: var(--text-muted); cursor: pointer; border-radius: 6px; transition: all 0.2s; }
+.mode-btn:hover:not(.active) { color: var(--primary); }
+.mode-btn.active { background: white; color: var(--primary); box-shadow: var(--shadow-sm); font-weight: 700; }
+
+/* --- DASHBOARD STYLES --- */
+.dashboard-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 24px; flex-wrap: wrap; gap: 12px; }
+.dashboard-title { font-size: 26px; font-weight: 800; color: var(--primary); margin: 0; letter-spacing: -0.5px; }
+
+/* KPIs */
+.kpi-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 32px; }
+.kpi-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; padding: 24px; box-shadow: var(--shadow-sm); }
+.kpi-label { font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+.kpi-value { font-size: 32px; font-weight: 800; color: var(--primary); letter-spacing: -1px; }
+
+/* --- PRO SECTION --- */
+/* FIX 3: Pro Grid logic. Only split into 2 columns on VERY large screens. Stack everywhere else. */
+.pro-grid { display: grid; grid-template-columns: 1fr; gap: 24px; align-items: start; }
+
+@media (min-width: 1300px) {
+  .pro-grid { grid-template-columns: 1fr 360px; } /* Safe width so charts don't squish */
+}
+
+.card { background: var(--surface); border-radius: 16px; padding: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); margin-bottom: 24px; }
+.card-title { font-size: 16px; font-weight: 700; margin: 0 0 20px 0; display: flex; justify-content: space-between; align-items: center; }
+
+/* FIX 4: Chart Container (Prevents overflow off the screen) */
+.chart-wrapper {
+  position: relative;
+  height: 320px;
+  width: 100%;
+  max-width: 100%;
+}
+canvas { max-width: 100%; }
+
+/* --- SIMULATOR --- */
+.slider-group { margin-bottom: 20px; }
+.slider-header { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; margin-bottom: 12px; }
+.slider-val { color: var(--accent); background: #EEF2FF; padding: 2px 8px; border-radius: 6px; font-size: 12px; font-weight: 700; }
+input[type=range] { -webkit-appearance: none; width: 100%; background: transparent; padding: 0; margin: 0; border: none; box-shadow: none; }
+input[type=range]:focus { outline: none; box-shadow: none; }
+input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 6px; cursor: pointer; background: #E2E8F0; border-radius: 3px; }
+input[type=range]::-webkit-slider-thumb { height: 18px; width: 18px; border-radius: 50%; background: var(--accent); cursor: pointer; -webkit-appearance: none; margin-top: -6px; box-shadow: 0 2px 4px rgba(0,0,0,0.2); }
+.sim-result-box { background: #F8FAFC; border: 1px solid var(--border); padding: 20px; border-radius: 12px; margin-top: 24px; text-align: center; }
+.sim-diff { font-size: 13px; font-weight: 600; margin-top: 4px; }
+.diff-pos { color: var(--success); }
+.diff-neg { color: var(--danger); }
+
+/* --- Locked Content --- */
+.locked-container { position: relative; overflow: hidden; }
+.blur-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(244, 247, 249, 0.6); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.lock-card { background: var(--surface); padding: 32px; border-radius: 20px; text-align: center; box-shadow: var(--shadow-lg); border: 1px solid var(--border); max-width: 380px; width: 90%; }
+.premium-badge { background: linear-gradient(135deg, #2563EB 0%, #1E40AF 100%); color: white; padding: 6px 14px; border-radius: 20px; font-size: 11px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 16px; display: inline-block; box-shadow: 0 4px 10px rgba(37,99,235,0.2); }
+
+/* --- Insights & AI --- */
+.insight-item { padding: 16px; border-radius: 12px; margin-bottom: 12px; font-size: 14px; line-height: 1.6; background: white; border: 1px solid var(--border); border-left-width: 4px; box-shadow: var(--shadow-sm); }
+.insight-green { border-left-color: #10B981; }
+.insight-blue { border-left-color: #3B82F6; }
+.insight-orange { border-left-color: #F59E0B; }
+.insight-gray { border-left-color: #94A3B8; }
+
+.ai-thinking { background: linear-gradient(90deg, #F1F5F9 0%, #E2E8F0 50%, #F1F5F9 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite; color: var(--text-muted) !important; border-color: transparent !important; cursor: wait; }
+@keyframes shimmer { 0% {background-position: 100% 0} 100% {background-position: -100% 0} }
+
+/* --- Tables --- */
+.table-wrapper { border: 1px solid var(--border); border-radius: 12px; overflow-x: auto; width: 100%; }
+table { width: 100%; border-collapse: collapse; background: white; min-width: 400px; }
+th { text-align: left; padding: 14px 16px; background: #F8FAFC; border-bottom: 1px solid var(--border); font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+td { padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 14px; font-weight: 500; }
+tr:last-child td { border-bottom: none; }
+tr:hover td { background: #F8FAFC; }
+
+/* --- Menus & Modals --- */
+.menu-btn { width: 40px; height: 40px; border: 1px solid var(--border); background: var(--surface); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow-sm); padding: 0; flex-shrink: 0; transition: all 0.2s; }
+.menu-btn:hover { background: #F8FAFC; }
 .menu-icon { width: 16px; height: 12px; position: relative; }
 .menu-icon span { position: absolute; left: 0; right: 0; height: 2px; background: var(--text-main); border-radius: 10px; }
 .menu-icon span:nth-child(1) { top: 0; }
 .menu-icon span:nth-child(2) { top: 5px; opacity: 0.9; }
 .menu-icon span:nth-child(3) { bottom: 0; }
 
-.drawer-overlay { position: fixed; inset: 0; background: rgba(2,6,23,0.55); opacity: 0; pointer-events: none; transition: opacity .2s ease; z-index: 150; }
-.drawer { position: fixed; top: 0; right: 0; height: 100%; width: min(300px, 85vw); background: #fff; border-left: 1px solid var(--border); box-shadow: -10px 0 30px rgba(2,6,23,.14); transform: translateX(105%); transition: transform .25s ease; z-index: 160; display: flex; flex-direction: column; }
+.drawer-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity .3s ease; z-index: 2000; }
+.drawer { position: fixed; top: 0; right: 0; height: 100%; width: min(320px, 85vw); background: var(--surface); border-left: 1px solid var(--border); box-shadow: -10px 0 40px rgba(0,0,0,.1); transform: translateX(105%); transition: transform .3s cubic-bezier(0.16, 1, 0.3, 1); z-index: 2010; display: flex; flex-direction: column; }
 .drawer.open { transform: translateX(0); }
 .drawer-overlay.open { opacity: 1; pointer-events: auto; }
-.drawer-head { padding: 16px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
-.drawer-title { font-weight: 900; font-size: 16px; color: var(--primary); }
-.drawer-close { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border); background: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;}
+.drawer-head { padding: 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.drawer-title { font-weight: 800; font-size: 18px; color: var(--primary); }
+.drawer-close { width: 36px; height: 36px; border-radius: 10px; border: none; background: #F1F5F9; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s;}
+.drawer-close:hover { background: #E2E8F0; }
 .drawer-close svg { width: 18px; height: 18px; stroke: var(--text-main); }
-.drawer-body { padding: 16px; overflow: auto; }
-.drawer-profile { background: #EFF6FF; border: 1px solid #DBEAFE; padding: 12px; border-radius: 12px; margin-bottom: 16px; }
-.drawer-profile-label { font-size: 11px; font-weight: 700; color: #64748B; text-transform: uppercase; margin-bottom: 4px; }
-.drawer-profile-email { font-size: 13px; font-weight: 600; color: #1E40AF; word-break: break-all; }
-.drawer-links { display: flex; flex-direction: column; gap: 8px; }
-.drawer-links a { text-decoration: none; color: var(--text-main); border: 1px solid var(--border); background: #fff; padding: 12px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 14px; }
-.drawer-links a:hover { background: #F8FAFC; }
-.drawer-mini { margin-top: 20px; padding-top: 14px; border-top: 1px solid var(--border); color: var(--text-muted); font-size: 12px; line-height: 1.5; }
+.drawer-body { padding: 24px; overflow: auto; }
+.drawer-profile { background: #F8FAFC; border: 1px solid var(--border); padding: 16px; border-radius: 16px; margin-bottom: 24px; }
+.drawer-profile-label { font-size: 11px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; }
+.drawer-profile-email { font-size: 14px; font-weight: 600; color: var(--primary); word-break: break-all; }
+.drawer-links { display: flex; flex-direction: column; gap: 10px; }
+.drawer-links a { text-decoration: none; color: var(--text-main); padding: 14px 16px; border-radius: 14px; display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 15px; border: 1px solid var(--border); transition: 0.2s; }
+.drawer-links a:hover { background: #F8FAFC; transform: translateX(4px); }
 
-/* --- Cards & Layout --- */
-.card { background: var(--surface); border-radius: var(--radius); padding: 24px; margin-bottom: 24px; box-shadow: var(--shadow-sm); border: 1px solid var(--border); transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 2000; display: none; align-items: center; justify-content: center; }
+.modal-content { background: white; width: 90%; max-width: 500px; border-radius: 20px; padding: 28px; max-height: 80vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); border: 1px solid rgba(255,255,255,0.2); }
+.history-item { display: flex; justify-content: space-between; align-items: center; padding: 16px; border-bottom: 1px solid var(--border); cursor: pointer; border-radius: 12px; border: 1px solid transparent; margin-bottom: 8px; transition: 0.2s; }
+.history-item:hover { background: #F8FAFC; border-color: var(--border); }
 
-/* --- Inputs & Grid --- */
-.input-group { position: relative; margin-bottom: 20px; }
-.input-label { display: block; font-size: 12px; font-weight: 700; color: var(--text-muted); margin-bottom: 6px; text-transform: uppercase; letter-spacing: 0.5px; }
-
-input { width: 100%; padding: 12px 14px; border-radius: 10px; border: 1px solid var(--border); background: #F1F5F9; font-weight: 500; transition: all 0.2s; font-size: 14px; }
-input:focus { background: #fff; border-color: var(--accent); box-shadow: 0 0 0 4px var(--accent-glow); }
-
-.grid-header { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 40px; gap: 10px; padding: 0 10px 8px 10px; font-size: 11px; font-weight: 600; color: var(--text-muted); }
-.grid-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 40px; gap: 10px; margin-bottom: 10px; align-items: center; }
-
-@media(max-width:640px){
-  .grid-header { display: none; }
-  .grid-row { grid-template-columns: 1fr 1fr; gap: 8px; background: #fff; padding: 12px; border-radius: 12px; border: 1px solid var(--border); box-shadow: 0 1px 2px rgba(0,0,0,0.02); }
-  .grid-row input:first-child { grid-column: span 2; }
+/* --- Mobile Cleanups --- */
+@media(max-width: 768px){
+    .btn-text-desktop, .header-email-display { display: none !important; } 
+    .topbar { padding: 0 16px; }
+    .brand { font-size: 20px; }
+    .brand-badge { display: none; }
+    .dashboard-title { font-size: 22px; }
+    .kpi-value { font-size: 28px; }
 }
-
-/* --- Buttons --- */
-button { padding: 10px 16px; border-radius: 12px; font-weight: 600; font-size: 13px; cursor: pointer; border: none; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; gap: 6px; white-space: nowrap; }
-.btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 12px rgba(15, 23, 42, 0.2); }
-.btn-secondary { background: white; border: 1px solid var(--border); color: var(--text-main); }
-.btn-ghost { background: transparent; color: var(--text-muted); padding: 8px; }
-
-/* --- Results Section --- */
-.kpi-container { display: flex; gap: 12px; margin-bottom: 24px; flex-wrap: wrap; }
-.kpi-card { flex: 1; background: linear-gradient(135deg, #f8fafc 0%, #ffffff 100%); border: 1px solid var(--border); border-radius: 12px; padding: 14px; min-width: 130px; }
-.kpi-label { font-size: 11px; font-weight: 700; color: var(--text-muted); margin-bottom: 4px; }
-.kpi-value { font-size: 20px; font-weight: 800; color: var(--primary); white-space: nowrap; }
-
-/* --- NEW: TOGGLE SWITCH --- */
-.mode-switch-container { display: flex; background: #F1F5F9; padding: 4px; border-radius: 12px; margin-bottom: 20px; border: 1px solid var(--border); }
-.mode-btn { flex: 1; padding: 10px; border: none; background: transparent; font-weight: 600; font-size: 13px; color: var(--text-muted); cursor: pointer; border-radius: 10px; transition: all 0.2s ease; }
-.mode-btn.active { background: white; color: var(--primary); box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
-
-/* --- NEW: MONTHLY INPUTS --- */
-.monthly-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-@media(max-width: 600px) { .monthly-inputs { grid-template-columns: 1fr; } }
-
-/* Info Box */
-.info-box-small { background: #EFF6FF; border: 1px solid #DBEAFE; color: #1E40AF; padding: 10px 12px; border-radius: 10px; font-size: 12px; font-weight: 600; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
-
-/* --- Locked Content --- */
-.locked-container { position: relative; overflow: hidden; }
-.blur-overlay { position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.2); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); z-index: 10; display: flex; flex-direction: column; align-items: center; justify-content: center; border-radius: var(--radius); border: 1px solid rgba(255,255,255,0.5); }
-.lock-card { background: white; padding: 24px; border-radius: 20px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.1); border: 1px solid var(--border); max-width: 320px; width: 90%; }
-.premium-badge { background: linear-gradient(135deg, #0F172A 0%, #334155 100%); color: white; padding: 4px 12px; border-radius: 20px; font-size: 10px; font-weight: 700; text-transform: uppercase; margin-bottom: 12px; display: inline-block; }
-.feature-list { text-align: left; margin: 15px 0 20px; padding: 0 10px; font-size: 13px; color: var(--text-muted); display: inline-block; }
-.feature-list div { margin-bottom: 6px; display: flex; align-items: center; gap: 8px; }
-
-/* --- History Modal --- */
-.modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 100; display: none; align-items: center; justify-content: center; }
-.modal-content { background: white; width: 90%; max-width: 500px; border-radius: 16px; padding: 24px; max-height: 80vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
-.history-item { display: flex; justify-content: space-between; align-items: center; padding: 12px; border-bottom: 1px solid var(--border); cursor: pointer; }
-.history-item:hover { background: #F8FAFC; }
-
-/* --- Insights & AI --- */
-.insight-item { display: flex; align-items: start; gap: 12px; padding: 14px; border-radius: 12px; margin-bottom: 10px; font-size: 13px; line-height: 1.5; }
-.insight-green { background: #ECFDF5; color: #065F46; border: 1px solid #D1FAE5; }
-.insight-blue { background: #EFF6FF; color: #1E40AF; border: 1px solid #DBEAFE; }
-.insight-orange { background: #FFF7ED; color: #9A3412; border: 1px solid #FFEDD5; }
-.insight-gray { background: #F8FAFC; color: #475569; border: 1px solid #E2E8F0; }
-.ai-thinking { background: linear-gradient(90deg, #eff6ff 0%, #dbeafe 50%, #eff6ff 100%); background-size: 200% 100%; animation: shimmer 1.5s infinite; color: #1E40AF !important; cursor: wait; }
-@keyframes shimmer { 0% {background-position: 100% 0} 100% {background-position: -100% 0} }
-
-table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 20px; }
-th { text-align: left; padding: 12px; border-bottom: 2px solid var(--border); font-size: 12px; color: var(--text-muted); }
-td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
-
 </style>
 </head>
 
@@ -174,9 +278,9 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
 
 <div class="modal-overlay" id="historyModal">
   <div class="modal-content">
-    <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
-      <h3 style="margin:0">Saved Analysis History</h3>
-      <button class="btn-ghost" onclick="toggleHistory(false)">✕</button>
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+      <h3 style="margin:0; font-size: 20px; font-weight: 800; color: var(--primary);">Saved History</h3>
+      <button class="btn-ghost" onclick="toggleHistory(false)" style="background: #F1F5F9; color: var(--primary);">✕</button>
     </div>
     <div id="historyList">Loading...</div>
   </div>
@@ -186,153 +290,180 @@ td { padding: 12px; border-bottom: 1px solid var(--border); font-size: 14px; }
 <aside class="drawer" id="drawer">
   <div class="drawer-head">
     <div class="drawer-title">Menu</div>
-    <button class="drawer-close" id="drawerClose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 6L6 18"></path><path d="M6 6l12 12"></path></svg></button>
+    <button class="drawer-close" id="drawerClose"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 6L6 18"></path><path d="M6 6l12 12"></path></svg></button>
   </div>
   <div class="drawer-body">
     <div id="drawerProfile" class="drawer-profile" style="display:none;">
         <div class="drawer-profile-label">Signed in as</div>
         <div id="drawerEmailDisplay" class="drawer-profile-email"></div>
-        <div id="drawerExpiryDisplay" style="font-size:11px; color:#64748B; margin-top:4px;"></div>
+        <div id="drawerExpiryDisplay" style="font-size:12px; color:var(--text-muted); margin-top:6px; font-weight: 500;"></div>
     </div>
     <div class="drawer-links">
       <a href="index.html">Home</a>
       <a href="#" onclick="closeDrawer(); toggleHistory(true); return false;">Saved History</a>
-      <a href="profit-leak.html" style="background: #F0F9FF; border-color: #BAE6FD;">Profit Optimizer <span style="background:#0F172A; color:white; padding:2px 6px; border-radius:6px; font-size:10px;">NEW</span></a>
+      <a href="profit-leak.html" style="background: #EFF6FF; border-color: #DBEAFE; color: #1E40AF;">Profit Optimizer <span style="background:#2563EB; color:white; padding:4px 8px; border-radius:8px; font-size:10px; font-weight:800; letter-spacing: 0.5px;">NEW</span></a>
       <a href="free-tools.html">Other Tools</a>
       <a href="about.html">About Vizbix</a>
     </div>
-    <div class="drawer-mini">Vizbix: Simple numbers → clear decisions.</div>
   </div>
 </aside>
 
-<main>
-  <header>
-    <div><div class="brand">Vizbix<span>.</span></div><div class="subtitle">E-commerce Intelligence Engine</div></div>
-    <div class="header-actions">
-        <button id="historyBtn" class="btn-secondary" style="display:none;" onclick="toggleHistory(true)"><span style="font-size: 16px;">📂</span><span class="btn-text-desktop">History</span></button>
-        <button id="loginBtn" class="btn-primary" onclick="handleLoginClick()">Login</button>
-        <div class="header-email-display" id="userEmailHeader" style="display:none; font-size:12px; font-weight:600; color:var(--primary); padding:6px 10px; background:white; border-radius:8px; border:1px solid var(--border);"></div>
-        <button class="menu-btn" id="menuBtn"><div class="menu-icon"><span></span><span></span><span></span></div></button>
-    </div>
-  </header>
-
-  <div class="card">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-      <div class="input-label">DATA SOURCE</div>
-      <div class="input-label" style="color:var(--accent); cursor:pointer;" onclick="sample()">Use Demo Data</div>
-    </div>
-    
-    <div class="mode-switch-container">
-        <button class="mode-btn active" id="btnProduct" onclick="setMode('product')">Product Wise</button>
-        <button class="mode-btn" id="btnMonthly" onclick="setMode('monthly')">Monthly Overview</button>
-    </div>
-
-    <div id="productInputs">
-        <div class="grid-header">
-          <div>PRODUCT NAME</div>
-          <div>SELL PRICE</div>
-          <div>COST PRICE</div>
-          <div>QTY SOLD</div>
-          <div></div>
-        </div>
-        <div id="items"></div>
-        <button class="btn-secondary" onclick="addRow()" style="width:100%; margin-top:10px;">+ Add Product</button>
-    </div>
-
-    <div id="monthlyInputs" style="display:none;">
-        <div class="info-box-small">
-            <span style="font-size:16px;">💡</span> 
-            <div><strong>Pro Tip:</strong> Add 2–6 months of data for the most accurate trend analysis.</div>
-        </div>
-        <div class="grid-header">
-            <div>MONTH (Optional)</div>
-            <div>SALES (₹)</div>
-            <div>EXPENSES (₹)</div>
-            <div>ORDERS</div>
-            <div></div>
-        </div>
-        <div id="monthItems"></div>
-        <button class="btn-secondary" onclick="addMonthRow()" style="width:100%; margin-top:10px;">+ Add Month Data</button>
-    </div>
-
-    <div style="margin-top:16px; display:flex; gap:10px; align-items: stretch;">
-      <button id="analyzeBtn" class="btn-primary" style="flex:2;" onclick="analyze()">Generate Report →</button>
-      <button id="saveCloudBtn" class="btn-secondary" style="display:none; width:50px; flex-shrink:0; padding:0; align-items:center; justify-content:center;" onclick="saveToCloud()" title="Save to Cloud"><span style="font-size:18px">💾</span></button>
-    </div>
+<header class="topbar">
+  <div class="brand">Vizbix <span>Pro</span> <span class="brand-badge">Optimizer</span></div>
+  <div class="header-actions">
+      <button id="historyBtn" class="btn-secondary" style="display:none;" onclick="toggleHistory(true)"><span style="font-size: 16px;">📂</span> <span class="btn-text-desktop">History</span></button>
+      <button id="saveCloudBtn" class="btn-secondary" style="display:none;" onclick="saveToCloud()" title="Save to Cloud"><span style="font-size: 16px;">💾</span> <span class="btn-text-desktop">Save</span></button>
+      <div class="header-email-display" id="userEmailHeader" style="display:none; font-size:13px; font-weight:600; color:var(--text-muted); padding: 8px 12px; border: 1px solid var(--border); border-radius: 8px;"></div>
+      <button id="loginBtn" class="btn-primary" onclick="handleLoginClick()">Login</button>
+      <button class="menu-btn" id="menuBtn"><div class="menu-icon"><span></span><span></span><span></span></div></button>
   </div>
+</header>
 
-  <div id="results" style="display:none">
+<div class="app-container">
+  
+  <aside class="input-panel">
+    <div class="input-panel-header">
+      <div class="mode-switch-container">
+          <button class="mode-btn active" id="btnProduct" onclick="setMode('product')">Product Data</button>
+          <button class="mode-btn" id="btnMonthly" onclick="setMode('monthly')">Monthly Overview</button>
+      </div>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 16px;">
+        <span class="input-label" style="margin:0;">Data Entry</span>
+        <span style="font-size:12px; font-weight:700; color:var(--accent); cursor:pointer;" onclick="sample()">Load Demo Data</span>
+      </div>
+    </div>
+
+    <div class="input-panel-body">
+      <div id="productInputs">
+          <div class="grid-header">
+            <div>Name</div><div>Sell ₹</div><div>Cost ₹</div><div>Qty</div><div></div>
+          </div>
+          <div id="items"></div>
+          <button class="btn-secondary" onclick="addRow()" style="width:100%; margin-top:16px; border-style:dashed; border-width: 2px;">+ Add Product Row</button>
+      </div>
+
+      <div id="monthlyInputs" style="display:none;">
+          <div class="grid-header">
+              <div>Month</div><div>Sales ₹</div><div>Exp ₹</div><div>Orders</div><div></div>
+          </div>
+          <div id="monthItems"></div>
+          <button class="btn-secondary" onclick="addMonthRow()" style="width:100%; margin-top:16px; border-style:dashed; border-width: 2px;">+ Add Month Row</button>
+      </div>
+
+      <button id="analyzeBtn" class="btn-primary" style="width:100%; margin-top:28px; padding: 14px; font-size: 15px;" onclick="analyze()">Run Analysis →</button>
+    </div>
+  </aside>
+
+  <main class="results-panel" id="results" style="display:none;">
     
+    <div class="dashboard-header">
+      <h1 class="dashboard-title">Financial Overview</h1>
+      <button class="btn-secondary" onclick="downloadPDF()">↓ Export Report</button>
+    </div>
+
     <div class="kpi-container">
       <div class="kpi-card">
-        <div class="kpi-label" id="kpiRevLabel">TOTAL REVENUE</div>
+        <div class="kpi-label" id="kpiRevLabel">Total Revenue</div>
         <div class="kpi-value" id="dispRevenue">₹0</div>
       </div>
       <div class="kpi-card">
-        <div class="kpi-label" id="kpiCostLabel">TOTAL COST</div>
-        <div class="kpi-value" id="dispCost" style="color:#64748B">₹0</div>
+        <div class="kpi-label" id="kpiCostLabel">Total Cost</div>
+        <div class="kpi-value" id="dispCost" style="color:var(--text-muted)">₹0</div>
       </div>
-      <div class="kpi-card" style="border-color:var(--success); background:#f0fdf4;">
-        <div class="kpi-label" style="color:#15803d" id="kpiProfitLabel">NET PROFIT</div>
-        <div class="kpi-value" id="dispProfit" style="color:#15803d">₹0</div>
+      <div class="kpi-card" style="background:#F0FDF4; border-color:#BBF7D0;">
+        <div class="kpi-label" style="color:#047857" id="kpiProfitLabel">Net Profit</div>
+        <div class="kpi-value" id="dispProfit" style="color:#047857">₹0</div>
       </div>
     </div>
 
     <div id="monthlyMetrics" class="kpi-container" style="display:none;">
-        <div class="kpi-card" style="background:#EFF6FF; border-color:#DBEAFE">
+        <div class="kpi-card" style="background:#F8FAFC; border-color:var(--border)">
+            <div class="kpi-label">Avg Order Value</div>
             <div class="kpi-value" id="dispAOV">₹0</div>
-            <div class="kpi-label" style="color:#1E40AF">Avg Order Value</div>
         </div>
-        <div class="kpi-card" style="background:#EFF6FF; border-color:#DBEAFE">
+        <div class="kpi-card" style="background:#F8FAFC; border-color:var(--border)">
+            <div class="kpi-label">Avg Monthly Orders</div>
             <div class="kpi-value" id="dispOrders">0</div>
-            <div class="kpi-label" style="color:#1E40AF">Avg Monthly Orders</div>
         </div>
     </div>
 
-    <div class="card locked-container" id="proContainer">
+    <div class="locked-container" id="proContainer">
       <div class="blur-overlay" id="lockOverlay">
         <div class="lock-card">
-          <span class="premium-badge">Vizbix Pro</span>
-          <h3 style="margin:0 0 5px 0;">Unlock Strategic Insights</h3>
+          <span class="premium-badge">Vizbix Pro ✨</span>
+          <h3 style="margin:0 0 8px 0; font-size: 22px; font-weight: 800;">Unlock Advanced Analytics</h3>
+          <p style="margin: 0 0 24px 0; font-size: 14px; color: var(--text-muted);">Predict margins, identify leaks, and generate AI strategies.</p>
           
           <div class="feature-list">
-              <div>✅ <strong>AI Business Consultant</strong></div>
-              <div>✅ <strong>Unlimited Cloud History</strong></div>
-              <div>✅ <strong>Visual Charts & Graphs</strong></div>
-              <div>✅ <strong>PDF Report Export</strong></div>
+              <div><strong>"What-If" Scenario Simulator</strong></div>
+              <div><strong>AI Business Consultant</strong></div>
+              <div><strong>Unlimited Save History</strong></div>
+              <div><strong>PDF Report Exports</strong></div>
           </div>
 
-          <input id="emailInput" placeholder="Enter your email" style="margin-bottom:10px; text-align:center;">
-          <button class="btn-primary" style="width:100%" onclick="pay()">Unlock for ₹499</button>
-          <button style="background:none; border:none; color:#64748B; font-size:11px; margin-top:10px; cursor:pointer; text-decoration:underline" onclick="verify(null)">Restore Purchase</button>
+          <input id="emailInput" placeholder="Enter your email" style="margin-bottom:12px; text-align:center;">
+          <button class="btn-primary" style="width:100%; padding: 14px; font-size: 15px;" onclick="pay()">Subscribe for ₹499/mo</button>
+          <button style="background:none; border:none; color:var(--text-muted); font-size:12px; margin-top:16px; font-weight:600; cursor:pointer;" onclick="verify(null)">Restore Access</button>
         </div>
       </div>
 
-      <div id="proContent">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-          <h3 style="margin:0">Strategic Report</h3>
-          <button class="btn-secondary" style="padding:6px 12px; font-size:12px;" onclick="downloadPDF()">↓ Export Report</button>
-        </div>
+      <div id="proContent" class="pro-grid">
+        
+        <div class="pro-main-col">
+          <div class="card">
+            <h3 class="card-title">Visual Breakdown</h3>
+            <div class="chart-wrapper">
+              <canvas id="chart"></canvas>
+            </div>
+          </div>
 
-        <h3 style="margin-bottom:15px">Optimization Strategy</h3>
-        <div id="insights"></div>
-
-        <div id="tableContainer">
-            <h3 style="margin-top:30px; margin-bottom:15px">Detailed Margin Analysis</h3>
-            <div style="overflow-x:auto;">
+          <div class="card" id="tableContainer">
+            <h3 class="card-title">Detailed Margin Analysis</h3>
+            <div class="table-wrapper">
               <table id="table"></table>
             </div>
+          </div>
         </div>
 
-        <h3 style="margin-top:40px; margin-bottom:15px">Visual Breakdown</h3>
-        <div style="height:300px; margin-bottom:30px; position: relative;">
-          <canvas id="chart"></canvas>
+        <div class="pro-side-col">
+          
+          <div class="card" style="border-top: 4px solid var(--accent);">
+            <h3 class="card-title">Scenario Simulator <span style="font-size:10px; background:#EEF2FF; color:var(--accent); padding:4px 8px; border-radius:6px;">PRO</span></h3>
+            <p style="font-size: 13px; color: var(--text-muted); margin-top:0; margin-bottom:20px;">Adjust variables to forecast your profit.</p>
+            
+            <div class="slider-group">
+              <div class="slider-header">
+                <span>Price Adjustment</span>
+                <span class="slider-val" id="priceLabel">+0%</span>
+              </div>
+              <input type="range" id="simPrice" min="-20" max="30" value="0" step="1">
+            </div>
+
+            <div class="slider-group">
+              <div class="slider-header">
+                <span>Cost Adjustment</span>
+                <span class="slider-val" id="costLabel" style="color:var(--danger); background:#FEF2F2;">+0%</span>
+              </div>
+              <input type="range" id="simCost" min="-20" max="30" value="0" step="1">
+            </div>
+
+            <div class="sim-result-box">
+              <div style="font-size:11px; font-weight:700; color:var(--text-muted); text-transform:uppercase;">Projected Profit</div>
+              <div style="font-size:28px; font-weight:800; color:var(--primary); margin: 4px 0;" id="simProjected">₹0</div>
+              <div class="sim-diff" id="simDiff">Impact: ₹0</div>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="card-title">AI Optimization Strategy</h3>
+            <div id="insights"></div>
+          </div>
+
         </div>
       </div>
     </div>
-  </div>
-
-</main>
+  </main>
+</div>
 
 <script type="module">
 // --- FIREBASE CONFIGURATION ---
@@ -366,100 +497,68 @@ let monthlyStats = null;
 let userEmail = null;
 let isProUser = false;
 let currentMode = 'product';
+let baseProfitForSim = 0;
+let baseRevenueForSim = 0;
+let baseCostForSim = 0;
 
 Chart.register(ChartDataLabels);
 
-// --- SECURE INITIALIZATION ---
+// --- INIT ---
 window.addEventListener('DOMContentLoaded', () => {
     loadDrafts();
-    
-    // Check Firebase for active session instead of just localStorage
     onAuthStateChanged(auth, (user) => {
         if (user) {
-            // USER IS SECURELY LOGGED IN
             userEmail = user.email;
-            
-            // Update UI with their email
-            document.getElementById("loginBtn").style.display = "none";
+            document.getElementById("loginBtn").innerText = "Logout";
             document.getElementById("userEmailHeader").style.display = "block";
             document.getElementById("userEmailHeader").innerText = userEmail;
             document.getElementById("drawerEmailDisplay").innerText = userEmail;
             document.getElementById("drawerProfile").style.display = "block";
-            
-            // Pre-fill the Razorpay email input (and hide it if you want)
             document.getElementById("emailInput").value = userEmail;
-            document.getElementById("emailInput").style.display = "none"; // Hide it since we already know it
-
-            // Now check if they have paid
+            document.getElementById("emailInput").style.display = "none"; 
             verify(userEmail);
         } else {
-            // NOT LOGGED IN
             userEmail = null;
             isProUser = false;
-            
-            // Lock the UI
             document.getElementById("proContainer").classList.add("locked-container");
             document.getElementById("lockOverlay").style.display = "flex";
-            
-            // Change the Pay button to redirect to login
-            const payBtn = document.querySelector("button[onclick='pay()']");
-            if(payBtn) {
-                payBtn.innerText = "Log in to unlock Pro";
-                payBtn.onclick = () => window.location.href = "index.html"; // Send to landing page to login
-            }
-            
-            document.getElementById("emailInput").style.display = "none";
-            document.querySelector(".lock-card button:last-child").style.display = "none"; // Hide restore purchase
         }
     });
 });
 
-// Attach logout function to window
-window.handleLogout = function() {
-    signOut(auth).then(() => {
-        window.location.href = "index.html";
-    });
+window.handleLoginClick = function() {
+    if(userEmail) { if(confirm("Log out?")) signOut(auth).then(() => window.location.href="index.html"); } 
+    else { window.location.href = "index.html"; }
 };
 
-// Update the drawer "Login" button to function as Logout if logged in
-document.getElementById("loginBtn").addEventListener("click", () => {
-    if(userEmail) {
-        if(confirm("Are you sure you want to log out?")) window.handleLogout();
-    } else {
-        window.location.href = "index.html";
-    }
-});
+// --- DRAWER LOGIC ---
+const menuBtn = document.getElementById("menuBtn"), drawer = document.getElementById("drawer"), overlay = document.getElementById("drawerOverlay"), closeBtn = document.getElementById("drawerClose");
+window.openDrawer = function(){ drawer.classList.add("open"); overlay.classList.add("open"); };
+window.closeDrawer = function(){ drawer.classList.remove("open"); overlay.classList.remove("open"); };
+if(menuBtn) menuBtn.addEventListener("click", window.openDrawer); if(closeBtn) closeBtn.addEventListener("click", window.closeDrawer); if(overlay) overlay.addEventListener("click", window.closeDrawer);
+document.addEventListener("keydown", (e) => { if(e.key === "Escape") window.closeDrawer(); });
 
-
-// --- ALL YOUR EXISTING FUNCTIONS BELOW (No changes needed here, just make them global) ---
+// --- CORE LOGIC ---
 window.setMode = function(mode) {
     currentMode = mode;
     document.getElementById('btnProduct').className = mode === 'product' ? 'mode-btn active' : 'mode-btn';
     document.getElementById('btnMonthly').className = mode === 'monthly' ? 'mode-btn active' : 'mode-btn';
     document.getElementById('productInputs').style.display = mode === 'product' ? 'block' : 'none';
     document.getElementById('monthlyInputs').style.display = mode === 'monthly' ? 'block' : 'none';
-    document.querySelector(".input-label[onclick='sample()']").style.display = mode === 'product' ? 'block' : 'none';
     const resultsDiv = document.getElementById('results');
-    if (mode === 'monthly' && monthlyStats) {
-        resultsDiv.style.display = 'block'; analyzeMonthly();
-    } else if (mode === 'product' && currentData.length > 0) {
-        resultsDiv.style.display = 'block'; analyzeProduct();
-    } else {
-        resultsDiv.style.display = 'none';
-    }
+    if (mode === 'monthly' && monthlyStats) { resultsDiv.style.display = 'block'; analyzeMonthly(); } 
+    else if (mode === 'product' && currentData.length > 0) { resultsDiv.style.display = 'block'; analyzeProduct(); } 
+    else { resultsDiv.style.display = 'none'; }
+    resetSimulator();
 };
 
 window.createRow = function(container, name="", val1="", val2="", val3="", isMonth=false){
   const d = document.createElement("div"); d.className = "grid-row";
-  const p1 = isMonth ? "Month (e.g. Jan)" : "Product Name";
-  const p2 = isMonth ? "Sales ₹" : "Sell Price";
-  const p3 = isMonth ? "Expenses ₹" : "Cost Price";
-  const p4 = isMonth ? "Orders" : "Quantity";
   d.innerHTML = `
-    <input type="text" placeholder="${p1}" value="${name}">
-    <input type="number" placeholder="${p2}" value="${val1}">
-    <input type="number" placeholder="${p3}" value="${val2}">
-    <input type="number" placeholder="${p4}" value="${val3}">
+    <input type="text" placeholder="${isMonth ? "Month" : "Product Name"}" value="${name}">
+    <input type="number" placeholder="Sell ₹" value="${val1}">
+    <input type="number" placeholder="Cost ₹" value="${val2}">
+    <input type="number" placeholder="Qty" value="${val3}">
     <button class="btn-ghost" onclick="this.parentElement.remove(); window.saveDraft()">✕</button>
   `;
   container.appendChild(d);
@@ -474,25 +573,22 @@ window.saveDraft = function() {
 };
 
 window.loadDrafts = function() {
-    const prodSaved = JSON.parse(localStorage.getItem("vizbix_draft") || "[]");
-    const monthSaved = JSON.parse(localStorage.getItem("vizbix_draft_month") || "[]");
+    const p = JSON.parse(localStorage.getItem("vizbix_draft") || "[]");
+    const m = JSON.parse(localStorage.getItem("vizbix_draft_month") || "[]");
     items.innerHTML = ""; monthItems.innerHTML = "";
-    if(prodSaved.length > 0) prodSaved.forEach(x => window.createRow(items, x.n, x.v1, x.v2, x.v3)); else { window.addRow(); window.addRow(); }
-    if(monthSaved.length > 0) monthSaved.forEach(x => window.createRow(monthItems, x.n, x.v1, x.v2, x.v3, true)); else { window.addMonthRow(); window.addMonthRow(); }
+    if(p.length > 0) p.forEach(x => window.createRow(items, x.n, x.v1, x.v2, x.v3)); else { window.addRow(); window.addRow(); }
+    if(m.length > 0) m.forEach(x => window.createRow(monthItems, x.n, x.v1, x.v2, x.v3, true)); else { window.addMonthRow(); window.addMonthRow(); }
 };
 
 window.scrapeRows = function(container) {
     let data = [];
-    container.querySelectorAll(".grid-row").forEach(r => {
-        const i = r.querySelectorAll("input");
-        data.push({ n: i[0].value, v1: i[1].value, v2: i[2].value, v3: i[3].value });
-    });
+    container.querySelectorAll(".grid-row").forEach(r => { const i = r.querySelectorAll("input"); data.push({ n: i[0].value, v1: i[1].value, v2: i[2].value, v3: i[3].value }); });
     return data;
 };
 
 window.sample = function(){
   items.innerHTML="";
-  [["Wireless Earbuds", 2500, 1200, 140], ["Smart Watch", 4500, 2800, 85], ["USB-C Cable", 499, 150, 400]].forEach(x => window.createRow(items, x[0], x[1], x[2], x[3]));
+  [["Premium T-Shirt", 999, 450, 120], ["Hoodie", 1499, 800, 45], ["Cap", 299, 100, 80]].forEach(x => window.createRow(items, x[0], x[1], x[2], x[3]));
   window.saveDraft(); window.analyze();
 };
 
@@ -501,34 +597,27 @@ window.analyze = function(){ if(currentMode === 'monthly') window.analyzeMonthly
 window.analyzeMonthly = function() {
     let totalSales=0, totalExp=0, totalOrders=0, count=0;
     monthItems.querySelectorAll(".grid-row").forEach(r => {
-        const i = r.querySelectorAll("input");
-        const s = Number(i[1].value)||0, e = Number(i[2].value)||0, o = Number(i[3].value)||0;
+        const i = r.querySelectorAll("input"); const s = Number(i[1].value)||0, e = Number(i[2].value)||0, o = Number(i[3].value)||0;
         if(s>0 || e>0) { totalSales+=s; totalExp+=e; totalOrders+=o; count++; }
     });
-    if(count === 0) return alert("Please enter data for at least one month.");
+    if(count === 0) return alert("Please enter data.");
     const avgSales = totalSales / count; const avgExp = totalExp / count; const avgProfit = avgSales - avgExp;
     const avgOrders = totalOrders > 0 ? (totalOrders / count) : 0; const avgAOV = avgOrders > 0 ? (avgSales / avgOrders) : 0;
     const margin = avgSales > 0 ? (avgProfit / avgSales * 100) : 0;
     monthlyStats = { avgSales, avgExp, avgProfit, avgOrders, avgAOV, margin, count };
+    
+    baseRevenueForSim = avgSales; baseCostForSim = avgExp; baseProfitForSim = avgProfit;
+    updateSimulator();
+
     window.showResults();
     document.getElementById("kpiRevLabel").innerText = "AVG MONTHLY SALES"; document.getElementById("kpiCostLabel").innerText = "AVG MONTHLY EXPENSES"; document.getElementById("kpiProfitLabel").innerText = "AVG MONTHLY PROFIT";
-    document.getElementById("dispRevenue").innerText = "₹ " + avgSales.toLocaleString(undefined, {maximumFractionDigits:0});
-    document.getElementById("dispCost").innerText = "₹ " + avgExp.toLocaleString(undefined, {maximumFractionDigits:0});
-    document.getElementById("dispProfit").innerText = "₹ " + avgProfit.toLocaleString(undefined, {maximumFractionDigits:0});
-    document.getElementById("monthlyMetrics").style.display = "flex"; document.getElementById("dispAOV").innerText = "₹ " + avgAOV.toFixed(0); document.getElementById("dispOrders").innerText = avgOrders.toFixed(1);
+    document.getElementById("dispRevenue").innerText = "₹" + avgSales.toLocaleString(undefined, {maximumFractionDigits:0});
+    document.getElementById("dispCost").innerText = "₹" + avgExp.toLocaleString(undefined, {maximumFractionDigits:0});
+    document.getElementById("dispProfit").innerText = "₹" + avgProfit.toLocaleString(undefined, {maximumFractionDigits:0});
+    document.getElementById("monthlyMetrics").style.display = "grid"; document.getElementById("dispAOV").innerText = "₹" + avgAOV.toFixed(0); document.getElementById("dispOrders").innerText = avgOrders.toFixed(1);
     document.getElementById("tableContainer").style.display = "none";
     window.generateMonthlyInsights(margin, avgOrders, avgAOV, count);
-    window.drawChart('pie', ['Expenses', 'Net Profit'], [avgExp, avgProfit], ['#F97316', '#10B981']);
-};
-
-window.generateMonthlyInsights = function(margin, orders, aov, count) {
-    const div = document.getElementById("insights"); let statusTitle = ""; let statusColor = ""; let strategies = [];
-    if (margin <= 0) { statusTitle = "🚨 CRITICAL: You are losing money on every sale."; statusColor = "insight-orange"; strategies = [`<strong>Stop Ads Immediately:</strong> You are burning cash. Pause all paid marketing until you fix your unit economics.`, `<strong>Price Audit:</strong> You need to raise prices by at least ${Math.abs(margin).toFixed(0)}% just to break even.`, `<strong>Cost Cutting:</strong> Negotiate with your supplier or switch to cheaper packaging immediately.`]; } 
-    else if (orders > 30 && margin < 15) { statusTitle = "⚠ High Activity, Low Profit (The 'Busy Trap')"; statusColor = "insight-orange"; strategies = [`<strong>Price Hike Test:</strong> You have volume leverage. Increase prices by 5-10%. You might lose a few customers, but total profit will likely go <i>up</i>.`, `<strong>Kill Low-Margin Best Sellers:</strong> If your most popular item has low margin, it is dragging you down. Bundle it with a high-margin accessory.`, `<strong>Supplier Negotiation:</strong> Since you are ordering ${orders.toFixed(0)} times a month, demand a bulk discount from your vendor.`]; }
-    else if (margin > 25 && orders < 10) { statusTitle = "💎 Hidden Gem: Great Product, Needs Eyes"; statusColor = "insight-blue"; strategies = [`<strong>Aggressive Marketing:</strong> Your margins are healthy (${margin.toFixed(0)}%). You can afford to spend more on ads to acquire customers.`, `<strong>Collect Social Proof:</strong> Email your ${orders.toFixed(0)} past customers personally. Ask for a photo review in exchange for a discount code.`, `<strong>Micro-Influencers:</strong> Send free samples to small influencers. Your high margin covers the cost, and you need the visibility.`]; }
-    else if (margin >= 20 && orders >= 10) { statusTitle = "✅ Healthy Business: Time to Maximize"; statusColor = "insight-green"; strategies = [`<strong>Increase AOV:</strong> Your flow is steady. Add a "One-Click Upsell" at checkout (e.g., a ₹299 accessory) to boost revenue by 15% without new customers.`, `<strong>Email Marketing:</strong> Don't just sell once. Send a "VIP Restock" or "New Arrival" email to your list this week.`, `<strong>Loyalty Loop:</strong> Insert a "Thank You" card with a 10% off coupon for their <i>next</i> order inside the box.`]; }
-    else { statusTitle = "⚖️ Stable but Stagnant"; statusColor = "insight-blue"; strategies = [`<strong>Bundle Builder:</strong> Create a "Starter Kit" or "Gift Bundle" priced at ₹${(aov * 1.5).toFixed(0)}. This forces AOV up.`, `<strong>Shipping Threshold:</strong> Set "Free Shipping" at ₹${(aov + 200).toFixed(0)} to encourage adding one more small item.`, `<strong>Follow Up:</strong> Send a WhatsApp message 7 days after delivery asking "How was it?" to build trust for repeat sales.`]; }
-    div.innerHTML = `<div class="insight-item ${statusColor}"><div><div style="font-size:14px; font-weight:800; margin-bottom:8px;">${statusTitle}</div><div style="margin-bottom:12px;">Based on your average of <strong>${orders.toFixed(1)} orders/mo</strong> and <strong>${margin.toFixed(0)}% margin</strong>:</div><ul style="margin:0; padding-left:18px; line-height:1.6;"><li style="margin-bottom:6px;">${strategies[0]}</li><li style="margin-bottom:6px;">${strategies[1]}</li><li>${strategies[2]}</li></ul></div></div>${window.getAiButtonHtml()}`;
+    window.drawChart('pie', ['Expenses', 'Net Profit'], [avgExp, avgProfit], ['#E2E8F0', '#10B981']);
 };
 
 window.analyzeProduct = function(){
@@ -538,49 +627,98 @@ window.analyzeProduct = function(){
     if(sell===0 && cost===0) return; const rev=sell*qty, pc=cost*qty, prof=rev-pc; totalRevenue+=rev; totalCost+=pc; totalProfit+=prof;
     data.push({name, sell, cost, qty, profit:prof, margin: sell>0?((sell-cost)/sell):0});
   });
-  if(data.length===0) return alert("Please enter at least one product.");
-  currentData = data; window.showResults();
+  if(data.length===0) return alert("Please enter product data.");
+  currentData = data; 
+  
+  baseRevenueForSim = totalRevenue; baseCostForSim = totalCost; baseProfitForSim = totalProfit;
+  updateSimulator();
+
+  window.showResults();
   document.getElementById("kpiRevLabel").innerText = "TOTAL REVENUE"; document.getElementById("kpiCostLabel").innerText = "TOTAL COST"; document.getElementById("kpiProfitLabel").innerText = "NET PROFIT";
   document.getElementById("monthlyMetrics").style.display = "none"; document.getElementById("tableContainer").style.display = "block";
-  document.getElementById("dispRevenue").innerText = "₹ "+totalRevenue.toLocaleString(); document.getElementById("dispCost").innerText = "₹ "+totalCost.toLocaleString(); document.getElementById("dispProfit").innerText = "₹ "+totalProfit.toLocaleString();
-  window.generateTable(data); window.generateInsights(data); window.drawChart('bar', data.map(x=>x.name), data.map(x=>x.profit), '#0F172A');
+  document.getElementById("dispRevenue").innerText = "₹"+totalRevenue.toLocaleString(); document.getElementById("dispCost").innerText = "₹"+totalCost.toLocaleString(); document.getElementById("dispProfit").innerText = "₹"+totalProfit.toLocaleString();
+  window.generateTable(data); window.generateInsights(data); window.drawChart('bar', data.map(x=>x.name), data.map(x=>x.profit), '#4F46E5');
 };
 
-window.showResults = function() { document.getElementById("results").style.display = "block"; document.getElementById("results").scrollIntoView({behavior: "smooth"}); };
+window.showResults = function() { 
+  const res = document.getElementById("results");
+  res.style.display = "block"; 
+  if(window.innerWidth < 1024) res.scrollIntoView({behavior: "smooth"}); 
+};
+
+// --- SIMULATOR LOGIC ---
+const simPrice = document.getElementById('simPrice');
+const simCost = document.getElementById('simCost');
+simPrice.addEventListener('input', updateSimulator);
+simCost.addEventListener('input', updateSimulator);
+
+function resetSimulator() {
+    simPrice.value = 0; simCost.value = 0;
+    document.getElementById('priceLabel').innerText = "+0%";
+    document.getElementById('costLabel').innerText = "+0%";
+    document.getElementById('priceLabel').style.color = 'var(--accent)';
+    document.getElementById('costLabel').style.color = 'var(--danger)';
+}
+
+function updateSimulator() {
+    const pChange = parseInt(simPrice.value);
+    const cChange = parseInt(simCost.value);
+    
+    document.getElementById('priceLabel').innerText = (pChange > 0 ? "+" : "") + pChange + "%";
+    document.getElementById('costLabel').innerText = (cChange > 0 ? "+" : "") + cChange + "%";
+    
+    const newRev = baseRevenueForSim * (1 + (pChange/100));
+    const newCost = baseCostForSim * (1 + (cChange/100));
+    const newProfit = newRev - newCost;
+    const diff = newProfit - baseProfitForSim;
+
+    document.getElementById('simProjected').innerText = "₹" + newProfit.toLocaleString(undefined, {maximumFractionDigits:0});
+    const diffEl = document.getElementById('simDiff');
+    if(diff > 0) { diffEl.innerText = "Impact: +₹" + diff.toLocaleString(undefined, {maximumFractionDigits:0}); diffEl.className = "sim-diff diff-pos"; }
+    else if(diff < 0) { diffEl.innerText = "Impact: -₹" + Math.abs(diff).toLocaleString(undefined, {maximumFractionDigits:0}); diffEl.className = "sim-diff diff-neg"; }
+    else { diffEl.innerText = "Impact: ₹0"; diffEl.className = "sim-diff"; }
+}
+
+// --- INSIGHTS ---
+window.generateMonthlyInsights = function(margin, orders, aov, count) {
+    const div = document.getElementById("insights"); let statusTitle = ""; let statusColor = ""; let strategies = [];
+    if (margin <= 0) { statusTitle = "🚨 CRITICAL: Losing money on sales."; statusColor = "insight-orange"; strategies = [`<strong>Stop Ads:</strong> Pause paid marketing until unit economics are fixed.`, `<strong>Price Audit:</strong> Raise prices to break even.`, `<strong>Cost Cutting:</strong> Negotiate with suppliers.`]; } 
+    else if (orders > 30 && margin < 15) { statusTitle = "⚠ High Activity, Low Profit"; statusColor = "insight-orange"; strategies = [`<strong>Price Hike Test:</strong> Increase prices by 5-10%.`, `<strong>Bundle:</strong> Bundle low-margin best sellers with high-margin accessories.`, `<strong>Negotiate:</strong> Demand bulk discount from vendors.`]; }
+    else if (margin > 25 && orders < 10) { statusTitle = "💎 Hidden Gem: Great Product"; statusColor = "insight-blue"; strategies = [`<strong>Aggressive Marketing:</strong> Spend more on ads.`, `<strong>Social Proof:</strong> Ask for photo reviews.`, `<strong>Influencers:</strong> Send free samples.`]; }
+    else if (margin >= 20 && orders >= 10) { statusTitle = "✅ Healthy Business"; statusColor = "insight-green"; strategies = [`<strong>Increase AOV:</strong> Add "One-Click Upsell" at checkout.`, `<strong>Email Marketing:</strong> Send "VIP Restock" emails.`, `<strong>Loyalty Loop:</strong> Insert 10% off coupons.`]; }
+    else { statusTitle = "⚖️ Stable but Stagnant"; statusColor = "insight-blue"; strategies = [`<strong>Bundle Builder:</strong> Create a Starter Kit.`, `<strong>Shipping Threshold:</strong> Set Free Shipping higher than AOV.`, `<strong>Follow Up:</strong> Send WhatsApp messages post-delivery.`]; }
+    div.innerHTML = `<div class="insight-item ${statusColor}"><div><div style="font-weight:800; color:var(--primary); margin-bottom:8px;">${statusTitle}</div><ul style="margin:0; padding-left:18px; color:var(--text-main)"><li style="margin-bottom:8px;">${strategies[0]}</li><li style="margin-bottom:8px;">${strategies[1]}</li><li>${strategies[2]}</li></ul></div></div>${window.getAiButtonHtml()}`;
+};
 
 window.generateInsights = function(d){
   const div = document.getElementById("insights"); let html = "", cnt = 0;
-  const bestProfit = [...d].sort((a,b)=>b.profit - a.profit)[0]; if(bestProfit) { html += `<div class="insight-item insight-green"><div><strong>★ Star Product:</strong> ${bestProfit.name} generates the most profit (₹${bestProfit.profit.toLocaleString()}). Focus ad spend here.</div></div>`; cnt++; }
-  const bestQty = [...d].sort((a,b)=>b.qty - a.qty)[0]; if(bestQty && bestQty.name !== bestProfit?.name) { html += `<div class="insight-item insight-blue"><div><strong>📦 Volume Leader:</strong> ${bestQty.name} is your most popular item (${bestQty.qty} units). Consider bundling it with slower items.</div></div>`; cnt++; }
-  d.filter(x => x.margin < 0.20).forEach(x => { if(cnt < 4) { html += `<div class="insight-item insight-orange"><div><strong>⚠ Low Margin:</strong> ${x.name} is only ${(x.margin*100).toFixed(0)}%. Raise price or lower cost to improve health.</div></div>`; cnt++; }});
-  if(cnt < 3 && d.length > 0) html += `<div class="insight-item insight-gray"><div><strong>💡 Growth Tip:</strong> You have a healthy catalog. Consider testing a 10% price increase on your top sellers to boost net profit.</div></div>`;
+  const bestProfit = [...d].sort((a,b)=>b.profit - a.profit)[0]; if(bestProfit) { html += `<div class="insight-item insight-green"><div><strong style="color:var(--primary)">★ Star Product:</strong> ${bestProfit.name} generates the most profit (₹${bestProfit.profit.toLocaleString()}). Focus ad spend here.</div></div>`; cnt++; }
+  const bestQty = [...d].sort((a,b)=>b.qty - a.qty)[0]; if(bestQty && bestQty.name !== bestProfit?.name) { html += `<div class="insight-item insight-blue"><div><strong style="color:var(--primary)">📦 Volume Leader:</strong> ${bestQty.name} is your most popular item. Consider bundling it.</div></div>`; cnt++; }
+  d.filter(x => x.margin < 0.20).forEach(x => { if(cnt < 4) { html += `<div class="insight-item insight-orange"><div><strong style="color:var(--primary)">⚠ Low Margin:</strong> ${x.name} is only ${(x.margin*100).toFixed(0)}%. Raise price or lower cost.</div></div>`; cnt++; }});
+  if(cnt < 3 && d.length > 0) html += `<div class="insight-item insight-gray"><div><strong style="color:var(--primary)">💡 Growth Tip:</strong> Consider testing a 10% price increase on top sellers to boost net profit.</div></div>`;
   html += window.getAiButtonHtml(); div.innerHTML = html;
 };
 
-window.getAiButtonHtml = function() { return `<div id="aiContainer" style="margin-top:15px; border-top:1px dashed var(--border); padding-top:15px;"><button id="aiBtn" class="btn-secondary" style="width:100%; border-color:#818cf8; color:#4f46e5; background:#eef2ff;" onclick="window.askAI()">✨ Ask AI Consultant for Strategy</button><div id="aiResult" style="margin-top:15px; font-size:14px; line-height:1.6; color:#334155; display:none; background:white; padding:15px; border-radius:12px; border:1px solid #e2e8f0;"></div></div>`; };
-window.generateTable = function(d){ const t = document.getElementById("table"); t.innerHTML = "<tr><th>Product</th><th>Profit</th><th>Margin</th><th>Status</th></tr>"; d.forEach(x => { t.innerHTML += `<tr><td><b>${x.name}</b><br><small style='color:#64748B'>Sold: ${x.qty}</small></td><td>₹${x.profit.toLocaleString()}</td><td>${(x.margin*100).toFixed(1)}%</td><td>${x.margin>0.3?"<span style='color:green'>Healthy</span>":"<span style='color:orange'>Review</span>"}</td></tr>`; }); };
+window.getAiButtonHtml = function() { return `<button id="aiBtn" class="btn-secondary" style="width:100%; border-color:#93C5FD; color:#2563EB; background:#EFF6FF; margin-top:12px; padding: 12px;" onclick="window.askAI()">✨ Generate AI Strategy</button><div id="aiResult" style="margin-top:16px; font-size:13px; line-height:1.6; display:none;"></div>`; };
+
+window.generateTable = function(d){ const t = document.getElementById("table"); t.innerHTML = "<tr><th>Product</th><th>Profit</th><th>Margin</th><th>Status</th></tr>"; d.forEach(x => { t.innerHTML += `<tr><td><b style="color:var(--primary)">${x.name}</b><br><small style='color:var(--text-muted)'>Vol: ${x.qty}</small></td><td>₹${x.profit.toLocaleString()}</td><td>${(x.margin*100).toFixed(1)}%</td><td>${x.margin>0.3?"<span style='color:#059669; font-weight:700;'>Healthy</span>":"<span style='color:#D97706; font-weight:700;'>Check</span>"}</td></tr>`; }); };
 
 window.drawChart = function(type, labels, data, colors){ 
   if(chartInstance) chartInstance.destroy(); 
   const ctx = document.getElementById("chart").getContext('2d'); 
-  const options = { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: type === 'pie', position: 'bottom' }, datalabels: { color: type === 'pie' ? 'white' : '#64748B', font: { weight: 'bold', size: 11 }, formatter: (value) => '₹' + value.toLocaleString(undefined, {maximumFractionDigits:0}), anchor: type === 'pie' ? 'center' : 'end', align: type === 'pie' ? 'center' : 'top', offset: 4 } } };
-  if (type === 'bar') options.scales = { y: { beginAtZero: true }, x: { grid: { display: false } } };
-  chartInstance = new Chart(ctx, { type: type, data: { labels: labels, datasets: [{ label: 'Profit', data: data, backgroundColor: colors, borderRadius: 4, borderWidth: 0 }] }, options: options, plugins: [ChartDataLabels] }); 
+  chartInstance = new Chart(ctx, { type: type, data: { labels: labels, datasets: [{ data: data, backgroundColor: colors, borderRadius: 6 }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: {display: type==='pie', position: 'bottom'}, datalabels: { display: false } }, scales: type === 'bar' ? { x: { grid: { display: false } }, y: { beginAtZero: true, border: { dash: [4, 4] } } } : {} } }); 
 };
 
+// --- API FUNCTIONS ---
 window.askAI = async function() {
-    if(!isProUser || !userEmail) return alert("Please Login (Pro Feature)");
+    if(!isProUser || !userEmail) return alert("Pro Feature");
     const btn = document.getElementById("aiBtn"); const box = document.getElementById("aiResult");
-    btn.innerHTML = "✨ Strategizing..."; btn.disabled = true; btn.classList.add("ai-thinking");
-    let aiPayload = {};
-    if (currentMode === 'monthly') {
-        if(!monthlyStats) return alert("Run analysis first."); const s = monthlyStats;
-        aiPayload = { email: userEmail, mode: 'monthly', summary: `Based on ${s.count} months average:\nAvg Monthly Sales: ₹${s.avgSales.toFixed(0)}, Avg Expenses: ₹${s.avgExp.toFixed(0)}, Avg Orders: ${s.avgOrders.toFixed(1)}, Gross Margin: ${s.margin.toFixed(1)}%.` };
-    } else { aiPayload = { email: userEmail, products: currentData.map(x => ({ name: x.name, cost: x.cost, sell: x.sell, qty: x.qty })), mode: 'product' }; }
+    btn.innerHTML = "✨ Analyzing Data..."; btn.disabled = true; btn.classList.add("ai-thinking");
+    let aiPayload = currentMode === 'monthly' ? { email: userEmail, mode: 'monthly', summary: `Based on ${monthlyStats.count} months avg:\nSales: ₹${monthlyStats.avgSales.toFixed(0)}, Exp: ₹${monthlyStats.avgExp.toFixed(0)}, Margin: ${monthlyStats.margin.toFixed(1)}%.` } : { email: userEmail, products: currentData.map(x => ({ name: x.name, cost: x.cost, sell: x.sell, qty: x.qty })), mode: 'product' };
     try {
         const r = await fetch(workerURL + "/ai-analyze", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(aiPayload) });
         const d = await r.json(); btn.classList.remove("ai-thinking");
-        if(d.ok) { btn.style.display = "none"; box.style.display = "block"; box.innerHTML = "<strong>🤖 AI Consultant Strategy:</strong><br><br>" + d.response.replace(/\n/g, "<br>").replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"); } else { alert(d.error); btn.innerHTML = "✨ Retry"; btn.disabled = false; }
+        if(d.ok) { btn.style.display = "none"; box.style.display = "block"; box.innerHTML = "<strong>🤖 Action Plan:</strong><br><br>" + d.response.replace(/\n/g, "<br>").replace(/\*\*(.*?)\*\*/g, "<strong style='color:var(--primary)'>$1</strong>"); } else { alert(d.error); btn.innerHTML = "✨ Retry AI"; btn.disabled = false; }
     } catch(e) { btn.classList.remove("ai-thinking"); alert("Error"); btn.disabled = false; }
 };
 
@@ -588,27 +726,16 @@ window.verify = async function(email){
   try {
     const r = await fetch(workerURL+"/check?email="+email); const d = await r.json();
     if(d.valid) {
-        isProUser = true; 
-        document.getElementById("lockOverlay").style.display = "none"; 
-        
+        isProUser = true; document.getElementById("lockOverlay").style.display = "none"; 
+        document.getElementById("historyBtn").style.display = "inline-flex"; document.getElementById("saveCloudBtn").style.display = "flex";
         let dateStr = "";
         if(d.expiry) { const date = new Date(parseInt(d.expiry)); dateStr = date.toLocaleDateString(undefined, {day:'numeric', month:'short', year:'numeric'}); }
-        
-        document.getElementById("userEmailHeader").innerHTML = `<div>${email}</div><div style="font-size:10px; opacity:0.8; margin-top:2px;">Pro Active</div>`;
         const drawerExpiry = document.getElementById("drawerExpiryDisplay");
         if(drawerExpiry) drawerExpiry.innerText = "Plan expires: " + dateStr;
-        
-        document.getElementById("historyBtn").style.display = "inline-flex"; document.getElementById("saveCloudBtn").style.display = "flex";
         if(chartInstance) chartInstance.resize();
     } else { 
-        // Logged in, but NOT a Pro user. Keep UI locked, but change button text.
         document.getElementById("proContainer").classList.add("locked-container");
         document.getElementById("lockOverlay").style.display = "flex";
-        const btn = document.querySelector("button[onclick='pay()']");
-        if(btn) {
-            btn.innerText = `Unlock Pro for ₹1`;
-            btn.onclick = window.pay; // Make sure it points to payment
-        }
     }
   } catch(e) { console.log(e); }
 };
@@ -620,21 +747,22 @@ window.saveToCloud = async function() {
     btn.innerHTML = "<span style='animation:spin 1s linear infinite'>⏳</span>";
     try { 
         await fetch(workerURL + "/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: userEmail, data: dataToSave, mode: currentMode, date: new Date().toISOString() }) }); 
-        btn.innerHTML = "✅"; setTimeout(() => btn.innerHTML = "<span style='font-size:18px'>💾</span>", 1500); 
+        btn.innerHTML = "✅"; setTimeout(() => btn.innerHTML = "<span style='font-size:16px'>💾</span> <span class='btn-text-desktop'>Save</span>", 1500); 
     } catch(e) { btn.innerHTML = "💾"; }
 };
 
 window.toggleHistory = function(show) { document.getElementById("historyModal").style.display = show ? "flex" : "none"; if(show && userEmail) window.fetchHistory(); };
+
 window.fetchHistory = async function() {
     const list = document.getElementById("historyList"); list.innerHTML = "Loading...";
     try {
         const r = await fetch(workerURL + "/history?email=" + userEmail); const d = await r.json();
-        if(d.length === 0) { list.innerHTML = "<p style='color:#64748B; text-align:center'>No history.</p>"; return; }
+        if(d.length === 0) { list.innerHTML = "<p style='color:var(--text-muted); text-align:center'>No history saved yet.</p>"; return; }
         list.innerHTML = "";
         d.forEach(item => {
-            const dateStr = new Date(item.date).toLocaleDateString(); const modeLabel = item.mode === 'monthly' ? 'Monthly' : 'Product';
+            const dateStr = new Date(item.date).toLocaleDateString(undefined, {month: 'short', day: 'numeric', year: 'numeric'}); const modeLabel = item.mode === 'monthly' ? 'Monthly Data' : 'Product Data';
             const div = document.createElement("div"); div.className = "history-item";
-            div.innerHTML = `<div><div style="font-weight:600; font-size:14px;">${dateStr}</div><div style="font-size:12px; color:#64748B">${item.data.length} Rows • ${modeLabel}</div></div><button class="btn-secondary" style="font-size:11px; padding:6px 10px;">Load</button>`;
+            div.innerHTML = `<div><div style="font-weight:700; font-size:15px; color:var(--primary);">${dateStr}</div><div style="font-size:13px; color:var(--text-muted); margin-top:4px;">${item.data.length} Rows • ${modeLabel}</div></div><button class="btn-secondary" style="font-size:12px; padding:8px 14px;">Load Data</button>`;
             div.onclick = () => window.loadHistoryItem(item.data, item.mode);
             list.appendChild(div);
         });
@@ -650,9 +778,8 @@ window.loadHistoryItem = function(data, savedMode) {
 
 window.pay = function(){
   if(!userEmail) return alert("Please log in first to purchase.");
-  
   const options = {
-    key: KEY, amount: PRICE, currency: "INR", name: "Vizbix Pro", description: "30 Days Access",
+    key: KEY, amount: PRICE, currency: "INR", name: "Vizbix Pro", description: "Unlimited Business Intelligence",
     prefill: { email: userEmail }, theme: { color: "#0F172A" },
     handler: async function(response){ 
         const btn = document.querySelector("button[onclick='pay()']"); const originalText = btn.innerText;
@@ -671,26 +798,13 @@ window.pay = function(){
 window.downloadPDF = async function() {
   const { jsPDF } = window.jspdf; const element = document.getElementById("results");
   const btn = document.querySelector("button[onclick='downloadPDF()']"); const originalText = btn.innerText;
-  btn.innerText = "Generating...";
-  const canvas = await html2canvas(element, { scale: 2, backgroundColor: "#ffffff", useCORS: true });
+  btn.innerText = "Generating PDF...";
+  const canvas = await html2canvas(element, { scale: 2, backgroundColor: "#F4F7F9", useCORS: true });
   const imgData = canvas.toDataURL('image/png'); const pdf = new jsPDF('p', 'mm', 'a4');
   const imgWidth = 210; const imgHeight = canvas.height * imgWidth / canvas.width;
-  pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight); pdf.save('Vizbix-Profit-Report.pdf');
+  pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight); pdf.save('Vizbix-Report.pdf');
   btn.innerText = originalText;
 };
-
-// --- Drawer Logic ---
-const menuBtn = document.getElementById("menuBtn"), drawer = document.getElementById("drawer"), overlay = document.getElementById("drawerOverlay"), closeBtn = document.getElementById("drawerClose");
-window.openDrawer = function(){ drawer.classList.add("open"); overlay.classList.add("open"); document.body.style.overflow = "hidden"; };
-window.closeDrawer = function(){ drawer.classList.remove("open"); overlay.classList.remove("open"); document.body.style.overflow = ""; };
-if(menuBtn) menuBtn.addEventListener("click", window.openDrawer); if(closeBtn) closeBtn.addEventListener("click", window.closeDrawer); if(overlay) overlay.addEventListener("click", window.closeDrawer);
-document.addEventListener("keydown", (e) => { if(e.key === "Escape") window.closeDrawer(); });
 </script>
 </body>
-</html>"
-
-
-
-
-
-
+</html>
