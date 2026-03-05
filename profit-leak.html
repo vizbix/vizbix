@@ -78,10 +78,13 @@ html, body {
 
 /* REDUCED PADDING TO FIX GAP */
 .input-panel-header {
-  padding: 8px 16px 12px; 
+  padding: 12px 16px 8px; /* Balanced padding */
   border-bottom: 1px solid var(--border);
-  background: var(--surface);
+  background: rgba(255, 255, 255, 0.95); /* Slightly translucent */
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
   position: sticky; top: 64px; z-index: 100;
+  box-shadow: 0 4px 10px rgba(0,0,0,0.04); /* Adds depth to prevent visual merging */
 }
 
 .input-panel-body { padding: 16px; }
@@ -126,7 +129,7 @@ button:active { transform: scale(0.97); }
   position: relative; box-shadow: var(--shadow-sm);
   margin-bottom: 12px;
 }
-.name-wrap { grid-column: span 3; padding-right: 32px; } 
+.name-wrap { grid-column: span 3; padding-right: 56px; }
 .num-wrap { grid-column: span 1; }
 
 .delete-btn {
@@ -348,8 +351,8 @@ tr:last-child td { border-bottom: none; }
           <button class="mode-btn active" id="btnProduct" onclick="setMode('product')">Product Data</button>
           <button class="mode-btn" id="btnMonthly" onclick="setMode('monthly')">Monthly Data</button>
       </div>
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 12px;">
-        <span class="input-label" style="font-size: 13px; font-weight: 600; color: var(--text-muted); margin:0;">Data Entry</span>
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 6px;">
+  <span class="input-label" style="font-size: 13px; font-weight: 600; color: var(--text-muted); margin:0;">Data Entry</span>
         <span style="font-size:12px; font-weight:700; color:var(--accent); cursor:pointer;" onclick="sample()">Load Demo Data</span>
       </div>
     </div>
@@ -874,4 +877,5 @@ window.downloadPDF = async function() {
 </script>
 </body>
 </html>
+
 
