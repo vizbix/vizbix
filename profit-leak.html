@@ -62,7 +62,9 @@ html, body {
 
 /* --- APP SHELL (Mobile Default) --- */
 .app-container {
-  margin-top: 64px; 
+  /* FIX 1: Switched to padding-top to prevent mobile margin-collapse gap */
+  padding-top: 64px; 
+  margin-top: 0;
   display: flex;
   flex-direction: column; 
   width: 100%;
@@ -76,15 +78,15 @@ html, body {
   border-bottom: 1px solid var(--border);
 }
 
-/* REDUCED PADDING TO FIX GAP */
+/* FIX 2: Tightened padding to bring elements closer to header */
 .input-panel-header {
-  padding: 8px 16px 12px; 
+  padding: 16px 20px 12px; 
   border-bottom: 1px solid var(--border);
   background: var(--surface);
   position: sticky; top: 64px; z-index: 100;
 }
 
-.input-panel-body { padding: 16px; }
+.input-panel-body { padding: 16px 20px 20px 20px; }
 
 .results-panel {
   width: 100%;
@@ -229,7 +231,7 @@ td { padding: 14px 16px; border-bottom: 1px solid var(--border); font-size: 14px
 tr:last-child td { border-bottom: none; }
 
 /* --- Menus & Modals --- */
-.menu-btn { width: 40px; height: 40px; border: 1px solid var(--border); background: var(--surface); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow-sm); padding: 0; flex-shrink: 0; }
+.menu-btn { width: 40px; height: 40px; flex-shrink: 0; border: 1px solid var(--border); background: var(--surface); border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: var(--shadow-sm); padding: 0; }
 .menu-btn svg { width: 20px; height: 20px; stroke: var(--primary); stroke-width: 2.5; stroke-linecap: round; stroke-linejoin: round; }
 
 .drawer-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.4); backdrop-filter: blur(4px); opacity: 0; pointer-events: none; transition: opacity .3s ease; z-index: 2000; }
@@ -239,8 +241,8 @@ tr:last-child td { border-bottom: none; }
 .drawer-head { padding: 24px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
 .drawer-title { font-weight: 800; font-size: 18px; color: var(--primary); }
 
-/* FIX: Changed from SVG to simple Text rendering to avoid the "dot" bug */
-.drawer-close { width: 36px; height: 36px; border-radius: 10px; border: none; background: #F1F5F9; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; font-size: 18px; font-weight: bold; color: var(--text-muted); padding: 0;}
+/* FIX 3: Added flex-shrink: 0 and min-width/height to prevent the 'dot' bug */
+.drawer-close { width: 36px; height: 36px; min-width: 36px; min-height: 36px; flex-shrink: 0; border-radius: 10px; border: none; background: #F1F5F9; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; font-size: 18px; font-weight: bold; color: var(--text-muted); padding: 0;}
 
 .drawer-body { padding: 24px; overflow: auto; }
 .drawer-links { display: flex; flex-direction: column; gap: 10px; }
@@ -348,7 +350,7 @@ tr:last-child td { border-bottom: none; }
           <button class="mode-btn active" id="btnProduct" onclick="setMode('product')">Product Data</button>
           <button class="mode-btn" id="btnMonthly" onclick="setMode('monthly')">Monthly Data</button>
       </div>
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 12px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-top: 16px;">
         <span class="input-label" style="font-size: 13px; font-weight: 600; color: var(--text-muted); margin:0;">Data Entry</span>
         <span style="font-size:12px; font-weight:700; color:var(--accent); cursor:pointer;" onclick="sample()">Load Demo Data</span>
       </div>
@@ -780,14 +782,12 @@ window.verify = async function(email){
         document.getElementById("drawerHistoryBtn").style.display = "flex"; 
         document.getElementById("saveCloudBtn").style.display = "inline-flex";
         
-        // --- DYNAMIC EXPIRY LOGIC (Matches Landing Page) ---
+        // --- FIX 4: MATCHED LANDING PAGE LOGIC EXACTLY (Using Number(d.expiry)) ---
         const expiryElement = document.getElementById("drawerExpiry");
         if (d.expiry) {
             const daysLeft = Math.ceil((Number(d.expiry) - Date.now()) / (1000 * 60 * 60 * 24));
             if (daysLeft > 0) {
-                expiryElement.innerText = `⏱ Your Pro access expires in ${daysLeft} days.`;
-                expiryElement.style.color = "var(--success)";
-                expiryElement.style.background = "var(--success-bg)";
+                expiryElement.innerText = `⏱ Pro access expires in ${daysLeft} days.`;
             } else {
                 expiryElement.innerText = "⚠️ Pro access has expired.";
                 expiryElement.style.color = "var(--danger)";
