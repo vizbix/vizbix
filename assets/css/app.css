@@ -69,21 +69,6 @@
 .pro-lock-card { background: white; border: 1px solid var(--border); border-radius: 20px; padding: 40px; text-align: center; max-width: 450px; box-shadow: 0 20px 40px rgba(15, 23, 42, 0.1); }
 .pro-lock-card h2 { font-size: 24px; margin-bottom: 12px; color: var(--dark); }
 .pro-lock-card p { color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
-
-/* --- AI Chat UI --- */
-.chat-container { display: flex; flex-direction: column; height: 500px; background: white; border-radius: 0 0 16px 16px; overflow: hidden; }
-.chat-history { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; background: #f8fafc; }
-.chat-msg { max-width: 85%; padding: 14px 18px; border-radius: 12px; font-size: 14px; line-height: 1.6; position: relative; }
-.msg-user { align-self: flex-end; background: var(--dark); color: white; border-bottom-right-radius: 4px; }
-.msg-ai { align-self: flex-start; background: white; border: 1px solid var(--border); color: var(--text-main); border-bottom-left-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
-.msg-ai strong { color: var(--dark); }
-
-.chat-input-row { display: flex; padding: 16px; background: white; border-top: 1px solid var(--border); gap: 12px; align-items: center; }
-.chat-input-row input { flex: 1; padding: 14px 20px; border: 1px solid var(--border); border-radius: 99px; outline: none; font-size: 15px; background: #f8fafc; transition: border 0.2s; }
-.chat-input-row input:focus { border-color: var(--primary); background: white; }
-.chat-input-row button { background: var(--primary); color: white; border: none; padding: 0 24px; height: 48px; border-radius: 99px; font-weight: 700; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center;}
-.chat-input-row button:hover { background: #1d4ed8; }
-.typing-indicator { font-style: italic; color: #94a3b8; font-size: 13px; margin-left: 8px; display: none; }
 /* =========================================
    MOBILE RESPONSIVENESS FIXES
    ========================================= */
@@ -132,4 +117,5 @@
   .data-row input { background: white; }
   .delete-btn { width: 100%; height: auto; padding: 10px; background: #e2e8f0; color: #475569; grid-column: span 2; margin-top: 4px; }
 }
+
 
