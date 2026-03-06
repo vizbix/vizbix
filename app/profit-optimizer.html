@@ -7,8 +7,8 @@
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="../assets/css/main.css?v=2.0">
-  <link rel="stylesheet" href="../assets/css/app.css?v=2.0">
+  <link rel="stylesheet" href="../assets/css/main.css?v=3.0">
+  <link rel="stylesheet" href="../assets/css/app.css?v=3.0">
   
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -18,7 +18,15 @@
     .app-view.active { display: block; animation: fadeIn 0.3s ease; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     .pro-lock-hidden { display: none !important; }
-    .ai-typing { font-style: italic; color: #94a3b8; font-size: 13px; margin: 10px 20px; display: none; }
+    
+    /* Perfect AI Chat Bubbles */
+    .chat-container { display: flex; flex-direction: column; height: calc(100vh - 160px); background: #f8fafc; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
+    .chat-history { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 16px; }
+    .chat-msg { max-width: 80%; padding: 14px 20px; border-radius: 16px; font-size: 15px; line-height: 1.6; }
+    /* AI is Left (White), User is Right (Dark) */
+    .msg-ai { align-self: flex-start; background: white; border: 1px solid var(--border); color: #0f172a; border-bottom-left-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
+    .msg-user { align-self: flex-end; background: #0f172a; color: white; border-bottom-right-radius: 4px; }
+    .ai-typing { font-style: italic; color: #2563eb; font-size: 14px; font-weight: 600; padding: 10px 20px; display: none; }
   </style>
 </head>
 <body>
@@ -37,7 +45,6 @@
     
     <div class="mobile-overlay" id="mobileAppOverlay" onclick="toggleAppDrawer()"></div>
 
-    <aside class="app-sidebar" id="appSidebar">
     <aside class="app-sidebar" id="appSidebar">
       <nav class="sidebar-nav">
         <a class="nav-item" onclick="switchView('dashboard', this)" id="nav-dashboard">
@@ -68,8 +75,6 @@
     </aside>
 
     <main class="app-main" id="mainContainer">
-
-      <main class="app-main" id="mainContainer">
       
       <div class="mobile-app-bar">
         <button onclick="toggleAppDrawer()">
@@ -78,49 +83,6 @@
         <div class="page-title" id="mobilePageTitle">Data Input</div>
       </div>
 
-      ```
-
-**3. Update the Javascript:**
-Scroll down to the `<script>` block at the bottom of the file. Find the existing `switchView` function and replace it with this updated block:
-
-```javascript
-    function toggleAppDrawer() {
-      const sidebar = document.getElementById("appSidebar");
-      const overlay = document.getElementById("mobileAppOverlay");
-      sidebar.classList.toggle("mobile-open");
-      overlay.classList.toggle("active");
-    }
-
-    function switchView(viewId, element, bypassPaywall = false) {
-      window.currentView = viewId;
-      if(proViews.includes(viewId) && window.isProUser === false && !bypassPaywall) {
-        document.getElementById('proLockOverlay').classList.remove('pro-lock-hidden');
-        document.querySelectorAll('.app-view').forEach(v => v.style.filter = "blur(6px)");
-      } else {
-        document.getElementById('proLockOverlay').classList.add('pro-lock-hidden');
-        document.querySelectorAll('.app-view').forEach(v => v.style.filter = "none");
-      }
-      document.querySelectorAll('.app-view').forEach(view => view.classList.remove('active'));
-      document.getElementById('view-' + viewId).classList.add('active');
-      
-      if (element) {
-        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-        element.classList.add('active');
-        
-        // Update the mobile header title dynamically
-        const titleText = element.querySelector('.nav-item-text').innerText;
-        document.getElementById('mobilePageTitle').innerText = titleText;
-      }
-
-      // Automatically close the mobile drawer when a button is clicked
-      const sidebar = document.getElementById("appSidebar");
-      const overlay = document.getElementById("mobileAppOverlay");
-      if(sidebar && sidebar.classList.contains('mobile-open')) {
-          sidebar.classList.remove('mobile-open');
-          overlay.classList.remove('active');
-      }
-    }
-      
       <div id="view-data" class="app-view active">
         <div class="data-card">
           <div class="card-header">
@@ -140,7 +102,7 @@ Scroll down to the `<script>` block at the bottom of the file. Find the existing
               <input type="number" placeholder="Sell Price" class="input-sell" value="2500">
               <input type="number" placeholder="Cost Price" class="input-cost" value="1200">
               <input type="number" placeholder="Quantity" class="input-qty" value="140">
-              <button class="delete-btn" onclick="deleteRow(this)">×</button>
+              <button class="delete-btn" onclick="this.parentElement.remove()">×</button>
             </div>
           </div>
           <button class="add-row-btn" onclick="addNewRow()">+ Add Product</button>
@@ -174,7 +136,7 @@ Scroll down to the `<script>` block at the bottom of the file. Find the existing
               <div style="position: relative; height: 300px; width: 100%;"><canvas id="profitChart"></canvas></div>
             </div>
             <div class="data-card" style="padding: 24px; margin: 0; background: #f8fafc;">
-              <h4 style="margin-top: 0; margin-bottom: 16px; color: var(--dark); font-size: 16px; display: flex; align-items: center; gap: 8px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> 3-Point Action Plan</h4>
+              <h4 style="margin-top: 0; margin-bottom: 16px; color: var(--dark); font-size: 16px; display: flex; align-items: center; gap: 8px;">⚡ 3-Point Action Plan</h4>
               <div id="auto-insights-list" style="font-size: 14px; line-height: 1.6; display: flex; flex-direction: column; gap: 16px;">
                 <p>Run analysis to see insights.</p>
               </div>
@@ -183,7 +145,7 @@ Scroll down to the `<script>` block at the bottom of the file. Find the existing
         </div>
       </div>
 
-<div id="view-ai" class="app-view">
+      <div id="view-ai" class="app-view">
         <div style="max-width: 850px; margin: 0 auto; height: 100%;">
           
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
@@ -191,20 +153,17 @@ Scroll down to the `<script>` block at the bottom of the file. Find the existing
               <span style="font-size: 28px; background: var(--dark); color: white; padding: 6px 10px; border-radius: 8px; line-height: 1;">Ai</span> Strategy
             </h2>
             <button class="btn btn-secondary" style="padding: 10px 20px; font-size: 14px;" onclick="if(window.startAIAnalysis) window.startAIAnalysis();">
-              🔄 Re-Analyze Latest Data
+              🔄 Analyze Latest Data
             </button>
           </div>
 
-          <div id="aiSplashScreen" style="height: calc(100vh - 220px); display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.02);">
-              <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 18px;">Click below to analyze your numbers instantly.</p>
-              <button class="btn btn-dark" style="border-radius: 99px; padding: 18px 48px; font-size: 18px; box-shadow: 0 4px 15px rgba(15,23,42,0.2);" onclick="if(window.startAIAnalysis) window.startAIAnalysis();">✨ Generate Strategy</button>
-          </div>
-
-          <div id="aiChatContainer" class="chat-container" style="display: none;">
-             <div class="chat-history" id="chatHistory"></div>
+          <div id="aiChatContainer" class="chat-container">
+             <div class="chat-history" id="chatHistory">
+                <div class="chat-msg msg-ai">Hi! Click <strong>Analyze Latest Data</strong> to run your numbers, or type a custom question below!</div>
+             </div>
              
-             <div style="background: white;">
-               <div id="typingIndicator" class="ai-typing" style="color: var(--primary); font-weight: 600;">AI is analyzing your numbers... ⏳</div>
+             <div style="background: white; border-top: 1px solid var(--border);">
+               <div id="typingIndicator" class="ai-typing">AI is analyzing your business... ⏳</div>
                <div class="chat-input-row">
                   <input type="text" id="aiChatInput" placeholder="Ask about raising prices, bundle ideas, or profit margins..." onkeypress="if(event.key === 'Enter' && window.sendChatMessage) window.sendChatMessage()" />
                   <button id="chatSendBtn" onclick="if(window.sendChatMessage) window.sendChatMessage()">
@@ -216,7 +175,7 @@ Scroll down to the `<script>` block at the bottom of the file. Find the existing
 
         </div>
       </div>
-      
+
       <div id="view-report" class="app-view">
         <div style="max-width: 1000px; margin: 0 auto;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
@@ -282,51 +241,45 @@ Scroll down to the `<script>` block at the bottom of the file. Find the existing
       </div>
 
     </main>
-
   </div>
 
-  <div style="position: fixed; top: 2000px; left: -9999px; z-index: -9999;">
-      <div id="pdf-export-container" style="display: none; width: 1100px; background: white; font-family: Arial, sans-serif; padding: 40px; box-sizing: border-box; color: #0f172a;">
-        <div style="margin-bottom: 40px; border-bottom: 2px solid #0f172a; padding-bottom: 10px;">
-            <h1 style="font-size: 40px; margin: 0; text-transform: uppercase;">Business Report</h1>
-            <h4 style="color: #64748b; font-size: 16px; margin-top: 5px;">EXECUTIVE SUMMARY</h4>
-        </div>
-        
-        <div style="display: flex; gap: 40px;">
-            <div style="flex: 1;">
-                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 10px 0; font-size: 18px;"><span>Total Revenue</span> <span id="pdf-rev" style="font-weight: bold;">0</span></div>
-                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 10px 0; font-size: 18px;"><span>Total Cost</span> <span id="pdf-cost" style="font-weight: bold;">0</span></div>
-                <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 10px 0; font-size: 18px;"><span>Net Profit</span> <span id="pdf-profit" style="font-weight: bold; color: #0f172a;">0</span></div>
-                
-                <div style="margin-top: 40px;">
-                    <h4 style="font-size: 16px; color: #475569; margin: 0 0 5px 0;">TOTAL UNITS SOLD</h4>
-                    <div id="pdf-units-sold" style="font-size: 48px; font-weight: bold;">0</div>
-                </div>
-            </div>
-
-            <div style="flex: 2;">
-                <img id="pdf-chart-image" style="width: 100%; max-height: 250px; object-fit: contain; margin-bottom: 20px;" src="" alt="Chart">
-                
-                <div style="display: flex; justify-content: space-between; gap: 20px;">
-                    <div style="flex: 1;">
-                        <h4 style="color: #64748b; font-size: 14px; margin: 0 0 5px 0;">GROSS MARGIN</h4>
-                        <div id="pdf-margin" style="font-size: 54px; font-weight: bold;">0%</div>
-                        <h4 style="color: #64748b; font-size: 14px; margin: 20px 0 5px 0;">TOP PRODUCT</h4>
-                        <div id="pdf-top-prod" style="font-size: 24px; font-weight: bold;">-</div>
-                    </div>
-                    <div style="flex: 2;">
-                        <h4 style="font-size: 16px; color: #475569; margin-bottom: 10px;">KEY INSIGHTS</h4>
-                        <ul id="pdf-insight-list" style="list-style: none; padding: 0; margin: 0; font-size: 14px; line-height: 1.5;">
-                            <li style="margin-bottom: 8px;">Insight 1</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+  <div id="pdf-export-container" style="position: absolute; left: -9999px; top: 0; width: 1100px; background: white; font-family: Arial, sans-serif; padding: 40px; box-sizing: border-box; color: #0f172a; visibility: hidden;">
+      <div style="margin-bottom: 40px; border-bottom: 2px solid #0f172a; padding-bottom: 10px;">
+          <h1 style="font-size: 40px; margin: 0; text-transform: uppercase;">Business Report</h1>
+          <h4 style="color: #64748b; font-size: 16px; margin-top: 5px;">EXECUTIVE SUMMARY</h4>
+      </div>
+      
+      <div style="display: flex; gap: 40px;">
+          <div style="flex: 1;">
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 10px 0; font-size: 18px;"><span>Total Revenue</span> <span id="pdf-rev" style="font-weight: bold;">0</span></div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 10px 0; font-size: 18px;"><span>Total Cost</span> <span id="pdf-cost" style="font-weight: bold;">0</span></div>
+              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 10px 0; font-size: 18px;"><span>Net Profit</span> <span id="pdf-profit" style="font-weight: bold; color: #0f172a;">0</span></div>
+              <div style="margin-top: 40px;">
+                  <h4 style="font-size: 16px; color: #475569; margin: 0 0 5px 0;">TOTAL UNITS SOLD</h4>
+                  <div id="pdf-units-sold" style="font-size: 48px; font-weight: bold;">0</div>
+              </div>
+          </div>
+          <div style="flex: 2;">
+              <img id="pdf-chart-image" style="width: 100%; max-height: 250px; object-fit: contain; margin-bottom: 20px;" src="" alt="Chart">
+              <div style="display: flex; justify-content: space-between; gap: 20px;">
+                  <div style="flex: 1;">
+                      <h4 style="color: #64748b; font-size: 14px; margin: 0 0 5px 0;">GROSS MARGIN</h4>
+                      <div id="pdf-margin" style="font-size: 54px; font-weight: bold;">0%</div>
+                      <h4 style="color: #64748b; font-size: 14px; margin: 20px 0 5px 0;">TOP PRODUCT</h4>
+                      <div id="pdf-top-prod" style="font-size: 24px; font-weight: bold;">-</div>
+                  </div>
+                  <div style="flex: 2;">
+                      <h4 style="font-size: 16px; color: #475569; margin-bottom: 10px;">KEY INSIGHTS</h4>
+                      <ul id="pdf-insight-list" style="list-style: none; padding: 0; margin: 0; font-size: 14px; line-height: 1.5;">
+                          <li style="margin-bottom: 8px;">Insight 1</li>
+                      </ul>
+                  </div>
+              </div>
+          </div>
+      </div>
   </div>
 
-  <script src="../assets/js/drawer.js?v=2.0"></script>
+  <script src="../assets/js/drawer.js?v=3.0"></script>
   
   <script>
     window.currentMode = 'product'; 
@@ -336,27 +289,24 @@ Scroll down to the `<script>` block at the bottom of the file. Find the existing
     window.currencySymbol = '₹';
     let myChart = null; 
 
-    // FIX 1: Robust Data Scraper that is forced to run right before sending to AI
+    // THE FIX: Aggressive scraping so AI never says "No Data"
     function getFreshData() {
         let data = [];
         document.querySelectorAll('#items .data-row').forEach(row => {
-            const nameInput = row.querySelector('.input-name');
-            const sellInput = row.querySelector('.input-sell');
-            const costInput = row.querySelector('.input-cost');
-            const qtyInput = row.querySelector('.input-qty');
-            
-            if(!nameInput || !sellInput || !costInput || !qtyInput) return;
-
-            const name = nameInput.value.trim();
-            const sell = parseFloat(sellInput.value) || 0;
-            const cost = parseFloat(costInput.value) || 0;
-            const qty = parseFloat(qtyInput.value) || 0;
-            
+            const name = row.querySelector('.input-name').value.trim();
+            const sell = parseFloat(row.querySelector('.input-sell').value) || 0;
+            const cost = parseFloat(row.querySelector('.input-cost').value) || 0;
+            const qty = parseFloat(row.querySelector('.input-qty').value) || 0;
             if(name !== '' || sell > 0 || cost > 0 || qty > 0) {
                 data.push({ name, sell, cost, qty });
             }
         });
         return data;
+    }
+
+    function toggleAppDrawer() {
+      document.getElementById("appSidebar").classList.toggle("mobile-open");
+      document.getElementById("mobileAppOverlay").classList.toggle("active");
     }
 
     function updateCurrency() {
@@ -382,11 +332,21 @@ Scroll down to the `<script>` block at the bottom of the file. Find the existing
         document.getElementById('proLockOverlay').classList.add('pro-lock-hidden');
         document.querySelectorAll('.app-view').forEach(v => v.style.filter = "none");
       }
+      
       document.querySelectorAll('.app-view').forEach(view => view.classList.remove('active'));
       document.getElementById('view-' + viewId).classList.add('active');
+      
       if (element) {
         document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
         element.classList.add('active');
+        document.getElementById('mobilePageTitle').innerText = element.querySelector('.nav-item-text').innerText;
+      }
+
+      const sidebar = document.getElementById("appSidebar");
+      const overlay = document.getElementById("mobileAppOverlay");
+      if(sidebar && sidebar.classList.contains('mobile-open')) {
+          sidebar.classList.remove('mobile-open');
+          overlay.classList.remove('active');
       }
     }
 
@@ -411,7 +371,6 @@ Scroll down to the `<script>` block at the bottom of the file. Find the existing
 
       const freshData = getFreshData();
       if(freshData.length === 0) return alert("Please enter data first.");
-      
       window.currentData = freshData;
 
       let totalRevenue = 0, totalCost = 0, totalProfit = 0, totalItems = 0;
@@ -455,19 +414,20 @@ Scroll down to the `<script>` block at the bottom of the file. Find the existing
       else if(healthScore >= 50) { hc.style.background = '#fef3c7'; hc.style.color = '#d97706'; }
       else { hc.style.background = '#fee2e2'; hc.style.color = '#dc2626'; }
 
+      // FORCE EXACTLY 3 INSIGHTS
       let insightsHTML = '';
       let pdfInsights = '';
       
       if (topProduct.profit > 0) {
-        insightsHTML += `<div style="padding: 12px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;"><strong>1. Scale Top Performer:</strong> ${topProduct.name} generated ${formatCurrency(topProduct.profit)}. Increase ad spend on this item by 10%.</div>`;
-        pdfInsights += `<li style="margin-bottom: 12px;"><strong>Scale Winner:</strong> ${topProduct.name} generates the highest profit mass. Increase visibility.</li>`;
+        insightsHTML += `<div style="padding: 12px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;"><strong>1. Scale Top Performer:</strong> ${topProduct.name} generated ${formatCurrency(topProduct.profit)}. Increase ad spend on this item.</div>`;
+        pdfInsights += `<li style="margin-bottom: 12px;"><strong>Scale Winner:</strong> ${topProduct.name} generates the highest profit. Increase visibility.</li>`;
       } else {
-        insightsHTML += `<div style="padding: 12px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;"><strong>1. Raise Prices:</strong> You have no highly profitable products. Raise prices 10% immediately.</div>`;
+        insightsHTML += `<div style="padding: 12px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;"><strong>1. Raise Prices:</strong> You have no highly profitable products. Raise prices immediately.</div>`;
         pdfInsights += `<li style="margin-bottom: 12px;"><strong>Raise Prices:</strong> No core profitable products detected. Implement a price increase.</li>`;
       }
 
       if (profitLeaks.length > 0) {
-        insightsHTML += `<div style="padding: 12px; background: #fef2f2; border-radius: 8px; border: 1px solid #fecaca; color: #dc2626;"><strong>2. Stop Profit Leaks:</strong> ${profitLeaks.join(', ')} are currently operating at a loss. Reprice or discontinue them.</div>`;
+        insightsHTML += `<div style="padding: 12px; background: #fef2f2; border-radius: 8px; border: 1px solid #fecaca; color: #dc2626;"><strong>2. Stop Profit Leaks:</strong> ${profitLeaks.join(', ')} are currently operating at a loss. Reprice or drop them.</div>`;
         pdfInsights += `<li style="margin-bottom: 12px; color: #dc2626;"><strong>Fix Leaks:</strong> ${profitLeaks.join(', ')} are losing money. Fix unit economics or drop them.</li>`;
       } else {
         insightsHTML += `<div style="padding: 12px; background: #ecfdf5; border-radius: 8px; border: 1px solid #a7f3d0; color: #059669;"><strong>2. Unit Economics Safe:</strong> Zero products are losing money. Your baseline is highly secure.</div>`;
@@ -475,10 +435,10 @@ Scroll down to the `<script>` block at the bottom of the file. Find the existing
       }
 
       if (overallMargin < 20) {
-        insightsHTML += `<div style="padding: 12px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;"><strong>3. Margin Warning:</strong> An average margin of ${overallMargin.toFixed(1)}% is dangerous. Bundle items to increase Average Order Value.</div>`;
+        insightsHTML += `<div style="padding: 12px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;"><strong>3. Margin Warning:</strong> ${overallMargin.toFixed(1)}% is dangerous. Bundle items to increase Average Order Value.</div>`;
         pdfInsights += `<li><strong>Increase Margin:</strong> Your ${overallMargin.toFixed(1)}% margin is tight. Implement product bundling.</li>`;
       } else {
-        insightsHTML += `<div style="padding: 12px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;"><strong>3. Healthy Margin:</strong> ${overallMargin.toFixed(1)}% gives you excellent cash flow to aggressively invest in growth.</div>`;
+        insightsHTML += `<div style="padding: 12px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;"><strong>3. Healthy Margin:</strong> ${overallMargin.toFixed(1)}% gives you excellent cash flow to invest in growth.</div>`;
         pdfInsights += `<li><strong>Healthy Margin:</strong> ${overallMargin.toFixed(1)}% provides excellent flexibility for scaling operations.</li>`;
       }
       
@@ -503,42 +463,32 @@ Scroll down to the `<script>` block at the bottom of the file. Find the existing
       switchView('dashboard', document.getElementById('nav-dashboard'));
     }
 
-    // FIX 2: THE BULLETPROOF PDF ENGINE
+    // THE FIX: PDF EXPORT (Flawless rendering by bringing it into view behind other elements)
     function exportExecutivePDF() {
-      // Grab Chart
       const chartCanvas = document.getElementById('profitChart');
       if(chartCanvas) {
           document.getElementById('pdf-chart-image').src = chartCanvas.toDataURL('image/png');
       }
 
-      // Clone the template so we can show it without ruining the screen
-      const originalElement = document.getElementById('pdf-export-container');
-      const clone = originalElement.cloneNode(true);
+      const element = document.getElementById('pdf-export-container');
       
-      // Inject clone into the body, make it visible but invisible to the user (opacity)
-      clone.id = "pdf-clone";
-      clone.style.display = 'block';
-      clone.style.position = 'absolute';
-      clone.style.top = '0';
-      clone.style.left = '0';
-      clone.style.zIndex = '-9999';
-      clone.style.opacity = '0.01'; 
-      document.body.appendChild(clone);
+      // Reveal the element but keep it hidden behind the dashboard
+      element.style.visibility = 'visible';
 
       const opt = {
-        margin:       [0.5, 0.5],
+        margin:       0.5,
         filename:     'Vizbix_Executive_Summary.pdf',
         image:        { type: 'jpeg', quality: 1 },
-        html2canvas:  { scale: 2, useCORS: true, windowWidth: 1200 },
+        html2canvas:  { scale: 2, useCORS: true, windowWidth: 1100 },
         jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
       };
       
-      // Give browser 100ms to paint the clone, take picture, then delete it.
+      // Wait 300ms for browser to paint the HTML, then take picture and hide it again
       setTimeout(() => {
-          html2pdf().set(opt).from(clone).save().then(() => {
-              clone.remove(); 
+          html2pdf().set(opt).from(element).save().then(() => {
+              element.style.visibility = 'hidden';
           });
-      }, 100);
+      }, 300);
     }
 
     let hasVerified = false;
@@ -570,17 +520,10 @@ Scroll down to the `<script>` block at the bottom of the file. Find the existing
       }
     }, 1000);
   </script>
-  
+
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  <script type="module" src="../assets/js/auth.js?v=2.0"></script>
-  <script src="../assets/js/ai.js?v=2.0"></script>
+  <script type="module" src="../assets/js/auth.js?v=3.0"></script>
+  <script src="../assets/js/ai.js?v=3.0"></script>
 
 </body>
 </html>
-
-
-
-
-
-
-
