@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Markup vs Margin: Don’t Mix These Up | Vizbix</title>
+  <meta name="description" content="Most businesses lose money because they confuse markup and margin. Learn the difference with simple examples and pricing tips." />
+
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/main.css">
+
+  <style>
+    /* --- Specific Layout for Blog Articles --- */
+    article { 
+      max-width: 800px; 
+      margin: 0 auto; 
+      padding: 40px 18px 80px; 
+    }
+    
+    .meta { display: flex; gap: 12px; align-items: center; color: var(--text-muted); font-size: 14px; margin-bottom: 12px; }
+    .tag { border: 1px solid var(--border); padding: 4px 10px; border-radius: 999px; background: var(--bg-light); color: var(--text-main); font-weight: 600; }
+
+    h1 { font-size: clamp(32px, 4vw, 48px); line-height: 1.1; margin-bottom: 20px; color: var(--dark); }
+    .subtitle { font-size: 20px; color: var(--text-muted); margin-bottom: 32px; line-height: 1.5; }
+
+    .content p { margin-bottom: 20px; font-size: 18px; color: var(--text-main); line-height: 1.8; }
+    .content h2 { margin: 40px 0 16px; font-size: 26px; color: var(--dark); }
+    .content h3 { margin: 30px 0 12px; font-size: 20px; color: var(--dark); }
+    
+    /* Blog Alert Boxes */
+    .box { background: var(--bg-light); border: 1px solid var(--border); padding: 20px; border-radius: 12px; margin: 24px 0; font-weight: 700; font-size: 18px; text-align: center; color: var(--dark); }
+    .warn { background: #fff7ed; border: 1px solid #fed7aa; padding: 20px; border-radius: 12px; margin: 24px 0; color: #9a3412; font-weight: 600; font-size: 16px; }
+    .danger { background: #fef2f2; border: 1px solid #fecaca; padding: 20px; border-radius: 12px; margin: 24px 0; color: #991b1b; font-weight: 700; font-size: 16px; }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; margin: 24px 0; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    th, td { padding: 14px 16px; border-bottom: 1px solid var(--border); text-align: left; font-size: 16px; color: var(--text-main); }
+    th { background: var(--bg-light); font-weight: 700; color: var(--dark); }
+    tr:last-child td { border-bottom: none; }
+
+    .content ul { padding-left: 20px; margin-bottom: 24px; }
+    .content li { margin-bottom: 12px; font-size: 17px; color: var(--text-main); line-height: 1.6; }
+
+    .cta-card { margin-top: 50px; padding: 30px; border: 1px solid var(--primary); border-radius: 20px; background: #eff6ff; }
+    .cta-card strong { display: block; margin-bottom: 10px; font-size: 20px; color: var(--dark); }
+    .cta-card p { font-size: 16px; color: var(--text-muted); margin-bottom: 20px; }
+
+    .back-link { margin-top: 40px; display: inline-flex; align-items: center; gap: 8px; color: var(--text-muted); font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; }
+    .back-link:hover { color: var(--primary); }
+    .text-link { color: var(--primary); font-weight: 600; text-decoration: none; }
+    .text-link:hover { text-decoration: underline; }
+  </style>
+</head>
+
+<body>
+
+<div id="vizbix-nav-container"></div>
+
+<main>
+  <article>
+    <div class="meta">
+      <span class="tag">Pricing</span>
+      <span>6 min read</span>
+      <span>Jan 2026</span>
+    </div>
+
+    <h1>Markup vs Margin: Don’t Mix These Up</h1>
+    <p class="subtitle">
+      Most businesses lose money because they calculate profit wrong. The biggest mistake? Confusing <strong>markup</strong> with <strong>margin</strong>.
+    </p>
+
+    <div class="content">
+      <p>
+        If you price products using the wrong number, you might think you’re making “30% profit”… but in reality, you’re making far less.
+      </p>
+
+      <h2>Quick definitions (simple)</h2>
+
+      <div class="box">
+        Markup = Profit ÷ Cost<br/>
+        Margin = Profit ÷ Selling Price
+      </div>
+
+      <p>Both are useful, but they are NOT the same.</p>
+
+      <h2>One simple example</h2>
+      <p>Let’s say:</p>
+      <ul>
+        <li>Cost price = ₹100</li>
+        <li>Selling price = ₹150</li>
+        <li>Profit = ₹50</li>
+      </ul>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Formula</th>
+            <th>Answer</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Markup</strong></td>
+            <td>₹50 ÷ ₹100</td>
+            <td><strong>50%</strong></td>
+          </tr>
+          <tr>
+            <td><strong>Margin</strong></td>
+            <td>₹50 ÷ ₹150</td>
+            <td><strong>33.33%</strong></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <p>
+        Same product. Same profit. But two different percentages. That’s why mixing them up creates massive pricing mistakes.
+      </p>
+
+      <h2>The common mistake (that kills profit)</h2>
+      <p>Many small business owners say: <em>“I want 30% profit. So I’ll add 30% on cost.”</em></p>
+
+      <div class="danger">
+        <strong>⚠️ Warning:</strong> Adding 30% on cost gives you a 30% MARKUP — not a 30% MARGIN.
+      </div>
+
+      <p>
+        If your goal is a <strong>30% margin</strong>, your markup needs to be higher than 30%. Otherwise, your net profit at the end of the month will be unexpectedly low.
+      </p>
+
+      <h2>How to convert markup ↔ margin</h2>
+
+      <h3>Markup → Margin</h3>
+      <div class="box">
+        Margin % = Markup % ÷ (100 + Markup %)
+      </div>
+      <p>Example: Markup = 50% <br/> Margin = 50 ÷ 150 = <strong>33.33%</strong></p>
+
+      <h3>Margin → Markup</h3>
+      <div class="box">
+        Markup % = Margin % ÷ (100 − Margin %)
+      </div>
+      <p>Example: Margin = 30% <br/> Markup = 30 ÷ 70 = <strong>42.86%</strong></p>
+
+      <h2>Which one should you use in business?</h2>
+      <p>Simple rule:</p>
+      <ul>
+        <li><strong>Use Markup</strong> when you’re setting a selling price starting from your cost.</li>
+        <li><strong>Use Margin</strong> when you’re checking the overall profitability of your business.</li>
+      </ul>
+
+      <p>
+        Why margin matters more for tracking: Your rent, salaries, marketing, and taxes are all paid out of your total revenue (the selling price), not your cost.
+      </p>
+
+      <h2>Real-world pricing tip</h2>
+      <p>
+        If you sell on platforms (Amazon/Flipkart/Swiggy/Zomato) or ship physical goods, your real cost is not just the product cost.
+      </p>
+
+      <div class="box">
+        True Cost = Product cost + packaging + delivery + platform fee + payment fee + returns risk
+      </div>
+
+      <p>
+        Always calculate your markup and margin on the <strong>true cost</strong>. Otherwise, you’ll feel like “sales are high” but wonder why the bank account isn't growing.
+      </p>
+
+      <h2>Use the free calculators</h2>
+      <p>
+        If you want a quick selling price using markup, try:
+        <br>
+        <a href="../tools/markup.html" class="text-link">Markup Calculator →</a>
+      </p>
+      <p>
+        And to check your real margin based on revenue:
+        <br>
+        <a href="../tools/profit-margin.html" class="text-link">Profit Margin Calculator →</a>
+      </p>
+    </div>
+
+    <div class="cta-card">
+      <strong>Want a custom profit and margin plan?</strong>
+      <p>Stop guessing your margins. Upload your product catalog to Vizbix Pro to see exactly what your true margins are after all hidden costs.</p>
+      <a href="../app/profit-optimizer.html" class="btn btn-primary">Try Profit Optimizer Pro</a>
+    </div>
+
+    <a href="../pages/blogs.html" class="back-link">← Back to all posts</a>
+  </article>
+</main>
+
+<footer>
+  <div style="max-width: 1100px; margin: 0 auto; text-align: center; color: var(--text-muted); padding: 20px 0;">
+    © 2026 Vizbix — Built for founders.
+  </div>
+</footer>
+
+<script src="../assets/js/drawer.js"></script>
+
+</body>
+</html>

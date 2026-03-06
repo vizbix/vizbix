@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Discounting Without Killing Profit | Vizbix</title>
+  <meta name="description" content="Learn how to run discounts safely, avoid margin loss, and use smarter offers like bundles and thresholds." />
+
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../assets/css/main.css">
+
+  <style>
+    /* --- Specific Layout for Blog Articles --- */
+    article { 
+      max-width: 800px; 
+      margin: 0 auto; 
+      padding: 40px 18px 80px; 
+    }
+    
+    .meta { display: flex; gap: 12px; align-items: center; color: var(--text-muted); font-size: 14px; margin-bottom: 12px; }
+    .tag { border: 1px solid var(--border); padding: 4px 10px; border-radius: 999px; background: var(--bg-light); color: var(--text-main); font-weight: 600; }
+
+    h1 { font-size: clamp(32px, 4vw, 48px); line-height: 1.1; margin-bottom: 20px; color: var(--dark); }
+    .subtitle { font-size: 20px; color: var(--text-muted); margin-bottom: 32px; line-height: 1.5; }
+
+    .content p { margin-bottom: 20px; font-size: 18px; color: var(--text-main); line-height: 1.8; }
+    .content h2 { margin: 40px 0 16px; font-size: 26px; color: var(--dark); }
+    .content h3 { margin: 30px 0 12px; font-size: 20px; color: var(--dark); }
+    
+    /* Blog Alert Boxes */
+    .box { background: var(--bg-light); border: 1px solid var(--border); padding: 20px; border-radius: 12px; margin: 24px 0; font-weight: 700; font-size: 18px; text-align: center; color: var(--dark); }
+    .warn { background: #fff7ed; border: 1px solid #fed7aa; padding: 20px; border-radius: 12px; margin: 24px 0; color: #9a3412; font-weight: 600; font-size: 16px; }
+    .danger { background: #fef2f2; border: 1px solid #fecaca; padding: 20px; border-radius: 12px; margin: 24px 0; color: #991b1b; font-weight: 700; font-size: 16px; }
+
+    /* Tables */
+    table { width: 100%; border-collapse: collapse; margin: 24px 0; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; }
+    th, td { padding: 14px 16px; border-bottom: 1px solid var(--border); text-align: left; font-size: 16px; color: var(--text-main); }
+    th { background: var(--bg-light); font-weight: 700; color: var(--dark); }
+    tr:last-child td { border-bottom: none; }
+
+    .content ul { padding-left: 20px; margin-bottom: 24px; }
+    .content li { margin-bottom: 12px; font-size: 17px; color: var(--text-main); line-height: 1.6; }
+
+    .cta-card { margin-top: 50px; padding: 30px; border: 1px solid var(--primary); border-radius: 20px; background: #eff6ff; }
+    .cta-card strong { display: block; margin-bottom: 10px; font-size: 20px; color: var(--dark); }
+    .cta-card p { font-size: 16px; color: var(--text-muted); margin-bottom: 20px; }
+
+    .back-link { margin-top: 40px; display: inline-flex; align-items: center; gap: 8px; color: var(--text-muted); font-weight: 600; font-size: 14px; text-transform: uppercase; letter-spacing: 1px; text-decoration: none; }
+    .back-link:hover { color: var(--primary); }
+    .text-link { color: var(--primary); font-weight: 600; text-decoration: none; }
+    .text-link:hover { text-decoration: underline; }
+  </style>
+</head>
+
+<body>
+
+<div id="vizbix-nav-container"></div>
+
+<main>
+  <article>
+    <div class="meta">
+      <span class="tag">Sales</span>
+      <span>4 min read</span>
+      <span>Jan 2026</span>
+    </div>
+
+    <h1>Discounting Without Killing Profit</h1>
+    <p class="subtitle">
+      Discounts can increase orders fast — but they can also destroy margins quietly. Here’s how to discount safely like a smart business owner.
+    </p>
+
+    <div class="content">
+      <p>
+        Most businesses use discounts for one reason: to get more sales. But the real goal should be: <strong>more profit</strong>, not just more orders.
+      </p>
+
+      <h2>Step 1: Know your real profit per order</h2>
+      <p>
+        Before running any offer, you should know how much you earn from 1 order after costs. Your “true cost” is usually higher than you think.
+      </p>
+
+      <div class="box">
+        True Cost = Product cost + packaging + delivery + platform fee + payment fee + returns risk
+      </div>
+
+      <p>
+        If you discount without knowing this, you might sell more and still lose money.
+      </p>
+
+      <h2>Why discounts hurt more than you think</h2>
+      <p>
+        Discounts reduce your selling price, but most costs stay the same. That means your profit drops faster than the discount percentage.
+      </p>
+
+      <div class="warn">
+        <strong>⚠️ Fact:</strong> A 20% discount can reduce your actual net profit by 50%+ depending on your margin structure.
+      </div>
+
+      <h2>Simple example</h2>
+      <p>Suppose you have the following unit economics:</p>
+      <ul>
+        <li>Selling price = ₹1,000</li>
+        <li>True cost = ₹750</li>
+        <li>Profit = ₹250</li>
+      </ul>
+
+      <p>Now you give a 20% discount:</p>
+      <ul>
+        <li>New selling price = ₹800</li>
+        <li>True cost stays = ₹750</li>
+        <li>New profit = <strong>₹50</strong></li>
+      </ul>
+
+      <div class="danger">
+        A 20% Discount → Profit drops from ₹250 to ₹50 (An 80% drop in profit!)
+      </div>
+
+      <h2>When discounts make sense</h2>
+      <p>
+        Discounts are not always bad. They are highly effective when used strategically:
+      </p>
+      <ul>
+        <li><strong>Clearing old stock</strong> (End of season, slow-moving items)</li>
+        <li><strong>Increasing repeat purchase</strong> (Coupon for returning customers)</li>
+        <li><strong>Increasing AOV</strong> (Discount above a certain cart value)</li>
+        <li><strong>Launching a new product</strong> (Small first-week introductory offer)</li>
+      </ul>
+
+      <h2>Smarter discount types (Better than flat % off)</h2>
+
+      <table>
+        <thead>
+          <tr>
+            <th>Offer Type</th>
+            <th>Example</th>
+            <th>Why it’s safer</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Threshold discount</strong></td>
+            <td>₹100 off above ₹999</td>
+            <td>Forces an increase in cart value</td>
+          </tr>
+          <tr>
+            <td><strong>Bundle offer</strong></td>
+            <td>Buy 2, save 10%</td>
+            <td>Yields a higher profit mass per order</td>
+          </tr>
+          <tr>
+            <td><strong>Free shipping</strong></td>
+            <td>Free delivery above ₹799</td>
+            <td>Feels highly valuable, reduces discount pressure</td>
+          </tr>
+          <tr>
+            <td><strong>Gift with purchase</strong></td>
+            <td>Free sample above ₹999</td>
+            <td>Higher perceived value, much lower cost to you</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>When you should avoid discounts entirely</h2>
+      <ul>
+        <li>Your margin is already low</li>
+        <li>Your delivery cost is unusually high</li>
+        <li>You have frequent returns/refunds in that category</li>
+        <li>You’re discounting only because competitors are doing it</li>
+        <li>You are using discounts to “force sales” instead of improving your product's perceived value</li>
+      </ul>
+
+      <h2>Quick rule to stay safe</h2>
+      <p>Before running an offer, always ask yourself:</p>
+      
+      <div class="box">
+        After the discount, will my profit per order still be healthy?
+      </div>
+
+      <p>If the profit becomes too small, you’ll just get busy—you won't grow.</p>
+
+      <h2>Use the discount calculator</h2>
+      <p>
+        Use this free tool to instantly check your final price and margin after a discount:
+        <a href="../tools/discount.html" class="text-link">Discount Calculator →</a>
+      </p>
+    </div>
+
+    <div class="cta-card">
+      <strong>Find the "Safe Discount" for your catalog</strong>
+      <p>Don't guess. Upload your product data to Vizbix Pro to identify which products can handle discounts, and which ones should never go on sale.</p>
+      <a href="../app/profit-optimizer.html" class="btn btn-primary">Try Profit Optimizer Pro</a>
+    </div>
+
+    <a href="../pages/blogs.html" class="back-link">← Back to all posts</a>
+  </article>
+</main>
+
+<footer>
+  <div style="max-width: 1100px; margin: 0 auto; text-align: center; color: var(--text-muted); padding: 20px 0;">
+    © 2026 Vizbix — Built for founders.
+  </div>
+</footer>
+
+<script src="../assets/js/drawer.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,107 @@
+/* =========================================
+   main.css - Global Styles for Vizbix
+   ========================================= */
+
+:root {
+  --text-main: #0f172a;
+  --text-muted: #475569;
+  --bg-light: #f8fafc;
+  --border: #e2e8f0;
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --dark: #0f172a;
+  --max-width: 1200px;
+}
+
+* { 
+  box-sizing: border-box; 
+  font-family: 'Inter', system-ui, sans-serif; 
+}
+
+html, body { 
+  margin: 0; 
+  padding: 0; 
+  color: var(--text-main); 
+  background: #ffffff; 
+  overflow-x: hidden; 
+}
+
+/* --- TYPOGRAPHY --- */
+h1, h2, h3, h4 { margin: 0; letter-spacing: -0.02em; }
+p { line-height: 1.6; margin: 0; }
+a { text-decoration: none; color: inherit; }
+
+/* --- BUTTONS & LINKS --- */
+.btn { 
+  display: inline-flex; 
+  align-items: center; 
+  justify-content: center; 
+  font-weight: 600; 
+  border-radius: 8px; 
+  cursor: pointer; 
+  transition: all 0.2s; 
+  border: none; 
+  padding: 12px 24px; 
+  font-size: 15px; 
+}
+.btn-primary { background: var(--primary); color: white; }
+.btn-primary:hover { background: var(--primary-hover); }
+.btn-secondary { background: white; color: var(--text-main); border: 1px solid var(--border); }
+.btn-secondary:hover { background: var(--bg-light); border-color: #cbd5e1; }
+.btn-dark { background: var(--dark); color: white; }
+.btn-dark:hover { background: #1e293b; }
+.btn-large { padding: 16px 32px; font-size: 18px; font-weight: 700; border-radius: 10px; }
+
+.text-link { color: var(--primary); font-weight: 600; font-size: 16px; display: inline-flex; align-items: center; gap: 4px; transition: gap 0.2s; }
+.text-link:hover { gap: 8px; text-decoration: underline; }
+
+/* --- LOGIN MODAL --- */
+.modal-overlay-login { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(4px); z-index: 200; display: none; align-items: center; justify-content: center; }
+.modal-overlay-login.active { display: flex; }
+.login-box { background: white; width: 90%; max-width: 400px; padding: 32px; border-radius: 20px; position: relative; }
+.close-modal { position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 20px; cursor: pointer; color: var(--text-muted); }
+.login-box input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); margin-bottom: 16px; font-size: 15px; }
+
+/* --- HEADER & DRAWER STYLES (Injected by drawer.js) --- */
+header { position: sticky; top: 0; z-index: 50; background: rgba(255,255,255,0.95); backdrop-filter: blur(8px); border-bottom: 1px solid var(--border); }
+.nav-container { max-width: var(--max-width); margin: 0 auto; padding: 16px 24px; display: flex; align-items: center; justify-content: space-between; }
+.logo { font-size: 24px; font-weight: 900; letter-spacing: -1px; color: var(--dark); display: flex; align-items: center; gap: 8px; }
+.logo-dot { width: 8px; height: 8px; background: var(--primary); border-radius: 50%; display: inline-block; }
+.nav-links { display: flex; gap: 32px; align-items: center; }
+.nav-links a { font-weight: 500; color: var(--text-muted); font-size: 15px; transition: color 0.2s; }
+.nav-links a:hover { color: var(--text-main); }
+.nav-actions { display: flex; gap: 12px; align-items: center; }
+
+.menu-btn { width: 42px; height: 42px; border: 1px solid var(--border); background: #fff; border-radius: 10px; display: flex; align-items: center; justify-content: center; cursor: pointer; box-shadow: 0 2px 5px rgba(2, 6, 23, 0.05); padding: 0; }
+.menu-btn:active { transform: scale(0.96); }
+.menu-icon { width: 18px; height: 12px; position: relative; }
+.menu-icon span { position: absolute; left: 0; right: 0; height: 2px; background: var(--text-main); border-radius: 10px; }
+.menu-icon span:nth-child(1) { top: 0; }
+.menu-icon span:nth-child(2) { top: 5px; opacity: 0.9; }
+.menu-icon span:nth-child(3) { bottom: 0; }
+
+.drawer-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.55); opacity: 0; pointer-events: none; transition: opacity .2s ease; z-index: 90; backdrop-filter: blur(2px); }
+.drawer { position: fixed; top: 0; right: 0; height: 100%; width: min(340px, 88vw); background: #fff; border-left: 1px solid var(--border); box-shadow: -10px 0 30px rgba(15, 23, 42, .14); transform: translateX(105%); transition: transform .25s ease; z-index: 100; display: flex; flex-direction: column; }
+.drawer.open { transform: translateX(0); }
+.drawer-overlay.open { opacity: 1; pointer-events: auto; }
+.drawer-head { padding: 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; justify-content: space-between; }
+.drawer-title { font-weight: 900; font-size: 18px; letter-spacing: -0.5px; }
+.drawer-close { width: 36px; height: 36px; border-radius: 10px; border: 1px solid var(--border); background: #f8fafc; cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0; font-size: 18px; color: var(--text-muted); }
+.drawer-body { padding: 20px; overflow: auto; }
+.drawer-links { display: flex; flex-direction: column; gap: 12px; }
+.drawer-links a { text-decoration: none; color: var(--text-main); border: 1px solid var(--border); background: #f8fafc; padding: 16px; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; font-weight: 700; font-size: 15px; transition: background 0.2s; }
+.drawer-links a:hover { background: white; border-color: #cbd5e1; }
+.drawer-links a span { color: var(--text-muted); font-weight: 500; font-size: 12px; }
+
+/* FOOTER (Shared across all pages) */
+footer { background: white; padding: 60px 24px 30px; border-top: 1px solid var(--border); }
+.footer-grid { max-width: var(--max-width); margin: 0 auto; display: grid; grid-template-columns: 2fr 1fr 1fr 1fr; gap: 40px; margin-bottom: 60px; }
+.footer-col h4 { font-size: 16px; font-weight: 700; margin-bottom: 20px; }
+.footer-col a { display: block; color: var(--text-muted); margin-bottom: 12px; font-size: 14px; transition: color 0.2s; }
+.footer-col a:hover { color: var(--primary); }
+.footer-bottom { max-width: var(--max-width); margin: 0 auto; padding-top: 24px; border-top: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; color: var(--text-muted); font-size: 14px; }
+.social-icons { display: flex; gap: 12px; margin-top: 24px; }
+.social-icons a { display: flex !important; align-items: center; justify-content: center; width: 36px; height: 36px; border-radius: 50%; background: #f1f5f9; color: var(--text-muted); transition: all 0.2s; margin-bottom: 0 !important; }
+.social-icons a:hover { background: var(--primary); color: white; transform: translateY(-2px); }
+.social-icons svg { width: 16px; height: 16px; fill: currentColor; }
+

@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0"/>
+  <title>Profit Optimizer – Vizbix Pro</title>
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
+
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="icon" type="image/png" href="/assets/img/favicon.png">
+
+  <link rel="stylesheet" href="/assets/css/main.css">
+  <link rel="stylesheet" href="/assets/css/app.css">
+</head>
+<body>
+
+  <div class="modal-overlay" id="historyModal">
+    <div class="modal-content">
+      <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
+        <h3 style="margin:0">Saved Analysis History</h3>
+        <button class="btn-ghost" onclick="window.toggleHistory(false)">✕</button>
+      </div>
+      <div id="historyList">Loading...</div>
+    </div>
+  </div>
+
+  <div id="vizbix-nav-container"></div>
+
+  <main>
+    <div class="card">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <div class="input-label">DATA SOURCE</div>
+        <div class="input-label" style="color:var(--accent); cursor:pointer;" onclick="window.sample()">Use Demo Data</div>
+      </div>
+      
+      <div class="mode-switch-container">
+          <button class="mode-btn active" id="btnProduct" onclick="window.setMode('product')">Product Wise</button>
+          <button class="mode-btn" id="btnMonthly" onclick="window.setMode('monthly')">Monthly Overview</button>
+      </div>
+
+      <div id="productInputs">
+          <div class="grid-header">
+            <div>PRODUCT NAME</div>
+            <div>SELL PRICE</div>
+            <div>COST PRICE</div>
+            <div>QTY SOLD</div>
+            <div></div>
+          </div>
+          <div id="items"></div>
+          <button class="btn-secondary" onclick="window.addRow()" style="width:100%; margin-top:10px;">+ Add Product</button>
+      </div>
+
+      <div id="monthlyInputs" style="display:none;">
+          <div class="info-box-small">
+              <span style="font-size:16px;">💡</span> 
+              <div><strong>Pro Tip:</strong> Add 2–6 months of data for the most accurate trend analysis.</div>
+          </div>
+          <div class="grid-header">
+              <div>MONTH (Optional)</div>
+              <div>SALES (₹)</div>
+              <div>EXPENSES (₹)</div>
+              <div>ORDERS</div>
+              <div></div>
+          </div>
+          <div id="monthItems"></div>
+          <button class="btn-secondary" onclick="window.addMonthRow()" style="width:100%; margin-top:10px;">+ Add Month Data</button>
+      </div>
+
+      <div style="margin-top:16px; display:flex; gap:10px; align-items: stretch;">
+        <button id="analyzeBtn" class="btn-primary" style="flex:2;" onclick="window.analyze()">Generate Report →</button>
+        <button id="saveCloudBtn" class="btn-secondary" style="display:none; width:50px; flex-shrink:0; padding:0; align-items:center; justify-content:center;" onclick="window.saveToCloud()" title="Save to Cloud"><span style="font-size:18px">💾</span></button>
+      </div>
+    </div>
+
+    <div id="results" style="display:none">
+      
+      <div class="kpi-container">
+        <div class="kpi-card">
+          <div class="kpi-label" id="kpiRevLabel">TOTAL REVENUE</div>
+          <div class="kpi-value" id="dispRevenue">₹0</div>
+        </div>
+        <div class="kpi-card">
+          <div class="kpi-label" id="kpiCostLabel">TOTAL COST</div>
+          <div class="kpi-value" id="dispCost" style="color:#64748B">₹0</div>
+        </div>
+        <div class="kpi-card" style="border-color:var(--success); background:#f0fdf4;">
+          <div class="kpi-label" style="color:#15803d" id="kpiProfitLabel">NET PROFIT</div>
+          <div class="kpi-value" id="dispProfit" style="color:#15803d">₹0</div>
+        </div>
+      </div>
+
+      <div id="monthlyMetrics" class="kpi-container" style="display:none;">
+          <div class="kpi-card" style="background:#EFF6FF; border-color:#DBEAFE">
+              <div class="kpi-value" id="dispAOV">₹0</div>
+              <div class="kpi-label" style="color:#1E40AF">Avg Order Value</div>
+          </div>
+          <div class="kpi-card" style="background:#EFF6FF; border-color:#DBEAFE">
+              <div class="kpi-value" id="dispOrders">0</div>
+              <div class="kpi-label" style="color:#1E40AF">Avg Monthly Orders</div>
+          </div>
+      </div>
+
+      <div class="card locked-container" id="proContainer">
+        <div class="blur-overlay" id="lockOverlay">
+          <div class="lock-card">
+            <span class="premium-badge">Vizbix Pro</span>
+            <h3 style="margin:0 0 5px 0;">Unlock Strategic Insights</h3>
+            
+            <div class="feature-list">
+                <div>✅ <strong>AI Business Consultant</strong></div>
+                <div>✅ <strong>Unlimited Cloud History</strong></div>
+                <div>✅ <strong>Visual Charts & Graphs</strong></div>
+                <div>✅ <strong>PDF Report Export</strong></div>
+            </div>
+
+            <input id="emailInput" placeholder="Enter your email" style="margin-bottom:10px; text-align:center;">
+            <button class="btn-primary" style="width:100%" onclick="window.pay()">Unlock for ₹499</button>
+            <button style="background:none; border:none; color:#64748B; font-size:11px; margin-top:10px; cursor:pointer; text-decoration:underline" onclick="window.verify(null)">Restore Purchase</button>
+          </div>
+        </div>
+
+        <div id="proContent">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+            <h3 style="margin:0">Strategic Report</h3>
+            <button class="btn-secondary" style="padding:6px 12px; font-size:12px;" onclick="window.downloadPDF()">↓ Export Report</button>
+          </div>
+
+          <h3 style="margin-bottom:15px">Optimization Strategy</h3>
+          <div id="insights"></div>
+
+          <div id="tableContainer">
+              <h3 style="margin-top:30px; margin-bottom:15px">Detailed Margin Analysis</h3>
+              <div style="overflow-x:auto;">
+                <table id="table"></table>
+              </div>
+          </div>
+
+          <h3 style="margin-top:40px; margin-bottom:15px">Visual Breakdown</h3>
+          <div style="height:300px; margin-bottom:30px; position: relative;">
+            <canvas id="chart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+
+  <script src="/assets/js/drawer.js"></script>
+  <script type="module" src="/assets/js/auth.js"></script>
+  <script src="../assets/js/charts.js"></script>
+  <script src="../assets/js/ai.js"></script>
+  <script src="/assets/js/app.js"></script>
+  </body>
+</html>
