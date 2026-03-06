@@ -1,8 +1,16 @@
 document.addEventListener("DOMContentLoaded", () => {
-    // 1. Define the HTML for the Header and Drawer
-    // Note: We use absolute paths (starting with "/") so links work perfectly 
-    // no matter which folder (tools, app, templates) the user is currently in.
+    // 1. Define the HTML and inject a specific <style> tag to bypass CSS caching
     const drawerHTML = `
+      <style>
+        /* Force mobile header fix - Bypasses CSS caching issues */
+        @media (max-width: 850px) {
+          .nav-links { display: none !important; }
+          .nav-actions { gap: 8px !important; }
+          .nav-container { padding: 12px 16px !important; }
+          .logo { font-size: 20px !important; }
+        }
+      </style>
+
       <div class="drawer-overlay" id="drawerOverlay"></div>
       
       <aside class="drawer" id="drawer">
