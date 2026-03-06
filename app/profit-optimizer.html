@@ -40,7 +40,7 @@
           <svg viewBox="0 0 24 24"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg><span class="nav-item-text">Dashboard</span>
         </a>
         <a class="nav-item" onclick="switchView('ai', this)">
-          <span style="background: white; color: #0f172a; padding: 2px 4px; border-radius: 4px; font-size: 14px; font-weight: 900; line-height: 1;">Ai</span><span class="nav-item-text">Strategy</span>
+          <svg viewBox="0 0 24 24"><path d="M19 3l-1.5 3.5L14 8l3.5 1.5L19 13l1.5-3.5L24 8l-3.5-1.5L19 3zm-7 2L8.5 12 5 13.5 8.5 15 12 22l3.5-7L19 13.5 15.5 12 12 5zm0 3.8l1.6 3.2 3.4 1.5-3.4 1.5-1.6 3.2-1.6-3.2-3.4-1.5 3.4-1.5L12 8.8z"/></svg><span class="nav-item-text">AI Strategy</span>
         </a>
         <a class="nav-item" onclick="switchView('report', this)">
           <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg><span class="nav-item-text">Detailed Report</span>
@@ -112,22 +112,26 @@
               <h4 style="margin-top: 0; margin-bottom: 16px; color: var(--text-muted); text-transform: uppercase; font-size: 13px;">Revenue vs Profit</h4>
               <div style="position: relative; height: 300px; width: 100%;"><canvas id="profitChart"></canvas></div>
             </div>
-            <div class="data-card" style="padding: 20px; margin: 0; background: #f8fafc;">
-              <h4 style="margin-top: 0; margin-bottom: 16px; color: var(--text-muted); text-transform: uppercase; font-size: 13px;">⚡ Fast Insights</h4>
-              <div id="auto-insights-list" style="font-size: 14px; line-height: 1.6;">Run analysis to see insights.</div>
+            <div class="data-card" style="padding: 24px; margin: 0; background: #f8fafc;">
+              <h4 style="margin-top: 0; margin-bottom: 16px; color: var(--dark); font-size: 16px; display: flex; align-items: center; gap: 8px;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> 3-Point Action Plan</h4>
+              <div id="auto-insights-list" style="font-size: 14px; line-height: 1.6; display: flex; flex-direction: column; gap: 16px;">
+                <p>Run analysis to see insights.</p>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
       <div id="view-ai" class="app-view">
-        <div style="max-width: 900px; margin: 0 auto; height: 100%; display: flex; flex-direction: column;">
+        <div style="max-width: 850px; margin: 0 auto; height: 100%;">
           
-          <h2 style="margin-bottom: 20px;"><span style="font-size: 24px; background: var(--dark); color: white; padding: 4px 8px; border-radius: 8px;">Ai</span> Strategy</h2>
+          <h2 style="margin-bottom: 24px; display: flex; align-items: center; gap: 12px;">
+            <span style="font-size: 28px; background: var(--dark); color: white; padding: 6px 10px; border-radius: 8px; line-height: 1;">Ai</span> Strategy
+          </h2>
 
-          <div id="aiSplashScreen" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; border: 1px solid var(--border); border-radius: 16px;">
-              <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 18px;">Ready to uncover hidden profits?</p>
-              <button class="btn btn-dark btn-large" style="border-radius: 99px; padding: 16px 40px;" onclick="if(window.startAIAnalysis) window.startAIAnalysis();">✨ Generate Strategy</button>
+          <div id="aiSplashScreen" style="height: calc(100vh - 220px); display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.02);">
+              <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 18px;">Click below to analyze your numbers instantly.</p>
+              <button class="btn btn-dark" style="border-radius: 99px; padding: 18px 48px; font-size: 18px; box-shadow: 0 4px 15px rgba(15,23,42,0.2);" onclick="if(window.startAIAnalysis) window.startAIAnalysis();">✨ Generate Strategy</button>
           </div>
 
           <div id="aiChatContainer" class="chat-container" style="display: none;">
@@ -136,8 +140,10 @@
              <div style="background: white;">
                <div id="typingIndicator" class="ai-typing">AI is analyzing your numbers...</div>
                <div class="chat-input-row">
-                  <input type="text" id="aiChatInput" placeholder="How Can I Help You..." onkeypress="if(event.key === 'Enter' && window.sendChatMessage) window.sendChatMessage()" />
-                  <button id="chatSendBtn" onclick="if(window.sendChatMessage) window.sendChatMessage()">➔</button>
+                  <input type="text" id="aiChatInput" placeholder="How can I improve my margin on the highest selling item?" onkeypress="if(event.key === 'Enter' && window.sendChatMessage) window.sendChatMessage()" />
+                  <button id="chatSendBtn" onclick="if(window.sendChatMessage) window.sendChatMessage()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
+                  </button>
                </div>
              </div>
           </div>
@@ -212,23 +218,38 @@
     </main>
 
     <div id="pdf-export-container">
-        <div class="pdf-wrap" id="pdfTemplateContent">
-            <div class="pdf-header">
-                <h1>Business Report</h1>
-                <h4>Executive Summary</h4>
-            </div>
+        <div class="pdf-header">
+            <h1>Business Report</h1>
+            <h4>Executive Summary</h4>
+        </div>
+        
+        <div class="pdf-grid">
             <div class="pdf-col-1">
                 <div class="pdf-stat-row"><span>Total Revenue</span> <span id="pdf-rev">0</span></div>
                 <div class="pdf-stat-row"><span>Total Cost</span> <span id="pdf-cost">0</span></div>
                 <div class="pdf-stat-row"><span>Net Profit</span> <span id="pdf-profit" style="color:#0f172a;">0</span></div>
-                <div class="pdf-big-num"><h4>Top Product Sales</h4><div id="pdf-top-prod-qty">0</div></div>
+                <div class="pdf-big-metric">
+                    <h4>Total Units Sold</h4>
+                    <div id="pdf-units-sold">0</div>
+                </div>
             </div>
+
             <div class="pdf-chart-box">
                 <img id="pdf-chart-image" class="pdf-chart-img" src="" alt="Chart">
-                <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-top: 30px;">
-                    <div><h4 style="color: #64748b; font-size: 14px; margin: 0 0 8px 0; text-transform: uppercase;">Gross Margin</h4><div id="pdf-margin" style="font-size: 42px; font-weight: 900; line-height: 1;">0%</div></div>
-                    <div style="width: 50%;" class="pdf-insights"><h4>Key Insights</h4><p id="pdf-insight-text">Analysis will appear here.</p></div>
+                <div class="pdf-big-metric" style="margin-top: 20px;">
+                    <h4>Top Product</h4>
+                    <div id="pdf-top-prod" style="font-size: 32px;">-</div>
                 </div>
+            </div>
+
+            <div>
+                <div id="pdf-margin" style="font-size: 80px; font-weight: 900; line-height: 1; margin-bottom: 30px; letter-spacing: -2px;">0%</div>
+                <h4 class="pdf-col-title">Key Insights</h4>
+                <ul class="pdf-list" id="pdf-insight-list">
+                    <li>Insight 1</li>
+                    <li>Insight 2</li>
+                    <li>Insight 3</li>
+                </ul>
             </div>
         </div>
     </div>
@@ -261,9 +282,6 @@
 
     function switchView(viewId, element, bypassPaywall = false) {
       window.currentView = viewId;
-      
-      // FIX: Only show lock screen if we DEFINITELY know they are free (isProUser === false). 
-      // If it's undefined, it means Cloudflare is still checking, so don't lock them out yet!
       if(proViews.includes(viewId) && window.isProUser === false && !bypassPaywall) {
         document.getElementById('proLockOverlay').classList.remove('pro-lock-hidden');
         document.querySelectorAll('.app-view').forEach(v => v.style.filter = "blur(6px)");
@@ -271,7 +289,6 @@
         document.getElementById('proLockOverlay').classList.add('pro-lock-hidden');
         document.querySelectorAll('.app-view').forEach(v => v.style.filter = "none");
       }
-      
       document.querySelectorAll('.app-view').forEach(view => view.classList.remove('active'));
       document.getElementById('view-' + viewId).classList.add('active');
       if (element) {
@@ -352,75 +369,76 @@
       else if(healthScore >= 50) { hc.style.background = '#fef3c7'; hc.style.color = '#d97706'; }
       else { hc.style.background = '#fee2e2'; hc.style.color = '#dc2626'; }
 
-      // 3 Guaranteed Pre-Calculated Insights
+      // FORCE EXACTLY 3 INSIGHTS
       let insightsHTML = '';
+      let pdfInsights = '';
+      
+      // 1. Hero Product
       if (topProduct.profit > 0) {
-        insightsHTML += `<p style="margin: 0 0 12px 0;"><strong>⭐ Hero Product:</strong> ${topProduct.name} is driving the most profit (${formatCurrency(topProduct.profit)}). Consider a 5-10% price test here to maximize net revenue.</p>`;
+        insightsHTML += `<p><strong>🔥 Top Performer:</strong> ${topProduct.name} generated ${formatCurrency(topProduct.profit)}. Focus ad spend here.</p>`;
+        pdfInsights += `<li><strong>Focus on ${topProduct.name}:</strong> It generated the highest profit at ${formatCurrency(topProduct.profit)}.</li>`;
+      } else {
+        insightsHTML += `<p><strong>🔥 Top Performer:</strong> None detected. You need to raise prices across the board.</p>`;
+        pdfInsights += `<li><strong>Warning:</strong> No highly profitable products detected.</li>`;
       }
+
+      // 2. Leaks
       if (profitLeaks.length > 0) {
-        insightsHTML += `<p style="margin: 0 0 12px 0; color: #dc2626;"><strong>⚠️ Profit Leaks:</strong> ${profitLeaks.join(', ')} are currently losing money. You must either raise prices, lower cost of goods, or discontinue these items.</p>`;
+        insightsHTML += `<p style="color: #dc2626;"><strong>⚠️ Profit Leaks:</strong> ${profitLeaks.join(', ')} are losing money. Increase prices or drop them immediately.</p>`;
+        pdfInsights += `<li><strong>Fix Leaks:</strong> ${profitLeaks.join(', ')} are operating at a loss. Adjust pricing or discontinue.</li>`;
       } else {
-        insightsHTML += `<p style="margin: 0 0 12px 0; color: #059669;"><strong>✅ Pricing Safe:</strong> No negative margin products detected. Your unit economics are currently stable.</p>`;
+        insightsHTML += `<p style="color: #059669;"><strong>✅ Pricing Safe:</strong> No negative margins detected across your catalog.</p>`;
+        pdfInsights += `<li><strong>Pricing Safe:</strong> Zero products are currently losing money.</li>`;
       }
+
+      // 3. Margin Overall
       if (overallMargin < 20) {
-        insightsHTML += `<p style="margin: 0;"><strong>📉 Margin Warning:</strong> An average margin of ${overallMargin.toFixed(1)}% is dangerous. After marketing and operational costs, your net cash flow might be negative.</p>`;
-      } else if (overallMargin < 40) {
-        insightsHTML += `<p style="margin: 0;"><strong>📊 Margin Status:</strong> ${overallMargin.toFixed(1)}% is fair, but aim for >40% by bundling items or negotiating lower supplier costs.</p>`;
+        insightsHTML += `<p><strong>📉 Margin Warning:</strong> ${overallMargin.toFixed(1)}% gross margin is dangerously low to sustain a business.</p>`;
+        pdfInsights += `<li><strong>Margin Warning:</strong> Your ${overallMargin.toFixed(1)}% margin leaves little room for operational expenses.</li>`;
       } else {
-        insightsHTML += `<p style="margin: 0; color: #059669;"><strong>📈 Healthy Margin:</strong> ${overallMargin.toFixed(1)}% gives you excellent cash flow to aggressively invest in marketing and scale.</p>`;
+        insightsHTML += `<p><strong>📈 Healthy Margin:</strong> ${overallMargin.toFixed(1)}% gross margin gives you excellent room for scaling.</p>`;
+        pdfInsights += `<li><strong>Healthy Margin:</strong> ${overallMargin.toFixed(1)}% provides strong cash flow for scaling operations.</li>`;
       }
+      
       document.getElementById('auto-insights-list').innerHTML = insightsHTML;
+      document.getElementById('pdf-insight-list').innerHTML = pdfInsights;
 
       // Populate PDF Hidden Template Values
       document.getElementById('pdf-rev').innerText = formatCurrency(totalRevenue);
       document.getElementById('pdf-cost').innerText = formatCurrency(totalCost);
       document.getElementById('pdf-profit').innerText = formatCurrency(totalProfit);
-      document.getElementById('pdf-top-prod-qty').innerText = topProduct.qty + " units";
+      document.getElementById('pdf-units-sold').innerText = totalItems;
       document.getElementById('pdf-margin').innerText = overallMargin.toFixed(1) + '%';
-      
-      let pdfInsight = `Your overall business health is ${healthScore}/100. `;
-      if(profitLeaks.length > 0) pdfInsight += `Warning: ${profitLeaks.join(', ')} are losing money. Consider raising prices to instantly boost net profit.`;
-      else pdfInsight += `You have zero negative margin products. Your top performer is ${topProduct.name}. To scale safely, focus marketing spend on this item.`;
-      document.getElementById('pdf-insight-text').innerText = pdfInsight;
+      document.getElementById('pdf-top-prod').innerText = topProduct.name;
 
-      // Draw Chart
+      // Draw Chart (Make it purple like the PDF design!)
       const ctx = document.getElementById('profitChart').getContext('2d');
       if(myChart) myChart.destroy();
       myChart = new Chart(ctx, {
         type: 'bar',
         data: { labels: chartLabels, datasets: [{ label: 'Revenue', data: chartRevData, backgroundColor: '#cbd5e1', borderRadius: 4 }, { label: 'Profit', data: chartProfitData, backgroundColor: '#4f46e5', borderRadius: 4 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } }
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { x: { grid: { display: false } }, y: { beginAtZero: true } } }
       });
 
       switchView('dashboard', document.getElementById('nav-dashboard'));
     }
 
-    // FIX: PDF Generation Engine (Fixes blank PDF output)
+    // FIX: PDF Generation Engine (Hidden completely safely using z-index)
     function exportExecutivePDF() {
       const chartCanvas = document.getElementById('profitChart');
       document.getElementById('pdf-chart-image').src = chartCanvas.toDataURL('image/png');
 
       const element = document.getElementById('pdf-export-container');
       
-      // Temporarily make the container visible so html2canvas can "see" it
-      element.style.opacity = '1';
-      element.style.position = 'relative';
-      element.style.zIndex = '9999';
-
       const opt = {
         margin:       0,
         filename:     'Vizbix_Executive_Summary.pdf',
         image:        { type: 'jpeg', quality: 1 },
-        html2canvas:  { scale: 2, useCORS: true, windowWidth: 1100 },
+        html2canvas:  { scale: 2, useCORS: true, windowWidth: 1200 },
         jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
       };
       
-      html2pdf().set(opt).from(element).save().then(() => {
-          // Hide it again immediately after capturing
-          element.style.opacity = '0';
-          element.style.position = 'absolute';
-          element.style.zIndex = '-9999';
-      });
+      html2pdf().set(opt).from(element).save();
     }
 
     let hasVerified = false;
@@ -441,7 +459,6 @@
         const upgradeBtn = document.getElementById('upgradeBtn');
         if(upgradeBtn) upgradeBtn.style.display = 'none';
 
-        // FIX: Ensure UI unlocks if it accidentally locked during the 1-second load
         document.getElementById('proLockOverlay').classList.add('pro-lock-hidden');
         document.querySelectorAll('.app-view').forEach(v => v.style.filter = "none");
 
@@ -460,4 +477,3 @@
 
 </body>
 </html>
-
