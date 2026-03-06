@@ -37,6 +37,7 @@
 .data-row input:focus { border-color: var(--primary); background: white; }
 .delete-btn { width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; border: none; background: transparent; color: #94a3b8; font-size: 18px; cursor: pointer; border-radius: 8px; transition: background 0.2s, color 0.2s; }
 .delete-btn:hover { background: #fef2f2; color: #ef4444; }
+
 .add-row-btn { width: 100%; padding: 14px; background: transparent; border: 1px dashed #cbd5e1; border-radius: 8px; color: var(--text-muted); font-weight: 600; cursor: pointer; margin-top: 8px; transition: all 0.2s; }
 .add-row-btn:hover { border-color: var(--primary); color: var(--primary); background: #eff6ff; }
 .action-buttons-wrap { display: flex; gap: 12px; margin-top: 24px; }
@@ -60,39 +61,44 @@
 .status-healthy { background: #d1fae5; color: #059669; }
 .status-leak { background: #fee2e2; color: #dc2626; }
 
-/* --- AI Chat UI --- */
-.chat-container { display: flex; flex-direction: column; height: 60vh; background: white; border: 1px solid var(--border); border-radius: 16px; overflow: hidden; }
-.chat-history { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 16px; background: #f8fafc; }
-.chat-msg { max-width: 85%; padding: 14px 18px; border-radius: 12px; font-size: 15px; line-height: 1.6; position: relative; }
+/* --- AI Chat UI (Matches Mockup) --- */
+.chat-container { display: flex; flex-direction: column; height: calc(100vh - 180px); }
+.chat-history { flex: 1; overflow-y: auto; padding: 24px; display: flex; flex-direction: column; gap: 20px; }
+.chat-msg { max-width: 80%; padding: 16px 20px; border-radius: 16px; font-size: 15px; line-height: 1.6; position: relative; }
+/* AI is Left, User is Right */
+.msg-ai { align-self: flex-start; background: white; border: 1px solid var(--border); color: var(--text-main); border-bottom-left-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
 .msg-user { align-self: flex-end; background: var(--dark); color: white; border-bottom-right-radius: 4px; }
-.msg-ai { align-self: flex-start; background: white; border: 1px solid var(--border); color: var(--text-main); border-bottom-left-radius: 4px; box-shadow: 0 2px 8px rgba(0,0,0,0.02); }
 .msg-ai strong { color: var(--dark); }
-.chat-input-row { display: flex; padding: 16px; background: white; border-top: 1px solid var(--border); gap: 12px; align-items: center; }
-.chat-input-row input { flex: 1; padding: 14px 20px; border: 1px solid var(--border); border-radius: 99px; outline: none; font-size: 15px; background: #f8fafc; transition: border 0.2s; }
-.chat-input-row input:focus { border-color: var(--primary); background: white; }
-.chat-input-row button { background: var(--primary); color: white; border: none; padding: 0 24px; height: 48px; border-radius: 99px; font-weight: 700; cursor: pointer; transition: background 0.2s; }
 
-/* --- PAYWALL BLUR OVERLAY --- */
+.chat-input-row { display: flex; padding: 16px 0; gap: 12px; align-items: center; position: relative; }
+.chat-input-row input { flex: 1; padding: 18px 60px 18px 24px; border: 1px solid var(--border); border-radius: 99px; outline: none; font-size: 15px; background: white; box-shadow: 0 4px 20px rgba(0,0,0,0.05); transition: border 0.2s; }
+.chat-input-row input:focus { border-color: var(--primary); }
+.chat-input-row button { position: absolute; right: 8px; top: 24px; background: var(--dark); color: white; border: none; width: 40px; height: 40px; border-radius: 50%; font-weight: 700; cursor: pointer; transition: background 0.2s; display: flex; align-items: center; justify-content: center; }
+.chat-input-row button:hover { background: var(--primary); }
+
+/* --- PAYWALL --- */
 .pro-lock-overlay { position: absolute; inset: 0; background: rgba(255, 255, 255, 0.4); backdrop-filter: blur(8px); z-index: 100; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 20px; }
 .pro-lock-hidden { display: none !important; }
 .pro-lock-card { background: white; border: 1px solid var(--border); border-radius: 20px; padding: 40px; text-align: center; max-width: 450px; box-shadow: 0 20px 40px rgba(15, 23, 42, 0.1); }
 .pro-lock-card h2 { font-size: 24px; margin-bottom: 12px; color: var(--dark); }
 
 /* --- Hidden PDF Template --- */
+/* FIX: Now it lives in the viewport but is fully invisible */
+#pdf-export-container { width: 1100px; background: white; color: #0f172a; position: absolute; z-index: -9999; opacity: 0; pointer-events: none; left: 0; top: 0; }
 .pdf-wrap { padding: 60px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 40px; font-family: 'Inter', sans-serif; }
-.pdf-header { grid-column: span 3; margin-bottom: 20px; }
-.pdf-header h1 { font-size: 42px; font-weight: 900; margin: 0; text-transform: uppercase; letter-spacing: -1px; }
-.pdf-header h4 { color: #64748b; font-size: 14px; text-transform: uppercase; letter-spacing: 2px; margin-top: 8px; }
-.pdf-col-1 h3 { font-size: 14px; color: #64748b; margin-bottom: 12px; }
-.pdf-stat-row { display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 12px 0; font-size: 18px; font-weight: 600; }
-.pdf-stat-row span:last-child { font-weight: 800; }
+.pdf-header { grid-column: span 3; margin-bottom: 20px; border-bottom: 2px solid #0f172a; padding-bottom: 20px; }
+.pdf-header h1 { font-size: 48px; font-weight: 900; margin: 0; text-transform: uppercase; letter-spacing: -1px; color: #0f172a; }
+.pdf-header h4 { color: #64748b; font-size: 16px; text-transform: uppercase; letter-spacing: 2px; margin-top: 8px; }
+.pdf-col-1 h3 { font-size: 14px; color: #64748b; margin-bottom: 12px; text-transform: uppercase;}
+.pdf-stat-row { display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 14px 0; font-size: 20px; font-weight: 600; }
+.pdf-stat-row span:last-child { font-weight: 900; color: #0f172a; }
 .pdf-big-num { margin-top: 40px; }
-.pdf-big-num h4 { font-size: 18px; color: #64748b; margin: 0 0 8px 0; }
-.pdf-big-num div { font-size: 48px; font-weight: 900; line-height: 1; }
+.pdf-big-num h4 { font-size: 18px; color: #64748b; margin: 0 0 8px 0; text-transform: uppercase; }
+.pdf-big-num div { font-size: 54px; font-weight: 900; line-height: 1; }
 .pdf-chart-box { grid-column: span 2; }
 .pdf-chart-img { width: 100%; height: auto; border: 1px solid #e2e8f0; border-radius: 12px; padding: 20px; margin-bottom: 20px; }
-.pdf-insights h4 { font-size: 14px; color: #64748b; text-transform: uppercase; margin-bottom: 12px; }
-.pdf-insights p { font-size: 14px; line-height: 1.6; color: #334155; }
+.pdf-insights h4 { font-size: 16px; color: #64748b; text-transform: uppercase; margin-bottom: 12px; }
+.pdf-insights p { font-size: 16px; line-height: 1.6; color: #334155; }
 
 /* Mobile View */
 @media (max-width: 850px) {
