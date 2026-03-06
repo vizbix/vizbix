@@ -17,22 +17,22 @@ window.askAI = async function() {
     btn.disabled = true; 
     btn.classList.add("ai-thinking");
     
-    let aiPayload = {};
-    if (window.currentMode === 'monthly') {
-        if(!window.monthlyStats) return alert("Run analysis first."); 
-        const s = window.monthlyStats;
-        aiPayload = { 
-            email: window.userEmail, 
-            mode: 'monthly', 
-            summary: `Based on ${s.count} months average:\nAvg Monthly Sales: ₹${s.avgSales.toFixed(0)}, Avg Expenses: ₹${s.avgExp.toFixed(0)}, Avg Orders: ${s.avgOrders.toFixed(1)}, Gross Margin: ${s.margin.toFixed(1)}%.` 
-        };
-    } else { 
-        aiPayload = { 
-            email: window.userEmail, 
-            products: window.currentData.map(x => ({ name: x.name, cost: x.cost, sell: x.sell, qty: x.qty })), 
-            mode: 'product' 
-        }; 
-    }
+    // Scrape current data from the UI to ensure AI gets latest numbers
+    let currentProducts = [];
+    document.querySelectorAll('#items .data-row').forEach(row => {
+        const name = row.querySelector('.input-name').value;
+        const sell = row.querySelector('.input-sell').value;
+        const cost = row.querySelector('.input-cost').value;
+        const qty = row.querySelector('.input-qty').value;
+        if(name || sell || cost || qty) currentProducts.push({ name, sell, cost, qty });
+    });
+
+    let aiPayload = { 
+        email: window.userEmail, 
+        currency: window.currentCurrency || 'INR',
+        products: currentProducts, 
+        mode: 'product' 
+    }; 
     
     try {
         const r = await fetch(workerURL + "/ai-analyze", { 
@@ -70,38 +70,19 @@ window.verify = async function(email){
         if(d.valid) {
             window.isProUser = true; 
             
-            // Unlock UI
-            const lockOverlay = document.getElementById("lockOverlay");
-            const proContainer = document.getElementById("proContainer");
-            if(lockOverlay) lockOverlay.style.display = "none"; 
-            if(proContainer) proContainer.classList.remove("locked-container");
-            
-            let dateStr = "";
+            // Calculate exact days left
             if(d.expiry) { 
-                const date = new Date(parseInt(d.expiry)); 
-                dateStr = date.toLocaleDateString(undefined, {day:'numeric', month:'short', year:'numeric'}); 
+                const diff = d.expiry - Date.now();
+                if(diff > 0) {
+                    const days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+                    window.proDaysLeft = days + " Days Left";
+                } else {
+                    window.isProUser = false; // Plan Expired
+                    window.proDaysLeft = "Expired";
+                }
             }
-            
-            const headerEmail = document.getElementById("userEmailHeader");
-            if(headerEmail) headerEmail.innerHTML = `<div>${targetEmail}</div><div style="font-size:10px; opacity:0.8; margin-top:2px;">Pro Active</div>`;
-            
-            const drawerExpiry = document.getElementById("drawerExpiryDisplay");
-            if(drawerExpiry) drawerExpiry.innerText = "Plan expires: " + dateStr;
-            
-            const historyBtn = document.getElementById("historyBtn");
-            const saveCloudBtn = document.getElementById("saveCloudBtn");
-            if(historyBtn) historyBtn.style.display = "inline-flex"; 
-            if(saveCloudBtn) saveCloudBtn.style.display = "flex";
-            
-            if(window.chartInstance) window.chartInstance.resize();
         } else { 
-            // Logged in, but NOT a Pro user. Keep UI locked.
             window.isProUser = false;
-            const btn = document.querySelector("button[onclick='window.pay()']");
-            if(btn) {
-                btn.innerText = `Unlock Pro for ₹499`;
-                btn.onclick = window.pay; 
-            }
         }
     } catch(e) { console.log(e); }
 };
@@ -118,10 +99,8 @@ window.pay = function(){
         prefill: { email: window.userEmail }, 
         theme: { color: "#0F172A" },
         handler: async function(response){ 
-            const btn = document.querySelector("button[onclick='window.pay()']"); 
-            const originalText = btn.innerText;
-            btn.innerText = "Verifying Payment..."; 
-            btn.disabled = true;
+            const btn = document.getElementById("upgradeBtn"); 
+            if(btn) { btn.innerText = "Verifying Payment..."; btn.disabled = true; }
             
             try {
                 const verifyReq = await fetch(workerURL + "/verify-payment", { 
@@ -135,14 +114,12 @@ window.pay = function(){
                     alert("Payment Successful! Welcome to Pro."); 
                     window.verify(window.userEmail); 
                 } else { 
-                    alert("Verification Failed: " + (verifyData.error || "Unknown error")); 
-                    btn.innerText = originalText; 
-                    btn.disabled = false; 
+                    alert("Verification Failed."); 
+                    if(btn) { btn.innerText = "Upgrade to PRO (₹499)"; btn.disabled = false; }
                 }
             } catch (e) { 
                 alert("Network error during verification."); 
-                btn.innerText = originalText; 
-                btn.disabled = false; 
+                if(btn) { btn.innerText = "Upgrade to PRO (₹499)"; btn.disabled = false; }
             }
         }
     };
@@ -150,49 +127,68 @@ window.pay = function(){
     rzp1.open();
 };
 
-// --- CLOUD HISTORY & SAVING (Append to ai.js) ---
-
 window.saveToCloud = async function() {
-    if(!window.isProUser) return alert("Login required"); 
+    if(!window.isProUser) return alert("Pro Plan required to save data to cloud."); 
     const btn = document.getElementById("saveCloudBtn");
-    let dataToSave = window.currentMode === 'monthly' ? window.scrapeRows(document.getElementById("monthItems")) : window.scrapeRows(document.getElementById("items"));
+    
+    // Scrape UI data
+    let dataToSave = [];
+    document.querySelectorAll('#items .data-row').forEach(row => {
+        const name = row.querySelector('.input-name').value;
+        const sell = row.querySelector('.input-sell').value;
+        const cost = row.querySelector('.input-cost').value;
+        const qty = row.querySelector('.input-qty').value;
+        if(name || sell || cost || qty) dataToSave.push({ name, sell, cost, qty });
+    });
     
     if(dataToSave.length === 0) return alert("Nothing to save!");
     
-    btn.innerHTML = "<span style='animation:spin 1s linear infinite'>⏳</span>";
+    btn.innerHTML = "⏳";
     try { 
         await fetch(workerURL + "/save", { 
             method: "POST", 
             headers: { "Content-Type": "application/json" }, 
-            body: JSON.stringify({ email: window.userEmail, data: dataToSave, mode: window.currentMode, date: new Date().toISOString() }) 
+            body: JSON.stringify({ email: window.userEmail, data: dataToSave, mode: 'product', date: new Date().toISOString() }) 
         }); 
-        btn.innerHTML = "✅"; 
-        setTimeout(() => btn.innerHTML = "<span style='font-size:18px'>💾</span>", 1500); 
+        btn.innerHTML = "✅ Saved"; 
+        setTimeout(() => btn.innerHTML = "💾 Save", 2000); 
     } catch(e) { 
-        btn.innerHTML = "💾"; 
+        btn.innerHTML = "💾 Save"; 
     }
 };
 
 window.fetchHistory = async function() {
     const list = document.getElementById("historyList"); 
+    if(!window.isProUser) {
+        list.innerHTML = "<p style='text-align:center; color:#64748B;'>Unlock Pro to view your saved history.</p>";
+        return;
+    }
+
     list.innerHTML = "Loading...";
     try {
         const r = await fetch(workerURL + "/history?email=" + window.userEmail); 
         const d = await r.json();
         
         if(d.length === 0) { 
-            list.innerHTML = "<p style='color:#64748B; text-align:center'>No history.</p>"; 
+            list.innerHTML = "<p style='color:#64748B; text-align:center'>No history found.</p>"; 
             return; 
         }
         list.innerHTML = "";
         
         d.forEach(item => {
             const dateStr = new Date(item.date).toLocaleDateString(); 
-            const modeLabel = item.mode === 'monthly' ? 'Monthly' : 'Product';
             const div = document.createElement("div"); 
             div.className = "history-item";
-            div.innerHTML = `<div><div style="font-weight:600; font-size:14px;">${dateStr}</div><div style="font-size:12px; color:#64748B">${item.data.length} Rows • ${modeLabel}</div></div><button class="btn-secondary" style="font-size:11px; padding:6px 10px;">Load</button>`;
-            div.onclick = () => window.loadHistoryItem(item.data, item.mode);
+            // Map the history UI exactly to your app.css
+            div.innerHTML = `
+                <div>
+                    <div style="font-weight:600; font-size:14px; color: var(--dark);">${dateStr}</div>
+                    <div style="font-size:12px; color: var(--text-muted);">${item.data.length} Rows Saved</div>
+                </div>
+                <button class="btn btn-secondary" style="font-size:12px; padding:8px 12px;">Load Data</button>
+            `;
+            // Add click event to load data
+            div.onclick = () => window.loadHistoryItem(item.data);
             list.appendChild(div);
         });
     } catch(e) { 
@@ -200,19 +196,23 @@ window.fetchHistory = async function() {
     }
 };
 
-window.loadHistoryItem = function(data, savedMode) {
-    const targetMode = savedMode || 'product'; 
-    window.setMode(targetMode);
+// Rebuilt to match the new UI architecture
+window.loadHistoryItem = function(data) {
+    const container = document.getElementById("items"); 
+    container.innerHTML = ""; // Clear current table
     
-    const container = targetMode === 'monthly' ? document.getElementById("monthItems") : document.getElementById("items"); 
-    container.innerHTML = "";
-    
-    data.forEach(x => { 
-        if(Array.isArray(x)) window.createRow(container, x[0], x[1], x[2], x[3], targetMode==='monthly'); 
-        else window.createRow(container, x.n, x.v1, x.v2, x.v3, targetMode==='monthly'); 
+    data.forEach(row => { 
+        // Support both old and new data structures
+        const n = row.name || row.n || '';
+        const s = row.sell || row.v1 || '';
+        const c = row.cost || row.v2 || '';
+        const q = row.qty || row.v3 || '';
+        window.addNewRow(n, s, c, q); 
     });
     
-    window.toggleHistory(false); 
-    window.saveDraft(); 
-    window.analyze();
+    alert("History loaded! Click Generate to view dashboard.");
+    // Switch UI back to Data view
+    if(typeof window.switchView === 'function') {
+        window.switchView('data', document.querySelectorAll('.nav-item')[3]);
+    }
 };
