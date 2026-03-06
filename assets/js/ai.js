@@ -1,51 +1,100 @@
+// =========================================
+// ai.js - AI Chat Consultant & Pro Engine
+// =========================================
+
 const workerURL = "https://vizbix-api.vizbixhq.workers.dev";
 const PRICE = 49900; 
 const KEY = "rzp_live_SCvIqUMzTNsXgq"; 
 
 window.chatConversation = [];
 
-window.startAIAnalysis = async function() {
-    if(!window.isProUser || !window.userEmail) return alert("Please Login (Pro Feature)");
-    
-    // FORCE FETCH FRESH DATA
-    const freshData = typeof getFreshData === 'function' ? getFreshData() : window.currentData;
-    if(!freshData || freshData.length === 0) return alert("Please enter data in the Data Input tab first!");
+// 1. BULLETPROOF SCRAPER: Lives directly inside ai.js so it never fails.
+window.scrapeCurrentData = function() {
+    let data = [];
+    const rows = document.querySelectorAll('#items .data-row');
+    if (!rows) return data;
 
-    document.getElementById("aiSplashScreen").style.display = "none";
-    document.getElementById("aiChatContainer").style.display = "flex";
-
-    const promptMsg = `Analyze my catalog. Identify my hero product, spot any profit leaks, and give me a clear 3-step action plan to increase my net margin. Use ${window.currencySymbol}.`;
-    
-    document.getElementById("chatHistory").innerHTML = `<div class="chat-msg msg-ai" id="loadingAi">Analyzing your data in ${window.currencySymbol}...</div>`;
-    window.chatConversation = []; 
-    
-    await executeAIRequest(promptMsg, freshData);
+    rows.forEach(row => {
+        const nameEl = row.querySelector('.input-name');
+        const sellEl = row.querySelector('.input-sell');
+        const costEl = row.querySelector('.input-cost');
+        const qtyEl = row.querySelector('.input-qty');
+        
+        if (nameEl && sellEl && costEl && qtyEl) {
+            const name = nameEl.value.trim();
+            const sell = parseFloat(sellEl.value) || 0;
+            const cost = parseFloat(costEl.value) || 0;
+            const qty = parseFloat(qtyEl.value) || 0;
+            
+            // Only add rows that actually have data
+            if (name !== '' || sell > 0 || cost > 0 || qty > 0) {
+                data.push({ name, sell, cost, qty });
+            }
+        }
+    });
+    return data;
 };
 
+// 2. START AI ANALYSIS BUTTON
+window.startAIAnalysis = async function() {
+    if(!window.isProUser || !window.userEmail) {
+        return alert("Please wait for authentication, or log in to use Pro Features.");
+    }
+    
+    const freshData = window.scrapeCurrentData();
+    if(!freshData || freshData.length === 0) {
+        return alert("Please enter your product data in the Data Input tab first!");
+    }
+
+    // Switch UI
+    const splash = document.getElementById("aiSplashScreen");
+    const chat = document.getElementById("aiChatContainer");
+    if(splash) splash.style.display = "none";
+    if(chat) chat.style.display = "flex";
+
+    const sym = window.currencySymbol || '₹';
+    const promptMsg = `Analyze my catalog. Identify my hero product, spot any profit leaks, and give me a clear 3-step action plan to increase my net margin. Use ${sym}.`;
+    
+    const historyBox = document.getElementById("chatHistory");
+    if(historyBox) {
+        historyBox.innerHTML = `<div class="chat-msg msg-ai" id="loadingAi">Analyzing your data in ${sym}...</div>`;
+    }
+    
+    window.chatConversation = []; 
+    await window.executeAIRequest(promptMsg, freshData);
+};
+
+// 3. SEND CHAT MESSAGE BUTTON
 window.sendChatMessage = async function() {
-    if(!window.isProUser) return;
+    if(!window.isProUser) return alert("Pro feature required.");
+    
     const inputField = document.getElementById("aiChatInput");
+    if(!inputField) return;
+
     const msg = inputField.value.trim();
     if(!msg) return;
 
-    document.getElementById("aiSplashScreen").style.display = "none";
-    document.getElementById("aiChatContainer").style.display = "flex";
+    // Ensure chat UI is visible
+    const splash = document.getElementById("aiSplashScreen");
+    const chat = document.getElementById("aiChatContainer");
+    if(splash) splash.style.display = "none";
+    if(chat) chat.style.display = "flex";
 
-    appendChatBubble(msg, 'user');
+    window.appendChatBubble(msg, 'user');
     inputField.value = '';
     
-    const freshData = typeof getFreshData === 'function' ? getFreshData() : window.currentData;
-    await executeAIRequest(msg, freshData);
+    const freshData = window.scrapeCurrentData();
+    await window.executeAIRequest(msg, freshData);
 };
 
-async function executeAIRequest(userMessage, freshData) {
+// 4. CLOUDFLARE WORKER CONNECTION
+window.executeAIRequest = async function(userMessage, freshData) {
     const typingIndicator = document.getElementById("typingIndicator");
     const sendBtn = document.getElementById("chatSendBtn");
     
-    typingIndicator.style.display = "block";
-    sendBtn.disabled = true;
+    if(typingIndicator) typingIndicator.style.display = "block";
+    if(sendBtn) sendBtn.disabled = true;
 
-    // GUARANTEED to have data attached to the payload
     let aiPayload = { 
         email: window.userEmail, 
         currency: window.currentCurrency || 'INR',
@@ -59,39 +108,45 @@ async function executeAIRequest(userMessage, freshData) {
 
     try {
         const r = await fetch(workerURL + "/ai-analyze", { 
-            method: "POST", headers: { "Content-Type": "application/json" }, 
+            method: "POST", 
+            headers: { "Content-Type": "application/json" }, 
             body: JSON.stringify(aiPayload) 
         });
         const d = await r.json(); 
         
-        typingIndicator.style.display = "none";
-        sendBtn.disabled = false;
+        if(typingIndicator) typingIndicator.style.display = "none";
+        if(sendBtn) sendBtn.disabled = false;
         
         const loadingElement = document.getElementById("loadingAi");
         if(loadingElement) loadingElement.remove();
 
         if(d.ok) { 
             const formattedResponse = d.response.replace(/\n/g, "<br>").replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-            appendChatBubble(formattedResponse, 'ai');
+            window.appendChatBubble(formattedResponse, 'ai');
             window.chatConversation.push({ role: "assistant", content: d.response });
         } else { 
-            appendChatBubble("⚠️ " + d.error, 'ai'); 
+            window.appendChatBubble("⚠️ " + (d.error || "AI Error"), 'ai'); 
         }
     } catch(e) { 
-        typingIndicator.style.display = "none"; 
-        sendBtn.disabled = false; 
-        appendChatBubble("⚠️ Connection error.", 'ai'); 
+        if(typingIndicator) typingIndicator.style.display = "none"; 
+        if(sendBtn) sendBtn.disabled = false; 
+        window.appendChatBubble("⚠️ Connection error. Please try again.", 'ai'); 
     }
-}
+};
 
-function appendChatBubble(text, sender) {
+window.appendChatBubble = function(text, sender) {
     const historyBox = document.getElementById("chatHistory");
+    if(!historyBox) return;
     const div = document.createElement("div");
     div.className = `chat-msg msg-${sender}`;
     div.innerHTML = text;
     historyBox.appendChild(div);
     historyBox.scrollTop = historyBox.scrollHeight;
-}
+};
+
+// =========================================
+// ACCOUNT & CLOUD SETTINGS
+// =========================================
 
 window.verify = async function(email){
     const targetEmail = email || window.userEmail;
@@ -133,18 +188,29 @@ window.pay = function(){
 window.saveToCloud = async function() {
     if(!window.isProUser) return alert("Pro Plan required."); 
     const btn = document.getElementById("saveCloudBtn");
-    const freshData = typeof getFreshData === 'function' ? getFreshData() : window.currentData;
+    
+    const freshData = window.scrapeCurrentData();
     if(!freshData || freshData.length === 0) return alert("Nothing to save!");
-    btn.innerHTML = "⏳";
+    
+    if(btn) btn.innerHTML = "⏳";
     try { 
-        await fetch(workerURL + "/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: window.userEmail, data: freshData, mode: 'product', date: new Date().toISOString() }) }); 
-        btn.innerHTML = "✅ Saved"; setTimeout(() => btn.innerHTML = "💾 Save to Cloud", 2000); 
-    } catch(e) { btn.innerHTML = "💾 Save to Cloud"; }
+        await fetch(workerURL + "/save", { 
+            method: "POST", 
+            headers: { "Content-Type": "application/json" }, 
+            body: JSON.stringify({ email: window.userEmail, data: freshData, mode: 'product', date: new Date().toISOString() }) 
+        }); 
+        if(btn) { btn.innerHTML = "✅ Saved"; setTimeout(() => btn.innerHTML = "💾 Save to Cloud", 2000); }
+    } catch(e) { if(btn) btn.innerHTML = "💾 Save to Cloud"; }
 };
 
 window.fetchHistory = async function() {
     const list = document.getElementById("historyList"); 
-    if(!window.isProUser) { list.innerHTML = "<p style='text-align:center; color:#64748B;'>Unlock Pro to view history.</p>"; return; }
+    if(!list) return;
+
+    if(!window.isProUser) { 
+        list.innerHTML = "<p style='text-align:center; color:#64748B;'>Unlock Pro to view history.</p>"; 
+        return; 
+    }
     list.innerHTML = "Loading...";
     try {
         const r = await fetch(workerURL + "/history?email=" + window.userEmail); 
@@ -159,13 +225,23 @@ window.fetchHistory = async function() {
             div.onclick = () => window.loadHistoryItem(item.data);
             list.appendChild(div);
         });
-    } catch(e) {}
+    } catch(e) { list.innerHTML = "Error fetching history."; }
 };
 
 window.loadHistoryItem = function(data) {
     const container = document.getElementById("items"); 
+    if(!container) return;
+    
     container.innerHTML = "";
-    data.forEach(row => { window.addNewRow(row.name||row.n||'', row.sell||row.v1||'', row.cost||row.v2||'', row.qty||row.v3||''); });
-    alert("History loaded!");
-    if(typeof window.switchView === 'function') window.switchView('data', document.querySelectorAll('.nav-item')[3]);
+    data.forEach(row => { 
+        if(typeof window.addNewRow === 'function') {
+            window.addNewRow(row.name||row.n||'', row.sell||row.v1||'', row.cost||row.v2||'', row.qty||row.v3||''); 
+        }
+    });
+    alert("History loaded! Generating Dashboard...");
+    
+    // Auto-generate the dashboard for them
+    if(typeof window.processDataAndShowReport === 'function') {
+        window.processDataAndShowReport();
+    }
 };
