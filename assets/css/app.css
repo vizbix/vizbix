@@ -69,6 +69,7 @@
 .pro-lock-card { background: white; border: 1px solid var(--border); border-radius: 20px; padding: 40px; text-align: center; max-width: 450px; box-shadow: 0 20px 40px rgba(15, 23, 42, 0.1); }
 .pro-lock-card h2 { font-size: 24px; margin-bottom: 12px; color: var(--dark); }
 .pro-lock-card p { color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
+
 /* =========================================
    MOBILE RESPONSIVENESS FIXES
    ========================================= */
@@ -117,5 +118,3 @@
   .data-row input { background: white; }
   .delete-btn { width: 100%; height: auto; padding: 10px; background: #e2e8f0; color: #475569; grid-column: span 2; margin-top: 4px; }
 }
-
-
