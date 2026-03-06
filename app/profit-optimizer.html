@@ -10,7 +10,9 @@
   
   <link rel="stylesheet" href="../assets/css/main.css">
   <link rel="stylesheet" href="../assets/css/app.css">
+  
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
     .app-view { display: none; transition: filter 0.3s ease; }
@@ -22,10 +24,6 @@
     .insights-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
     .insights-list li { font-size: 14px; line-height: 1.5; padding-left: 28px; position: relative; }
     .insights-list li::before { content: '⚡'; position: absolute; left: 0; top: 0; }
-
-    .ai-thinking { animation: pulse 1.5s infinite; opacity: 0.7; pointer-events: none; }
-    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(0.98); } 100% { transform: scale(1); } }
-    #aiResult { background: #f8fafc; border: 1px solid var(--primary); border-radius: 12px; padding: 20px; margin-top: 20px; display: none; line-height: 1.6; font-size: 15px; }
   </style>
 </head>
 <body>
@@ -52,29 +50,23 @@
           <svg viewBox="0 0 24 24"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg>
           <span class="nav-item-text">Dashboard</span>
         </a>
-        
         <a class="nav-item" onclick="switchView('ai', this)">
           <svg viewBox="0 0 24 24"><path d="M19 3l-1.5 3.5L14 8l3.5 1.5L19 13l1.5-3.5L24 8l-3.5-1.5L19 3zm-7 2L8.5 12 5 13.5 8.5 15 12 22l3.5-7L19 13.5 15.5 12 12 5zm0 3.8l1.6 3.2 3.4 1.5-3.4 1.5-1.6 3.2-1.6-3.2-3.4-1.5 3.4-1.5L12 8.8z"/></svg>
           <span class="nav-item-text">AI Strategy</span>
         </a>
-        
         <a class="nav-item" onclick="switchView('report', this)">
           <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
           <span class="nav-item-text">Detailed Report</span>
         </a>
-        
         <a class="nav-item active" onclick="switchView('data', this)">
           <svg viewBox="0 0 24 24"><path d="M3 3v18h18V3H3zm16 16H5v-2h14v2zm0-4H5v-2h14v2zm0-4H5V9h14v2zm0-4H5V5h14v2z"/></svg>
           <span class="nav-item-text">Data Input</span>
         </a>
-        
         <a class="nav-item" onclick="switchView('history', this); if(window.fetchHistory) window.fetchHistory();">
           <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
           <span class="nav-item-text">Cloud History</span>
         </a>
-        
         <div style="flex-grow: 1;"></div>
-        
         <a class="nav-item" onclick="switchView('settings', this)">
           <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
           <span class="nav-item-text">Settings</span>
@@ -96,12 +88,6 @@
             <div class="card-title">Data Source</div>
             <a class="demo-link" onclick="loadDemoData()">USE DEMO DATA</a>
           </div>
-
-          <div class="tabs">
-            <div class="tab active" onclick="setMode('product')">Product Wise</div>
-            <div class="tab" onclick="setMode('monthly')">Monthly Overview</div>
-          </div>
-
           <div class="data-table-headers">
             <div>Name</div>
             <div id="hdr-sell">Sell Price (₹)</div>
@@ -109,7 +95,6 @@
             <div>Qty Sold</div>
             <div></div>
           </div>
-
           <div id="items">
             <div class="data-row">
               <input type="text" placeholder="Product Name" class="input-name" value="Wireless Earbuds">
@@ -119,9 +104,7 @@
               <button class="delete-btn" onclick="deleteRow(this)">×</button>
             </div>
           </div>
-
           <button class="add-row-btn" onclick="addNewRow()">+ Add Product</button>
-          
           <div class="action-buttons-wrap">
             <button class="btn btn-primary" style="flex: 1; padding: 16px; font-size: 16px;" onclick="processDataAndShowReport()">Generate Dashboard →</button>
             <button id="saveCloudBtn" class="btn btn-secondary" style="padding: 16px;" onclick="if(window.saveToCloud) window.saveToCloud();">💾 Save to Cloud</button>
@@ -132,39 +115,20 @@
       <div id="view-dashboard" class="app-view">
         <div style="max-width: 1000px; margin: 0 auto;">
           <h2 style="margin-bottom: 20px;">Financial Dashboard</h2>
-          
           <div class="metrics-grid">
-            <div class="metric-card">
-              <h4>Total Revenue</h4>
-              <div class="value" id="dash-revenue">0</div>
-            </div>
-            <div class="metric-card highlight">
-              <h4>Total Net Profit</h4>
-              <div class="value" id="dash-profit">0</div>
-            </div>
-            <div class="metric-card">
-              <h4>Avg Gross Margin</h4>
-              <div class="value" id="dash-margin">0%</div>
-            </div>
-            <div class="metric-card" style="border-left: 4px solid var(--primary);">
-              <h4>Top Product</h4>
-              <div class="value" id="dash-top-product" style="font-size: 20px; line-height: 1.3; margin-top: 8px;">-</div>
-            </div>
+            <div class="metric-card"><h4>Total Revenue</h4><div class="value" id="dash-revenue">0</div></div>
+            <div class="metric-card highlight"><h4>Total Net Profit</h4><div class="value" id="dash-profit">0</div></div>
+            <div class="metric-card"><h4>Avg Gross Margin</h4><div class="value" id="dash-margin">0%</div></div>
+            <div class="metric-card" style="border-left: 4px solid var(--primary);"><h4>Top Product</h4><div class="value" id="dash-top-product" style="font-size: 20px; line-height: 1.3; margin-top: 8px;">-</div></div>
           </div>
-
           <div class="dash-grid">
             <div class="data-card" style="padding: 20px; margin: 0; width: 100%;">
               <h4 style="margin-top: 0; margin-bottom: 16px; color: var(--text-muted); text-transform: uppercase; font-size: 13px;">Revenue vs Profit</h4>
-              <div style="position: relative; height: 300px; width: 100%;">
-                <canvas id="profitChart"></canvas>
-              </div>
+              <div style="position: relative; height: 300px; width: 100%;"><canvas id="profitChart"></canvas></div>
             </div>
-
             <div class="insights-box">
               <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> Fast Insights</h3>
-              <ul class="insights-list" id="auto-insights-list">
-                <li style="color: var(--text-muted);">Run analysis to see insights.</li>
-              </ul>
+              <ul class="insights-list" id="auto-insights-list"><li style="color: var(--text-muted);">Run analysis to see insights.</li></ul>
             </div>
           </div>
         </div>
@@ -174,36 +138,60 @@
         <div style="max-width: 1000px; margin: 0 auto;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h2>Detailed Profit Report</h2>
-            <button class="btn btn-secondary" onclick="switchView('data', document.querySelectorAll('.nav-item')[3])">← Edit Data</button>
+            <div style="display: flex; gap: 10px;">
+              <button class="btn btn-secondary" onclick="switchView('data', document.querySelectorAll('.nav-item')[3])">← Edit Data</button>
+              <button class="btn btn-primary" onclick="exportReportPDF()">📥 Download PDF</button>
+            </div>
           </div>
-          <div style="overflow-x: auto;">
-            <table class="report-table">
-              <thead>
-                <tr>
-                  <th>Product Name</th>
-                  <th>Revenue</th>
-                  <th>Total Cost</th>
-                  <th>Total Profit</th>
-                  <th>Margin %</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="reportTableBody"></tbody>
-            </table>
+          
+          <div id="reportPrintArea" style="background: white; border-radius: 12px; border: 1px solid var(--border); overflow: hidden;">
+            <div style="padding: 20px; border-bottom: 1px solid var(--border); display: none;" id="pdfHeader">
+                <h2>Vizbix Profit Report</h2>
+                <p style="color: var(--text-muted); margin: 0;">Generated by Vizbix Pro</p>
+            </div>
+            <div style="overflow-x: auto;">
+              <table class="report-table" style="border: none;">
+                <thead>
+                  <tr>
+                    <th>Product Name</th>
+                    <th>Revenue</th>
+                    <th>Total Cost</th>
+                    <th>Total Profit</th>
+                    <th>Margin %</th>
+                    <th>Status</th>
+                  </tr>
+                </thead>
+                <tbody id="reportTableBody"></tbody>
+              </table>
+            </div>
           </div>
         </div>
       </div>
 
       <div id="view-ai" class="app-view">
-        <div class="data-card" style="max-width: 700px; margin: 0 auto;">
-          <h2 style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 28px;">🤖</span> AI Consultant
-          </h2>
-          <p style="color: var(--text-muted); margin-bottom: 24px; line-height: 1.6;">
-            Our Cloudflare-powered AI analyzes your exact profit margins to suggest specific price increases, bundle ideas, and cost-cutting measures.
-          </p>
-          <button id="aiBtn" class="btn btn-primary btn-large" style="width: 100%;" onclick="if(window.askAI) window.askAI();">✨ Generate AI Strategy</button>
-          <div id="aiResult"></div>
+        <div class="data-card" style="max-width: 800px; margin: 0 auto; padding: 0;">
+          
+          <div style="padding: 20px 24px; border-bottom: 1px solid var(--border); display: flex; justify-content: space-between; align-items: center; background: white; border-radius: 16px 16px 0 0;">
+             <h2 style="margin: 0; display: flex; align-items: center; gap: 10px; font-size: 20px;">
+                <span style="font-size: 24px;">🤖</span> AI Profit Consultant
+             </h2>
+             <button class="btn btn-secondary" onclick="if(window.startAIAnalysis) window.startAIAnalysis();">Analyze My Data</button>
+          </div>
+          
+          <div class="chat-container">
+             <div class="chat-history" id="chatHistory">
+                <div class="chat-msg msg-ai">Hi! I am your AI Consultant. Click <strong>Analyze My Data</strong> to send me your current table, or type a custom question below about pricing strategies!</div>
+             </div>
+             
+             <div style="background: white;">
+               <div id="typingIndicator" class="typing-indicator">AI is typing...</div>
+               <div class="chat-input-row">
+                  <input type="text" id="aiChatInput" placeholder="Ask about lowering costs, raising prices, bundle ideas..." onkeypress="if(event.key === 'Enter' && window.sendChatMessage) window.sendChatMessage()" />
+                  <button id="chatSendBtn" onclick="if(window.sendChatMessage) window.sendChatMessage()">Send</button>
+               </div>
+             </div>
+          </div>
+
         </div>
       </div>
 
@@ -222,7 +210,6 @@
       <div id="view-settings" class="app-view">
         <div class="data-card" style="max-width: 600px; margin: 0 auto;">
           <h2 style="margin-bottom: 24px;">Account Settings</h2>
-          
           <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 24px;">
             <h4 style="margin: 0 0 8px 0; color: var(--text-muted);">Currency Selector</h4>
             <select id="currencySelect" onchange="updateCurrency()" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); font-size: 15px;">
@@ -231,20 +218,16 @@
               <option value="EUR">€ Euro (EUR)</option>
               <option value="GBP">£ British Pound (GBP)</option>
             </select>
-            <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">The AI and reports will use this currency.</p>
           </div>
-
           <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 24px;">
             <h4 style="margin: 0 0 8px 0; color: var(--text-muted);">Account Email</h4>
             <div id="settingsEmail" style="font-weight: 700; font-size: 16px;">Not logged in</div>
           </div>
-
           <div style="background: #eff6ff; padding: 20px; border-radius: 12px; border: 1px solid #bfdbfe; margin-bottom: 24px;">
             <h4 style="margin: 0 0 8px 0; color: #1e40af;">Subscription Plan</h4>
             <div id="settingsPlan" style="font-weight: 700; font-size: 16px; color: var(--text-muted); margin-bottom: 16px;">Free Plan</div>
             <button id="upgradeBtn" class="btn btn-primary" onclick="if(window.pay) window.pay();">Upgrade to PRO (₹499)</button>
           </div>
-
           <button class="btn btn-secondary" style="width: 100%; color: #dc2626;" onclick="if(window.handleLogout) window.handleLogout();">Log Out</button>
         </div>
       </div>
@@ -255,11 +238,9 @@
   <script src="../assets/js/drawer.js"></script>
   
   <script>
-    // --- STATE ---
     window.currentMode = 'product'; 
     window.currentData = []; 
     window.currentView = 'data';
-    
     window.currentCurrency = 'INR';
     window.currencySymbol = '₹';
 
@@ -276,8 +257,6 @@
     }
 
     let myChart = null; 
-
-    // --- UI LOGIC ---
     const proViews = ['dashboard', 'ai', 'report', 'history'];
 
     function toggleSidebar() {
@@ -288,7 +267,6 @@
 
     function switchView(viewId, element, bypassPaywall = false) {
       window.currentView = viewId;
-      
       if(proViews.includes(viewId) && !window.isProUser && !bypassPaywall) {
         document.getElementById('proLockOverlay').classList.remove('pro-lock-hidden');
         document.querySelectorAll('.app-view').forEach(v => v.style.filter = "blur(6px)");
@@ -296,28 +274,19 @@
         document.getElementById('proLockOverlay').classList.add('pro-lock-hidden');
         document.querySelectorAll('.app-view').forEach(v => v.style.filter = "none");
       }
-
       document.querySelectorAll('.app-view').forEach(view => view.classList.remove('active'));
       document.getElementById('view-' + viewId).classList.add('active');
-      
       if (element) {
         document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
         element.classList.add('active');
       }
     }
 
-    // --- ROW LOGIC ---
     function addNewRow(name='', sell='', cost='', qty='') {
       const container = document.getElementById('items');
       const row = document.createElement('div');
       row.className = 'data-row';
-      row.innerHTML = `
-        <input type="text" placeholder="Product Name" class="input-name" value="${name}">
-        <input type="number" placeholder="Sell Price" class="input-sell" value="${sell}">
-        <input type="number" placeholder="Cost Price" class="input-cost" value="${cost}">
-        <input type="number" placeholder="Quantity" class="input-qty" value="${qty}">
-        <button class="delete-btn" onclick="deleteRow(this)">×</button>
-      `;
+      row.innerHTML = `<input type="text" placeholder="Product Name" class="input-name" value="${name}"><input type="number" placeholder="Sell Price" class="input-sell" value="${sell}"><input type="number" placeholder="Cost Price" class="input-cost" value="${cost}"><input type="number" placeholder="Quantity" class="input-qty" value="${qty}"><button class="delete-btn" onclick="deleteRow(this)">×</button>`;
       container.appendChild(row);
     }
     function deleteRow(btnElement) { btnElement.parentElement.remove(); }
@@ -329,20 +298,13 @@
       addNewRow('Phone Case', '600', '700', '50');
     }
 
-    // --- MATH ENGINE ---
     function processDataAndShowReport() {
-      if(!window.isProUser) {
-        switchView('dashboard', document.getElementById('nav-dashboard'));
-        return;
-      }
+      if(!window.isProUser) { switchView('dashboard', document.getElementById('nav-dashboard')); return; }
 
       const rows = document.querySelectorAll('#items .data-row');
       let totalRevenue = 0, totalCost = 0, totalProfit = 0;
       let chartLabels = [], chartRevData = [], chartProfitData = [];
-      let reportHTML = '';
-      let topProduct = { name: '-', profit: -Infinity };
-      let profitLeaks = [];
-
+      let reportHTML = '', topProduct = { name: '-', profit: -Infinity }, profitLeaks = [];
       window.currentData = []; 
 
       rows.forEach(row => {
@@ -350,13 +312,10 @@
         const sell = parseFloat(row.querySelector('.input-sell').value) || 0;
         const cost = parseFloat(row.querySelector('.input-cost').value) || 0;
         const qty = parseFloat(row.querySelector('.input-qty').value) || 0;
-
         if(sell === 0 && cost === 0 && qty === 0) return; 
 
         window.currentData.push({ name, sell, cost, qty });
-        const rev = sell * qty;
-        const itemCost = cost * qty;
-        const profit = rev - itemCost;
+        const rev = sell * qty; const itemCost = cost * qty; const profit = rev - itemCost;
         const margin = rev > 0 ? ((profit / rev) * 100).toFixed(1) : 0;
 
         totalRevenue += rev; totalCost += itemCost; totalProfit += profit;
@@ -400,6 +359,23 @@
       });
     }
 
+    // PDF Export Function
+    function exportReportPDF() {
+      const element = document.getElementById('reportPrintArea');
+      document.getElementById('pdfHeader').style.display = 'block'; // Show header for PDF
+      const opt = {
+        margin:       0.5,
+        filename:     'Vizbix_Profit_Report.pdf',
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+      };
+      
+      html2pdf().set(opt).from(element).save().then(() => {
+          document.getElementById('pdfHeader').style.display = 'none'; // Hide header again
+      });
+    }
+
     let hasVerified = false;
     setInterval(() => {
       const globalLoginBtn = document.getElementById('headerLoginBtn');
@@ -407,13 +383,8 @@
         if(globalLoginBtn) globalLoginBtn.style.display = 'none';
         document.getElementById('sidebarEmail').innerText = window.userEmail;
         document.getElementById('settingsEmail').innerText = window.userEmail;
-        
-        if(!hasVerified && typeof window.verify === 'function') {
-            hasVerified = true; 
-            window.verify(window.userEmail); 
-        }
+        if(!hasVerified && typeof window.verify === 'function') { hasVerified = true; window.verify(window.userEmail); }
       }
-      
       if(window.isProUser) {
         const planText = `Pro Active (${window.proDaysLeft || 'Active'})`;
         document.getElementById('sidebarPlan').innerText = planText;
@@ -436,6 +407,3 @@
 
 </body>
 </html>
-
-
-
