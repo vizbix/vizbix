@@ -17,7 +17,7 @@
     .app-view.active { display: block; animation: fadeIn 0.3s ease; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     .pro-lock-hidden { display: none !important; }
-    .ai-typing { font-style: italic; color: #94a3b8; font-size: 13px; margin-top: 8px; display: none; }
+    .ai-typing { font-style: italic; color: #94a3b8; font-size: 13px; margin: 10px 20px; display: none; }
   </style>
 </head>
 <body>
@@ -40,7 +40,7 @@
           <svg viewBox="0 0 24 24"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg><span class="nav-item-text">Dashboard</span>
         </a>
         <a class="nav-item" onclick="switchView('ai', this)">
-          <svg viewBox="0 0 24 24"><path d="M19 3l-1.5 3.5L14 8l3.5 1.5L19 13l1.5-3.5L24 8l-3.5-1.5L19 3zm-7 2L8.5 12 5 13.5 8.5 15 12 22l3.5-7L19 13.5 15.5 12 12 5zm0 3.8l1.6 3.2 3.4 1.5-3.4 1.5-1.6 3.2-1.6-3.2-3.4-1.5 3.4-1.5L12 8.8z"/></svg><span class="nav-item-text">AI Strategy</span>
+          <span style="background: white; color: #0f172a; padding: 2px 4px; border-radius: 4px; font-size: 14px; font-weight: 900; line-height: 1;">Ai</span><span class="nav-item-text">Strategy</span>
         </a>
         <a class="nav-item" onclick="switchView('report', this)">
           <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg><span class="nav-item-text">Detailed Report</span>
@@ -56,11 +56,6 @@
           <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg><span class="nav-item-text">Settings</span>
         </a>
       </nav>
-      <div class="sidebar-profile">
-        <div class="profile-label">Signed in as</div>
-        <div class="profile-email" id="sidebarEmail">Not logged in</div>
-        <div class="profile-plan" id="sidebarPlan">Free User</div>
-      </div>
     </aside>
 
     <main class="app-main" id="mainContainer">
@@ -97,11 +92,10 @@
 
       <div id="view-dashboard" class="app-view">
         <div style="max-width: 1000px; margin: 0 auto;">
-          
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
             <h2 style="margin: 0;">Financial Dashboard</h2>
-            <div style="display: flex; align-items: center; gap: 12px; background: white; padding: 8px 16px; border-radius: 99px; border: 1px solid var(--border); box-shadow: 0 2px 10px rgba(0,0,0,0.02);">
-                <span style="font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.5px;">Health Score</span>
+            <div style="display: flex; align-items: center; gap: 12px; background: white; padding: 8px 16px; border-radius: 99px; border: 1px solid var(--border);">
+                <span style="font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Health Score</span>
                 <div id="health-circle" style="font-size: 16px; font-weight: 900; padding: 4px 12px; border-radius: 99px; background: #e2e8f0; color: #475569;">0%</div>
             </div>
           </div>
@@ -127,25 +121,23 @@
       </div>
 
       <div id="view-ai" class="app-view">
-        <div style="max-width: 800px; margin: 0 auto;">
+        <div style="max-width: 900px; margin: 0 auto; height: 100%; display: flex; flex-direction: column;">
           
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2 style="margin: 0; display: flex; align-items: center; gap: 10px;">
-              <span style="font-size: 28px;">🤖</span> AI Strategy Chat
-            </h2>
-            <button class="btn btn-secondary" onclick="if(window.startAIAnalysis) window.startAIAnalysis();">✨ Generate Full Report</button>
+          <h2 style="margin-bottom: 20px;"><span style="font-size: 24px; background: var(--dark); color: white; padding: 4px 8px; border-radius: 8px;">Ai</span> Strategy</h2>
+
+          <div id="aiSplashScreen" style="flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; border: 1px solid var(--border); border-radius: 16px;">
+              <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 18px;">Ready to uncover hidden profits?</p>
+              <button class="btn btn-dark btn-large" style="border-radius: 99px; padding: 16px 40px;" onclick="if(window.startAIAnalysis) window.startAIAnalysis();">✨ Generate Strategy</button>
           </div>
 
-          <div class="chat-container">
-             <div class="chat-history" id="chatHistory">
-                <div class="chat-msg msg-ai">Hi! Click <strong>Generate Full Report</strong> at the top to analyze your numbers, or just type a specific question below about pricing, bundles, or margins.</div>
-             </div>
+          <div id="aiChatContainer" class="chat-container" style="display: none;">
+             <div class="chat-history" id="chatHistory"></div>
              
-             <div style="background: white; border-top: 1px solid var(--border);">
-               <div id="typingIndicator" class="ai-typing" style="padding: 0 20px;">AI is thinking...</div>
-               <div class="chat-input-row" style="border: none;">
-                  <input type="text" id="aiChatInput" placeholder="How can I improve my margin on the Wireless Earbuds?" onkeypress="if(event.key === 'Enter' && window.sendChatMessage) window.sendChatMessage()" />
-                  <button id="chatSendBtn" onclick="if(window.sendChatMessage) window.sendChatMessage()">Send</button>
+             <div style="background: white;">
+               <div id="typingIndicator" class="ai-typing">AI is analyzing your numbers...</div>
+               <div class="chat-input-row">
+                  <input type="text" id="aiChatInput" placeholder="How Can I Help You..." onkeypress="if(event.key === 'Enter' && window.sendChatMessage) window.sendChatMessage()" />
+                  <button id="chatSendBtn" onclick="if(window.sendChatMessage) window.sendChatMessage()">➔</button>
                </div>
              </div>
           </div>
@@ -219,7 +211,7 @@
 
     </main>
 
-    <div id="pdf-export-container" style="position: absolute; top: -10000px; left: -10000px; width: 1100px; background: white; z-index: -9999;">
+    <div id="pdf-export-container">
         <div class="pdf-wrap" id="pdfTemplateContent">
             <div class="pdf-header">
                 <h1>Business Report</h1>
@@ -334,7 +326,7 @@
 
       let overallMargin = totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100) : 0;
       
-      // Calculate Business Health Score
+      // Calculate Health Score
       let healthScore = 70; 
       if(overallMargin > 40) healthScore += 20;
       else if(overallMargin > 20) healthScore += 10;
@@ -342,19 +334,44 @@
       healthScore -= (profitLeaks.length * 15);
       healthScore = Math.max(0, Math.min(100, healthScore));
 
-      // Update UI Dashboard
+      // UI Dashboard Updates
       document.getElementById('dash-revenue').innerText = formatCurrency(totalRevenue);
       document.getElementById('dash-profit').innerText = formatCurrency(totalProfit);
       document.getElementById('dash-margin').innerText = overallMargin.toFixed(1) + '%';
       document.getElementById('dash-top-product').innerText = topProduct.name;
       document.getElementById('reportTableBody').innerHTML = reportHTML;
 
-      // Update Health Score Badge
+      // Health Score Badge Updates
       const hc = document.getElementById('health-circle');
       hc.innerText = healthScore + '%';
       if(healthScore >= 80) { hc.style.background = '#d1fae5'; hc.style.color = '#059669'; }
       else if(healthScore >= 50) { hc.style.background = '#fef3c7'; hc.style.color = '#d97706'; }
       else { hc.style.background = '#fee2e2'; hc.style.color = '#dc2626'; }
+
+      // 3 Guaranteed Pre-Calculated Insights
+      let insightsHTML = '';
+      
+      // 1. Hero Product Insight
+      if (topProduct.profit > 0) {
+        insightsHTML += `<p style="margin: 0 0 12px 0;"><strong>⭐ Hero Product:</strong> ${topProduct.name} is driving the most profit (${formatCurrency(topProduct.profit)}). Consider a 5-10% price test here to maximize net revenue.</p>`;
+      }
+      
+      // 2. Leaks Insight
+      if (profitLeaks.length > 0) {
+        insightsHTML += `<p style="margin: 0 0 12px 0; color: #dc2626;"><strong>⚠️ Profit Leaks:</strong> ${profitLeaks.join(', ')} are currently losing money. You must either raise prices, lower cost of goods, or discontinue these items.</p>`;
+      } else {
+        insightsHTML += `<p style="margin: 0 0 12px 0; color: #059669;"><strong>✅ Pricing Safe:</strong> No negative margin products detected. Your unit economics are currently stable.</p>`;
+      }
+
+      // 3. Margin Insight
+      if (overallMargin < 20) {
+        insightsHTML += `<p style="margin: 0;"><strong>📉 Margin Warning:</strong> An average margin of ${overallMargin.toFixed(1)}% is dangerous. After marketing and operational costs, your net cash flow might be negative.</p>`;
+      } else if (overallMargin < 40) {
+        insightsHTML += `<p style="margin: 0;"><strong>📊 Margin Status:</strong> ${overallMargin.toFixed(1)}% is fair, but aim for >40% by bundling items or negotiating lower supplier costs.</p>`;
+      } else {
+        insightsHTML += `<p style="margin: 0; color: #059669;"><strong>📈 Healthy Margin:</strong> ${overallMargin.toFixed(1)}% gives you excellent cash flow to aggressively invest in marketing and scale.</p>`;
+      }
+      document.getElementById('auto-insights-list').innerHTML = insightsHTML;
 
       // Populate PDF Hidden Template Values
       document.getElementById('pdf-rev').innerText = formatCurrency(totalRevenue);
@@ -368,12 +385,7 @@
       else pdfInsight += `You have zero negative margin products. Your top performer is ${topProduct.name}. To scale safely, focus marketing spend on this item.`;
       document.getElementById('pdf-insight-text').innerText = pdfInsight;
 
-      let insightsHTML = `<p style="margin: 0 0 10px 0;"><strong>Score: ${healthScore}/100</strong></p>`;
-      if (topProduct.profit > 0) insightsHTML += `<p style="margin: 0 0 8px 0; color: #059669;">✅ "${topProduct.name}" generates ${formatCurrency(topProduct.profit)} profit.</p>`;
-      if (profitLeaks.length > 0) insightsHTML += `<p style="margin: 0; color: #dc2626;">⚠️ Leaks: ${profitLeaks.join(', ')} are losing money.</p>`;
-      document.getElementById('auto-insights-list').innerHTML = insightsHTML;
-
-      // Draw Chart (Make it purple like the PDF design!)
+      // Draw Chart
       const ctx = document.getElementById('profitChart').getContext('2d');
       if(myChart) myChart.destroy();
       myChart = new Chart(ctx, {
@@ -385,7 +397,7 @@
       switchView('dashboard', document.getElementById('nav-dashboard'));
     }
 
-    // PDF Generation Engine (Fix applied: NO layout shifting)
+    // PDF Generator (Flawless export now that it's rendered correctly in CSS)
     function exportExecutivePDF() {
       const chartCanvas = document.getElementById('profitChart');
       document.getElementById('pdf-chart-image').src = chartCanvas.toDataURL('image/png');
@@ -394,9 +406,9 @@
       const opt = {
         margin:       0,
         filename:     'Vizbix_Executive_Summary.pdf',
-        image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 2, useCORS: true },
-        jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+        image:        { type: 'jpeg', quality: 1 },
+        html2canvas:  { scale: 2, useCORS: true, windowWidth: 1100 },
+        jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
       };
       
       html2pdf().set(opt).from(element).save();
