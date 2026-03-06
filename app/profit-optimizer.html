@@ -17,7 +17,7 @@
     .app-view.active { display: block; animation: fadeIn 0.3s ease; }
     @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-    .insights-box { background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-top: 20px; }
+    .insights-box { background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 20px; height: 100%;}
     .insights-box h3 { margin-top: 0; font-size: 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
     .insights-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
     .insights-list li { font-size: 14px; line-height: 1.5; padding-left: 28px; position: relative; }
@@ -48,28 +48,28 @@
       </button>
 
       <nav class="sidebar-nav">
-        <a href="#" class="nav-item" onclick="switchView('dashboard', this)" id="nav-dashboard">
+        <a class="nav-item" onclick="switchView('dashboard', this)" id="nav-dashboard">
           <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
           <span class="nav-item-text">Dashboard</span>
         </a>
-        <a href="#" class="nav-item" onclick="switchView('ai', this)">
+        <a class="nav-item" onclick="switchView('ai', this)">
           <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
           <span class="nav-item-text">AI Strategy</span>
         </a>
-        <a href="#" class="nav-item" onclick="switchView('report', this)">
+        <a class="nav-item" onclick="switchView('report', this)">
           <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
           <span class="nav-item-text">Detailed Report</span>
         </a>
-        <a href="#" class="nav-item active" onclick="switchView('data', this)">
+        <a class="nav-item active" onclick="switchView('data', this)">
           <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
           <span class="nav-item-text">Data Input</span>
         </a>
-        <a href="#" class="nav-item" onclick="switchView('history', this); if(window.fetchHistory) window.fetchHistory();">
+        <a class="nav-item" onclick="switchView('history', this); if(window.fetchHistory) window.fetchHistory();">
           <svg viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
           <span class="nav-item-text">Cloud History</span>
         </a>
         <div style="flex-grow: 1;"></div>
-        <a href="#" class="nav-item" onclick="switchView('settings', this)">
+        <a class="nav-item" onclick="switchView('settings', this)">
           <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
           <span class="nav-item-text">Settings</span>
         </a>
@@ -89,6 +89,11 @@
           <div class="card-header">
             <div class="card-title">Data Source</div>
             <a class="demo-link" onclick="loadDemoData()">USE DEMO DATA</a>
+          </div>
+
+          <div class="tabs">
+            <div class="tab active" onclick="setMode('product')">Product Wise</div>
+            <div class="tab" onclick="setMode('monthly')">Monthly Overview</div>
           </div>
 
           <div class="data-table-headers">
@@ -111,9 +116,9 @@
 
           <button class="add-row-btn" onclick="addNewRow()">+ Add Product</button>
           
-          <div style="display: flex; gap: 12px; margin-top: 24px;">
+          <div class="action-buttons-wrap">
             <button class="btn btn-primary" style="flex: 1; padding: 16px; font-size: 16px;" onclick="processDataAndShowReport()">Generate Dashboard →</button>
-            <button id="saveCloudBtn" class="btn btn-secondary" style="padding: 16px;" onclick="if(window.saveToCloud) window.saveToCloud();">💾 Save</button>
+            <button id="saveCloudBtn" class="btn btn-secondary" style="padding: 16px;" onclick="if(window.saveToCloud) window.saveToCloud();">💾 Save to Cloud</button>
           </div>
         </div>
       </div>
@@ -141,7 +146,7 @@
             </div>
           </div>
 
-          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; align-items: start;">
+          <div class="dash-grid">
             <div class="data-card" style="padding: 20px; margin: 0; width: 100%;">
               <h4 style="margin-top: 0; margin-bottom: 16px; color: var(--text-muted); text-transform: uppercase; font-size: 13px;">Revenue vs Profit</h4>
               <div style="position: relative; height: 300px; width: 100%;">
@@ -149,7 +154,7 @@
               </div>
             </div>
 
-            <div class="insights-box" style="margin: 0;">
+            <div class="insights-box">
               <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> Fast Insights</h3>
               <ul class="insights-list" id="auto-insights-list">
                 <li style="color: var(--text-muted);">Run analysis to see insights.</li>
@@ -249,7 +254,6 @@
     window.currentData = []; 
     window.currentView = 'data';
     
-    // Default Currency Logic
     window.currentCurrency = 'INR';
     window.currencySymbol = '₹';
 
@@ -279,7 +283,6 @@
     function switchView(viewId, element, bypassPaywall = false) {
       window.currentView = viewId;
       
-      // Paywall check
       if(proViews.includes(viewId) && !window.isProUser && !bypassPaywall) {
         document.getElementById('proLockOverlay').classList.remove('pro-lock-hidden');
         document.querySelectorAll('.app-view').forEach(v => v.style.filter = "blur(6px)");
@@ -322,7 +325,6 @@
 
     // --- MATH ENGINE ---
     function processDataAndShowReport() {
-      // Show Paywall instantly if not pro
       if(!window.isProUser) {
         switchView('dashboard', document.getElementById('nav-dashboard'));
         return;
@@ -370,11 +372,11 @@
       document.getElementById('dash-top-product').innerText = topProduct.name;
 
       let insightsHTML = '';
-      if (topProduct.profit > 0) insightsHTML += `<li><strong>Hero Product:</strong> "${topProduct.name}" generates ${formatCurrency(topProduct.profit)} in profit. Focus ad spend here.</li>`;
+      if (topProduct.profit > 0) insightsHTML += `<li><strong>Hero Product:</strong> "${topProduct.name}" generates ${formatCurrency(topProduct.profit)} in profit.</li>`;
       if (profitLeaks.length > 0) insightsHTML += `<li style="color: #dc2626;"><strong>Profit Leaks Found:</strong> ${profitLeaks.join(', ')} are losing money. Fix pricing or drop them.</li>`;
       else insightsHTML += `<li style="color: #059669;"><strong>Pricing is Safe:</strong> No negative margins detected.</li>`;
       if (overallMargin < 20) insightsHTML += `<li><strong>Margin Warning:</strong> ${overallMargin.toFixed(1)}% is dangerous after operational costs.</li>`;
-      else insightsHTML += `<li><strong>Healthy Margin:</strong> ${overallMargin.toFixed(1)}% provides excellent safety to scale.</li>`;
+      else insightsHTML += `<li><strong>Healthy Margin:</strong> ${overallMargin.toFixed(1)}% provides excellent safety.</li>`;
       
       document.getElementById('auto-insights-list').innerHTML = insightsHTML;
       document.getElementById('reportTableBody').innerHTML = reportHTML;
@@ -382,7 +384,6 @@
       switchView('dashboard', document.getElementById('nav-dashboard'));
     }
 
-    // CHART FIX APPLIED HERE
     function renderChart(labels, revData, profitData) {
       const ctx = document.getElementById('profitChart').getContext('2d');
       if(myChart) myChart.destroy();
@@ -393,38 +394,30 @@
       });
     }
 
-    // Dynamic UI Poller & Auto-Verifier
-    let hasVerified = false; // Prevents checking the database 100 times a second
-
+    let hasVerified = false;
     setInterval(() => {
       const globalLoginBtn = document.getElementById('headerLoginBtn');
-      
       if(window.userEmail) {
-        // Hide login button and show email
         if(globalLoginBtn) globalLoginBtn.style.display = 'none';
         document.getElementById('sidebarEmail').innerText = window.userEmail;
         document.getElementById('settingsEmail').innerText = window.userEmail;
         
-        // 🔥 THE FIX: Auto-verify Pro status the second they log in
         if(!hasVerified && typeof window.verify === 'function') {
-            hasVerified = true; // Mark as checked
+            hasVerified = true; 
             window.verify(window.userEmail); 
         }
       }
       
-      // Update UI based on Pro status
       if(window.isProUser) {
         const planText = `Pro Active (${window.proDaysLeft || 'Active'})`;
         document.getElementById('sidebarPlan').innerText = planText;
         document.getElementById('settingsPlan').innerText = planText;
         document.getElementById('settingsPlan').style.color = '#059669'; 
-        
         const upgradeBtn = document.getElementById('upgradeBtn');
         if(upgradeBtn) upgradeBtn.style.display = 'none';
       } else {
         document.getElementById('sidebarPlan').innerText = "Free User";
         document.getElementById('settingsPlan').innerText = "Free Plan (Limited)";
-        
         const upgradeBtn = document.getElementById('upgradeBtn');
         if(upgradeBtn) upgradeBtn.style.display = 'block';
       }
@@ -437,4 +430,3 @@
 
 </body>
 </html>
-
