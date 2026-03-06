@@ -281,6 +281,29 @@
     window.currencySymbol = '₹';
     let myChart = null; 
 
+    // FIX 1: Robust Data Scraper that is forced to run right before sending to AI
+    function getFreshData() {
+        let data = [];
+        document.querySelectorAll('#items .data-row').forEach(row => {
+            const nameInput = row.querySelector('.input-name');
+            const sellInput = row.querySelector('.input-sell');
+            const costInput = row.querySelector('.input-cost');
+            const qtyInput = row.querySelector('.input-qty');
+            
+            if(!nameInput || !sellInput || !costInput || !qtyInput) return;
+
+            const name = nameInput.value.trim();
+            const sell = parseFloat(sellInput.value) || 0;
+            const cost = parseFloat(costInput.value) || 0;
+            const qty = parseFloat(qtyInput.value) || 0;
+            
+            if(name !== '' || sell > 0 || cost > 0 || qty > 0) {
+                data.push({ name, sell, cost, qty });
+            }
+        });
+        return data;
+    }
+
     function updateCurrency() {
       const sel = document.getElementById('currencySelect');
       window.currentCurrency = sel.value;
@@ -331,34 +354,30 @@
     function processDataAndShowReport() {
       if(window.isProUser === false) { switchView('dashboard', document.getElementById('nav-dashboard')); return; }
 
-      const rows = document.querySelectorAll('#items .data-row');
+      const freshData = getFreshData();
+      if(freshData.length === 0) return alert("Please enter data first.");
+      
+      window.currentData = freshData;
+
       let totalRevenue = 0, totalCost = 0, totalProfit = 0, totalItems = 0;
       let chartLabels = [], chartRevData = [], chartProfitData = [];
       let reportHTML = '', topProduct = { name: '-', profit: -Infinity, qty: 0 }, profitLeaks = [];
-      window.currentData = []; 
 
-      rows.forEach(row => {
-        const name = row.querySelector('.input-name').value || 'Unnamed';
-        const sell = parseFloat(row.querySelector('.input-sell').value) || 0;
-        const cost = parseFloat(row.querySelector('.input-cost').value) || 0;
-        const qty = parseFloat(row.querySelector('.input-qty').value) || 0;
-        if(sell === 0 && cost === 0 && qty === 0) return; 
-
-        window.currentData.push({ name, sell, cost, qty });
-        const rev = sell * qty; const itemCost = cost * qty; const profit = rev - itemCost;
+      freshData.forEach(item => {
+        const rev = item.sell * item.qty; 
+        const itemCost = item.cost * item.qty; 
+        const profit = rev - itemCost;
         const margin = rev > 0 ? ((profit / rev) * 100).toFixed(1) : 0;
 
-        totalRevenue += rev; totalCost += itemCost; totalProfit += profit; totalItems += qty;
-        if(profit > topProduct.profit && qty > 0) topProduct = { name, profit, qty };
-        if(profit < 0) profitLeaks.push(name);
+        totalRevenue += rev; totalCost += itemCost; totalProfit += profit; totalItems += item.qty;
+        if(profit > topProduct.profit && item.qty > 0) topProduct = { name: item.name, profit, qty: item.qty };
+        if(profit < 0) profitLeaks.push(item.name);
 
-        chartLabels.push(name); chartRevData.push(rev); chartProfitData.push(profit);
+        chartLabels.push(item.name); chartRevData.push(rev); chartProfitData.push(profit);
 
         let statusHtml = profit > 0 ? `<span class="status-pill status-healthy">Healthy</span>` : `<span class="status-pill status-leak">Leak</span>`;
-        reportHTML += `<tr><td style="font-weight: 600;">${name}</td><td>${formatCurrency(rev)}</td><td>${formatCurrency(itemCost)}</td><td style="font-weight: 700; color: ${profit < 0 ? '#dc2626' : 'inherit'};">${formatCurrency(profit)}</td><td>${margin}%</td><td>${statusHtml}</td></tr>`;
+        reportHTML += `<tr><td style="font-weight: 600;">${item.name}</td><td>${formatCurrency(rev)}</td><td>${formatCurrency(itemCost)}</td><td style="font-weight: 700; color: ${profit < 0 ? '#dc2626' : 'inherit'};">${formatCurrency(profit)}</td><td>${margin}%</td><td>${statusHtml}</td></tr>`;
       });
-
-      if(totalRevenue === 0) return alert("Please enter data first.");
 
       let overallMargin = totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100) : 0;
       
@@ -381,11 +400,9 @@
       else if(healthScore >= 50) { hc.style.background = '#fef3c7'; hc.style.color = '#d97706'; }
       else { hc.style.background = '#fee2e2'; hc.style.color = '#dc2626'; }
 
-      // NEW: STRIClY 3 PRE-GENERATED INSIGHTS
       let insightsHTML = '';
       let pdfInsights = '';
       
-      // Insight 1
       if (topProduct.profit > 0) {
         insightsHTML += `<div style="padding: 12px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;"><strong>1. Scale Top Performer:</strong> ${topProduct.name} generated ${formatCurrency(topProduct.profit)}. Increase ad spend on this item by 10%.</div>`;
         pdfInsights += `<li style="margin-bottom: 12px;"><strong>Scale Winner:</strong> ${topProduct.name} generates the highest profit mass. Increase visibility.</li>`;
@@ -394,7 +411,6 @@
         pdfInsights += `<li style="margin-bottom: 12px;"><strong>Raise Prices:</strong> No core profitable products detected. Implement a price increase.</li>`;
       }
 
-      // Insight 2
       if (profitLeaks.length > 0) {
         insightsHTML += `<div style="padding: 12px; background: #fef2f2; border-radius: 8px; border: 1px solid #fecaca; color: #dc2626;"><strong>2. Stop Profit Leaks:</strong> ${profitLeaks.join(', ')} are currently operating at a loss. Reprice or discontinue them.</div>`;
         pdfInsights += `<li style="margin-bottom: 12px; color: #dc2626;"><strong>Fix Leaks:</strong> ${profitLeaks.join(', ')} are losing money. Fix unit economics or drop them.</li>`;
@@ -403,7 +419,6 @@
         pdfInsights += `<li style="margin-bottom: 12px;"><strong>Secure Economics:</strong> Zero products are currently operating at a net loss.</li>`;
       }
 
-      // Insight 3
       if (overallMargin < 20) {
         insightsHTML += `<div style="padding: 12px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;"><strong>3. Margin Warning:</strong> An average margin of ${overallMargin.toFixed(1)}% is dangerous. Bundle items to increase Average Order Value.</div>`;
         pdfInsights += `<li><strong>Increase Margin:</strong> Your ${overallMargin.toFixed(1)}% margin is tight. Implement product bundling.</li>`;
@@ -415,7 +430,6 @@
       document.getElementById('auto-insights-list').innerHTML = insightsHTML;
       document.getElementById('pdf-insight-list').innerHTML = pdfInsights;
 
-      // Update PDF Stats
       document.getElementById('pdf-rev').innerText = formatCurrency(totalRevenue);
       document.getElementById('pdf-cost').innerText = formatCurrency(totalCost);
       document.getElementById('pdf-profit').innerText = formatCurrency(totalProfit);
@@ -434,22 +448,27 @@
       switchView('dashboard', document.getElementById('nav-dashboard'));
     }
 
-   // FIX: PDF Generation Engine (Forces rendering to fix the blank screen)
+    // FIX 2: THE BULLETPROOF PDF ENGINE
     function exportExecutivePDF() {
+      // Grab Chart
       const chartCanvas = document.getElementById('profitChart');
       if(chartCanvas) {
           document.getElementById('pdf-chart-image').src = chartCanvas.toDataURL('image/png');
       }
 
-      const element = document.getElementById('pdf-export-container');
+      // Clone the template so we can show it without ruining the screen
+      const originalElement = document.getElementById('pdf-export-container');
+      const clone = originalElement.cloneNode(true);
       
-      // We physically place the element at the top of the screen, but behind the background
-      // This forces the browser to render it, completely fixing the "blank PDF" bug.
-      element.style.display = 'block';
-      element.style.position = 'absolute';
-      element.style.top = '0';
-      element.style.left = '0';
-      element.style.zIndex = '-9999';
+      // Inject clone into the body, make it visible but invisible to the user (opacity)
+      clone.id = "pdf-clone";
+      clone.style.display = 'block';
+      clone.style.position = 'absolute';
+      clone.style.top = '0';
+      clone.style.left = '0';
+      clone.style.zIndex = '-9999';
+      clone.style.opacity = '0.01'; 
+      document.body.appendChild(clone);
 
       const opt = {
         margin:       [0.5, 0.5],
@@ -459,10 +478,12 @@
         jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
       };
       
-      html2pdf().set(opt).from(element).save().then(() => {
-          // Immediately hide it again once the PDF downloads
-          element.style.display = 'none';
-      });
+      // Give browser 100ms to paint the clone, take picture, then delete it.
+      setTimeout(() => {
+          html2pdf().set(opt).from(clone).save().then(() => {
+              clone.remove(); 
+          });
+      }, 100);
     }
 
     let hasVerified = false;
@@ -494,13 +515,14 @@
       }
     }, 1000);
   </script>
-
+  
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script type="module" src="../assets/js/auth.js?v=2.0"></script>
   <script src="../assets/js/ai.js?v=2.0"></script>
 
 </body>
 </html>
+
 
 
 
