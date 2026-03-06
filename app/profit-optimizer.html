@@ -393,25 +393,40 @@
       });
     }
 
-    // Dynamic UI Poller (Hides login, updates days left)
+    // Dynamic UI Poller & Auto-Verifier
+    let hasVerified = false; // Prevents checking the database 100 times a second
+
     setInterval(() => {
       const globalLoginBtn = document.getElementById('headerLoginBtn');
+      
       if(window.userEmail) {
+        // Hide login button and show email
         if(globalLoginBtn) globalLoginBtn.style.display = 'none';
         document.getElementById('sidebarEmail').innerText = window.userEmail;
         document.getElementById('settingsEmail').innerText = window.userEmail;
+        
+        // 🔥 THE FIX: Auto-verify Pro status the second they log in
+        if(!hasVerified && typeof window.verify === 'function') {
+            hasVerified = true; // Mark as checked
+            window.verify(window.userEmail); 
+        }
       }
       
+      // Update UI based on Pro status
       if(window.isProUser) {
         const planText = `Pro Active (${window.proDaysLeft || 'Active'})`;
         document.getElementById('sidebarPlan').innerText = planText;
         document.getElementById('settingsPlan').innerText = planText;
         document.getElementById('settingsPlan').style.color = '#059669'; 
-        document.getElementById('upgradeBtn').style.display = 'none';
+        
+        const upgradeBtn = document.getElementById('upgradeBtn');
+        if(upgradeBtn) upgradeBtn.style.display = 'none';
       } else {
         document.getElementById('sidebarPlan').innerText = "Free User";
         document.getElementById('settingsPlan').innerText = "Free Plan (Limited)";
-        document.getElementById('upgradeBtn').style.display = 'block';
+        
+        const upgradeBtn = document.getElementById('upgradeBtn');
+        if(upgradeBtn) upgradeBtn.style.display = 'block';
       }
     }, 1000);
   </script>
@@ -422,3 +437,4 @@
 
 </body>
 </html>
+
