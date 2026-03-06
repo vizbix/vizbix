@@ -1,159 +1,424 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=0"/>
-  <title>Profit Optimizer – Vizbix Pro</title>
-
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Profit Optimizer Pro | Vizbix</title>
+  
+  <link rel="icon" type="image/png" href="../assets/img/favicon.png">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  
+  <link rel="stylesheet" href="../assets/css/main.css">
+  <link rel="stylesheet" href="../assets/css/app.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.1/dist/jspdf.umd.min.js"></script>
 
-  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <link rel="icon" type="image/png" href="/assets/img/favicon.png">
+  <style>
+    .app-view { display: none; transition: filter 0.3s ease; }
+    .app-view.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-  <link rel="stylesheet" href="/assets/css/main.css">
-  <link rel="stylesheet" href="/assets/css/app.css">
+    .insights-box { background: #f8fafc; border: 1px solid var(--border); border-radius: 12px; padding: 20px; margin-top: 20px; }
+    .insights-box h3 { margin-top: 0; font-size: 16px; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+    .insights-list { list-style: none; padding: 0; margin: 0; display: flex; flex-direction: column; gap: 12px; }
+    .insights-list li { font-size: 14px; line-height: 1.5; padding-left: 28px; position: relative; }
+    .insights-list li::before { content: '⚡'; position: absolute; left: 0; top: 0; }
+
+    .ai-thinking { animation: pulse 1.5s infinite; opacity: 0.7; pointer-events: none; }
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(0.98); } 100% { transform: scale(1); } }
+    #aiResult { background: #f8fafc; border: 1px solid var(--primary); border-radius: 12px; padding: 20px; margin-top: 20px; display: none; line-height: 1.6; font-size: 15px; }
+  </style>
 </head>
 <body>
 
-  <div class="modal-overlay" id="historyModal">
-    <div class="modal-content">
-      <div style="display:flex; justify-content:space-between; margin-bottom:16px;">
-        <h3 style="margin:0">Saved Analysis History</h3>
-        <button class="btn-ghost" onclick="window.toggleHistory(false)">✕</button>
-      </div>
-      <div id="historyList">Loading...</div>
-    </div>
-  </div>
-
   <div id="vizbix-nav-container"></div>
 
-  <main>
-    <div class="card">
-      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-        <div class="input-label">DATA SOURCE</div>
-        <div class="input-label" style="color:var(--accent); cursor:pointer;" onclick="window.sample()">Use Demo Data</div>
+  <div class="app-wrapper">
+    
+    <div id="proLockOverlay" class="pro-lock-overlay pro-lock-hidden">
+      <div class="pro-lock-card">
+        <h2>🔒 Pro Feature</h2>
+        <p>Unlock dashboards, detailed leak reports, AI pricing strategies, and cloud saving history.</p>
+        <button class="btn btn-primary btn-large" style="width: 100%;" onclick="switchView('settings', document.querySelectorAll('.nav-item')[5])">Upgrade to Pro (₹499)</button>
       </div>
-      
-      <div class="mode-switch-container">
-          <button class="mode-btn active" id="btnProduct" onclick="window.setMode('product')">Product Wise</button>
-          <button class="mode-btn" id="btnMonthly" onclick="window.setMode('monthly')">Monthly Overview</button>
-      </div>
+    </div>
 
-      <div id="productInputs">
-          <div class="grid-header">
-            <div>PRODUCT NAME</div>
-            <div>SELL PRICE</div>
-            <div>COST PRICE</div>
-            <div>QTY SOLD</div>
+    <aside class="app-sidebar" id="appSidebar">
+      <button class="sidebar-toggle" onclick="toggleSidebar()">
+        <svg id="toggleIcon" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg>
+      </button>
+
+      <nav class="sidebar-nav">
+        <a href="#" class="nav-item" onclick="switchView('dashboard', this)" id="nav-dashboard">
+          <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="3" y1="9" x2="21" y2="9"></line><line x1="9" y1="21" x2="9" y2="9"></line></svg>
+          <span class="nav-item-text">Dashboard</span>
+        </a>
+        <a href="#" class="nav-item" onclick="switchView('ai', this)">
+          <svg viewBox="0 0 24 24"><path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8v.5z"></path></svg>
+          <span class="nav-item-text">AI Strategy</span>
+        </a>
+        <a href="#" class="nav-item" onclick="switchView('report', this)">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          <span class="nav-item-text">Detailed Report</span>
+        </a>
+        <a href="#" class="nav-item active" onclick="switchView('data', this)">
+          <svg viewBox="0 0 24 24"><ellipse cx="12" cy="5" rx="9" ry="3"></ellipse><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"></path><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path></svg>
+          <span class="nav-item-text">Data Input</span>
+        </a>
+        <a href="#" class="nav-item" onclick="switchView('history', this); if(window.fetchHistory) window.fetchHistory();">
+          <svg viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+          <span class="nav-item-text">Cloud History</span>
+        </a>
+        <div style="flex-grow: 1;"></div>
+        <a href="#" class="nav-item" onclick="switchView('settings', this)">
+          <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"></circle><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path></svg>
+          <span class="nav-item-text">Settings</span>
+        </a>
+      </nav>
+
+      <div class="sidebar-profile">
+        <div class="profile-label">Signed in as</div>
+        <div class="profile-email" id="sidebarEmail">Not logged in</div>
+        <div class="profile-plan" id="sidebarPlan">Free User</div>
+      </div>
+    </aside>
+
+    <main class="app-main" id="mainContainer">
+      
+      <div id="view-data" class="app-view active">
+        <div class="data-card">
+          <div class="card-header">
+            <div class="card-title">Data Source</div>
+            <a class="demo-link" onclick="loadDemoData()">USE DEMO DATA</a>
+          </div>
+
+          <div class="data-table-headers">
+            <div>Name</div>
+            <div id="hdr-sell">Sell Price (₹)</div>
+            <div id="hdr-cost">Cost Price (₹)</div>
+            <div>Qty Sold</div>
             <div></div>
           </div>
-          <div id="items"></div>
-          <button class="btn-secondary" onclick="window.addRow()" style="width:100%; margin-top:10px;">+ Add Product</button>
-      </div>
 
-      <div id="monthlyInputs" style="display:none;">
-          <div class="info-box-small">
-              <span style="font-size:16px;">💡</span> 
-              <div><strong>Pro Tip:</strong> Add 2–6 months of data for the most accurate trend analysis.</div>
+          <div id="items">
+            <div class="data-row">
+              <input type="text" placeholder="Product Name" class="input-name" value="Wireless Earbuds">
+              <input type="number" placeholder="Sell Price" class="input-sell" value="2500">
+              <input type="number" placeholder="Cost Price" class="input-cost" value="1200">
+              <input type="number" placeholder="Quantity" class="input-qty" value="140">
+              <button class="delete-btn" onclick="deleteRow(this)">×</button>
+            </div>
           </div>
-          <div class="grid-header">
-              <div>MONTH (Optional)</div>
-              <div>SALES (₹)</div>
-              <div>EXPENSES (₹)</div>
-              <div>ORDERS</div>
-              <div></div>
+
+          <button class="add-row-btn" onclick="addNewRow()">+ Add Product</button>
+          
+          <div style="display: flex; gap: 12px; margin-top: 24px;">
+            <button class="btn btn-primary" style="flex: 1; padding: 16px; font-size: 16px;" onclick="processDataAndShowReport()">Generate Dashboard →</button>
+            <button id="saveCloudBtn" class="btn btn-secondary" style="padding: 16px;" onclick="if(window.saveToCloud) window.saveToCloud();">💾 Save</button>
           </div>
-          <div id="monthItems"></div>
-          <button class="btn-secondary" onclick="window.addMonthRow()" style="width:100%; margin-top:10px;">+ Add Month Data</button>
-      </div>
-
-      <div style="margin-top:16px; display:flex; gap:10px; align-items: stretch;">
-        <button id="analyzeBtn" class="btn-primary" style="flex:2;" onclick="window.analyze()">Generate Report →</button>
-        <button id="saveCloudBtn" class="btn-secondary" style="display:none; width:50px; flex-shrink:0; padding:0; align-items:center; justify-content:center;" onclick="window.saveToCloud()" title="Save to Cloud"><span style="font-size:18px">💾</span></button>
-      </div>
-    </div>
-
-    <div id="results" style="display:none">
-      
-      <div class="kpi-container">
-        <div class="kpi-card">
-          <div class="kpi-label" id="kpiRevLabel">TOTAL REVENUE</div>
-          <div class="kpi-value" id="dispRevenue">₹0</div>
-        </div>
-        <div class="kpi-card">
-          <div class="kpi-label" id="kpiCostLabel">TOTAL COST</div>
-          <div class="kpi-value" id="dispCost" style="color:#64748B">₹0</div>
-        </div>
-        <div class="kpi-card" style="border-color:var(--success); background:#f0fdf4;">
-          <div class="kpi-label" style="color:#15803d" id="kpiProfitLabel">NET PROFIT</div>
-          <div class="kpi-value" id="dispProfit" style="color:#15803d">₹0</div>
         </div>
       </div>
 
-      <div id="monthlyMetrics" class="kpi-container" style="display:none;">
-          <div class="kpi-card" style="background:#EFF6FF; border-color:#DBEAFE">
-              <div class="kpi-value" id="dispAOV">₹0</div>
-              <div class="kpi-label" style="color:#1E40AF">Avg Order Value</div>
+      <div id="view-dashboard" class="app-view">
+        <div style="max-width: 1000px; margin: 0 auto;">
+          <h2 style="margin-bottom: 20px;">Financial Dashboard</h2>
+          
+          <div class="metrics-grid">
+            <div class="metric-card">
+              <h4>Total Revenue</h4>
+              <div class="value" id="dash-revenue">0</div>
+            </div>
+            <div class="metric-card highlight">
+              <h4>Total Net Profit</h4>
+              <div class="value" id="dash-profit">0</div>
+            </div>
+            <div class="metric-card">
+              <h4>Avg Gross Margin</h4>
+              <div class="value" id="dash-margin">0%</div>
+            </div>
+            <div class="metric-card" style="border-left: 4px solid var(--primary);">
+              <h4>Top Product</h4>
+              <div class="value" id="dash-top-product" style="font-size: 20px; line-height: 1.3; margin-top: 8px;">-</div>
+            </div>
           </div>
-          <div class="kpi-card" style="background:#EFF6FF; border-color:#DBEAFE">
-              <div class="kpi-value" id="dispOrders">0</div>
-              <div class="kpi-label" style="color:#1E40AF">Avg Monthly Orders</div>
-          </div>
-      </div>
 
-      <div class="card locked-container" id="proContainer">
-        <div class="blur-overlay" id="lockOverlay">
-          <div class="lock-card">
-            <span class="premium-badge">Vizbix Pro</span>
-            <h3 style="margin:0 0 5px 0;">Unlock Strategic Insights</h3>
-            
-            <div class="feature-list">
-                <div>✅ <strong>AI Business Consultant</strong></div>
-                <div>✅ <strong>Unlimited Cloud History</strong></div>
-                <div>✅ <strong>Visual Charts & Graphs</strong></div>
-                <div>✅ <strong>PDF Report Export</strong></div>
+          <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 20px; align-items: start;">
+            <div class="data-card" style="padding: 20px; margin: 0; width: 100%;">
+              <h4 style="margin-top: 0; margin-bottom: 16px; color: var(--text-muted); text-transform: uppercase; font-size: 13px;">Revenue vs Profit</h4>
+              <div style="position: relative; height: 300px; width: 100%;">
+                <canvas id="profitChart"></canvas>
+              </div>
             </div>
 
-            <input id="emailInput" placeholder="Enter your email" style="margin-bottom:10px; text-align:center;">
-            <button class="btn-primary" style="width:100%" onclick="window.pay()">Unlock for ₹499</button>
-            <button style="background:none; border:none; color:#64748B; font-size:11px; margin-top:10px; cursor:pointer; text-decoration:underline" onclick="window.verify(null)">Restore Purchase</button>
-          </div>
-        </div>
-
-        <div id="proContent">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
-            <h3 style="margin:0">Strategic Report</h3>
-            <button class="btn-secondary" style="padding:6px 12px; font-size:12px;" onclick="window.downloadPDF()">↓ Export Report</button>
-          </div>
-
-          <h3 style="margin-bottom:15px">Optimization Strategy</h3>
-          <div id="insights"></div>
-
-          <div id="tableContainer">
-              <h3 style="margin-top:30px; margin-bottom:15px">Detailed Margin Analysis</h3>
-              <div style="overflow-x:auto;">
-                <table id="table"></table>
-              </div>
-          </div>
-
-          <h3 style="margin-top:40px; margin-bottom:15px">Visual Breakdown</h3>
-          <div style="height:300px; margin-bottom:30px; position: relative;">
-            <canvas id="chart"></canvas>
+            <div class="insights-box" style="margin: 0;">
+              <h3><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg> Fast Insights</h3>
+              <ul class="insights-list" id="auto-insights-list">
+                <li style="color: var(--text-muted);">Run analysis to see insights.</li>
+              </ul>
+            </div>
           </div>
         </div>
       </div>
-    </div>
 
-  </main>
+      <div id="view-report" class="app-view">
+        <div style="max-width: 1000px; margin: 0 auto;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>Detailed Profit Report</h2>
+            <button class="btn btn-secondary" onclick="switchView('data', document.querySelectorAll('.nav-item')[3])">← Edit Data</button>
+          </div>
+          <div style="overflow-x: auto;">
+            <table class="report-table">
+              <thead>
+                <tr>
+                  <th>Product Name</th>
+                  <th>Revenue</th>
+                  <th>Total Cost</th>
+                  <th>Total Profit</th>
+                  <th>Margin %</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody id="reportTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-  <script src="/assets/js/drawer.js"></script>
-  <script type="module" src="/assets/js/auth.js"></script>
-  <script src="../assets/js/charts.js"></script>
+      <div id="view-ai" class="app-view">
+        <div class="data-card" style="max-width: 700px; margin: 0 auto;">
+          <h2 style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 28px;">🤖</span> AI Consultant
+          </h2>
+          <p style="color: var(--text-muted); margin-bottom: 24px; line-height: 1.6;">
+            Our Cloudflare-powered AI analyzes your exact profit margins to suggest specific price increases, bundle ideas, and cost-cutting measures.
+          </p>
+          <button id="aiBtn" class="btn btn-primary btn-large" style="width: 100%;" onclick="if(window.askAI) window.askAI();">✨ Generate AI Strategy</button>
+          <div id="aiResult"></div>
+        </div>
+      </div>
+
+      <div id="view-history" class="app-view">
+        <div class="data-card" style="max-width: 700px; margin: 0 auto;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>Saved Cloud History</h2>
+            <button class="btn btn-secondary" onclick="if(window.fetchHistory) window.fetchHistory();">↻ Refresh</button>
+          </div>
+          <div id="historyList" style="min-height: 150px; background: #f8fafc; border: 1px dashed var(--border); border-radius: 12px; padding: 20px;">
+            <p style="text-align: center; color: var(--text-muted);">Fetching history from database...</p>
+          </div>
+        </div>
+      </div>
+
+      <div id="view-settings" class="app-view">
+        <div class="data-card" style="max-width: 600px; margin: 0 auto;">
+          <h2 style="margin-bottom: 24px;">Account Settings</h2>
+          
+          <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 24px;">
+            <h4 style="margin: 0 0 8px 0; color: var(--text-muted);">Currency Selector</h4>
+            <select id="currencySelect" onchange="updateCurrency()" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); font-size: 15px;">
+              <option value="INR">₹ Indian Rupee (INR)</option>
+              <option value="USD">$ US Dollar (USD)</option>
+              <option value="EUR">€ Euro (EUR)</option>
+              <option value="GBP">£ British Pound (GBP)</option>
+            </select>
+            <p style="font-size: 12px; color: var(--text-muted); margin-top: 8px;">The AI and reports will use this currency.</p>
+          </div>
+
+          <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 24px;">
+            <h4 style="margin: 0 0 8px 0; color: var(--text-muted);">Account Email</h4>
+            <div id="settingsEmail" style="font-weight: 700; font-size: 16px;">Not logged in</div>
+          </div>
+
+          <div style="background: #eff6ff; padding: 20px; border-radius: 12px; border: 1px solid #bfdbfe; margin-bottom: 24px;">
+            <h4 style="margin: 0 0 8px 0; color: #1e40af;">Subscription Plan</h4>
+            <div id="settingsPlan" style="font-weight: 700; font-size: 16px; color: var(--text-muted); margin-bottom: 16px;">Free Plan</div>
+            <button id="upgradeBtn" class="btn btn-primary" onclick="if(window.pay) window.pay();">Upgrade to PRO (₹499)</button>
+          </div>
+
+          <button class="btn btn-secondary" style="width: 100%; color: #dc2626;" onclick="if(window.handleLogout) window.handleLogout();">Log Out</button>
+        </div>
+      </div>
+
+    </main>
+  </div>
+
+  <script src="../assets/js/drawer.js"></script>
+  
+  <script>
+    // --- STATE ---
+    window.currentMode = 'product'; 
+    window.currentData = []; 
+    window.currentView = 'data';
+    
+    // Default Currency Logic
+    window.currentCurrency = 'INR';
+    window.currencySymbol = '₹';
+
+    function updateCurrency() {
+      const sel = document.getElementById('currencySelect');
+      window.currentCurrency = sel.value;
+      window.currencySymbol = sel.options[sel.selectedIndex].text.split(' ')[0];
+      document.getElementById('hdr-sell').innerText = `Sell Price (${window.currencySymbol})`;
+      document.getElementById('hdr-cost').innerText = `Cost Price (${window.currencySymbol})`;
+    }
+
+    function formatCurrency(num) {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: window.currentCurrency, maximumFractionDigits: 0 }).format(num);
+    }
+
+    let myChart = null; 
+
+    // --- UI LOGIC ---
+    const proViews = ['dashboard', 'ai', 'report', 'history'];
+
+    function toggleSidebar() {
+      const sidebar = document.getElementById("appSidebar");
+      sidebar.classList.toggle("collapsed");
+      document.getElementById("toggleIcon").innerHTML = sidebar.classList.contains("collapsed") ? '<path d="M9 18l6-6-6-6"/>' : '<path d="M15 18l-6-6 6-6"/>';
+    }
+
+    function switchView(viewId, element, bypassPaywall = false) {
+      window.currentView = viewId;
+      
+      // Paywall check
+      if(proViews.includes(viewId) && !window.isProUser && !bypassPaywall) {
+        document.getElementById('proLockOverlay').classList.remove('pro-lock-hidden');
+        document.querySelectorAll('.app-view').forEach(v => v.style.filter = "blur(6px)");
+      } else {
+        document.getElementById('proLockOverlay').classList.add('pro-lock-hidden');
+        document.querySelectorAll('.app-view').forEach(v => v.style.filter = "none");
+      }
+
+      document.querySelectorAll('.app-view').forEach(view => view.classList.remove('active'));
+      document.getElementById('view-' + viewId).classList.add('active');
+      
+      if (element) {
+        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        element.classList.add('active');
+      }
+    }
+
+    // --- ROW LOGIC ---
+    function addNewRow(name='', sell='', cost='', qty='') {
+      const container = document.getElementById('items');
+      const row = document.createElement('div');
+      row.className = 'data-row';
+      row.innerHTML = `
+        <input type="text" placeholder="Product Name" class="input-name" value="${name}">
+        <input type="number" placeholder="Sell Price" class="input-sell" value="${sell}">
+        <input type="number" placeholder="Cost Price" class="input-cost" value="${cost}">
+        <input type="number" placeholder="Quantity" class="input-qty" value="${qty}">
+        <button class="delete-btn" onclick="deleteRow(this)">×</button>
+      `;
+      container.appendChild(row);
+    }
+    function deleteRow(btnElement) { btnElement.parentElement.remove(); }
+    function loadDemoData() {
+      document.getElementById('items').innerHTML = ''; 
+      addNewRow('Wireless Earbuds', '2500', '1200', '140');
+      addNewRow('Smart Watch', '4500', '2800', '85');
+      addNewRow('USB-C Cable', '400', '150', '300');
+      addNewRow('Phone Case', '600', '700', '50');
+    }
+
+    // --- MATH ENGINE ---
+    function processDataAndShowReport() {
+      // Show Paywall instantly if not pro
+      if(!window.isProUser) {
+        switchView('dashboard', document.getElementById('nav-dashboard'));
+        return;
+      }
+
+      const rows = document.querySelectorAll('#items .data-row');
+      let totalRevenue = 0, totalCost = 0, totalProfit = 0;
+      let chartLabels = [], chartRevData = [], chartProfitData = [];
+      let reportHTML = '';
+      let topProduct = { name: '-', profit: -Infinity };
+      let profitLeaks = [];
+
+      window.currentData = []; 
+
+      rows.forEach(row => {
+        const name = row.querySelector('.input-name').value || 'Unnamed';
+        const sell = parseFloat(row.querySelector('.input-sell').value) || 0;
+        const cost = parseFloat(row.querySelector('.input-cost').value) || 0;
+        const qty = parseFloat(row.querySelector('.input-qty').value) || 0;
+
+        if(sell === 0 && cost === 0 && qty === 0) return; 
+
+        window.currentData.push({ name, sell, cost, qty });
+        const rev = sell * qty;
+        const itemCost = cost * qty;
+        const profit = rev - itemCost;
+        const margin = rev > 0 ? ((profit / rev) * 100).toFixed(1) : 0;
+
+        totalRevenue += rev; totalCost += itemCost; totalProfit += profit;
+        if(profit > topProduct.profit && qty > 0) topProduct = { name, profit };
+        if(profit < 0) profitLeaks.push(name);
+
+        chartLabels.push(name); chartRevData.push(rev); chartProfitData.push(profit);
+
+        let statusHtml = profit > 0 ? `<span class="status-pill status-healthy">Healthy</span>` : `<span class="status-pill status-leak">Profit Leak</span>`;
+        reportHTML += `<tr><td style="font-weight: 600;">${name}</td><td>${formatCurrency(rev)}</td><td>${formatCurrency(itemCost)}</td><td style="font-weight: 700; color: ${profit < 0 ? '#dc2626' : 'inherit'};">${formatCurrency(profit)}</td><td>${margin}%</td><td>${statusHtml}</td></tr>`;
+      });
+
+      if(totalRevenue === 0) return alert("Please enter data first.");
+
+      document.getElementById('dash-revenue').innerText = formatCurrency(totalRevenue);
+      document.getElementById('dash-profit').innerText = formatCurrency(totalProfit);
+      let overallMargin = ((totalProfit / totalRevenue) * 100);
+      document.getElementById('dash-margin').innerText = overallMargin.toFixed(1) + '%';
+      document.getElementById('dash-top-product').innerText = topProduct.name;
+
+      let insightsHTML = '';
+      if (topProduct.profit > 0) insightsHTML += `<li><strong>Hero Product:</strong> "${topProduct.name}" generates ${formatCurrency(topProduct.profit)} in profit. Focus ad spend here.</li>`;
+      if (profitLeaks.length > 0) insightsHTML += `<li style="color: #dc2626;"><strong>Profit Leaks Found:</strong> ${profitLeaks.join(', ')} are losing money. Fix pricing or drop them.</li>`;
+      else insightsHTML += `<li style="color: #059669;"><strong>Pricing is Safe:</strong> No negative margins detected.</li>`;
+      if (overallMargin < 20) insightsHTML += `<li><strong>Margin Warning:</strong> ${overallMargin.toFixed(1)}% is dangerous after operational costs.</li>`;
+      else insightsHTML += `<li><strong>Healthy Margin:</strong> ${overallMargin.toFixed(1)}% provides excellent safety to scale.</li>`;
+      
+      document.getElementById('auto-insights-list').innerHTML = insightsHTML;
+      document.getElementById('reportTableBody').innerHTML = reportHTML;
+      renderChart(chartLabels, chartRevData, chartProfitData);
+      switchView('dashboard', document.getElementById('nav-dashboard'));
+    }
+
+    // CHART FIX APPLIED HERE
+    function renderChart(labels, revData, profitData) {
+      const ctx = document.getElementById('profitChart').getContext('2d');
+      if(myChart) myChart.destroy();
+      myChart = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: labels, datasets: [{ label: 'Revenue', data: revData, backgroundColor: '#cbd5e1', borderRadius: 4 }, { label: 'Profit', data: profitData, backgroundColor: '#0f172a', borderRadius: 4 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } } }
+      });
+    }
+
+    // Dynamic UI Poller (Hides login, updates days left)
+    setInterval(() => {
+      const globalLoginBtn = document.getElementById('headerLoginBtn');
+      if(window.userEmail) {
+        if(globalLoginBtn) globalLoginBtn.style.display = 'none';
+        document.getElementById('sidebarEmail').innerText = window.userEmail;
+        document.getElementById('settingsEmail').innerText = window.userEmail;
+      }
+      
+      if(window.isProUser) {
+        const planText = `Pro Active (${window.proDaysLeft || 'Active'})`;
+        document.getElementById('sidebarPlan').innerText = planText;
+        document.getElementById('settingsPlan').innerText = planText;
+        document.getElementById('settingsPlan').style.color = '#059669'; 
+        document.getElementById('upgradeBtn').style.display = 'none';
+      } else {
+        document.getElementById('sidebarPlan').innerText = "Free User";
+        document.getElementById('settingsPlan').innerText = "Free Plan (Limited)";
+        document.getElementById('upgradeBtn').style.display = 'block';
+      }
+    }, 1000);
+  </script>
+
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
+  <script type="module" src="../assets/js/auth.js"></script>
   <script src="../assets/js/ai.js"></script>
-  <script src="/assets/js/app.js"></script>
-  </body>
+
+</body>
 </html>
