@@ -5,72 +5,65 @@
     <loc>https://vizbix.com/</loc>
     <priority>1.0</priority>
   </url>
+  <url>
+    <loc>https://vizbix.com/app/profit-optimizer.html</loc>
+    <priority>0.9</priority>
+  </url>
 
   <url>
     <loc>https://vizbix.com/tools/index.html</loc>
     <priority>0.9</priority>
   </url>
-
   <url>
-    <loc>https://vizbix.com/blogs.html</loc>
+    <loc>https://vizbix.com/templates/index.html</loc>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://vizbix.com/pages/blogs.html</loc>
     <priority>0.8</priority>
   </url>
 
   <url>
-    <loc>https://vizbix.com/about.html</loc>
+    <loc>https://vizbix.com/pages/about.html</loc>
     <priority>0.6</priority>
   </url>
-
   <url>
-    <loc>https://vizbix.com/privacy.html</loc>
+    <loc>https://vizbix.com/pages/privacy.html</loc>
     <priority>0.3</priority>
   </url>
-
   <url>
-    <loc>https://vizbix.com/disclaimer.html</loc>
+    <loc>https://vizbix.com/pages/disclaimer.html</loc>
     <priority>0.3</priority>
-  </url>
-
-  <url>
-    <loc>https://vizbix.com/profit-optimizer.html</loc>
-    <priority>0.9</priority>
   </url>
 
   <url>
     <loc>https://vizbix.com/tools/profit-margin.html</loc>
     <priority>0.8</priority>
   </url>
-
   <url>
     <loc>https://vizbix.com/tools/break-even.html</loc>
     <priority>0.8</priority>
   </url>
-
   <url>
     <loc>https://vizbix.com/tools/roi.html</loc>
     <priority>0.8</priority>
   </url>
-
   <url>
     <loc>https://vizbix.com/tools/markup.html</loc>
     <priority>0.8</priority>
   </url>
-
   <url>
     <loc>https://vizbix.com/tools/discount.html</loc>
     <priority>0.8</priority>
   </url>
-
   <url>
     <loc>https://vizbix.com/tools/gst.html</loc>
     <priority>0.8</priority>
   </url>
-
   <url>
     <loc>https://vizbix.com/tools/monthly-target.html</loc>
     <priority>0.8</priority>
   </url>
-
   <url>
     <loc>https://vizbix.com/tools/cash-runway.html</loc>
     <priority>0.8</priority>
@@ -80,31 +73,25 @@
     <loc>https://vizbix.com/blogs/profit-margin.html</loc>
     <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://vizbix.com/blogs/break-even-point.html</loc>
     <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://vizbix.com/blogs/markup-vs-margin.html</loc>
     <priority>0.7</priority>
   </url>
-
   <url>
-    <loc>https://vizbix.com/blogs/roi-marketing.html</loc>
+    <loc>https://vizbix.com/blogs/roi-how-to-know-if-marketing-is-working.html</loc>
     <priority>0.7</priority>
   </url>
-
   <url>
     <loc>https://vizbix.com/blogs/discounting-without-killing-profit.html</loc>
     <priority>0.7</priority>
   </url>
-
   <url>
-    <loc>https://vizbix.com/blogs/cash-runway.html</loc>
+    <loc>https://vizbix.com/blogs/cash-runway-how-long-will-your-business-survive.html</loc>
     <priority>0.7</priority>
   </url>
 
 </urlset>
-
