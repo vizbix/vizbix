@@ -6,12 +6,11 @@ const workerURL = "https://vizbix-api.vizbixhq.workers.dev";
 const PRICE = 49900; // ₹499
 const KEY = "rzp_live_SCvIqUMzTNsXgq"; 
 
-window.chatConversation = []; // Holds the chat history
+window.chatConversation = [];
 
 window.startAIAnalysis = async function() {
     if(!window.isProUser || !window.userEmail) return alert("Please Login (Pro Feature)");
     
-    // Scrape latest data
     let currentProducts = [];
     document.querySelectorAll('#items .data-row').forEach(row => {
         const name = row.querySelector('.input-name').value;
@@ -23,22 +22,28 @@ window.startAIAnalysis = async function() {
 
     if(currentProducts.length === 0) return alert("Enter data in the Data Input tab first!");
 
+    // Switch UI from Splash to Chat
+    document.getElementById("aiSplashScreen").style.display = "none";
+    document.getElementById("aiChatContainer").style.display = "flex";
+
     const promptMsg = `Analyze my product data using ${window.currentCurrency} (${window.currencySymbol}). Spot profit leaks, suggest pricing strategies, and tell me where to focus. Data: ${JSON.stringify(currentProducts)}`;
     
-    // Reset Chat UI
     document.getElementById("chatHistory").innerHTML = `<div class="chat-msg msg-ai">Analyzing your data in ${window.currencySymbol}...</div>`;
-    window.chatConversation = []; // Clear previous chat
+    window.chatConversation = []; 
     
     await executeAIRequest(promptMsg, "Initial Analysis");
 };
 
 window.sendChatMessage = async function() {
-    if(!window.isProUser) return alert("Pro feature locked.");
+    if(!window.isProUser) return;
     const inputField = document.getElementById("aiChatInput");
     const msg = inputField.value.trim();
     if(!msg) return;
 
-    // Add user message to UI
+    // Switch UI if they type before clicking generate
+    document.getElementById("aiSplashScreen").style.display = "none";
+    document.getElementById("aiChatContainer").style.display = "flex";
+
     appendChatBubble(msg, 'user');
     inputField.value = '';
     
@@ -53,7 +58,6 @@ async function executeAIRequest(userMessage, contextType) {
     typingIndicator.style.display = "block";
     sendBtn.disabled = true;
 
-    // Add to internal conversation history
     window.chatConversation.push({ role: "user", content: userMessage });
 
     let aiPayload = { 
@@ -61,7 +65,7 @@ async function executeAIRequest(userMessage, contextType) {
         currency: window.currentCurrency || 'INR',
         symbol: window.currencySymbol || '₹',
         message: userMessage,
-        history: window.chatConversation, // Send full context to worker
+        history: window.chatConversation,
         type: contextType 
     }; 
     
@@ -85,7 +89,7 @@ async function executeAIRequest(userMessage, contextType) {
     } catch(e) { 
         typingIndicator.style.display = "none"; 
         sendBtn.disabled = false; 
-        appendChatBubble("⚠️ Connection error. Please try again.", 'ai'); 
+        appendChatBubble("⚠️ Connection error.", 'ai'); 
     }
 }
 
@@ -94,12 +98,11 @@ function appendChatBubble(text, sender) {
     const div = document.createElement("div");
     div.className = `chat-msg msg-${sender}`;
     div.innerHTML = text;
-    // Clear the "Analyzing..." placeholder if it's the first real AI message
     if(sender === 'ai' && historyBox.innerHTML.includes("Analyzing your data")) {
         historyBox.innerHTML = '';
     }
     historyBox.appendChild(div);
-    historyBox.scrollTop = historyBox.scrollHeight; // Auto-scroll to bottom
+    historyBox.scrollTop = historyBox.scrollHeight;
 }
 
 window.verify = async function(email){
@@ -154,8 +157,8 @@ window.saveToCloud = async function() {
     btn.innerHTML = "⏳";
     try { 
         await fetch(workerURL + "/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: window.userEmail, data: dataToSave, mode: 'product', date: new Date().toISOString() }) }); 
-        btn.innerHTML = "✅ Saved"; setTimeout(() => btn.innerHTML = "💾 Save", 2000); 
-    } catch(e) { btn.innerHTML = "💾 Save"; }
+        btn.innerHTML = "✅ Saved"; setTimeout(() => btn.innerHTML = "💾 Save to Cloud", 2000); 
+    } catch(e) { btn.innerHTML = "💾 Save to Cloud"; }
 };
 
 window.fetchHistory = async function() {
