@@ -6,8 +6,9 @@
   <title>Profit Optimizer Pro | Vizbix</title>
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="../assets/css/main.css">
-  <link rel="stylesheet" href="../assets/css/app.css">
+  
+  <link rel="stylesheet" href="../assets/css/main.css?v=2.0">
+  <link rel="stylesheet" href="../assets/css/app.css?v=2.0">
   
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -40,7 +41,7 @@
           <svg viewBox="0 0 24 24"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg><span class="nav-item-text">Dashboard</span>
         </a>
         <a class="nav-item" onclick="switchView('ai', this)">
-          <svg viewBox="0 0 24 24"><path d="M19 3l-1.5 3.5L14 8l3.5 1.5L19 13l1.5-3.5L24 8l-3.5-1.5L19 3zm-7 2L8.5 12 5 13.5 8.5 15 12 22l3.5-7L19 13.5 15.5 12 12 5zm0 3.8l1.6 3.2 3.4 1.5-3.4 1.5-1.6 3.2-1.6-3.2-3.4-1.5 3.4-1.5L12 8.8z"/></svg><span class="nav-item-text">AI Strategy</span>
+          <span style="background: white; color: #0f172a; padding: 2px 4px; border-radius: 4px; font-size: 14px; font-weight: 900; line-height: 1;">Ai</span><span class="nav-item-text">Strategy</span>
         </a>
         <a class="nav-item" onclick="switchView('report', this)">
           <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg><span class="nav-item-text">Detailed Report</span>
@@ -56,6 +57,11 @@
           <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg><span class="nav-item-text">Settings</span>
         </a>
       </nav>
+      <div class="sidebar-profile">
+        <div class="profile-label">Signed in as</div>
+        <div class="profile-email" id="sidebarEmail">Loading auth...</div>
+        <div class="profile-plan" id="sidebarPlan">Verifying Plan...</div>
+      </div>
     </aside>
 
     <main class="app-main" id="mainContainer">
@@ -124,30 +130,27 @@
 
       <div id="view-ai" class="app-view">
         <div style="max-width: 850px; margin: 0 auto; height: 100%;">
-          
           <h2 style="margin-bottom: 24px; display: flex; align-items: center; gap: 12px;">
             <span style="font-size: 28px; background: var(--dark); color: white; padding: 6px 10px; border-radius: 8px; line-height: 1;">Ai</span> Strategy
           </h2>
 
           <div id="aiSplashScreen" style="height: calc(100vh - 220px); display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.02);">
               <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 18px;">Click below to analyze your numbers instantly.</p>
-              <button class="btn btn-dark" style="border-radius: 99px; padding: 18px 48px; font-size: 18px; box-shadow: 0 4px 15px rgba(15,23,42,0.2);" onclick="if(window.startAIAnalysis) window.startAIAnalysis();">✨ Generate Strategy</button>
+              <button class="btn btn-dark" style="border-radius: 99px; padding: 18px 48px; font-size: 18px; box-shadow: 0 4px 15px rgba(15,23,42,0.2);" onclick="if(window.startAIAnalysis) window.startAIAnalysis(); else alert('Backend Loading...');">✨ Generate Strategy</button>
           </div>
 
           <div id="aiChatContainer" class="chat-container" style="display: none;">
              <div class="chat-history" id="chatHistory"></div>
-             
              <div style="background: white;">
                <div id="typingIndicator" class="ai-typing">AI is analyzing your numbers...</div>
                <div class="chat-input-row">
-                  <input type="text" id="aiChatInput" placeholder="How can I improve my margin on the highest selling item?" onkeypress="if(event.key === 'Enter' && window.sendChatMessage) window.sendChatMessage()" />
+                  <input type="text" id="aiChatInput" placeholder="Ask about raising prices, bundle ideas, or profit margins..." onkeypress="if(event.key === 'Enter' && window.sendChatMessage) window.sendChatMessage()" />
                   <button id="chatSendBtn" onclick="if(window.sendChatMessage) window.sendChatMessage()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                   </button>
                </div>
              </div>
           </div>
-
         </div>
       </div>
 
@@ -217,46 +220,44 @@
 
     </main>
 
-    <div id="pdf-export-container">
-        <div class="pdf-header">
-            <h1>Business Report</h1>
-            <h4>Executive Summary</h4>
-        </div>
-        
-        <div class="pdf-grid">
-            <div class="pdf-col-1">
-                <div class="pdf-stat-row"><span>Total Revenue</span> <span id="pdf-rev">0</span></div>
-                <div class="pdf-stat-row"><span>Total Cost</span> <span id="pdf-cost">0</span></div>
-                <div class="pdf-stat-row"><span>Net Profit</span> <span id="pdf-profit" style="color:#0f172a;">0</span></div>
-                <div class="pdf-big-metric">
-                    <h4>Total Units Sold</h4>
-                    <div id="pdf-units-sold">0</div>
-                </div>
-            </div>
-
-            <div class="pdf-chart-box">
-                <img id="pdf-chart-image" class="pdf-chart-img" src="" alt="Chart">
-                <div class="pdf-big-metric" style="margin-top: 20px;">
-                    <h4>Top Product</h4>
-                    <div id="pdf-top-prod" style="font-size: 32px;">-</div>
-                </div>
-            </div>
-
-            <div>
-                <div id="pdf-margin" style="font-size: 80px; font-weight: 900; line-height: 1; margin-bottom: 30px; letter-spacing: -2px;">0%</div>
-                <h4 class="pdf-col-title">Key Insights</h4>
-                <ul class="pdf-list" id="pdf-insight-list">
-                    <li>Insight 1</li>
-                    <li>Insight 2</li>
-                    <li>Insight 3</li>
-                </ul>
-            </div>
-        </div>
-    </div>
-
   </div>
 
-  <script src="../assets/js/drawer.js"></script>
+  <div style="position: fixed; top: 2000px; left: -9999px; z-index: -9999;">
+      <div id="pdf-export-container" style="width: 1200px; background: white; font-family: sans-serif; padding: 60px; box-sizing: border-box;">
+          <div style="margin-bottom: 50px; border-bottom: 2px solid #0f172a; padding-bottom: 20px;">
+              <h1 style="font-size: 54px; font-weight: 900; margin: 0; text-transform: uppercase; color: #0f172a; line-height: 1;">Business Report</h1>
+              <h4 style="color: #64748b; font-size: 16px; text-transform: uppercase; letter-spacing: 2px; margin-top: 8px;">Executive Summary</h4>
+          </div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 60px;">
+              <div>
+                  <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 12px 0; font-size: 20px; font-weight: 500;"><span>Total Revenue</span> <span id="pdf-rev" style="font-weight: 900;">0</span></div>
+                  <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 12px 0; font-size: 20px; font-weight: 500;"><span>Total Cost</span> <span id="pdf-cost" style="font-weight: 900;">0</span></div>
+                  <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 12px 0; font-size: 20px; font-weight: 500;"><span>Net Profit</span> <span id="pdf-profit" style="color:#0f172a; font-weight: 900;">0</span></div>
+                  <div style="margin-top: 60px;">
+                      <h4 style="font-size: 20px; color: #475569; margin: 0 0 10px 0; text-transform: uppercase;">Total Units Sold</h4>
+                      <div id="pdf-units-sold" style="font-size: 64px; font-weight: 900; line-height: 1;">0</div>
+                  </div>
+              </div>
+              <div style="grid-column: span 2;">
+                  <img id="pdf-chart-image" style="width: 100%; height: 250px; object-fit: contain; margin-bottom: 40px;" src="" alt="Chart">
+                  <div style="display: flex; justify-content: space-between;">
+                      <div>
+                          <h4 style="color: #64748b; font-size: 14px; margin: 0 0 8px 0; text-transform: uppercase;">Gross Margin</h4>
+                          <div id="pdf-margin" style="font-size: 80px; font-weight: 900; line-height: 1; letter-spacing: -2px;">0%</div>
+                      </div>
+                      <div style="width: 50%;">
+                          <h4 style="font-size: 16px; font-weight: 800; color: #475569; text-transform: uppercase; margin-bottom: 12px;">Key Insights</h4>
+                          <ul id="pdf-insight-list" style="list-style: none; padding: 0; margin: 0; font-size: 16px; line-height: 1.6; color: #1e293b; font-weight: 500;">
+                              <li style="margin-bottom: 10px;">Insight 1</li>
+                          </ul>
+                      </div>
+                  </div>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <script src="../assets/js/drawer.js?v=2.0"></script>
   
   <script>
     window.currentMode = 'product'; 
@@ -347,7 +348,6 @@
 
       let overallMargin = totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100) : 0;
       
-      // Calculate Health Score
       let healthScore = 70; 
       if(overallMargin > 40) healthScore += 20;
       else if(overallMargin > 20) healthScore += 10;
@@ -355,63 +355,54 @@
       healthScore -= (profitLeaks.length * 15);
       healthScore = Math.max(0, Math.min(100, healthScore));
 
-      // UI Dashboard Updates
       document.getElementById('dash-revenue').innerText = formatCurrency(totalRevenue);
       document.getElementById('dash-profit').innerText = formatCurrency(totalProfit);
       document.getElementById('dash-margin').innerText = overallMargin.toFixed(1) + '%';
       document.getElementById('dash-top-product').innerText = topProduct.name;
       document.getElementById('reportTableBody').innerHTML = reportHTML;
 
-      // Update Health Score Badge
       const hc = document.getElementById('health-circle');
       hc.innerText = healthScore + '%';
       if(healthScore >= 80) { hc.style.background = '#d1fae5'; hc.style.color = '#059669'; }
       else if(healthScore >= 50) { hc.style.background = '#fef3c7'; hc.style.color = '#d97706'; }
       else { hc.style.background = '#fee2e2'; hc.style.color = '#dc2626'; }
 
-      // FORCE EXACTLY 3 INSIGHTS
       let insightsHTML = '';
       let pdfInsights = '';
       
-      // 1. Hero Product
       if (topProduct.profit > 0) {
-        insightsHTML += `<p><strong>🔥 Top Performer:</strong> ${topProduct.name} generated ${formatCurrency(topProduct.profit)}. Focus ad spend here.</p>`;
-        pdfInsights += `<li><strong>Focus on ${topProduct.name}:</strong> It generated the highest profit at ${formatCurrency(topProduct.profit)}.</li>`;
+        insightsHTML += `<p><strong>⭐ Priority:</strong> ${topProduct.name} generated ${formatCurrency(topProduct.profit)}. Focus ad spend here.</p>`;
+        pdfInsights += `<li style="margin-bottom: 10px;"><strong>Top Performer:</strong> Focus heavily on ${topProduct.name} as it drives the most profit.</li>`;
       } else {
-        insightsHTML += `<p><strong>🔥 Top Performer:</strong> None detected. You need to raise prices across the board.</p>`;
-        pdfInsights += `<li><strong>Warning:</strong> No highly profitable products detected.</li>`;
+        insightsHTML += `<p><strong>⭐ Priority:</strong> None detected. Raise prices immediately.</p>`;
+        pdfInsights += `<li style="margin-bottom: 10px;"><strong>Warning:</strong> No profitable products detected.</li>`;
       }
 
-      // 2. Leaks
       if (profitLeaks.length > 0) {
-        insightsHTML += `<p style="color: #dc2626;"><strong>⚠️ Profit Leaks:</strong> ${profitLeaks.join(', ')} are losing money. Increase prices or drop them immediately.</p>`;
-        pdfInsights += `<li><strong>Fix Leaks:</strong> ${profitLeaks.join(', ')} are operating at a loss. Adjust pricing or discontinue.</li>`;
+        insightsHTML += `<p style="color: #dc2626;"><strong>⚠️ Leaks:</strong> ${profitLeaks.join(', ')} are losing money.</p>`;
+        pdfInsights += `<li style="margin-bottom: 10px; color: #dc2626;"><strong>Profit Leaks:</strong> ${profitLeaks.join(', ')} are operating at a loss. Fix pricing.</li>`;
       } else {
-        insightsHTML += `<p style="color: #059669;"><strong>✅ Pricing Safe:</strong> No negative margins detected across your catalog.</p>`;
-        pdfInsights += `<li><strong>Pricing Safe:</strong> Zero products are currently losing money.</li>`;
+        insightsHTML += `<p style="color: #059669;"><strong>✅ Status:</strong> No negative margins detected.</p>`;
+        pdfInsights += `<li style="margin-bottom: 10px;"><strong>Stability:</strong> Zero products are currently losing money.</li>`;
       }
 
-      // 3. Margin Overall
       if (overallMargin < 20) {
-        insightsHTML += `<p><strong>📉 Margin Warning:</strong> ${overallMargin.toFixed(1)}% gross margin is dangerously low to sustain a business.</p>`;
-        pdfInsights += `<li><strong>Margin Warning:</strong> Your ${overallMargin.toFixed(1)}% margin leaves little room for operational expenses.</li>`;
+        insightsHTML += `<p><strong>📉 Warning:</strong> ${overallMargin.toFixed(1)}% margin leaves little room for operating costs.</p>`;
+        pdfInsights += `<li><strong>Margin Risk:</strong> A ${overallMargin.toFixed(1)}% margin is difficult to scale with ads.</li>`;
       } else {
-        insightsHTML += `<p><strong>📈 Healthy Margin:</strong> ${overallMargin.toFixed(1)}% gross margin gives you excellent room for scaling.</p>`;
-        pdfInsights += `<li><strong>Healthy Margin:</strong> ${overallMargin.toFixed(1)}% provides strong cash flow for scaling operations.</li>`;
+        insightsHTML += `<p><strong>📈 Scale:</strong> ${overallMargin.toFixed(1)}% margin provides strong cash flow.</p>`;
+        pdfInsights += `<li><strong>Ready to Scale:</strong> A ${overallMargin.toFixed(1)}% margin gives you healthy leverage.</li>`;
       }
       
       document.getElementById('auto-insights-list').innerHTML = insightsHTML;
       document.getElementById('pdf-insight-list').innerHTML = pdfInsights;
 
-      // Populate PDF Hidden Template Values
       document.getElementById('pdf-rev').innerText = formatCurrency(totalRevenue);
       document.getElementById('pdf-cost').innerText = formatCurrency(totalCost);
       document.getElementById('pdf-profit').innerText = formatCurrency(totalProfit);
       document.getElementById('pdf-units-sold').innerText = totalItems;
       document.getElementById('pdf-margin').innerText = overallMargin.toFixed(1) + '%';
-      document.getElementById('pdf-top-prod').innerText = topProduct.name;
 
-      // Draw Chart (Make it purple like the PDF design!)
       const ctx = document.getElementById('profitChart').getContext('2d');
       if(myChart) myChart.destroy();
       myChart = new Chart(ctx, {
@@ -423,7 +414,6 @@
       switchView('dashboard', document.getElementById('nav-dashboard'));
     }
 
-    // FIX: PDF Generation Engine (Hidden completely safely using z-index)
     function exportExecutivePDF() {
       const chartCanvas = document.getElementById('profitChart');
       document.getElementById('pdf-chart-image').src = chartCanvas.toDataURL('image/png');
@@ -448,7 +438,12 @@
         if(globalLoginBtn) globalLoginBtn.style.display = 'none';
         document.getElementById('sidebarEmail').innerText = window.userEmail;
         document.getElementById('settingsEmail').innerText = window.userEmail;
-        if(!hasVerified && typeof window.verify === 'function') { hasVerified = true; window.verify(window.userEmail); }
+        
+        // Wait to verify until email is present
+        if(!hasVerified && typeof window.verify === 'function') { 
+            hasVerified = true; 
+            window.verify(window.userEmail); 
+        }
       }
       
       if(window.isProUser) {
@@ -472,8 +467,8 @@
   </script>
 
   <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  <script type="module" src="../assets/js/auth.js"></script>
-  <script src="../assets/js/ai.js"></script>
+  <script type="module" src="../assets/js/auth.js?v=2.0"></script>
+  <script src="../assets/js/ai.js?v=2.0"></script>
 
 </body>
 </html>
