@@ -152,7 +152,7 @@
               <span style="font-size: 28px; background: var(--dark); color: white; padding: 6px 10px; border-radius: 8px; line-height: 1;">Ai</span> Strategy
             </h2>
             <button class="btn btn-secondary" style="padding: 10px 20px; font-size: 14px;" onclick="window.startAIAnalysis();">
-              🔄 Clear Chat & Re-Analyze Data
+              🔄 Re-Analyze Data
             </button>
           </div>
 
@@ -518,7 +518,7 @@
 
         const promptMsg = `Analyze my catalog. Identify my hero product, spot any profit leaks, and give me a clear 3-step action plan to increase my net margin. Use ${window.currencySymbol}.`;
         
-        document.getElementById("chatHistory").innerHTML = `<div class="chat-msg msg-ai" id="loadingAi">Analyzing your latest numbers in the cloud... This takes about 5 seconds ⏳</div>`;
+        document.getElementById("chatHistory").innerHTML = `<div class="chat-msg msg-ai" id="loadingAi">Analyzing your latest numbers in the cloud... This takes about 15 seconds ⏳</div>`;
         window.chatConversation = []; 
         
         await window.executeAIRequest(promptMsg, freshData);
