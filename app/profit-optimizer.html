@@ -367,41 +367,47 @@
       else if(healthScore >= 50) { hc.style.background = '#fef3c7'; hc.style.color = '#d97706'; }
       else { hc.style.background = '#fee2e2'; hc.style.color = '#dc2626'; }
 
+      // NEW: STRIClY 3 PRE-GENERATED INSIGHTS
       let insightsHTML = '';
       let pdfInsights = '';
       
+      // Insight 1
       if (topProduct.profit > 0) {
-        insightsHTML += `<p><strong>⭐ Priority:</strong> ${topProduct.name} generated ${formatCurrency(topProduct.profit)}. Focus ad spend here.</p>`;
-        pdfInsights += `<li style="margin-bottom: 10px;"><strong>Top Performer:</strong> Focus heavily on ${topProduct.name} as it drives the most profit.</li>`;
+        insightsHTML += `<div style="padding: 12px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;"><strong>1. Scale Top Performer:</strong> ${topProduct.name} generated ${formatCurrency(topProduct.profit)}. Increase ad spend on this item by 10%.</div>`;
+        pdfInsights += `<li style="margin-bottom: 12px;"><strong>Scale Winner:</strong> ${topProduct.name} generates the highest profit mass. Increase visibility.</li>`;
       } else {
-        insightsHTML += `<p><strong>⭐ Priority:</strong> None detected. Raise prices immediately.</p>`;
-        pdfInsights += `<li style="margin-bottom: 10px;"><strong>Warning:</strong> No profitable products detected.</li>`;
+        insightsHTML += `<div style="padding: 12px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;"><strong>1. Raise Prices:</strong> You have no highly profitable products. Raise prices 10% immediately.</div>`;
+        pdfInsights += `<li style="margin-bottom: 12px;"><strong>Raise Prices:</strong> No core profitable products detected. Implement a price increase.</li>`;
       }
 
+      // Insight 2
       if (profitLeaks.length > 0) {
-        insightsHTML += `<p style="color: #dc2626;"><strong>⚠️ Leaks:</strong> ${profitLeaks.join(', ')} are losing money.</p>`;
-        pdfInsights += `<li style="margin-bottom: 10px; color: #dc2626;"><strong>Profit Leaks:</strong> ${profitLeaks.join(', ')} are operating at a loss. Fix pricing.</li>`;
+        insightsHTML += `<div style="padding: 12px; background: #fef2f2; border-radius: 8px; border: 1px solid #fecaca; color: #dc2626;"><strong>2. Stop Profit Leaks:</strong> ${profitLeaks.join(', ')} are currently operating at a loss. Reprice or discontinue them.</div>`;
+        pdfInsights += `<li style="margin-bottom: 12px; color: #dc2626;"><strong>Fix Leaks:</strong> ${profitLeaks.join(', ')} are losing money. Fix unit economics or drop them.</li>`;
       } else {
-        insightsHTML += `<p style="color: #059669;"><strong>✅ Status:</strong> No negative margins detected.</p>`;
-        pdfInsights += `<li style="margin-bottom: 10px;"><strong>Stability:</strong> Zero products are currently losing money.</li>`;
+        insightsHTML += `<div style="padding: 12px; background: #ecfdf5; border-radius: 8px; border: 1px solid #a7f3d0; color: #059669;"><strong>2. Unit Economics Safe:</strong> Zero products are losing money. Your baseline is highly secure.</div>`;
+        pdfInsights += `<li style="margin-bottom: 12px;"><strong>Secure Economics:</strong> Zero products are currently operating at a net loss.</li>`;
       }
 
+      // Insight 3
       if (overallMargin < 20) {
-        insightsHTML += `<p><strong>📉 Warning:</strong> ${overallMargin.toFixed(1)}% margin leaves little room for operating costs.</p>`;
-        pdfInsights += `<li><strong>Margin Risk:</strong> A ${overallMargin.toFixed(1)}% margin is difficult to scale with ads.</li>`;
+        insightsHTML += `<div style="padding: 12px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;"><strong>3. Margin Warning:</strong> An average margin of ${overallMargin.toFixed(1)}% is dangerous. Bundle items to increase Average Order Value.</div>`;
+        pdfInsights += `<li><strong>Increase Margin:</strong> Your ${overallMargin.toFixed(1)}% margin is tight. Implement product bundling.</li>`;
       } else {
-        insightsHTML += `<p><strong>📈 Scale:</strong> ${overallMargin.toFixed(1)}% margin provides strong cash flow.</p>`;
-        pdfInsights += `<li><strong>Ready to Scale:</strong> A ${overallMargin.toFixed(1)}% margin gives you healthy leverage.</li>`;
+        insightsHTML += `<div style="padding: 12px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;"><strong>3. Healthy Margin:</strong> ${overallMargin.toFixed(1)}% gives you excellent cash flow to aggressively invest in growth.</div>`;
+        pdfInsights += `<li><strong>Healthy Margin:</strong> ${overallMargin.toFixed(1)}% provides excellent flexibility for scaling operations.</li>`;
       }
       
       document.getElementById('auto-insights-list').innerHTML = insightsHTML;
       document.getElementById('pdf-insight-list').innerHTML = pdfInsights;
 
+      // Update PDF Stats
       document.getElementById('pdf-rev').innerText = formatCurrency(totalRevenue);
       document.getElementById('pdf-cost').innerText = formatCurrency(totalCost);
       document.getElementById('pdf-profit').innerText = formatCurrency(totalProfit);
       document.getElementById('pdf-units-sold').innerText = totalItems;
       document.getElementById('pdf-margin').innerText = overallMargin.toFixed(1) + '%';
+      document.getElementById('pdf-top-prod').innerText = topProduct.name;
 
       const ctx = document.getElementById('profitChart').getContext('2d');
       if(myChart) myChart.destroy();
@@ -414,18 +420,22 @@
       switchView('dashboard', document.getElementById('nav-dashboard'));
     }
 
+    // NEW PDF ENGINE: Uses a completely robust layout technique
     function exportExecutivePDF() {
       const chartCanvas = document.getElementById('profitChart');
       document.getElementById('pdf-chart-image').src = chartCanvas.toDataURL('image/png');
 
       const element = document.getElementById('pdf-export-container');
       
+      // Override CSS to ensure perfect rendering
+      element.style.display = 'block';
+      
       const opt = {
-        margin:       0,
+        margin:       [0.5, 0.5],
         filename:     'Vizbix_Executive_Summary.pdf',
         image:        { type: 'jpeg', quality: 1 },
         html2canvas:  { scale: 2, useCORS: true, windowWidth: 1200 },
-        jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
       };
       
       html2pdf().set(opt).from(element).save();
@@ -438,12 +448,7 @@
         if(globalLoginBtn) globalLoginBtn.style.display = 'none';
         document.getElementById('sidebarEmail').innerText = window.userEmail;
         document.getElementById('settingsEmail').innerText = window.userEmail;
-        
-        // Wait to verify until email is present
-        if(!hasVerified && typeof window.verify === 'function') { 
-            hasVerified = true; 
-            window.verify(window.userEmail); 
-        }
+        if(!hasVerified && typeof window.verify === 'function') { hasVerified = true; window.verify(window.userEmail); }
       }
       
       if(window.isProUser) {
@@ -472,3 +477,4 @@
 
 </body>
 </html>
+
