@@ -34,7 +34,10 @@
         <button class="btn btn-primary btn-large" style="width: 100%;" onclick="switchView('settings', document.querySelectorAll('.nav-item')[5])">Upgrade to Pro (₹499)</button>
       </div>
     </div>
+    
+    <div class="mobile-overlay" id="mobileAppOverlay" onclick="toggleAppDrawer()"></div>
 
+    <aside class="app-sidebar" id="appSidebar">
     <aside class="app-sidebar" id="appSidebar">
       <nav class="sidebar-nav">
         <a class="nav-item" onclick="switchView('dashboard', this)" id="nav-dashboard">
@@ -65,6 +68,58 @@
     </aside>
 
     <main class="app-main" id="mainContainer">
+
+      <main class="app-main" id="mainContainer">
+      
+      <div class="mobile-app-bar">
+        <button onclick="toggleAppDrawer()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+        <div class="page-title" id="mobilePageTitle">Data Input</div>
+      </div>
+
+      ```
+
+**3. Update the Javascript:**
+Scroll down to the `<script>` block at the bottom of the file. Find the existing `switchView` function and replace it with this updated block:
+
+```javascript
+    function toggleAppDrawer() {
+      const sidebar = document.getElementById("appSidebar");
+      const overlay = document.getElementById("mobileAppOverlay");
+      sidebar.classList.toggle("mobile-open");
+      overlay.classList.toggle("active");
+    }
+
+    function switchView(viewId, element, bypassPaywall = false) {
+      window.currentView = viewId;
+      if(proViews.includes(viewId) && window.isProUser === false && !bypassPaywall) {
+        document.getElementById('proLockOverlay').classList.remove('pro-lock-hidden');
+        document.querySelectorAll('.app-view').forEach(v => v.style.filter = "blur(6px)");
+      } else {
+        document.getElementById('proLockOverlay').classList.add('pro-lock-hidden');
+        document.querySelectorAll('.app-view').forEach(v => v.style.filter = "none");
+      }
+      document.querySelectorAll('.app-view').forEach(view => view.classList.remove('active'));
+      document.getElementById('view-' + viewId).classList.add('active');
+      
+      if (element) {
+        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        element.classList.add('active');
+        
+        // Update the mobile header title dynamically
+        const titleText = element.querySelector('.nav-item-text').innerText;
+        document.getElementById('mobilePageTitle').innerText = titleText;
+      }
+
+      // Automatically close the mobile drawer when a button is clicked
+      const sidebar = document.getElementById("appSidebar");
+      const overlay = document.getElementById("mobileAppOverlay");
+      if(sidebar && sidebar.classList.contains('mobile-open')) {
+          sidebar.classList.remove('mobile-open');
+          overlay.classList.remove('active');
+      }
+    }
       
       <div id="view-data" class="app-view active">
         <div class="data-card">
@@ -522,6 +577,7 @@
 
 </body>
 </html>
+
 
 
 
