@@ -41,6 +41,10 @@
 .add-row-btn { width: 100%; padding: 14px; background: transparent; border: 1px dashed #cbd5e1; border-radius: 8px; color: var(--text-muted); font-weight: 600; cursor: pointer; margin-top: 8px; transition: all 0.2s; }
 .add-row-btn:hover { border-color: var(--primary); color: var(--primary); background: #eff6ff; }
 
+/* Desktop Action Buttons & Grids */
+.action-buttons-wrap { display: flex; gap: 12px; margin-top: 24px; }
+.dash-grid { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; align-items: start; }
+
 /* --- Dashboard Metrics Grid --- */
 .metrics-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 30px; }
 .metric-card { background: white; border: 1px solid var(--border); border-radius: 16px; padding: 20px; box-shadow: 0 4px 15px rgba(15, 23, 42, 0.03); }
@@ -66,13 +70,51 @@
 .pro-lock-card h2 { font-size: 24px; margin-bottom: 12px; color: var(--dark); }
 .pro-lock-card p { color: var(--text-muted); margin-bottom: 24px; line-height: 1.6; }
 
-/* Mobile View Adjustments */
-@media (max-width: 768px) {
-  .app-sidebar { position: fixed; transform: translateX(-100%); height: 100%; }
-  .app-main { padding: 16px; }
+/* =========================================
+   MOBILE RESPONSIVENESS FIXES
+   ========================================= */
+@media (max-width: 850px) {
+  /* 1. App Wrapper scrolls naturally */
+  .app-wrapper { flex-direction: column; height: auto; min-height: calc(100vh - 75px); overflow: visible; }
+  
+  /* 2. Turn Sidebar into a horizontal swipeable menu */
+  .app-sidebar { 
+    width: 100% !important; 
+    height: auto; 
+    flex-direction: row; 
+    overflow-x: auto; 
+    white-space: nowrap; 
+    border-right: none; 
+    border-bottom: 1px solid #1e293b;
+    -ms-overflow-style: none; /* Hide scrollbar IE */
+    scrollbar-width: none; /* Hide scrollbar Firefox */
+  }
+  .app-sidebar::-webkit-scrollbar { display: none; } /* Hide scrollbar Chrome */
+  
+  .sidebar-toggle, .sidebar-profile { display: none !important; }
+  
+  .sidebar-nav { flex-direction: row; padding: 8px 16px; gap: 8px; width: max-content; }
+  .nav-item { padding: 10px 16px; border-radius: 8px; gap: 8px; background: rgba(255, 255, 255, 0.05); }
+  .app-sidebar .nav-item-text { display: inline-block !important; font-size: 13px; }
+  
+  /* 3. Main Content & Grids stack cleanly */
+  .app-main { padding: 16px; overflow: visible; }
+  .dash-grid { grid-template-columns: 1fr !important; gap: 16px; }
+  .action-buttons-wrap { flex-direction: column; }
+  .action-buttons-wrap button { width: 100%; }
+  
+  /* 4. Data Rows stack into 2-column mobile cards */
   .data-table-headers { display: none; }
-  .data-row { grid-template-columns: 1fr 1fr; background: #f8fafc; border: 1px solid var(--border); padding: 16px; border-radius: 12px; gap: 12px; margin-bottom: 16px; }
+  .data-row { 
+    grid-template-columns: 1fr 1fr; 
+    background: #f8fafc; 
+    border: 1px solid var(--border); 
+    padding: 16px; 
+    border-radius: 12px; 
+    gap: 12px; 
+    margin-bottom: 16px; 
+  }
   .data-row input:nth-child(1) { grid-column: span 2; background: white; font-weight: 600; }
   .data-row input { background: white; }
-  .delete-btn { width: 100%; height: 100%; background: #e2e8f0; color: #475569; }
+  .delete-btn { width: 100%; height: auto; padding: 10px; background: #e2e8f0; color: #475569; grid-column: span 2; margin-top: 4px; }
 }
