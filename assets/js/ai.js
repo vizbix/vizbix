@@ -1,7 +1,3 @@
-// =========================================
-// ai.js - AI Chat Consultant & Pro Engine
-// =========================================
-
 const workerURL = "https://vizbix-api.vizbixhq.workers.dev";
 const PRICE = 49900; // ₹499
 const KEY = "rzp_live_SCvIqUMzTNsXgq"; 
@@ -10,28 +6,17 @@ window.chatConversation = [];
 
 window.startAIAnalysis = async function() {
     if(!window.isProUser || !window.userEmail) return alert("Please Login (Pro Feature)");
-    
-    let currentProducts = [];
-    document.querySelectorAll('#items .data-row').forEach(row => {
-        const name = row.querySelector('.input-name').value;
-        const sell = row.querySelector('.input-sell').value;
-        const cost = row.querySelector('.input-cost').value;
-        const qty = row.querySelector('.input-qty').value;
-        if(name || sell || cost || qty) currentProducts.push({ name, sell, cost, qty });
-    });
+    if(!window.currentData || window.currentData.length === 0) return alert("Please enter data in the Data Input tab first!");
 
-    if(currentProducts.length === 0) return alert("Enter data in the Data Input tab first!");
-
-    // Switch UI from Splash to Chat
     document.getElementById("aiSplashScreen").style.display = "none";
     document.getElementById("aiChatContainer").style.display = "flex";
 
-    const promptMsg = `Analyze my product data using ${window.currentCurrency} (${window.currencySymbol}). Spot profit leaks, suggest pricing strategies, and tell me where to focus. Data: ${JSON.stringify(currentProducts)}`;
+    const promptMsg = `Analyze my catalog. Identify my hero product, spot any profit leaks, and give me a clear 3-step action plan to increase my net margin. Use ${window.currencySymbol}.`;
     
-    document.getElementById("chatHistory").innerHTML = `<div class="chat-msg msg-ai">Analyzing your data in ${window.currencySymbol}...</div>`;
+    document.getElementById("chatHistory").innerHTML = `<div class="chat-msg msg-ai" id="loadingAi">Analyzing your data in ${window.currencySymbol}...</div>`;
     window.chatConversation = []; 
     
-    await executeAIRequest(promptMsg, "Initial Analysis");
+    await executeAIRequest(promptMsg);
 };
 
 window.sendChatMessage = async function() {
@@ -40,35 +25,34 @@ window.sendChatMessage = async function() {
     const msg = inputField.value.trim();
     if(!msg) return;
 
-    // Switch UI if they type before clicking generate
     document.getElementById("aiSplashScreen").style.display = "none";
     document.getElementById("aiChatContainer").style.display = "flex";
 
     appendChatBubble(msg, 'user');
     inputField.value = '';
     
-    await executeAIRequest(msg, "Chat");
+    await executeAIRequest(msg);
 };
 
-async function executeAIRequest(userMessage, contextType) {
-    const historyBox = document.getElementById("chatHistory");
+async function executeAIRequest(userMessage) {
     const typingIndicator = document.getElementById("typingIndicator");
     const sendBtn = document.getElementById("chatSendBtn");
     
     typingIndicator.style.display = "block";
     sendBtn.disabled = true;
 
-    window.chatConversation.push({ role: "user", content: userMessage });
-
+    // The Critical Fix: Ensure products are ALWAYS sent to the worker
     let aiPayload = { 
         email: window.userEmail, 
         currency: window.currentCurrency || 'INR',
         symbol: window.currencySymbol || '₹',
         message: userMessage,
         history: window.chatConversation,
-        type: contextType 
+        products: window.currentData 
     }; 
     
+    window.chatConversation.push({ role: "user", content: userMessage });
+
     try {
         const r = await fetch(workerURL + "/ai-analyze", { 
             method: "POST", headers: { "Content-Type": "application/json" }, 
@@ -79,6 +63,9 @@ async function executeAIRequest(userMessage, contextType) {
         typingIndicator.style.display = "none";
         sendBtn.disabled = false;
         
+        const loadingElement = document.getElementById("loadingAi");
+        if(loadingElement) loadingElement.remove();
+
         if(d.ok) { 
             const formattedResponse = d.response.replace(/\n/g, "<br>").replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
             appendChatBubble(formattedResponse, 'ai');
@@ -98,9 +85,6 @@ function appendChatBubble(text, sender) {
     const div = document.createElement("div");
     div.className = `chat-msg msg-${sender}`;
     div.innerHTML = text;
-    if(sender === 'ai' && historyBox.innerHTML.includes("Analyzing your data")) {
-        historyBox.innerHTML = '';
-    }
     historyBox.appendChild(div);
     historyBox.scrollTop = historyBox.scrollHeight;
 }
@@ -145,18 +129,10 @@ window.pay = function(){
 window.saveToCloud = async function() {
     if(!window.isProUser) return alert("Pro Plan required."); 
     const btn = document.getElementById("saveCloudBtn");
-    let dataToSave = [];
-    document.querySelectorAll('#items .data-row').forEach(row => {
-        const name = row.querySelector('.input-name').value;
-        const sell = row.querySelector('.input-sell').value;
-        const cost = row.querySelector('.input-cost').value;
-        const qty = row.querySelector('.input-qty').value;
-        if(name || sell || cost || qty) dataToSave.push({ name, sell, cost, qty });
-    });
-    if(dataToSave.length === 0) return alert("Nothing to save!");
+    if(window.currentData.length === 0) return alert("Nothing to save! Run dashboard first.");
     btn.innerHTML = "⏳";
     try { 
-        await fetch(workerURL + "/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: window.userEmail, data: dataToSave, mode: 'product', date: new Date().toISOString() }) }); 
+        await fetch(workerURL + "/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: window.userEmail, data: window.currentData, mode: 'product', date: new Date().toISOString() }) }); 
         btn.innerHTML = "✅ Saved"; setTimeout(() => btn.innerHTML = "💾 Save to Cloud", 2000); 
     } catch(e) { btn.innerHTML = "💾 Save to Cloud"; }
 };
