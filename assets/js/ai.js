@@ -1,12 +1,27 @@
 const workerURL = "https://vizbix-api.vizbixhq.workers.dev";
-const PRICE = 49900; // ₹499
+const PRICE = 49900; 
 const KEY = "rzp_live_SCvIqUMzTNsXgq"; 
 
 window.chatConversation = [];
 
+// NEW FIX: Always scrape the inputs directly from the screen at the exact moment of clicking.
+function getFreshData() {
+    let data = [];
+    document.querySelectorAll('#items .data-row').forEach(row => {
+        const name = row.querySelector('.input-name')?.value;
+        const sell = row.querySelector('.input-sell')?.value;
+        const cost = row.querySelector('.input-cost')?.value;
+        const qty = row.querySelector('.input-qty')?.value;
+        if(name || sell || cost || qty) data.push({ name, sell, cost, qty });
+    });
+    return data;
+}
+
 window.startAIAnalysis = async function() {
     if(!window.isProUser || !window.userEmail) return alert("Please Login (Pro Feature)");
-    if(!window.currentData || window.currentData.length === 0) return alert("Please enter data in the Data Input tab first!");
+    
+    const freshData = getFreshData();
+    if(freshData.length === 0) return alert("Please enter data in the Data Input tab first!");
 
     document.getElementById("aiSplashScreen").style.display = "none";
     document.getElementById("aiChatContainer").style.display = "flex";
@@ -16,7 +31,7 @@ window.startAIAnalysis = async function() {
     document.getElementById("chatHistory").innerHTML = `<div class="chat-msg msg-ai" id="loadingAi">Analyzing your data in ${window.currencySymbol}...</div>`;
     window.chatConversation = []; 
     
-    await executeAIRequest(promptMsg);
+    await executeAIRequest(promptMsg, freshData);
 };
 
 window.sendChatMessage = async function() {
@@ -31,24 +46,24 @@ window.sendChatMessage = async function() {
     appendChatBubble(msg, 'user');
     inputField.value = '';
     
-    await executeAIRequest(msg);
+    await executeAIRequest(msg, getFreshData());
 };
 
-async function executeAIRequest(userMessage) {
+async function executeAIRequest(userMessage, freshData) {
     const typingIndicator = document.getElementById("typingIndicator");
     const sendBtn = document.getElementById("chatSendBtn");
     
     typingIndicator.style.display = "block";
     sendBtn.disabled = true;
 
-    // The Critical Fix: Ensure products are ALWAYS sent to the worker
+    // FIX: 'products' is now guaranteed to have your data.
     let aiPayload = { 
         email: window.userEmail, 
         currency: window.currentCurrency || 'INR',
         symbol: window.currencySymbol || '₹',
         message: userMessage,
         history: window.chatConversation,
-        products: window.currentData 
+        products: freshData 
     }; 
     
     window.chatConversation.push({ role: "user", content: userMessage });
@@ -129,10 +144,11 @@ window.pay = function(){
 window.saveToCloud = async function() {
     if(!window.isProUser) return alert("Pro Plan required."); 
     const btn = document.getElementById("saveCloudBtn");
-    if(window.currentData.length === 0) return alert("Nothing to save! Run dashboard first.");
+    const freshData = getFreshData();
+    if(freshData.length === 0) return alert("Nothing to save!");
     btn.innerHTML = "⏳";
     try { 
-        await fetch(workerURL + "/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: window.userEmail, data: window.currentData, mode: 'product', date: new Date().toISOString() }) }); 
+        await fetch(workerURL + "/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: window.userEmail, data: freshData, mode: 'product', date: new Date().toISOString() }) }); 
         btn.innerHTML = "✅ Saved"; setTimeout(() => btn.innerHTML = "💾 Save to Cloud", 2000); 
     } catch(e) { btn.innerHTML = "💾 Save to Cloud"; }
 };
