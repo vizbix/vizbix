@@ -4,24 +4,12 @@ const KEY = "rzp_live_SCvIqUMzTNsXgq";
 
 window.chatConversation = [];
 
-// NEW FIX: Always scrape the inputs directly from the screen at the exact moment of clicking.
-function getFreshData() {
-    let data = [];
-    document.querySelectorAll('#items .data-row').forEach(row => {
-        const name = row.querySelector('.input-name')?.value;
-        const sell = row.querySelector('.input-sell')?.value;
-        const cost = row.querySelector('.input-cost')?.value;
-        const qty = row.querySelector('.input-qty')?.value;
-        if(name || sell || cost || qty) data.push({ name, sell, cost, qty });
-    });
-    return data;
-}
-
 window.startAIAnalysis = async function() {
     if(!window.isProUser || !window.userEmail) return alert("Please Login (Pro Feature)");
     
-    const freshData = getFreshData();
-    if(freshData.length === 0) return alert("Please enter data in the Data Input tab first!");
+    // FORCE FETCH FRESH DATA
+    const freshData = typeof getFreshData === 'function' ? getFreshData() : window.currentData;
+    if(!freshData || freshData.length === 0) return alert("Please enter data in the Data Input tab first!");
 
     document.getElementById("aiSplashScreen").style.display = "none";
     document.getElementById("aiChatContainer").style.display = "flex";
@@ -46,7 +34,8 @@ window.sendChatMessage = async function() {
     appendChatBubble(msg, 'user');
     inputField.value = '';
     
-    await executeAIRequest(msg, getFreshData());
+    const freshData = typeof getFreshData === 'function' ? getFreshData() : window.currentData;
+    await executeAIRequest(msg, freshData);
 };
 
 async function executeAIRequest(userMessage, freshData) {
@@ -56,7 +45,7 @@ async function executeAIRequest(userMessage, freshData) {
     typingIndicator.style.display = "block";
     sendBtn.disabled = true;
 
-    // FIX: 'products' is now guaranteed to have your data.
+    // GUARANTEED to have data attached to the payload
     let aiPayload = { 
         email: window.userEmail, 
         currency: window.currentCurrency || 'INR',
@@ -144,8 +133,8 @@ window.pay = function(){
 window.saveToCloud = async function() {
     if(!window.isProUser) return alert("Pro Plan required."); 
     const btn = document.getElementById("saveCloudBtn");
-    const freshData = getFreshData();
-    if(freshData.length === 0) return alert("Nothing to save!");
+    const freshData = typeof getFreshData === 'function' ? getFreshData() : window.currentData;
+    if(!freshData || freshData.length === 0) return alert("Nothing to save!");
     btn.innerHTML = "⏳";
     try { 
         await fetch(workerURL + "/save", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ email: window.userEmail, data: freshData, mode: 'product', date: new Date().toISOString() }) }); 
