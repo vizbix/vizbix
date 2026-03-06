@@ -426,16 +426,23 @@
       switchView('dashboard', document.getElementById('nav-dashboard'));
     }
 
-    // NEW PDF ENGINE: Uses a completely robust layout technique
+   // FIX: PDF Generation Engine (Forces rendering to fix the blank screen)
     function exportExecutivePDF() {
       const chartCanvas = document.getElementById('profitChart');
-      document.getElementById('pdf-chart-image').src = chartCanvas.toDataURL('image/png');
+      if(chartCanvas) {
+          document.getElementById('pdf-chart-image').src = chartCanvas.toDataURL('image/png');
+      }
 
       const element = document.getElementById('pdf-export-container');
       
-      // Override CSS to ensure perfect rendering
+      // We physically place the element at the top of the screen, but behind the background
+      // This forces the browser to render it, completely fixing the "blank PDF" bug.
       element.style.display = 'block';
-      
+      element.style.position = 'absolute';
+      element.style.top = '0';
+      element.style.left = '0';
+      element.style.zIndex = '-9999';
+
       const opt = {
         margin:       [0.5, 0.5],
         filename:     'Vizbix_Executive_Summary.pdf',
@@ -444,7 +451,10 @@
         jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
       };
       
-      html2pdf().set(opt).from(element).save();
+      html2pdf().set(opt).from(element).save().then(() => {
+          // Immediately hide it again once the PDF downloads
+          element.style.display = 'none';
+      });
     }
 
     let hasVerified = false;
@@ -483,6 +493,7 @@
 
 </body>
 </html>
+
 
 
 
