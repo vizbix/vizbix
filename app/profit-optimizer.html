@@ -7,8 +7,8 @@
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="../assets/css/main.css?v=3.0">
-  <link rel="stylesheet" href="../assets/css/app.css?v=3.0">
+  <link rel="stylesheet" href="../assets/css/main.css?v=4.0">
+  <link rel="stylesheet" href="../assets/css/app.css?v=4.0">
   
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -22,8 +22,7 @@
     /* Perfect AI Chat Bubbles */
     .chat-container { display: flex; flex-direction: column; height: calc(100vh - 160px); background: #f8fafc; border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
     .chat-history { flex: 1; overflow-y: auto; padding: 30px; display: flex; flex-direction: column; gap: 16px; }
-    .chat-msg { max-width: 80%; padding: 14px 20px; border-radius: 16px; font-size: 15px; line-height: 1.6; }
-    /* AI is Left (White), User is Right (Dark) */
+    .chat-msg { max-width: 80%; padding: 16px 20px; border-radius: 16px; font-size: 15px; line-height: 1.6; }
     .msg-ai { align-self: flex-start; background: white; border: 1px solid var(--border); color: #0f172a; border-bottom-left-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
     .msg-user { align-self: flex-end; background: #0f172a; color: white; border-bottom-right-radius: 4px; }
     .ai-typing { font-style: italic; color: #2563eb; font-size: 14px; font-weight: 600; padding: 10px 20px; display: none; }
@@ -59,7 +58,7 @@
         <a class="nav-item active" onclick="switchView('data', this)">
           <svg viewBox="0 0 24 24"><path d="M3 3v18h18V3H3zm16 16H5v-2h14v2zm0-4H5v-2h14v2zm0-4H5V9h14v2zm0-4H5V5h14v2z"/></svg><span class="nav-item-text">Data Input</span>
         </a>
-        <a class="nav-item" onclick="switchView('history', this); if(window.fetchHistory) window.fetchHistory();">
+        <a class="nav-item" onclick="switchView('history', this); window.fetchHistory();">
           <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg><span class="nav-item-text">Cloud History</span>
         </a>
         <div style="flex-grow: 1;"></div>
@@ -108,7 +107,7 @@
           <button class="add-row-btn" onclick="addNewRow()">+ Add Product</button>
           <div class="action-buttons-wrap">
             <button class="btn btn-primary" style="flex: 1; padding: 16px; font-size: 16px;" onclick="processDataAndShowReport()">Generate Dashboard →</button>
-            <button id="saveCloudBtn" class="btn btn-secondary" style="padding: 16px;" onclick="if(window.saveToCloud) window.saveToCloud();">💾 Save to Cloud</button>
+            <button id="saveCloudBtn" class="btn btn-secondary" style="padding: 16px;" onclick="window.saveToCloud();">💾 Save to Cloud</button>
           </div>
         </div>
       </div>
@@ -152,21 +151,26 @@
             <h2 style="margin: 0; display: flex; align-items: center; gap: 12px;">
               <span style="font-size: 28px; background: var(--dark); color: white; padding: 6px 10px; border-radius: 8px; line-height: 1;">Ai</span> Strategy
             </h2>
-            <button class="btn btn-secondary" style="padding: 10px 20px; font-size: 14px;" onclick="if(window.startAIAnalysis) window.startAIAnalysis();">
-              🔄 Analyze Latest Data
+            <button class="btn btn-secondary" style="padding: 10px 20px; font-size: 14px;" onclick="window.startAIAnalysis();">
+              🔄 Clear Chat & Re-Analyze Data
             </button>
           </div>
 
-          <div id="aiChatContainer" class="chat-container">
+          <div id="aiSplashScreen" style="height: calc(100vh - 220px); display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.02);">
+              <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 18px;">Click below to analyze your numbers instantly.</p>
+              <button class="btn btn-dark" style="border-radius: 99px; padding: 18px 48px; font-size: 18px; box-shadow: 0 4px 15px rgba(15,23,42,0.2);" onclick="window.startAIAnalysis();">✨ Generate Strategy</button>
+          </div>
+
+          <div id="aiChatContainer" class="chat-container" style="display: none;">
              <div class="chat-history" id="chatHistory">
-                <div class="chat-msg msg-ai">Hi! Click <strong>Analyze Latest Data</strong> to run your numbers, or type a custom question below!</div>
+                <div class="chat-msg msg-ai">Hi! Ask me a specific question below!</div>
              </div>
              
              <div style="background: white; border-top: 1px solid var(--border);">
-               <div id="typingIndicator" class="ai-typing">AI is analyzing your business... ⏳</div>
+               <div id="typingIndicator" class="ai-typing">AI is analyzing your numbers in the cloud... (Takes ~5 seconds)</div>
                <div class="chat-input-row">
-                  <input type="text" id="aiChatInput" placeholder="Ask about raising prices, bundle ideas, or profit margins..." onkeypress="if(event.key === 'Enter' && window.sendChatMessage) window.sendChatMessage()" />
-                  <button id="chatSendBtn" onclick="if(window.sendChatMessage) window.sendChatMessage()">
+                  <input type="text" id="aiChatInput" placeholder="Ask about raising prices, bundle ideas, or profit margins..." onkeypress="if(event.key === 'Enter') window.sendChatMessage()" />
+                  <button id="chatSendBtn" onclick="window.sendChatMessage()">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
                   </button>
                </div>
@@ -207,7 +211,7 @@
         <div class="data-card" style="max-width: 700px; margin: 0 auto;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h2>Saved Cloud History</h2>
-            <button class="btn btn-secondary" onclick="if(window.fetchHistory) window.fetchHistory();">↻ Refresh</button>
+            <button class="btn btn-secondary" onclick="window.fetchHistory();">↻ Refresh</button>
           </div>
           <div id="historyList" style="min-height: 150px; background: #f8fafc; border: 1px dashed var(--border); border-radius: 12px; padding: 20px;">
             <p style="text-align: center; color: var(--text-muted);">Fetching history from database...</p>
@@ -234,91 +238,99 @@
           <div style="background: #eff6ff; padding: 20px; border-radius: 12px; border: 1px solid #bfdbfe; margin-bottom: 24px;">
             <h4 style="margin: 0 0 8px 0; color: #1e40af;">Subscription Plan</h4>
             <div id="settingsPlan" style="font-weight: 700; font-size: 16px; color: var(--text-muted); margin-bottom: 16px;">Free Plan</div>
-            <button id="upgradeBtn" class="btn btn-primary" onclick="if(window.pay) window.pay();">Upgrade to PRO (₹499)</button>
+            <button id="upgradeBtn" class="btn btn-primary" onclick="window.pay();">Upgrade to PRO (₹499)</button>
           </div>
-          <button class="btn btn-secondary" style="width: 100%; color: #dc2626;" onclick="if(window.handleLogout) window.handleLogout();">Log Out</button>
+          <button class="btn btn-secondary" style="width: 100%; color: #dc2626;" onclick="window.handleLogout();">Log Out</button>
         </div>
       </div>
 
     </main>
   </div>
 
-  <div id="pdf-export-container" style="position: absolute; left: -9999px; top: 0; width: 1100px; background: white; font-family: Arial, sans-serif; padding: 40px; box-sizing: border-box; color: #0f172a; visibility: hidden;">
-      <div style="margin-bottom: 40px; border-bottom: 2px solid #0f172a; padding-bottom: 10px;">
-          <h1 style="font-size: 40px; margin: 0; text-transform: uppercase;">Business Report</h1>
-          <h4 style="color: #64748b; font-size: 16px; margin-top: 5px;">EXECUTIVE SUMMARY</h4>
-      </div>
-      
-      <div style="display: flex; gap: 40px;">
-          <div style="flex: 1;">
-              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 10px 0; font-size: 18px;"><span>Total Revenue</span> <span id="pdf-rev" style="font-weight: bold;">0</span></div>
-              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 10px 0; font-size: 18px;"><span>Total Cost</span> <span id="pdf-cost" style="font-weight: bold;">0</span></div>
-              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 10px 0; font-size: 18px;"><span>Net Profit</span> <span id="pdf-profit" style="font-weight: bold; color: #0f172a;">0</span></div>
-              <div style="margin-top: 40px;">
-                  <h4 style="font-size: 16px; color: #475569; margin: 0 0 5px 0;">TOTAL UNITS SOLD</h4>
-                  <div id="pdf-units-sold" style="font-size: 48px; font-weight: bold;">0</div>
-              </div>
+  <div id="pdf-export-wrapper" style="position: fixed; top: 0; left: 0; z-index: -9999; opacity: 0.01; pointer-events: none;">
+      <div id="pdf-export-container" style="width: 1100px; background: white; font-family: Arial, sans-serif; padding: 40px; box-sizing: border-box; color: #0f172a;">
+          <div style="margin-bottom: 40px; border-bottom: 2px solid #0f172a; padding-bottom: 10px;">
+              <h1 style="font-size: 40px; margin: 0; text-transform: uppercase;">Business Report</h1>
+              <h4 style="color: #64748b; font-size: 16px; margin-top: 5px;">EXECUTIVE SUMMARY</h4>
           </div>
-          <div style="flex: 2;">
-              <img id="pdf-chart-image" style="width: 100%; max-height: 250px; object-fit: contain; margin-bottom: 20px;" src="" alt="Chart">
-              <div style="display: flex; justify-content: space-between; gap: 20px;">
-                  <div style="flex: 1;">
-                      <h4 style="color: #64748b; font-size: 14px; margin: 0 0 5px 0;">GROSS MARGIN</h4>
-                      <div id="pdf-margin" style="font-size: 54px; font-weight: bold;">0%</div>
-                      <h4 style="color: #64748b; font-size: 14px; margin: 20px 0 5px 0;">TOP PRODUCT</h4>
-                      <div id="pdf-top-prod" style="font-size: 24px; font-weight: bold;">-</div>
-                  </div>
-                  <div style="flex: 2;">
-                      <h4 style="font-size: 16px; color: #475569; margin-bottom: 10px;">KEY INSIGHTS</h4>
-                      <ul id="pdf-insight-list" style="list-style: none; padding: 0; margin: 0; font-size: 14px; line-height: 1.5;">
-                          <li style="margin-bottom: 8px;">Insight 1</li>
-                      </ul>
-                  </div>
-              </div>
-          </div>
+          
+          <table style="width: 100%; border-collapse: collapse;">
+              <tr>
+                  <td style="width: 35%; vertical-align: top; padding-right: 40px;">
+                      <div style="border-bottom: 1px solid #e2e8f0; padding: 10px 0; font-size: 18px;">Total Revenue: <span id="pdf-rev" style="float: right; font-weight: bold;">0</span></div>
+                      <div style="border-bottom: 1px solid #e2e8f0; padding: 10px 0; font-size: 18px;">Total Cost: <span id="pdf-cost" style="float: right; font-weight: bold;">0</span></div>
+                      <div style="border-bottom: 1px solid #e2e8f0; padding: 10px 0; font-size: 18px;">Net Profit: <span id="pdf-profit" style="float: right; font-weight: bold; color: #0f172a;">0</span></div>
+                      <div style="margin-top: 40px;">
+                          <h4 style="font-size: 16px; color: #475569; margin: 0 0 5px 0;">TOTAL UNITS SOLD</h4>
+                          <div id="pdf-units-sold" style="font-size: 48px; font-weight: bold;">0</div>
+                      </div>
+                  </td>
+                  <td style="width: 65%; vertical-align: top;">
+                      <img id="pdf-chart-image" style="width: 100%; max-height: 250px; object-fit: contain; margin-bottom: 20px;" src="" alt="Chart">
+                      <table style="width: 100%;">
+                          <tr>
+                              <td style="width: 40%; vertical-align: top;">
+                                  <h4 style="color: #64748b; font-size: 14px; margin: 0 0 5px 0;">GROSS MARGIN</h4>
+                                  <div id="pdf-margin" style="font-size: 54px; font-weight: bold;">0%</div>
+                                  <h4 style="color: #64748b; font-size: 14px; margin: 20px 0 5px 0;">TOP PRODUCT</h4>
+                                  <div id="pdf-top-prod" style="font-size: 24px; font-weight: bold;">-</div>
+                              </td>
+                              <td style="width: 60%; vertical-align: top;">
+                                  <h4 style="font-size: 16px; color: #475569; margin-bottom: 10px;">KEY INSIGHTS</h4>
+                                  <ul id="pdf-insight-list" style="list-style: none; padding: 0; margin: 0; font-size: 14px; line-height: 1.5;">
+                                      <li style="margin-bottom: 8px;">Insight 1</li>
+                                  </ul>
+                              </td>
+                          </tr>
+                      </table>
+                  </td>
+              </tr>
+          </table>
       </div>
   </div>
 
-  <script src="../assets/js/drawer.js?v=3.0"></script>
+  <script src="../assets/js/drawer.js?v=4.0"></script>
   
   <script>
+    // System Config
+    const workerURL = "https://vizbix-api.vizbixhq.workers.dev";
+    const PRICE = 49900; 
+    const KEY = "rzp_live_SCvIqUMzTNsXgq"; 
+
     window.currentMode = 'product'; 
     window.currentData = []; 
     window.currentView = 'data';
     window.currentCurrency = 'INR';
     window.currencySymbol = '₹';
+    window.chatConversation = [];
     let myChart = null; 
 
-    // THE FIX: Aggressive scraping so AI never says "No Data"
+    // --- 1. DATA SCRAPER ---
     function getFreshData() {
         let data = [];
         document.querySelectorAll('#items .data-row').forEach(row => {
-            const name = row.querySelector('.input-name').value.trim();
-            const sell = parseFloat(row.querySelector('.input-sell').value) || 0;
-            const cost = parseFloat(row.querySelector('.input-cost').value) || 0;
-            const qty = parseFloat(row.querySelector('.input-qty').value) || 0;
+            const nameEl = row.querySelector('.input-name');
+            const sellEl = row.querySelector('.input-sell');
+            const costEl = row.querySelector('.input-cost');
+            const qtyEl = row.querySelector('.input-qty');
+            if(!nameEl || !sellEl || !costEl || !qtyEl) return;
+
+            const name = nameEl.value.trim();
+            const sell = parseFloat(sellEl.value) || 0;
+            const cost = parseFloat(costEl.value) || 0;
+            const qty = parseFloat(qtyEl.value) || 0;
             if(name !== '' || sell > 0 || cost > 0 || qty > 0) {
                 data.push({ name, sell, cost, qty });
             }
         });
+        window.currentData = data;
         return data;
     }
 
+    // --- 2. UI NAVIGATION ---
     function toggleAppDrawer() {
       document.getElementById("appSidebar").classList.toggle("mobile-open");
       document.getElementById("mobileAppOverlay").classList.toggle("active");
-    }
-
-    function updateCurrency() {
-      const sel = document.getElementById('currencySelect');
-      window.currentCurrency = sel.value;
-      window.currencySymbol = sel.options[sel.selectedIndex].text.split(' ')[0];
-      document.getElementById('hdr-sell').innerText = `Sell Price (${window.currencySymbol})`;
-      document.getElementById('hdr-cost').innerText = `Cost Price (${window.currencySymbol})`;
-    }
-
-    function formatCurrency(num) {
-      return new Intl.NumberFormat('en-US', { style: 'currency', currency: window.currentCurrency, maximumFractionDigits: 0 }).format(num);
     }
 
     const proViews = ['dashboard', 'ai', 'report', 'history'];
@@ -350,6 +362,19 @@
       }
     }
 
+    // --- 3. CURRENCY & MATH ---
+    function updateCurrency() {
+      const sel = document.getElementById('currencySelect');
+      window.currentCurrency = sel.value;
+      window.currencySymbol = sel.options[sel.selectedIndex].text.split(' ')[0];
+      document.getElementById('hdr-sell').innerText = `Sell Price (${window.currencySymbol})`;
+      document.getElementById('hdr-cost').innerText = `Cost Price (${window.currencySymbol})`;
+    }
+
+    function formatCurrency(num) {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: window.currentCurrency, maximumFractionDigits: 0 }).format(num);
+    }
+
     function addNewRow(name='', sell='', cost='', qty='') {
       const container = document.getElementById('items');
       const row = document.createElement('div');
@@ -371,7 +396,6 @@
 
       const freshData = getFreshData();
       if(freshData.length === 0) return alert("Please enter data first.");
-      window.currentData = freshData;
 
       let totalRevenue = 0, totalCost = 0, totalProfit = 0, totalItems = 0;
       let chartLabels = [], chartRevData = [], chartProfitData = [];
@@ -414,7 +438,6 @@
       else if(healthScore >= 50) { hc.style.background = '#fef3c7'; hc.style.color = '#d97706'; }
       else { hc.style.background = '#fee2e2'; hc.style.color = '#dc2626'; }
 
-      // FORCE EXACTLY 3 INSIGHTS
       let insightsHTML = '';
       let pdfInsights = '';
       
@@ -463,7 +486,7 @@
       switchView('dashboard', document.getElementById('nav-dashboard'));
     }
 
-    // THE FIX: PDF EXPORT (Flawless rendering by bringing it into view behind other elements)
+    // --- 4. PERFECT PDF EXPORT ---
     function exportExecutivePDF() {
       const chartCanvas = document.getElementById('profitChart');
       if(chartCanvas) {
@@ -472,25 +495,195 @@
 
       const element = document.getElementById('pdf-export-container');
       
-      // Reveal the element but keep it hidden behind the dashboard
-      element.style.visibility = 'visible';
-
       const opt = {
         margin:       0.5,
         filename:     'Vizbix_Executive_Summary.pdf',
         image:        { type: 'jpeg', quality: 1 },
-        html2canvas:  { scale: 2, useCORS: true, windowWidth: 1100 },
+        html2canvas:  { scale: 2, useCORS: true, windowWidth: 1100, letterRendering: true },
         jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
       };
       
-      // Wait 300ms for browser to paint the HTML, then take picture and hide it again
-      setTimeout(() => {
-          html2pdf().set(opt).from(element).save().then(() => {
-              element.style.visibility = 'hidden';
-          });
-      }, 300);
+      html2pdf().set(opt).from(element).save();
     }
 
+    // --- 5. AI CHAT ENGINE ---
+    window.startAIAnalysis = async function() {
+        if(!window.isProUser || !window.userEmail) return alert("Please Login (Pro Feature)");
+        
+        const freshData = getFreshData();
+        if(freshData.length === 0) return alert("Please enter data in the Data Input tab first!");
+
+        document.getElementById("aiSplashScreen").style.display = "none";
+        document.getElementById("aiChatContainer").style.display = "flex";
+
+        const promptMsg = `Analyze my catalog. Identify my hero product, spot any profit leaks, and give me a clear 3-step action plan to increase my net margin. Use ${window.currencySymbol}.`;
+        
+        document.getElementById("chatHistory").innerHTML = `<div class="chat-msg msg-ai" id="loadingAi">Analyzing your latest numbers in the cloud... This takes about 5 seconds ⏳</div>`;
+        window.chatConversation = []; 
+        
+        await window.executeAIRequest(promptMsg, freshData);
+    };
+
+    window.sendChatMessage = async function() {
+        if(!window.isProUser) return alert("Pro feature required.");
+        
+        const inputField = document.getElementById("aiChatInput");
+        if(!inputField) return;
+
+        const msg = inputField.value.trim();
+        if(!msg) return;
+
+        document.getElementById("aiSplashScreen").style.display = "none";
+        document.getElementById("aiChatContainer").style.display = "flex";
+
+        window.appendChatBubble(msg, 'user');
+        inputField.value = '';
+        
+        const freshData = getFreshData();
+        await window.executeAIRequest(msg, freshData);
+    };
+
+    window.executeAIRequest = async function(userMessage, freshData) {
+        const typingIndicator = document.getElementById("typingIndicator");
+        const sendBtn = document.getElementById("chatSendBtn");
+        
+        if(typingIndicator) typingIndicator.style.display = "block";
+        if(sendBtn) sendBtn.disabled = true;
+
+        let aiPayload = { 
+            email: window.userEmail, 
+            currency: window.currentCurrency || 'INR',
+            symbol: window.currencySymbol || '₹',
+            message: userMessage,
+            history: window.chatConversation,
+            products: freshData 
+        }; 
+        
+        window.chatConversation.push({ role: "user", content: userMessage });
+
+        try {
+            const r = await fetch(workerURL + "/ai-analyze", { 
+                method: "POST", 
+                headers: { "Content-Type": "application/json" }, 
+                body: JSON.stringify(aiPayload) 
+            });
+            const d = await r.json(); 
+            
+            if(typingIndicator) typingIndicator.style.display = "none";
+            if(sendBtn) sendBtn.disabled = false;
+            
+            const loadingElement = document.getElementById("loadingAi");
+            if(loadingElement) loadingElement.remove();
+
+            if(d.ok) { 
+                const formattedResponse = d.response.replace(/\n/g, "<br>").replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+                window.appendChatBubble(formattedResponse, 'ai');
+                window.chatConversation.push({ role: "assistant", content: d.response });
+            } else { 
+                window.appendChatBubble("⚠️ " + (d.error || "AI Error"), 'ai'); 
+            }
+        } catch(e) { 
+            if(typingIndicator) typingIndicator.style.display = "none"; 
+            if(sendBtn) sendBtn.disabled = false; 
+            window.appendChatBubble("⚠️ Connection error. Please try again.", 'ai'); 
+        }
+    };
+
+    window.appendChatBubble = function(text, sender) {
+        const historyBox = document.getElementById("chatHistory");
+        if(!historyBox) return;
+        const div = document.createElement("div");
+        div.className = `chat-msg msg-${sender}`;
+        div.innerHTML = text;
+        historyBox.appendChild(div);
+        historyBox.scrollTop = historyBox.scrollHeight;
+    };
+
+    // --- 6. AUTH & CLOUD ---
+    window.verify = async function(email){
+        const targetEmail = email || window.userEmail;
+        if(!targetEmail) return;
+        try {
+            const r = await fetch(workerURL+"/check?email="+targetEmail); 
+            const d = await r.json();
+            if(d.valid) {
+                window.isProUser = true; 
+                if(d.expiry) { 
+                    const diff = d.expiry - Date.now();
+                    if(diff > 0) window.proDaysLeft = Math.ceil(diff / (1000 * 60 * 60 * 24)) + " Days Left";
+                    else { window.isProUser = false; window.proDaysLeft = "Expired"; }
+                }
+            } else { window.isProUser = false; }
+        } catch(e) {}
+    };
+
+    window.pay = function(){
+        if(!window.userEmail) return alert("Please log in.");
+        const options = {
+            key: KEY, amount: PRICE, currency: "INR", name: "Vizbix Pro", description: "30 Days Access",
+            prefill: { email: window.userEmail }, theme: { color: "#0F172A" },
+            handler: async function(response){ 
+                try {
+                    const req = await fetch(workerURL + "/verify-payment", { 
+                        method: "POST", headers: { "Content-Type": "application/json" }, 
+                        body: JSON.stringify({ payment_id: response.razorpay_payment_id, email: window.userEmail }) 
+                    });
+                    const d = await req.json();
+                    if (d.ok) { alert("Welcome to Pro."); window.verify(window.userEmail); } 
+                    else { alert("Verification Failed."); }
+                } catch (e) { alert("Error."); }
+            }
+        };
+        new Razorpay(options).open();
+    };
+
+    window.saveToCloud = async function() {
+        if(!window.isProUser) return alert("Pro Plan required."); 
+        const btn = document.getElementById("saveCloudBtn");
+        const freshData = getFreshData();
+        if(freshData.length === 0) return alert("Nothing to save!");
+        if(btn) btn.innerHTML = "⏳";
+        try { 
+            await fetch(workerURL + "/save", { 
+                method: "POST", 
+                headers: { "Content-Type": "application/json" }, 
+                body: JSON.stringify({ email: window.userEmail, data: freshData, mode: 'product', date: new Date().toISOString() }) 
+            }); 
+            if(btn) { btn.innerHTML = "✅ Saved"; setTimeout(() => btn.innerHTML = "💾 Save to Cloud", 2000); }
+        } catch(e) { if(btn) btn.innerHTML = "💾 Save to Cloud"; }
+    };
+
+    window.fetchHistory = async function() {
+        const list = document.getElementById("historyList"); 
+        if(!list) return;
+        if(!window.isProUser) { list.innerHTML = "<p style='text-align:center; color:#64748B;'>Unlock Pro to view history.</p>"; return; }
+        list.innerHTML = "Loading...";
+        try {
+            const r = await fetch(workerURL + "/history?email=" + window.userEmail); 
+            const d = await r.json();
+            if(d.length === 0) { list.innerHTML = "<p style='text-align:center'>No history.</p>"; return; }
+            list.innerHTML = "";
+            d.forEach(item => {
+                const dateStr = new Date(item.date).toLocaleDateString(); 
+                const div = document.createElement("div"); 
+                div.className = "history-item";
+                div.innerHTML = `<div><div style="font-weight:600; font-size:14px; color: var(--dark);">${dateStr}</div><div style="font-size:12px; color: var(--text-muted);">${item.data.length} Rows</div></div><button class="btn btn-secondary" style="font-size:12px; padding:8px 12px;">Load Data</button>`;
+                div.onclick = () => window.loadHistoryItem(item.data);
+                list.appendChild(div);
+            });
+        } catch(e) { list.innerHTML = "Error fetching history."; }
+    };
+
+    window.loadHistoryItem = function(data) {
+        const container = document.getElementById("items"); 
+        if(!container) return;
+        container.innerHTML = "";
+        data.forEach(row => { addNewRow(row.name||row.n||'', row.sell||row.v1||'', row.cost||row.v2||'', row.qty||row.v3||''); });
+        alert("History loaded! Generating Dashboard...");
+        processDataAndShowReport();
+    };
+
+    // --- 7. AUTH POLLER ---
     let hasVerified = false;
     setInterval(() => {
       const globalLoginBtn = document.getElementById('headerLoginBtn');
@@ -498,7 +691,7 @@
         if(globalLoginBtn) globalLoginBtn.style.display = 'none';
         document.getElementById('sidebarEmail').innerText = window.userEmail;
         document.getElementById('settingsEmail').innerText = window.userEmail;
-        if(!hasVerified && typeof window.verify === 'function') { hasVerified = true; window.verify(window.userEmail); }
+        if(!hasVerified) { hasVerified = true; window.verify(window.userEmail); }
       }
       
       if(window.isProUser) {
@@ -521,9 +714,7 @@
     }, 1000);
   </script>
 
-  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
-  <script type="module" src="../assets/js/auth.js?v=3.0"></script>
-  <script src="../assets/js/ai.js?v=3.0"></script>
+  <script type="module" src="../assets/js/auth.js?v=4.0"></script>
 
 </body>
 </html>
