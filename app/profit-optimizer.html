@@ -261,13 +261,17 @@
 
     function switchView(viewId, element, bypassPaywall = false) {
       window.currentView = viewId;
-      if(proViews.includes(viewId) && !window.isProUser && !bypassPaywall) {
+      
+      // FIX: Only show lock screen if we DEFINITELY know they are free (isProUser === false). 
+      // If it's undefined, it means Cloudflare is still checking, so don't lock them out yet!
+      if(proViews.includes(viewId) && window.isProUser === false && !bypassPaywall) {
         document.getElementById('proLockOverlay').classList.remove('pro-lock-hidden');
         document.querySelectorAll('.app-view').forEach(v => v.style.filter = "blur(6px)");
       } else {
         document.getElementById('proLockOverlay').classList.add('pro-lock-hidden');
         document.querySelectorAll('.app-view').forEach(v => v.style.filter = "none");
       }
+      
       document.querySelectorAll('.app-view').forEach(view => view.classList.remove('active'));
       document.getElementById('view-' + viewId).classList.add('active');
       if (element) {
@@ -293,7 +297,7 @@
     }
 
     function processDataAndShowReport() {
-      if(!window.isProUser) { switchView('dashboard', document.getElementById('nav-dashboard')); return; }
+      if(window.isProUser === false) { switchView('dashboard', document.getElementById('nav-dashboard')); return; }
 
       const rows = document.querySelectorAll('#items .data-row');
       let totalRevenue = 0, totalCost = 0, totalProfit = 0, totalItems = 0;
@@ -341,7 +345,7 @@
       document.getElementById('dash-top-product').innerText = topProduct.name;
       document.getElementById('reportTableBody').innerHTML = reportHTML;
 
-      // Health Score Badge Updates
+      // Update Health Score Badge
       const hc = document.getElementById('health-circle');
       hc.innerText = healthScore + '%';
       if(healthScore >= 80) { hc.style.background = '#d1fae5'; hc.style.color = '#059669'; }
@@ -350,20 +354,14 @@
 
       // 3 Guaranteed Pre-Calculated Insights
       let insightsHTML = '';
-      
-      // 1. Hero Product Insight
       if (topProduct.profit > 0) {
         insightsHTML += `<p style="margin: 0 0 12px 0;"><strong>⭐ Hero Product:</strong> ${topProduct.name} is driving the most profit (${formatCurrency(topProduct.profit)}). Consider a 5-10% price test here to maximize net revenue.</p>`;
       }
-      
-      // 2. Leaks Insight
       if (profitLeaks.length > 0) {
         insightsHTML += `<p style="margin: 0 0 12px 0; color: #dc2626;"><strong>⚠️ Profit Leaks:</strong> ${profitLeaks.join(', ')} are currently losing money. You must either raise prices, lower cost of goods, or discontinue these items.</p>`;
       } else {
         insightsHTML += `<p style="margin: 0 0 12px 0; color: #059669;"><strong>✅ Pricing Safe:</strong> No negative margin products detected. Your unit economics are currently stable.</p>`;
       }
-
-      // 3. Margin Insight
       if (overallMargin < 20) {
         insightsHTML += `<p style="margin: 0;"><strong>📉 Margin Warning:</strong> An average margin of ${overallMargin.toFixed(1)}% is dangerous. After marketing and operational costs, your net cash flow might be negative.</p>`;
       } else if (overallMargin < 40) {
@@ -397,12 +395,18 @@
       switchView('dashboard', document.getElementById('nav-dashboard'));
     }
 
-    // PDF Generator (Flawless export now that it's rendered correctly in CSS)
+    // FIX: PDF Generation Engine (Fixes blank PDF output)
     function exportExecutivePDF() {
       const chartCanvas = document.getElementById('profitChart');
       document.getElementById('pdf-chart-image').src = chartCanvas.toDataURL('image/png');
 
       const element = document.getElementById('pdf-export-container');
+      
+      // Temporarily make the container visible so html2canvas can "see" it
+      element.style.opacity = '1';
+      element.style.position = 'relative';
+      element.style.zIndex = '9999';
+
       const opt = {
         margin:       0,
         filename:     'Vizbix_Executive_Summary.pdf',
@@ -411,7 +415,12 @@
         jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
       };
       
-      html2pdf().set(opt).from(element).save();
+      html2pdf().set(opt).from(element).save().then(() => {
+          // Hide it again immediately after capturing
+          element.style.opacity = '0';
+          element.style.position = 'absolute';
+          element.style.zIndex = '-9999';
+      });
     }
 
     let hasVerified = false;
@@ -423,6 +432,7 @@
         document.getElementById('settingsEmail').innerText = window.userEmail;
         if(!hasVerified && typeof window.verify === 'function') { hasVerified = true; window.verify(window.userEmail); }
       }
+      
       if(window.isProUser) {
         const planText = `Pro Active (${window.proDaysLeft || 'Active'})`;
         document.getElementById('sidebarPlan').innerText = planText;
@@ -430,7 +440,12 @@
         document.getElementById('settingsPlan').style.color = '#059669'; 
         const upgradeBtn = document.getElementById('upgradeBtn');
         if(upgradeBtn) upgradeBtn.style.display = 'none';
-      } else {
+
+        // FIX: Ensure UI unlocks if it accidentally locked during the 1-second load
+        document.getElementById('proLockOverlay').classList.add('pro-lock-hidden');
+        document.querySelectorAll('.app-view').forEach(v => v.style.filter = "none");
+
+      } else if (window.isProUser === false) {
         document.getElementById('sidebarPlan').innerText = "Free User";
         document.getElementById('settingsPlan').innerText = "Free Plan (Limited)";
         const upgradeBtn = document.getElementById('upgradeBtn');
@@ -445,3 +460,4 @@
 
 </body>
 </html>
+
