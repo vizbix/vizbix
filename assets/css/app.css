@@ -52,6 +52,26 @@
 .metric-card.highlight h4 { color: #94a3b8; }
 .metric-card.highlight .value { color: white; }
 
+/* --- PROFIT LAB (SIMULATOR) UI --- */
+.sim-controls { background: white; border: 1px solid var(--border); border-radius: 16px; padding: 24px; margin-bottom: 24px; }
+.slider-group { margin-bottom: 24px; }
+.slider-label-row { display: flex; justify-content: space-between; margin-bottom: 10px; font-size: 14px; font-weight: 600; color: var(--dark); }
+.slider-val { color: var(--primary); font-weight: 800; }
+
+/* Custom Range Slider */
+input[type=range] { width: 100%; -webkit-appearance: none; background: transparent; }
+input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; height: 20px; width: 20px; border-radius: 50%; background: var(--primary); cursor: pointer; margin-top: -8px; box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3); }
+input[type=range]::-webkit-slider-runnable-track { width: 100%; height: 4px; cursor: pointer; background: #e2e8f0; border-radius: 2px; }
+
+.sim-results { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.sim-card { background: #f8fafc; border: 1px solid var(--border); border-radius: 16px; padding: 24px; text-align: center; transition: all 0.3s ease; }
+.sim-card.active { background: #eff6ff; border-color: #bfdbfe; transform: scale(1.02); box-shadow: 0 10px 30px rgba(37, 99, 235, 0.1); }
+.sim-card h4 { margin: 0 0 10px 0; font-size: 13px; color: var(--text-muted); text-transform: uppercase; }
+.sim-card .big-num { font-size: 32px; font-weight: 900; color: var(--dark); }
+.sim-delta { font-size: 14px; font-weight: 700; margin-top: 8px; display: inline-flex; align-items: center; gap: 4px; padding: 4px 8px; border-radius: 6px; }
+.delta-pos { color: #059669; background: #d1fae5; }
+.delta-neg { color: #dc2626; background: #fee2e2; }
+
 /* --- Report Table --- */
 .report-table { width: 100%; border-collapse: collapse; background: white; border-radius: 12px; overflow: hidden; border: 1px solid var(--border); }
 .report-table th, .report-table td { padding: 16px; text-align: left; border-bottom: 1px solid var(--border); font-size: 14px; }
@@ -67,7 +87,6 @@
 .chat-msg { max-width: 75%; padding: 16px 20px; border-radius: 16px; font-size: 15px; line-height: 1.6; position: relative; }
 .msg-ai { align-self: flex-start; background: white; border: 1px solid var(--border); color: var(--text-main); border-bottom-left-radius: 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.03); }
 .msg-user { align-self: flex-end; background: var(--dark); color: white; border-bottom-right-radius: 4px; }
-.msg-ai strong { color: var(--dark); }
 .chat-input-row { display: flex; padding: 20px; background: white; border-top: 1px solid var(--border); gap: 12px; align-items: center; }
 .chat-input-row input { flex: 1; padding: 16px 24px; border: 1px solid var(--border); border-radius: 99px; outline: none; font-size: 15px; background: #f8fafc; transition: all 0.2s; }
 .chat-input-row input:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1); }
@@ -79,83 +98,31 @@
 .pro-lock-card { background: white; border: 1px solid var(--border); border-radius: 20px; padding: 40px; text-align: center; max-width: 450px; box-shadow: 0 20px 40px rgba(15, 23, 42, 0.1); }
 .pro-lock-card h2 { font-size: 24px; margin-bottom: 12px; color: var(--dark); }
 
-
-/* =========================================
-   PERFECT CHATGPT-STYLE MOBILE UI
-   ========================================= */
+/* --- MOBILE UI --- */
 .mobile-app-bar { display: none; }
 .mobile-overlay { display: none; }
 
 @media (max-width: 850px) {
-  .app-wrapper { flex-direction: column; height: auto; min-height: calc(100vh - 75px); overflow: hidden; }
-  
-  /* 1. New Sticky Hamburger Header */
-  .mobile-app-bar {
-    display: flex;
-    align-items: center;
-    background: white;
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    z-index: 30;
-  }
-  .mobile-app-bar button {
-    background: transparent;
-    border: none;
-    padding: 0;
-    margin-right: 16px;
-    cursor: pointer;
-    color: var(--dark);
-    display: flex;
-    align-items: center;
-  }
+  .app-wrapper { flex-direction: column; height: auto; min-height: calc(100vh - 75px); overflow: visible; }
+  .mobile-app-bar { display: flex; align-items: center; background: white; padding: 16px 20px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 30; }
+  .mobile-app-bar button { background: transparent; border: none; padding: 0; margin-right: 16px; cursor: pointer; color: var(--dark); display: flex; align-items: center; }
   .mobile-app-bar .page-title { font-size: 16px; font-weight: 700; color: var(--dark); }
-
-  /* 2. Dimming Background Overlay */
-  .mobile-overlay {
-    display: block;
-    position: fixed;
-    inset: 0;
-    background: rgba(15, 23, 42, 0.6);
-    backdrop-filter: blur(3px);
-    z-index: 99;
-    opacity: 0;
-    pointer-events: none;
-    transition: opacity 0.3s ease;
-  }
+  .mobile-overlay { display: block; position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(3px); z-index: 99; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
   .mobile-overlay.active { opacity: 1; pointer-events: auto; }
-
-  /* 3. The Sliding Sidebar Drawer */
-  .app-sidebar {
-    position: fixed;
-    top: 0;
-    left: -100%;
-    width: 280px !important;
-    height: 100vh;
-    z-index: 100;
-    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    border-right: 1px solid #1e293b;
-    flex-direction: column !important;
-  }
+  .app-sidebar { position: fixed; top: 0; left: -100%; width: 280px !important; height: 100vh; z-index: 100; transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1); border-right: 1px solid #1e293b; flex-direction: column !important; }
   .app-sidebar.mobile-open { left: 0; }
-
   .sidebar-toggle { display: none !important; }
   .sidebar-nav { flex-direction: column !important; width: 100% !important; padding: 20px 12px !important; }
   .nav-item { width: 100% !important; padding: 14px 16px !important; }
   .app-sidebar .nav-item-text { display: inline-block !important; font-size: 15px !important; }
   .sidebar-profile { display: block !important; margin-top: auto; }
-
-  /* Adjust Main Content to accommodate new header */
   .app-main { padding: 0; }
   .app-view { padding: 16px; }
-  .dash-grid { grid-template-columns: 1fr !important; height: auto; }
+  .dash-grid, .sim-results { grid-template-columns: 1fr !important; height: auto; }
   .action-buttons-wrap { flex-direction: column; }
   .data-table-headers { display: none; }
   .data-row { grid-template-columns: 1fr 1fr; background: #f8fafc; padding: 16px; border-radius: 12px; gap: 12px; margin-bottom: 16px; }
   .data-row input:nth-child(1) { grid-column: span 2; font-weight: 600; }
   .delete-btn { width: 100%; grid-column: span 2; background: #e2e8f0; margin-top: 8px; padding: 10px; }
-  
   .chat-container { height: calc(100vh - 220px); border-radius: 12px; }
-  .chat-msg { max-width: 90%; font-size: 14px; }
 }
