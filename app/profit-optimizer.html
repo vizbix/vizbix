@@ -547,9 +547,7 @@
 
         let currentProfit = 0;
         let newProfit = 0;
-        let baseRevenue = 0;
 
-        // 3. Run the Math
         if(!window.currentData) return;
         
         window.currentData.forEach(item => {
@@ -558,7 +556,6 @@
             const baseProfit = baseRev - baseCost;
             
             currentProfit += baseProfit;
-            baseRevenue += baseRev;
 
             const newSell = item.sell * pMod;
             const newCost = item.cost * cMod;
@@ -567,6 +564,88 @@
             
             newProfit += simProfit;
         });
+
+        // 3. Update UI Numbers
+        document.getElementById("sim-current").innerText = formatCurrency(currentProfit);
+        document.getElementById("sim-projected").innerText = formatCurrency(newProfit);
+        
+        const deltaEl = document.getElementById("sim-delta");
+        const insightEl = document.getElementById("sim-insight");
+        const diff = newProfit - currentProfit;
+        const profitGrowth = currentProfit > 0 ? ((diff / currentProfit) * 100).toFixed(1) : 0;
+
+        // 4. THE "12-SCENARIO" LOGIC ENGINE 🧠
+        insightEl.style.padding = "16px";
+        insightEl.style.borderRadius = "8px";
+        insightEl.style.lineHeight = "1.6";
+
+        if(diff >= 0) {
+            // --- POSITIVE OUTCOMES (GREEN) ---
+            deltaEl.innerText = "▲ " + formatCurrency(diff) + " (" + profitGrowth + "%)";
+            deltaEl.className = "sim-delta delta-pos";
+            insightEl.style.color = "#064e3b";
+            insightEl.style.background = "#d1fae5";
+            insightEl.style.border = "1px solid #34d399";
+
+            // 1. The Holy Grail (Price Up, Volume Up, Cost Down)
+            if (pVal > 0 && vVal > 0 && cVal < 0) {
+                insightEl.innerHTML = `<strong>🦄 The Unicorn Strategy:</strong> You pulled all three levers perfectly. By raising value, scaling volume, and cutting waste simultaneously, you have maximized total efficiency.`;
+            }
+            // 2. The Luxury Pivot (Price Up, Volume Down)
+            else if (pVal > 0 && vVal < 0) {
+                insightEl.innerHTML = `<strong>💎 Luxury Pivot:</strong> You are selling fewer units but making more money. You successfully repositioned your brand as "Premium" and fired your low-value customers.`;
+            }
+            // 3. The Mass Market Win (Price Down, Volume Way Up)
+            else if (pVal < 0 && vVal > 0) {
+                insightEl.innerHTML = `<strong>🔥 Mass Market Dominance:</strong> Your lower price point triggered huge demand. You are winning on volume and undercutting competitors to steal market share.`;
+            }
+            // 4. Pure Efficiency (Costs Down, Others Flat)
+            else if (cVal < 0 && pVal === 0 && vVal === 0) {
+                insightEl.innerHTML = `<strong>✂️ Lean Operations:</strong> Every rupee saved in costs flows 100% to the bottom line. This is the safest way to boost cash flow without risking customer churn.`;
+            }
+            // 5. Pricing Power (Price Up, Volume Flat/Up)
+            else if (pVal > 0 && vVal >= 0) {
+                insightEl.innerHTML = `<strong>📈 Pricing Power:</strong> Your brand is strong enough that customers accepted the price hike without leaving. This significantly boosts your Lifetime Value (LTV).`;
+            }
+            // 6. Growth Mode (Volume Up, Costs Up)
+            else if (vVal > 0 && cVal > 0) {
+                insightEl.innerHTML = `<strong>🚀 Aggressive Scale:</strong> You are spending more to grow, but the volume increase is paying off. Ensure your supply chain can handle the extra load.`;
+            }
+            // 7. General Win
+            else {
+                insightEl.innerHTML = `<strong>✅ Strategic Win:</strong> This configuration yields an extra <strong>${formatCurrency(diff)}</strong> in pure profit. A solid move for business health.`;
+            }
+
+        } else {
+            // --- NEGATIVE OUTCOMES (RED) ---
+            deltaEl.innerText = "▼ " + formatCurrency(Math.abs(diff));
+            deltaEl.className = "sim-delta delta-neg";
+            insightEl.style.color = "#7f1d1d";
+            insightEl.style.background = "#fecaca";
+            insightEl.style.border = "1px solid #f87171";
+
+            // 8. The Discount Trap (Price Down, Volume Up... but loss)
+            if (pVal < 0 && vVal > 0) {
+                insightEl.innerHTML = `<strong>⚠️ The Discount Trap:</strong> You are working harder for less money. The increase in volume (+${vVal}%) was not enough to cover the margin lost by lowering prices.`;
+            }
+            // 9. Price Shock (Price Up, Volume Crashed)
+            else if (pVal > 0 && vVal < 0) {
+                insightEl.innerHTML = `<strong>📉 Price Shock:</strong> The market rejected your price increase. You lost too many customers (-${Math.abs(vVal)}%) relative to the extra margin you gained.`;
+            }
+            // 10. Growing Broke (Volume Up, Costs Up... but loss)
+            else if (vVal > 0 && cVal > 0) {
+                insightEl.innerHTML = `<strong>💸 Growing Broke:</strong> You are scaling, but your costs are rising faster than your revenue. This is a dangerous "Unit Economics" failure. Stop scaling and fix margins first.`;
+            }
+            // 11. Brand Erosion (Price Down, Volume Down)
+            else if (pVal < 0 && vVal <= 0) {
+                insightEl.innerHTML = `<strong>🥀 Brand Erosion:</strong> Lowering prices didn't even stimulate demand. Your product may have lost its desirability. Re-evaluate your market fit immediately.`;
+            }
+            // 12. General Loss
+            else {
+                insightEl.innerHTML = `<strong>🛑 Profit Warning:</strong> This strategy destroys <strong>${formatCurrency(Math.abs(diff))}</strong> in value. Revert changes immediately.`;
+            }
+        }
+    }
 
         // 4. Update UI Numbers
         document.getElementById("sim-current").innerText = formatCurrency(currentProfit);
@@ -867,4 +946,5 @@
 
 </body>
 </html>
+
 
