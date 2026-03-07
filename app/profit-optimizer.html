@@ -7,11 +7,19 @@
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="../assets/css/main.css?v=11.0">
-  <link rel="stylesheet" href="../assets/css/app.css?v=11.0">
+  <link rel="stylesheet" href="../assets/css/main.css?v=8.0">
+  <link rel="stylesheet" href="../assets/css/app.css?v=8.0">
   
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+  <style>
+    .app-view { display: none; transition: filter 0.3s ease; }
+    .app-view.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    .pro-lock-hidden { display: none !important; }
+    .ai-typing { font-style: italic; color: #2563eb; font-size: 13px; margin: 10px 20px; display: none; }
+  </style>
 </head>
 <body>
 
@@ -23,27 +31,48 @@
       <div class="pro-lock-card">
         <h2>🔒 Pro Feature</h2>
         <p>Unlock Expense Tracking, Profit Lab, AI Strategy, and Cloud History.</p>
-        <button class="btn btn-primary btn-large" style="width: 100%; padding: 12px; background: #2563eb; color: white; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; margin-top: 16px;" onclick="window.pay()">Upgrade to Pro (₹499)</button>
+        <button class="btn btn-primary btn-large" style="width: 100%;" onclick="switchView('settings', document.querySelectorAll('.nav-item')[7])">Upgrade to Pro (₹499)</button>
       </div>
     </div>
     
     <div class="mobile-overlay" id="mobileAppOverlay" onclick="toggleAppDrawer()"></div>
 
     <aside class="app-sidebar" id="appSidebar">
-      <div style="padding: 24px; font-weight: 900; font-size: 20px; letter-spacing: -1px;">VIZBIX <span style="color: #4ade80;">PRO</span></div>
       <nav class="sidebar-nav">
-        <a class="nav-item active" onclick="switchView('data', this)">📦 Data Input</a>
-        <a class="nav-item" onclick="switchView('dashboard', this)">📊 Dashboard</a>
-        <a class="nav-item" onclick="switchView('expenses', this)">💸 Expenses</a>
-        <a class="nav-item" onclick="switchView('simulator', this); initSimulator();">🧪 Profit Lab</a>
-        <a class="nav-item" onclick="switchView('ai', this)">🤖 AI Strategy</a>
-        <a class="nav-item" onclick="switchView('report', this)">📑 Detailed Report</a>
-        <a class="nav-item" onclick="switchView('history', this); window.fetchHistory();">☁️ Cloud History</a>
+        <a class="nav-item" onclick="switchView('dashboard', this)" id="nav-dashboard">
+          <svg viewBox="0 0 24 24"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg><span class="nav-item-text">Dashboard</span>
+        </a>
+        
+        <a class="nav-item active" onclick="switchView('data', this)">
+          <svg viewBox="0 0 24 24"><path d="M3 3v18h18V3H3zm16 16H5v-2h14v2zm0-4H5v-2h14v2zm0-4H5V9h14v2zm0-4H5V5h14v2z"/></svg><span class="nav-item-text">Data Input</span>
+        </a>
+
+        <a class="nav-item" onclick="switchView('expenses', this)">
+          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg>
+          <span class="nav-item-text">Overhead & Ads</span>
+        </a>
+
+        <a class="nav-item" onclick="switchView('simulator', this); initSimulator();">
+          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+          <span class="nav-item-text">Profit Lab</span>
+        </a>
+
+        <a class="nav-item" onclick="switchView('ai', this)">
+          <span style="background: white; color: #0f172a; padding: 2px 4px; border-radius: 4px; font-size: 14px; font-weight: 900; line-height: 1;">Ai</span><span class="nav-item-text">Strategy</span>
+        </a>
+        <a class="nav-item" onclick="switchView('report', this)">
+          <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg><span class="nav-item-text">Detailed Report</span>
+        </a>
+        <a class="nav-item" onclick="switchView('history', this); window.fetchHistory();">
+          <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg><span class="nav-item-text">Cloud History</span>
+        </a>
         <div style="flex-grow: 1;"></div>
-        <a class="nav-item" onclick="switchView('settings', this)">⚙️ Settings</a>
+        <a class="nav-item" onclick="switchView('settings', this)">
+          <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.06-.94l2.03-1.58a.96.96 0 0 0 .12-.61l-1.92-3.32a.965.965 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.96.96 0 0 0-.48-.41h-3.84a.96.96 0 0 0-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.965.965 0 0 0-.59.22L2.73 8.87a.96.96 0 0 0 .12.61l2.03 1.58c-.04.3-.06.61-.06.94s.02.64.06.94l-2.03 1.58a.96.96 0 0 0-.12.61l1.92 3.32a.965.965 0 0 0 .59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96a.965.965 0 0 0 .59-.22l1.92-3.32a.96.96 0 0 0-.12-.61l-2.03-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg><span class="nav-item-text">Settings</span>
+        </a>
       </nav>
       <div class="sidebar-profile">
-        <div class="profile-label">ACCOUNT</div>
+        <div class="profile-label">Signed in as</div>
         <div class="profile-email" id="sidebarEmail">Loading...</div>
         <div class="profile-plan" id="sidebarPlan">Verifying...</div>
       </div>
@@ -52,27 +81,21 @@
     <main class="app-main" id="mainContainer">
       
       <div class="mobile-app-bar">
-        <button onclick="toggleAppDrawer()">☰</button>
-        <h1 id="mobilePageTitle">Data Input</h1>
+        <button onclick="toggleAppDrawer()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+        <div class="page-title" id="mobilePageTitle">Data Input</div>
       </div>
 
       <div id="view-data" class="app-view active">
         <div class="data-card">
-          <div class="card-header"><div class="card-title">PRODUCT DATA</div><a class="demo-link" onclick="loadDemoData()">LOAD DEMO DATA</a></div>
-          <div class="data-table-headers"><div>PRODUCT NAME</div><div>SELL PRICE</div><div>COST PRICE</div><div>QTY SOLD</div><div></div></div>
-          <div id="items">
-             <div class="data-row">
-               <input type="text" class="input-name" placeholder="Name" value="Wireless Earbuds">
-               <input type="number" class="input-sell" placeholder="Sell" value="2500">
-               <input type="number" class="input-cost" placeholder="Cost" value="1200">
-               <input type="number" class="input-qty" placeholder="Qty" value="140">
-               <button class="delete-btn" onclick="this.parentElement.remove()">×</button>
-             </div>
-          </div>
-          <button class="add-row-btn" onclick="addNewRow()">+ Add Product Row</button>
+          <div class="card-header"><div class="card-title">Data Source</div><a class="demo-link" onclick="loadDemoData()">USE DEMO DATA</a></div>
+          <div class="data-table-headers"><div>Name</div><div id="hdr-sell">Sell Price (₹)</div><div id="hdr-cost">Cost Price (₹)</div><div>Qty Sold</div><div></div></div>
+          <div id="items"><div class="data-row"><input type="text" placeholder="Product Name" class="input-name" value="Wireless Earbuds"><input type="number" placeholder="Sell Price" class="input-sell" value="2500"><input type="number" placeholder="Cost Price" class="input-cost" value="1200"><input type="number" placeholder="Quantity" class="input-qty" value="140"><button class="delete-btn" onclick="this.parentElement.remove()">×</button></div></div>
+          <button class="add-row-btn" onclick="addNewRow()">+ Add Product</button>
           <div class="action-buttons-wrap">
-            <button class="btn" style="flex: 1; background: #2563eb; color: white; padding: 14px; border-radius: 8px; border: none; font-weight: 600; cursor: pointer;" onclick="processDataAndShowReport()">Generate Dashboard ➔</button>
-            <button class="btn" style="background: #f1f5f9; color: #0f172a; padding: 14px 24px; border-radius: 8px; border: 1px solid #e2e8f0; font-weight: 600; cursor: pointer;" id="saveCloudBtn" onclick="window.saveToCloud()">💾 Save</button>
+            <button class="btn btn-primary" style="flex: 1; padding: 16px; font-size: 16px;" onclick="processDataAndShowReport()">Generate Dashboard →</button>
+            <button id="saveCloudBtn" class="btn btn-secondary" style="padding: 16px;" onclick="window.saveToCloud();">💾 Save to Cloud</button>
           </div>
         </div>
       </div>
@@ -81,135 +104,163 @@
         <div style="max-width: 1000px; margin: 0 auto;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
             <h2 style="margin: 0;">Financial Dashboard</h2>
-            <div style="display: flex; align-items: center; gap: 12px; background: white; padding: 8px 16px; border-radius: 99px; border: 1px solid #e2e8f0;"><span style="font-size: 13px; font-weight: 700; color: #64748b;">Health Score</span><div id="health-circle" style="font-size: 16px; font-weight: 900; padding: 4px 12px; border-radius: 99px; background: #e2e8f0; color: #475569;">0%</div></div>
+            <div style="display: flex; align-items: center; gap: 12px; background: white; padding: 8px 16px; border-radius: 99px; border: 1px solid var(--border);"><span style="font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Health Score</span><div id="health-circle" style="font-size: 16px; font-weight: 900; padding: 4px 12px; border-radius: 99px; background: #e2e8f0; color: #475569;">0%</div></div>
           </div>
 
           <div class="metrics-grid">
-            <div class="metric-card"><h4>Revenue</h4><div class="value" id="dash-revenue">0</div></div>
+            <div class="metric-card"><h4>Total Revenue</h4><div class="value" id="dash-revenue">0</div></div>
             <div class="metric-card"><h4>Gross Profit</h4><div class="value" id="dash-profit">0</div></div>
-            <div class="metric-card highlight" style="background: #0f172a;">
-               <h4 style="color: #94a3b8;">True Net Profit</h4>
-               <div class="value" id="dash-net-profit" style="color: white;">0</div>
-               <div style="font-size: 11px; color: #64748b; margin-top: 4px;">(After Expenses)</div>
-            </div>
+            <div class="metric-card highlight" style="background: #0f172a;"><h4>True Net Profit</h4><div class="value" id="dash-net-profit" style="color: white;">0</div><div style="font-size: 11px; color: #94a3b8; margin-top: 4px;">After Expenses</div></div>
             <div class="metric-card"><h4>Avg Margin</h4><div class="value" id="dash-margin">0%</div></div>
           </div>
-          
-          <div class="data-card" style="padding: 24px; margin-bottom: 24px;">
-             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                <span style="font-size: 13px; font-weight: 700; color: #0f172a;">BREAK-EVEN PROGRESS</span>
-                <span id="be-status" style="font-size: 13px; font-weight: 600; color: #64748b;">0% Covered</span>
-             </div>
-             <div style="background: #f1f5f9; height: 10px; border-radius: 99px; overflow: hidden;">
-                <div id="be-bar" style="width: 0%; background: #2563eb; height: 100%; transition: width 1s;"></div>
-             </div>
-             <div style="margin-top: 8px; font-size: 12px; color: #64748b; display: flex; justify-content: space-between;">
-                <span id="be-expenses">Total Costs: 0</span>
-                <span id="be-remaining">Profit Zone Reached</span>
-             </div>
+
+          <div class="data-card" style="padding: 24px; margin-bottom: 20px;">
+              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
+                  <span style="font-size: 14px; font-weight: 700; color: #0f172a;">Break-Even Progress</span>
+                  <span id="be-status" style="font-size: 14px; font-weight: 600; color: #64748b;">0% Covered</span>
+              </div>
+              <div class="be-container"><div class="be-bar" id="be-bar"></div></div>
+              <div class="be-text">
+                  <span id="be-expenses">Total Costs: 0</span>
+                  <span id="be-remaining">Profit Zone Reached</span>
+              </div>
           </div>
 
           <div class="dash-grid">
-            <div class="data-card" style="padding: 20px; margin: 0; width: 100%;"><h4 style="margin-top: 0; margin-bottom: 16px; font-size: 13px; color: #64748b; text-transform: uppercase; font-weight: 700;">Performance Chart</h4><div style="height: 300px;"><canvas id="profitChart"></canvas></div></div>
-            <div class="data-card" style="padding: 24px; margin: 0; background: #f8fafc;"><h4 style="margin-top: 0; margin-bottom: 16px; color: #0f172a; font-size: 16px; display: flex; align-items: center; gap: 8px;">⚡ 3-Point Action Plan</h4><div id="auto-insights-list" style="font-size: 14px; line-height: 1.6; display: flex; flex-direction: column; gap: 16px;"><p>Run analysis to see insights.</p></div></div>
+            <div class="data-card" style="padding: 20px; margin: 0; width: 100%;"><h4 style="margin-top: 0; margin-bottom: 16px; color: var(--text-muted); text-transform: uppercase; font-size: 13px;">Revenue vs Profit</h4><div style="position: relative; height: 300px; width: 100%;"><canvas id="profitChart"></canvas></div></div>
+            <div class="data-card" style="padding: 24px; margin: 0; background: #f8fafc;"><h4 style="margin-top: 0; margin-bottom: 16px; color: var(--dark); font-size: 16px; display: flex; align-items: center; gap: 8px;">⚡ 3-Point Action Plan</h4><div id="auto-insights-list" style="font-size: 14px; line-height: 1.6; display: flex; flex-direction: column; gap: 16px;"><p>Run analysis to see insights.</p></div></div>
           </div>
         </div>
       </div>
 
       <div id="view-expenses" class="app-view">
         <div style="max-width: 900px; margin: 0 auto;">
-           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-              <h2 style="margin: 0; font-size: 24px;">Overhead & Ads</h2>
-              <button style="padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;" onclick="processDataAndShowReport()">Update Dashboard</button>
-           </div>
-           <div class="expense-grid">
-              <div class="expense-card">
-                 <div class="expense-header"><h3>Fixed Costs (Monthly)</h3><div class="expense-total" id="total-fixed">0</div></div>
-                 <div id="fixed-items">
-                    <div class="expense-row"><input type="text" value="Rent"><input type="number" class="input-fixed" value="0"><button class="delete-btn" onclick="this.parentElement.remove()">×</button></div>
-                 </div>
-                 <button class="add-row-btn" onclick="addFixedRow()">+ Add Fixed Cost</button>
-              </div>
-              <div class="expense-card">
-                 <div class="expense-header"><h3>Variable Costs (Per Unit)</h3><div style="font-size: 12px;">Applies to every sale</div></div>
-                 <div id="variable-items">
-                    <div class="expense-row"><input type="text" value="Avg Ad Spend"><input type="number" class="input-variable" value="0"><button class="delete-btn" onclick="this.parentElement.remove()">×</button></div>
-                 </div>
-                 <button class="add-row-btn" onclick="addVariableRow()">+ Add Variable Cost</button>
-              </div>
-           </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 style="margin: 0;">Overhead & Expenses</h2>
+                <button class="btn btn-primary" onclick="processDataAndShowReport()">Update Dashboard →</button>
+            </div>
+            
+            <div class="data-card expense-section">
+                <div class="expense-header-row">
+                    <div class="expense-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
+                        Fixed Costs (Monthly)
+                    </div>
+                    <div class="expense-total-badge" id="total-fixed">0</div>
+                </div>
+                <div id="fixed-items">
+                    <div class="data-row" style="grid-template-columns: 2fr 1fr 40px; margin-bottom: 12px;">
+                        <input type="text" placeholder="Rent/Salaries" value="Rent">
+                        <input type="number" class="input-fixed" placeholder="Amount" value="0">
+                        <button class="delete-btn" onclick="this.parentElement.remove()">×</button>
+                    </div>
+                </div>
+                <button class="add-row-btn" onclick="addFixedRow()">+ Add Fixed Cost</button>
+            </div>
+
+            <div class="data-card expense-section">
+                <div class="expense-header-row">
+                    <div class="expense-title">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+                        Variable Costs (Per Unit)
+                    </div>
+                    <div class="expense-total-badge" style="background: #eff6ff; color: var(--primary);">Dynamic</div>
+                </div>
+                <div id="variable-items">
+                    <div class="data-row" style="grid-template-columns: 2fr 1fr 40px; margin-bottom: 12px;">
+                        <input type="text" placeholder="Ads/Shipping" value="Ads (Avg CPA)">
+                        <input type="number" class="input-variable" placeholder="Cost Per Unit" value="0">
+                        <button class="delete-btn" onclick="this.parentElement.remove()">×</button>
+                    </div>
+                </div>
+                <button class="add-row-btn" onclick="addVariableRow()">+ Add Variable Cost</button>
+            </div>
         </div>
       </div>
 
       <div id="view-simulator" class="app-view">
-         <div style="max-width: 800px; margin: 0 auto;">
-            <h2 style="margin-bottom: 24px;">🧪 Profit Lab <span style="font-size: 14px; font-weight: 400; color: #64748b;">What-If Simulator</span></h2>
+        <div style="max-width: 900px; margin: 0 auto;">
+            <h2 style="margin-bottom: 24px;">🧪 Profit Lab <span style="font-size: 14px; font-weight: 400; color: var(--text-muted);">What-If Simulator</span></h2>
             <div class="sim-controls">
-               <div class="slider-group"><div class="slider-label-row"><span>Price Change</span><span class="slider-val" id="val-price">0%</span></div><input type="range" min="-50" max="50" value="0" id="slide-price" oninput="runSimulation()"></div>
-               <div class="slider-group"><div class="slider-label-row"><span>Volume Change</span><span class="slider-val" id="val-vol">0%</span></div><input type="range" min="-50" max="50" value="0" id="slide-vol" oninput="runSimulation()"></div>
-               <div class="slider-group"><div class="slider-label-row"><span>Cost Change</span><span class="slider-val" id="val-cost">0%</span></div><input type="range" min="-50" max="50" value="0" id="slide-cost" oninput="runSimulation()"></div>
-               <div style="text-align: center;"><button style="background: transparent; border: 1px solid #e2e8f0; padding: 8px 16px; border-radius: 6px; cursor: pointer;" onclick="resetSimulation()">Reset Simulator</button></div>
+                <div class="slider-group"><div class="slider-label-row"><span>Price Change</span><span class="slider-val" id="val-price">0%</span></div><input type="range" min="-50" max="50" value="0" id="slide-price" oninput="runSimulation()"></div>
+                <div class="slider-group"><div class="slider-label-row"><span>Volume Change</span><span class="slider-val" id="val-vol">0%</span></div><input type="range" min="-50" max="50" value="0" id="slide-vol" oninput="runSimulation()"></div>
+                <div class="slider-group"><div class="slider-label-row"><span>Cost Change</span><span class="slider-val" id="val-cost">0%</span></div><input type="range" min="-50" max="50" value="0" id="slide-cost" oninput="runSimulation()"></div>
+                <div style="text-align: center; margin-top: 10px;"><button class="btn btn-secondary" style="font-size: 13px; padding: 6px 12px;" onclick="resetSimulation()">Reset All</button></div>
             </div>
             <div class="sim-results">
-               <div class="sim-card"><h4>Current Profit</h4><div class="big-num" id="sim-current">0</div></div>
-               <div class="sim-card active"><h4>Simulated Profit</h4><div class="big-num" id="sim-projected">0</div><div class="sim-delta" id="sim-delta">-</div></div>
+                <div class="sim-card"><h4>Current Profit</h4><div class="big-num" id="sim-current">0</div></div>
+                <div class="sim-card active"><h4>Simulated Profit</h4><div class="big-num" id="sim-projected">0</div><div class="sim-delta" id="sim-delta">-</div></div>
             </div>
-            <div class="data-card" style="margin-top: 24px; text-align: center; border-color: #bbf7d0; background: #f0fdf4;">
-               <p id="sim-insight" style="margin: 0; color: #166534; font-weight: 600;">Adjust sliders to simulate outcomes.</p>
-            </div>
-         </div>
+            <div class="data-card" style="margin-top: 24px; text-align: center; background: #f0fdf4; border-color: #bbf7d0;"><p id="sim-insight" style="font-weight: 600; color: #166534; font-size: 15px;">Adjust sliders to analyze scenarios.</p></div>
+        </div>
       </div>
 
       <div id="view-ai" class="app-view">
-         <div style="max-width: 800px; margin: 0 auto; height: 100%;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-               <h2 style="margin: 0;">🤖 AI Strategy</h2>
-               <button onclick="window.startAIAnalysis()" style="padding: 8px 16px; background: #f1f5f9; border: 1px solid #e2e8f0; border-radius: 6px; cursor: pointer;">🔄 Re-Analyze Data</button>
-            </div>
-            <div id="aiSplashScreen" style="height: 400px; display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; border-radius: 16px; border: 1px solid #e2e8f0;">
-               <p style="color: #64748b; margin-bottom: 20px;">Unlock hidden profit opportunities.</p>
-               <button onclick="window.startAIAnalysis()" style="padding: 16px 32px; background: #0f172a; color: white; font-weight: 700; border-radius: 99px; border: none; cursor: pointer;">✨ Generate Strategy</button>
-            </div>
-            <div id="aiChatContainer" class="chat-container" style="display: none;">
-               <div class="chat-history" id="chatHistory"></div>
-               <div style="background: white; border-top: 1px solid #e2e8f0; padding: 16px;">
-                  <div id="typingIndicator" style="display: none; font-style: italic; color: #2563eb; margin-bottom: 10px;">AI is thinking...</div>
-                  <div class="chat-input-row">
-                     <input type="text" id="aiChatInput" placeholder="Ask a question..." onkeypress="if(event.key==='Enter') window.sendChatMessage()">
-                     <button id="chatSendBtn" onclick="window.sendChatMessage()">➔</button>
-                  </div>
+        <div style="max-width: 850px; margin: 0 auto; height: 100%;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
+            <h2 style="margin: 0; display: flex; align-items: center; gap: 12px;"><span style="font-size: 28px; background: var(--dark); color: white; padding: 6px 10px; border-radius: 8px; line-height: 1;">Ai</span> Strategy</h2>
+            <button class="btn btn-secondary" style="padding: 10px 20px; font-size: 14px;" onclick="window.startAIAnalysis();">🔄 Clear & Re-Analyze</button>
+          </div>
+          <div id="aiSplashScreen" style="height: calc(100vh - 220px); display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.02);">
+              <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 18px;">Click below to analyze your numbers instantly.</p>
+              <button class="btn btn-dark" style="border-radius: 99px; padding: 18px 48px; font-size: 18px; box-shadow: 0 4px 15px rgba(15,23,42,0.2);" onclick="window.startAIAnalysis();">✨ Generate Strategy</button>
+          </div>
+          <div id="aiChatContainer" class="chat-container" style="display: none;">
+             <div class="chat-history" id="chatHistory"><div class="chat-msg msg-ai">Hi! Click Analyze to start.</div></div>
+             <div style="background: white; border-top: 1px solid var(--border);">
+               <div id="typingIndicator" class="ai-typing">AI is analyzing...</div>
+               <div class="chat-input-row">
+                  <input type="text" id="aiChatInput" placeholder="Ask question..." onkeypress="if(event.key === 'Enter') window.sendChatMessage()" />
+                  <button id="chatSendBtn" onclick="window.sendChatMessage()">➔</button>
                </div>
-            </div>
-         </div>
+             </div>
+          </div>
+        </div>
       </div>
 
       <div id="view-report" class="app-view">
-         <div style="max-width: 1000px; margin: 0 auto;">
-            <div style="display: flex; justify-content: space-between; margin-bottom: 20px;">
-               <h2>Detailed Report</h2>
-               <button onclick="exportExecutivePDF()" style="padding: 10px 20px; background: #2563eb; color: white; border: none; border-radius: 8px; font-weight: 700; cursor: pointer;">📥 Download PDF</button>
+        <div style="max-width: 1000px; margin: 0 auto;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h2>Detailed Profit Report</h2>
+            <div style="display: flex; gap: 10px;">
+              <button class="btn btn-secondary" onclick="switchView('data', document.querySelectorAll('.nav-item')[3])">← Edit Data</button>
+              <button class="btn btn-primary" onclick="exportExecutivePDF()">📥 Download PDF</button>
             </div>
-            <div style="overflow-x: auto; background: white; border-radius: 12px; border: 1px solid #e2e8f0;">
-               <table class="report-table">
-                  <thead><tr><th>Name</th><th>Revenue</th><th>Cost</th><th>Profit</th><th>Margin</th><th>Status</th></tr></thead>
-                  <tbody id="reportTableBody"></tbody>
-               </table>
-            </div>
-         </div>
+          </div>
+          <div style="overflow-x: auto; background: white; border: 1px solid var(--border); border-radius: 12px;">
+            <table class="report-table" style="border: none;">
+              <thead><tr><th>Product Name</th><th>Revenue</th><th>Total Cost</th><th>Total Profit</th><th>Margin %</th><th>Status</th></tr></thead>
+              <tbody id="reportTableBody"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div id="view-history" class="app-view">
+        <div class="data-card" style="max-width: 700px; margin: 0 auto;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;"><h2>Saved Cloud History</h2><button class="btn btn-secondary" onclick="window.fetchHistory();">↻ Refresh</button></div>
+          <div id="historyList" style="min-height: 150px; background: #f8fafc; border: 1px dashed var(--border); border-radius: 12px; padding: 20px;"><p style="text-align: center; color: var(--text-muted);">Fetching...</p></div>
+        </div>
       </div>
 
       <div id="view-settings" class="app-view">
-         <div class="data-card" style="max-width: 600px; margin: 0 auto;">
-            <h2>Settings</h2>
-            <div style="margin-top: 20px;">
-               <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #64748b;">Currency</label>
-               <select id="currencySelect" onchange="updateCurrency()" style="width: 100%; padding: 12px; border: 1px solid #e2e8f0; border-radius: 8px;"><option value="INR">₹ INR</option><option value="USD">$ USD</option></select>
-            </div>
-            <div style="margin-top: 24px; padding: 20px; background: #f8fafc; border-radius: 12px;">
-               <div id="settingsEmail" style="font-weight: 700;">Not Logged In</div>
-               <button onclick="window.handleLogout()" style="margin-top: 10px; color: #dc2626; background: none; border: none; cursor: pointer;">Log Out</button>
-            </div>
-         </div>
+        <div class="data-card" style="max-width: 600px; margin: 0 auto;">
+          <h2 style="margin-bottom: 24px;">Account Settings</h2>
+          <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 24px;">
+            <h4 style="margin: 0 0 8px 0; color: var(--text-muted);">Currency Selector</h4>
+            <select id="currencySelect" onchange="updateCurrency()" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); font-size: 15px;"><option value="INR">₹ Indian Rupee (INR)</option><option value="USD">$ US Dollar (USD)</option></select>
+          </div>
+          <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 24px;">
+            <h4 style="margin: 0 0 8px 0; color: var(--text-muted);">Account Email</h4>
+            <div id="settingsEmail" style="font-weight: 700; font-size: 16px;">Not logged in</div>
+          </div>
+          <div style="background: #eff6ff; padding: 20px; border-radius: 12px; border: 1px solid #bfdbfe; margin-bottom: 24px;">
+            <h4 style="margin: 0 0 8px 0; color: #1e40af;">Subscription Plan</h4>
+            <div id="settingsPlan" style="font-weight: 700; font-size: 16px; color: var(--text-muted); margin-bottom: 16px;">Free Plan</div>
+            <button id="upgradeBtn" class="btn btn-primary" onclick="window.pay();">Upgrade to PRO (₹499)</button>
+          </div>
+          <button class="btn btn-secondary" style="width: 100%; color: #dc2626;" onclick="window.handleLogout();">Log Out</button>
+        </div>
       </div>
 
     </main>
@@ -227,28 +278,26 @@
       </div>
   </div>
 
-  <script src="../assets/js/drawer.js?v=11.0"></script>
+  <script src="../assets/js/drawer.js?v=99.0"></script>
   
   <script>
-    // CONFIG
     const workerURL = "https://vizbix-api.vizbixhq.workers.dev";
     const PRICE = 49900; const KEY = "rzp_live_SCvIqUMzTNsXgq"; 
 
-    window.currentData = []; window.currencySymbol = '₹'; window.currentCurrency = 'INR';
-    window.chatConversation = []; let myChart = null;
+    window.currentMode = 'product'; window.currentData = []; window.currentView = 'data';
+    window.currentCurrency = 'INR'; window.currencySymbol = '₹'; window.chatConversation = []; let myChart = null;
 
-    // --- 1. DATA & EXPENSES ---
+    // --- DATA & EXPENSES ---
     function getFreshData() {
         let data = [];
         document.querySelectorAll('#items .data-row').forEach(row => {
-            const name = row.querySelector('.input-name').value.trim();
-            const sell = parseFloat(row.querySelector('.input-sell').value) || 0;
-            const cost = parseFloat(row.querySelector('.input-cost').value) || 0;
-            const qty = parseFloat(row.querySelector('.input-qty').value) || 0;
-            if(name !== '' || sell > 0 || cost > 0 || qty > 0) data.push({ name, sell, cost, qty });
+            const n = row.querySelector('.input-name').value;
+            const s = parseFloat(row.querySelector('.input-sell').value) || 0;
+            const c = parseFloat(row.querySelector('.input-cost').value) || 0;
+            const q = parseFloat(row.querySelector('.input-qty').value) || 0;
+            if(n && (s>0 || c>0 || q>0)) data.push({ name:n, sell:s, cost:c, qty:q });
         });
-        window.currentData = data;
-        return data;
+        window.currentData = data; return data;
     }
 
     function getExpenses() {
@@ -259,175 +308,139 @@
         return { fixed, variable };
     }
 
-    function addFixedRow() { const d = document.createElement('div'); d.className='expense-row'; d.innerHTML=`<input type="text" placeholder="Name"><input type="number" class="input-fixed" placeholder="0"><button class="delete-btn" onclick="this.parentElement.remove()">×</button>`; document.getElementById('fixed-items').appendChild(d); }
-    function addVariableRow() { const d = document.createElement('div'); d.className='expense-row'; d.innerHTML=`<input type="text" placeholder="Name"><input type="number" class="input-variable" placeholder="0"><button class="delete-btn" onclick="this.parentElement.remove()">×</button>`; document.getElementById('variable-items').appendChild(d); }
+    function addFixedRow() { const d = document.createElement('div'); d.className = 'data-row'; d.style.gridTemplateColumns="2fr 1fr 40px"; d.style.marginBottom="12px"; d.innerHTML = `<input type="text" placeholder="Cost Name"><input type="number" class="input-fixed" placeholder="Amount" value="0"><button class="delete-btn" onclick="this.parentElement.remove()">×</button>`; document.getElementById('fixed-items').appendChild(d); }
+    function addVariableRow() { const d = document.createElement('div'); d.className = 'data-row'; d.style.gridTemplateColumns="2fr 1fr 40px"; d.style.marginBottom="12px"; d.innerHTML = `<input type="text" placeholder="Cost Name"><input type="number" class="input-variable" placeholder="Cost Per Unit" value="0"><button class="delete-btn" onclick="this.parentElement.remove()">×</button>`; document.getElementById('variable-items').appendChild(d); }
 
-    // --- 2. DASHBOARD LOGIC ---
+    // --- DASHBOARD LOGIC ---
     function processDataAndShowReport() {
-        if(window.isProUser === false) { switchView('dashboard'); return; }
+        if(window.isProUser === false) { switchView('dashboard', document.getElementById('nav-dashboard')); return; }
         const data = getFreshData();
-        if(data.length === 0) return alert("Please enter data first.");
+        if(data.length === 0) return alert("Please enter data in the Data Input tab first.");
         const expenses = getExpenses();
 
-        let rev = 0; let prodCost = 0; let gross = 0; let items = 0;
-        let labels = []; let revData = []; let profitData = []; let html = ''; let topProd = {name:'-', profit:-999999};
+        let rev=0, cost=0, gross=0, items=0, html=''; let topProd={name:'-', profit:-Infinity};
+        let labels=[], revData=[], profData=[];
 
-        data.forEach(item => {
-            const r = item.sell * item.qty;
-            const c = item.cost * item.qty;
-            const p = r - c;
+        data.forEach(i => {
+            const r = i.sell * i.qty; const c = i.cost * i.qty; const p = r - c;
             const m = r > 0 ? ((p/r)*100).toFixed(1) : 0;
-            
-            rev += r; prodCost += c; gross += p; items += item.qty;
-            if(p > topProd.profit) topProd = {name: item.name, profit: p};
-            
-            labels.push(item.name); revData.push(r); profitData.push(p);
-            html += `<tr><td>${item.name}</td><td>${formatCurrency(r)}</td><td>${formatCurrency(c)}</td><td>${formatCurrency(p)}</td><td>${m}%</td><td>${p>0?'Healthy':'Leak'}</td></tr>`;
+            rev+=r; cost+=c; gross+=p; items+=i.qty;
+            if(p > topProd.profit) topProd = {name: i.name, profit: p};
+            labels.push(i.name); revData.push(r); profData.push(p);
+            html += `<tr><td>${i.name}</td><td>${formatCurrency(r)}</td><td>${formatCurrency(c)}</td><td>${formatCurrency(p)}</td><td>${m}%</td><td>${p>0?'Healthy':'Leak'}</td></tr>`;
         });
 
-        // True Net Logic
-        const totalVariable = expenses.variable * items;
+        const totalVar = expenses.variable * items;
         const totalFixed = expenses.fixed;
-        const netProfit = gross - totalVariable - totalFixed;
-        const totalOutflow = prodCost + totalVariable + totalFixed;
+        const trueNet = gross - totalVar - totalFixed;
+        const totalOutflow = cost + totalVar + totalFixed;
         const margin = rev > 0 ? ((gross/rev)*100).toFixed(1) : 0;
 
-        // Break Even Bar
         const bePercent = totalOutflow > 0 ? Math.min(100, (rev / totalOutflow) * 100) : 100;
         document.getElementById('be-bar').style.width = bePercent + "%";
         document.getElementById('be-status').innerText = bePercent.toFixed(0) + "% Covered";
         document.getElementById('be-expenses').innerText = "Costs: " + formatCurrency(totalOutflow);
 
-        // Update DOM
         document.getElementById('dash-revenue').innerText = formatCurrency(rev);
         document.getElementById('dash-profit').innerText = formatCurrency(gross);
-        document.getElementById('dash-net-profit').innerText = formatCurrency(netProfit);
-        document.getElementById('dash-net-profit').style.color = netProfit >= 0 ? "#4ade80" : "#f87171";
+        const netEl = document.getElementById('dash-net-profit');
+        netEl.innerText = formatCurrency(trueNet);
+        netEl.style.color = trueNet >= 0 ? '#4ade80' : '#f87171';
         document.getElementById('dash-margin').innerText = margin + "%";
+        document.getElementById('dash-top-product').innerText = topProd.name;
         document.getElementById('reportTableBody').innerHTML = html;
 
-        // Insights & Health Score
         let healthScore = 70; 
         if(overallMargin > 40) healthScore += 20; else if(overallMargin < 10) healthScore -= 20;
         const hc = document.getElementById('health-circle');
         hc.innerText = healthScore + '%';
         if(healthScore >= 80) { hc.style.background = '#d1fae5'; hc.style.color = '#059669'; } else { hc.style.background = '#fee2e2'; hc.style.color = '#dc2626'; }
 
-        // PDF Data
+        // PDF DATA
         document.getElementById('pdf-rev').innerText = formatCurrency(rev);
         document.getElementById('pdf-cost').innerText = formatCurrency(totalOutflow);
-        document.getElementById('pdf-profit').innerText = formatCurrency(netProfit);
+        document.getElementById('pdf-profit').innerText = formatCurrency(trueNet);
+        document.getElementById('pdf-units-sold').innerText = items;
 
-        // Chart
         if(myChart) myChart.destroy();
-        const ctx = document.getElementById('profitChart').getContext('2d');
-        myChart = new Chart(ctx, { type: 'bar', data: { labels: labels, datasets: [{ label: 'Revenue', data: revData, backgroundColor: '#cbd5e1' }, { label: 'Profit', data: profitData, backgroundColor: '#2563eb' }] } });
+        myChart = new Chart(document.getElementById('profitChart'), { type: 'bar', data: { labels: labels, datasets: [{ label: 'Revenue', data: revData, backgroundColor: '#cbd5e1' }, { label: 'Profit', data: profData, backgroundColor: '#2563eb' }] } });
 
         switchView('dashboard', document.querySelectorAll('.nav-item')[1]);
     }
 
-    // --- 3. PROFIT LAB (12-LOGIC SIMULATOR) ---
-    function initSimulator() { if(window.currentData.length === 0) getFreshData(); resetSimulation(); }
+    // --- SIMULATOR ---
+    function initSimulator() { if(window.currentData.length==0) getFreshData(); resetSimulation(); }
     function resetSimulation() { document.getElementById('slide-price').value=0; document.getElementById('slide-vol').value=0; document.getElementById('slide-cost').value=0; runSimulation(); }
-    
     function runSimulation() {
-        const pVal = parseInt(document.getElementById('slide-price').value);
-        const vVal = parseInt(document.getElementById('slide-vol').value);
-        const cVal = parseInt(document.getElementById('slide-cost').value);
+        const pVal = parseInt(document.getElementById("slide-price").value);
+        const vVal = parseInt(document.getElementById("slide-vol").value);
+        const cVal = parseInt(document.getElementById("slide-cost").value);
         
         document.getElementById('val-price').innerText = (pVal>0?"+":"")+pVal+"%";
         document.getElementById('val-vol').innerText = (vVal>0?"+":"")+vVal+"%";
         document.getElementById('val-cost').innerText = (cVal>0?"+":"")+cVal+"%";
 
-        const pMod = 1 + (pVal/100); const vMod = 1 + (vVal/100); const cMod = 1 + (cVal/100);
-        let curr = 0; let proj = 0;
-
+        let curr=0, proj=0;
+        if(!window.currentData) return;
         window.currentData.forEach(i => {
             curr += (i.sell * i.qty) - (i.cost * i.qty);
-            proj += ((i.sell * pMod) * (i.qty * vMod)) - ((i.cost * cMod) * (i.qty * vMod));
+            proj += ((i.sell * (1+pVal/100)) * (i.qty * (1+vVal/100))) - ((i.cost * (1+cVal/100)) * (i.qty * (1+vVal/100)));
         });
 
         document.getElementById('sim-current').innerText = formatCurrency(curr);
         document.getElementById('sim-projected').innerText = formatCurrency(proj);
-        
         const diff = proj - curr;
         const el = document.getElementById('sim-insight');
         const delta = document.getElementById('sim-delta');
         
-        if(diff >= 0) {
-            delta.innerText = "▲ " + formatCurrency(diff);
-            delta.style.color = "#15803d"; delta.style.background = "#dcfce7";
-            el.innerHTML = `<strong>✅ Strategic Win:</strong> This creates <strong>${formatCurrency(diff)}</strong> in extra profit.`;
-            if(pVal > 0 && vVal >= 0) el.innerHTML = `<strong>💎 Pricing Power:</strong> Raising prices without losing volume is the ultimate scaler.`;
-            if(cVal < 0) el.innerHTML = `<strong>✂️ Pure Efficiency:</strong> Cutting costs flows 100% to the bottom line.`;
-        } else {
-            delta.innerText = "▼ " + formatCurrency(Math.abs(diff));
-            delta.style.color = "#b91c1c"; delta.style.background = "#fee2e2";
-            el.innerHTML = `<strong>🛑 Warning:</strong> This strategy loses money.`;
-            if(pVal < 0 && vVal > 0) el.innerHTML = `<strong>⚠️ Discount Trap:</strong> Volume didn't make up for the price cut.`;
+        // 12-LOGIC SIMULATOR RESTORED
+        if(diff >= 0) { 
+            delta.innerText = "▲ " + formatCurrency(diff); 
+            delta.className = "sim-delta delta-pos";
+            el.style.color = "#166534";
+            if(pVal>0 && vVal>0 && cVal<0) el.innerHTML = "<strong>🦄 Unicorn Strategy:</strong> Efficiency maximized.";
+            else if(pVal>0 && vVal<0) el.innerHTML = "<strong>💎 Luxury Pivot:</strong> Selling less, earning more.";
+            else if(pVal<0 && vVal>0) el.innerHTML = "<strong>🔥 Mass Market:</strong> Winning on volume.";
+            else el.innerHTML = `<strong>✅ Strategic Win:</strong> Adds <strong>${formatCurrency(diff)}</strong> to profit.`; 
+        }
+        else { 
+            delta.innerText = "▼ " + formatCurrency(Math.abs(diff)); 
+            delta.className = "sim-delta delta-neg";
+            el.style.color = "#dc2626";
+            if(pVal<0 && vVal>0) el.innerHTML = "<strong>⚠️ Discount Trap:</strong> Working harder for less.";
+            else el.innerHTML = `<strong>🛑 Warning:</strong> Loses <strong>${formatCurrency(Math.abs(diff))}</strong>.`; 
         }
     }
 
-    // --- 4. AI CHAT ENGINE ---
+    // --- AI ---
     window.startAIAnalysis = async function() {
-        const data = getFreshData();
-        if(data.length === 0) return alert("Enter data first.");
+        const data = getFreshData(); if(data.length==0) return alert("Enter data first.");
         document.getElementById("aiSplashScreen").style.display = "none";
         document.getElementById("aiChatContainer").style.display = "flex";
         window.chatConversation = [];
-        await executeAI(`Analyze my data using ${window.currencySymbol}. Focus on Net Profit.`, data);
+        await executeAI(`Analyze my catalog using ${window.currencySymbol}. Focus on Net Profit.`, data);
     };
-
     window.sendChatMessage = async function() {
-        const input = document.getElementById("aiChatInput");
-        const msg = input.value.trim();
-        if(!msg) return;
-        
+        const i = document.getElementById("aiChatInput"); const msg = i.value.trim(); if(!msg) return;
         document.getElementById("aiSplashScreen").style.display = "none";
         document.getElementById("aiChatContainer").style.display = "flex";
-        
-        appendChat(msg, 'user');
-        input.value = '';
+        appendChat(msg, 'user'); i.value = '';
         await executeAI(msg, getFreshData());
     };
-
     async function executeAI(msg, data) {
         document.getElementById("typingIndicator").style.display = "block";
-        window.chatConversation.push({role: "user", content: msg});
-        
+        window.chatConversation.push({role:"user", content:msg});
         try {
-            const res = await fetch(workerURL + "/ai-analyze", {
-                method: "POST", headers: {"Content-Type": "application/json"},
-                body: JSON.stringify({
-                    email: window.userEmail,
-                    currency: window.currentCurrency,
-                    symbol: window.currencySymbol,
-                    message: msg,
-                    history: window.chatConversation,
-                    products: data
-                })
-            });
-            const json = await res.json();
+            const r = await fetch(workerURL + "/ai-analyze", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({email:window.userEmail, currency:window.currentCurrency, symbol:window.currencySymbol, message:msg, history:window.chatConversation, products:data}) });
+            const d = await r.json();
             document.getElementById("typingIndicator").style.display = "none";
-            if(json.ok) {
-                appendChat(json.response.replace(/\n/g, "<br>").replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"), 'ai');
-                window.chatConversation.push({role: "assistant", content: json.response});
-            } else {
-                appendChat("⚠️ " + json.error, 'ai');
-            }
+            if(d.ok) { appendChat(d.response.replace(/\n/g, "<br>").replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"), 'ai'); window.chatConversation.push({role:"assistant", content:d.response}); }
+            else appendChat("⚠️ " + d.error, 'ai');
         } catch(e) { appendChat("⚠️ Connection Error", 'ai'); }
     }
+    function appendChat(t, r) { const d=document.createElement('div'); d.className=`chat-msg msg-${r}`; d.innerHTML=t; document.getElementById("chatHistory").appendChild(d); }
 
-    function appendChat(text, role) {
-        const div = document.createElement("div");
-        div.className = `chat-msg msg-${role}`;
-        div.innerHTML = text;
-        const h = document.getElementById("chatHistory");
-        h.appendChild(div);
-        h.scrollTop = h.scrollHeight;
-    }
-
-    // --- 5. UTILS & AUTH ---
+    // --- UTILS & AUTH ---
     function updateCurrency() { const s = document.getElementById('currencySelect'); window.currentCurrency = s.value; window.currencySymbol = s.options[s.selectedIndex].text.split(' ')[0]; }
     function formatCurrency(n) { return new Intl.NumberFormat('en-US', { style: 'currency', currency: window.currentCurrency, maximumFractionDigits: 0 }).format(n); }
     function addNewRow(n='',s='',c='',q='') { const d=document.createElement('div'); d.className='data-row'; d.innerHTML=`<input type="text" class="input-name" placeholder="Name" value="${n}"><input type="number" class="input-sell" placeholder="Sell" value="${s}"><input type="number" class="input-cost" placeholder="Cost" value="${c}"><input type="number" class="input-qty" placeholder="Qty" value="${q}"><button class="delete-btn" onclick="this.parentElement.remove()">×</button>`; document.getElementById('items').appendChild(d); }
@@ -438,30 +451,22 @@
         const pro = ['dashboard','ai','report','history','simulator','expenses'];
         if(pro.includes(id) && window.isProUser === false) { document.getElementById('proLockOverlay').classList.remove('pro-lock-hidden'); }
         else { document.getElementById('proLockOverlay').classList.add('pro-lock-hidden'); }
-        
         document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
         document.getElementById('view-' + id).classList.add('active');
-        
-        if(el) {
-            document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-            el.classList.add('active');
-            document.getElementById('mobilePageTitle').innerText = el.querySelector('.nav-item-text').innerText;
-        }
+        if(el) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); el.classList.add('active'); document.getElementById('mobilePageTitle').innerText = el.querySelector('.nav-item-text').innerText; }
         if(document.getElementById("appSidebar").classList.contains("mobile-open")) toggleAppDrawer();
     }
 
     function exportExecutivePDF() {
-        const chart = document.getElementById('profitChart');
-        if(chart) document.getElementById('pdf-chart-image').src = chart.toDataURL('image/png');
-        const el = document.getElementById('pdf-export-container');
-        el.style.visibility = 'visible';
-        html2pdf().set({ margin: 0.5, filename: 'Vizbix_Report.pdf', image: { type: 'jpeg', quality: 1 }, html2canvas: { scale: 2, useCORS: true, windowWidth: 1100 }, jsPDF: { unit: 'in', format: 'letter', orientation: 'landscape' } }).from(el).save().then(() => el.style.visibility = 'hidden');
+        const c = document.getElementById('profitChart'); if(c) document.getElementById('pdf-chart-image').src = c.toDataURL('image/png');
+        const e = document.getElementById('pdf-export-container'); e.style.visibility = 'visible';
+        html2pdf().set({ margin:0.5, filename:'Report.pdf', image:{type:'jpeg',quality:1}, html2canvas:{scale:2, useCORS:true, windowWidth:1100}, jsPDF:{unit:'in', format:'letter', orientation:'landscape'} }).from(e).save().then(() => e.style.visibility = 'hidden');
     }
 
     window.verify = async function(e){ try{const r=await fetch(workerURL+"/check?email="+e);const d=await r.json(); window.isProUser=d.valid; }catch(e){} };
     window.pay = function(){ new Razorpay({ key: KEY, amount: PRICE, currency: "INR", name: "Vizbix Pro", prefill:{email:window.userEmail}, handler: async function(r){ await fetch(workerURL+"/verify-payment", {method:"POST", body:JSON.stringify({payment_id:r.razorpay_payment_id, email:window.userEmail})}); window.verify(window.userEmail); } }).open(); };
     window.saveToCloud = async function(){ const d=getFreshData(); if(d.length==0) return alert("Empty!"); await fetch(workerURL+"/save", {method:"POST", body:JSON.stringify({email:window.userEmail, data:d, date:new Date().toISOString()})}); alert("Saved!"); };
-    window.fetchHistory = async function(){ const l=document.getElementById("historyList"); if(!window.isProUser){l.innerHTML="Pro Only";return;} l.innerHTML="Loading..."; const r=await fetch(workerURL+"/history?email="+window.userEmail); const d=await r.json(); l.innerHTML=""; d.forEach(i=>{ const div=document.createElement("div"); div.className="history-item"; div.innerText=new Date(i.date).toLocaleDateString()+" ("+i.data.length+" items)"; div.onclick=()=> { document.getElementById("items").innerHTML=""; i.data.forEach(r=>addNewRow(r.name||r.n, r.sell||r.v1, r.cost||r.v2, r.qty||r.v3)); processDataAndShowReport(); }; l.appendChild(div); }); };
+    window.fetchHistory = async function(){ const l=document.getElementById("historyList"); if(!window.isProUser){l.innerHTML="Pro Only";return;} l.innerHTML="Loading..."; const r=await fetch(workerURL+"/history?email="+window.userEmail); const d=await r.json(); l.innerHTML=""; d.forEach(i=>{ const div=document.createElement("div"); div.className="history-item"; div.innerHTML=`<div><strong>${new Date(i.date).toLocaleDateString()}</strong></div>`; div.onclick=()=> { document.getElementById("items").innerHTML=""; i.data.forEach(r=>addNewRow(r.name, r.sell, r.cost, r.qty)); processDataAndShowReport(); }; l.appendChild(div); }); };
 
     let hasVerified = false;
     setInterval(() => {
@@ -469,6 +474,7 @@
       if(window.userEmail) {
         if(btn) btn.style.display = 'none';
         document.getElementById('sidebarEmail').innerText = window.userEmail;
+        document.getElementById('settingsEmail').innerText = window.userEmail;
         if(!hasVerified) { hasVerified=true; window.verify(window.userEmail); }
       }
       if(window.isProUser) {
@@ -480,7 +486,7 @@
     }, 1000);
   </script>
 
-  <script type="module" src="../assets/js/auth.js?v=11.0"></script>
+  <script type="module" src="../assets/js/auth.js?v=99.0"></script>
 
 </body>
 </html>
