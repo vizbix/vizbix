@@ -531,43 +531,99 @@
     }
 
     function runSimulation() {
-        const pMod = 1 + (parseInt(document.getElementById("slide-price").value) / 100);
-        const vMod = 1 + (parseInt(document.getElementById("slide-vol").value) / 100);
-        const cMod = 1 + (parseInt(document.getElementById("slide-cost").value) / 100);
+        // 1. Get Slider Values
+        const pVal = parseInt(document.getElementById("slide-price").value);
+        const vVal = parseInt(document.getElementById("slide-vol").value);
+        const cVal = parseInt(document.getElementById("slide-cost").value);
 
-        document.getElementById("val-price").innerText = (pMod > 1 ? "+" : "") + Math.round((pMod - 1)*100) + "%";
-        document.getElementById("val-vol").innerText = (vMod > 1 ? "+" : "") + Math.round((vMod - 1)*100) + "%";
-        document.getElementById("val-cost").innerText = (cMod > 1 ? "+" : "") + Math.round((cMod - 1)*100) + "%";
+        // 2. Update Visual Labels
+        document.getElementById("val-price").innerText = (pVal > 0 ? "+" : "") + pVal + "%";
+        document.getElementById("val-vol").innerText = (vVal > 0 ? "+" : "") + vVal + "%";
+        document.getElementById("val-cost").innerText = (cVal > 0 ? "+" : "") + cVal + "%";
+
+        const pMod = 1 + (pVal / 100);
+        const vMod = 1 + (vVal / 100);
+        const cMod = 1 + (cVal / 100);
 
         let currentProfit = 0;
         let newProfit = 0;
+        let baseRevenue = 0;
 
+        // 3. Run the Math
+        if(!window.currentData) return;
+        
         window.currentData.forEach(item => {
-            const baseProfit = (item.sell * item.qty) - (item.cost * item.qty);
+            const baseRev = item.sell * item.qty;
+            const baseCost = item.cost * item.qty;
+            const baseProfit = baseRev - baseCost;
+            
             currentProfit += baseProfit;
+            baseRevenue += baseRev;
 
             const newSell = item.sell * pMod;
             const newCost = item.cost * cMod;
             const newQty = item.qty * vMod;
             const simProfit = (newSell * newQty) - (newCost * newQty);
+            
             newProfit += simProfit;
         });
 
+        // 4. Update UI Numbers
         document.getElementById("sim-current").innerText = formatCurrency(currentProfit);
         document.getElementById("sim-projected").innerText = formatCurrency(newProfit);
         
         const deltaEl = document.getElementById("sim-delta");
+        const insightEl = document.getElementById("sim-insight");
         const diff = newProfit - currentProfit;
+        const profitGrowth = currentProfit > 0 ? ((diff / currentProfit) * 100).toFixed(1) : 0;
+
+        // 5. THE "SUPERB" LOGIC ENGINE 🧠
         if(diff >= 0) {
-            deltaEl.innerText = "▲ " + formatCurrency(diff);
+            deltaEl.innerText = "▲ " + formatCurrency(diff) + " (" + profitGrowth + "%)";
             deltaEl.className = "sim-delta delta-pos";
-            document.getElementById("sim-insight").innerText = "Great job! This strategy increases your total profit.";
-            document.getElementById("sim-insight").style.color = "#166534";
+            insightEl.style.color = "#166534";
+            insightEl.style.background = "#dcfce7";
+            insightEl.style.padding = "12px";
+            insightEl.style.borderRadius = "8px";
+
+            // Scenario A: Price is the main driver (The "Pricing Power" Insight)
+            if (pVal > 0 && pVal >= vVal) {
+                insightEl.innerHTML = `<strong>💎 Pricing Power:</strong> Raising prices by ${pVal}% improved your bottom line by <strong>${profitGrowth}%</strong> without needing to ship a single extra unit. This is the most efficient way to scale.`;
+            } 
+            // Scenario B: Volume is the main driver (The "Scale" Insight)
+            else if (vVal > 0 && vVal > pVal) {
+                insightEl.innerHTML = `<strong>🚀 Scale Velocity:</strong> Aggressive volume growth is paying off. Ensure your supply chain can handle the <strong>${vVal}% extra load</strong> required to capture this profit.`;
+            }
+            // Scenario C: Cost Cutting is the driver (The "Efficiency" Insight)
+            else if (cVal < 0) {
+                insightEl.innerHTML = `<strong>✂️ Pure Efficiency:</strong> Cutting costs by ${Math.abs(cVal)}% flows directly to your bank account. This strategy improves cash flow instantly without risking customer churn.`;
+            }
+            // Scenario D: General Good News
+            else {
+                insightEl.innerHTML = `<strong>📈 Strategic Win:</strong> This configuration yields an extra <strong>${formatCurrency(diff)}</strong> in pure profit. A solid move for business health.`;
+            }
+
         } else {
+            // Negative Scenarios
             deltaEl.innerText = "▼ " + formatCurrency(Math.abs(diff));
             deltaEl.className = "sim-delta delta-neg";
-            document.getElementById("sim-insight").innerText = "Warning: This strategy will reduce your total profit.";
-            document.getElementById("sim-insight").style.color = "#dc2626";
+            insightEl.style.color = "#991b1b";
+            insightEl.style.background = "#fee2e2";
+            insightEl.style.padding = "12px";
+            insightEl.style.borderRadius = "8px";
+
+            // Scenario E: Price drop didn't work
+            if (pVal < 0 && vVal > 0) {
+                insightEl.innerHTML = `<strong>⚠️ Margin Trap:</strong> You lowered prices to get ${vVal}% more volume, but it wasn't enough. You are now <strong>working harder for less money</strong>.`;
+            }
+            // Scenario F: Costs rose too high
+            else if (cVal > 0) {
+                insightEl.innerHTML = `<strong>⚠️ Cost Bloat:</strong> Rising costs are eating your margin faster than revenue can grow. You must either raise prices or cut overhead immediately.`;
+            }
+            // General Bad News
+            else {
+                insightEl.innerHTML = `<strong>📉 Warning:</strong> This strategy destroys <strong>${formatCurrency(Math.abs(diff))}</strong> in value. Revert changes or find a new angle.`;
+            }
         }
     }
 
@@ -811,3 +867,4 @@
 
 </body>
 </html>
+
