@@ -7,8 +7,8 @@
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="../assets/css/main.css?v=6.0">
-  <link rel="stylesheet" href="../assets/css/app.css?v=6.0">
+  <link rel="stylesheet" href="../assets/css/main.css?v=7.0">
+  <link rel="stylesheet" href="../assets/css/app.css?v=7.0">
   
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
@@ -30,7 +30,7 @@
     <div id="proLockOverlay" class="pro-lock-overlay pro-lock-hidden">
       <div class="pro-lock-card">
         <h2>🔒 Pro Feature</h2>
-        <p>Unlock dashboards, detailed leak reports, AI pricing strategies, and cloud saving history.</p>
+        <p>Unlock detailed reports, AI strategy, and the Profit Simulator.</p>
         <button class="btn btn-primary btn-large" style="width: 100%;" onclick="switchView('settings', document.querySelectorAll('.nav-item')[6])">Upgrade to Pro (₹499)</button>
       </div>
     </div>
@@ -45,7 +45,7 @@
         
         <a class="nav-item" onclick="switchView('simulator', this); initSimulator();">
           <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.06-.94l2.03-1.58a.96.96 0 0 0 .12-.61l-1.92-3.32a.965.965 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.96.96 0 0 0-.48-.41h-3.84a.96.96 0 0 0-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.965.965 0 0 0-.59.22L2.73 8.87a.96.96 0 0 0 .12.61l2.03 1.58c-.04.3-.06.61-.06.94s.02.64.06.94l-2.03 1.58a.96.96 0 0 0-.12.61l1.92 3.32a.965.965 0 0 0 .59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96a.965.965 0 0 0 .59-.22l1.92-3.32a.96.96 0 0 0-.12-.61l-2.03-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-          <span class="nav-item-text">Profit Lab (Beta)</span>
+          <span class="nav-item-text">Profit Lab</span>
         </a>
 
         <a class="nav-item" onclick="switchView('ai', this)">
@@ -62,7 +62,7 @@
         </a>
         <div style="flex-grow: 1;"></div>
         <a class="nav-item" onclick="switchView('settings', this)">
-          <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg><span class="nav-item-text">Settings</span>
+          <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg><span class="nav-item-text">Settings</span>
         </a>
       </nav>
       <div class="sidebar-profile">
@@ -209,9 +209,7 @@
                <div id="typingIndicator" class="ai-typing">AI is analyzing your business... ⏳</div>
                <div class="chat-input-row">
                   <input type="text" id="aiChatInput" placeholder="Ask about raising prices, bundle ideas, or profit margins..." onkeypress="if(event.key === 'Enter') window.sendChatMessage()" />
-                  <button id="chatSendBtn" onclick="window.sendChatMessage()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
-                  </button>
+                  <button id="chatSendBtn" onclick="window.sendChatMessage()">➔</button>
                </div>
              </div>
           </div>
@@ -321,7 +319,7 @@
       </div>
   </div>
 
-  <script src="../assets/js/drawer.js?v=6.0"></script>
+  <script src="../assets/js/drawer.js?v=7.0"></script>
   
   <script>
     // --- SYSTEM CONFIG ---
@@ -514,7 +512,7 @@
       switchView('dashboard', document.getElementById('nav-dashboard'));
     }
 
-    // --- 4. SIMULATOR LOGIC ---
+    // --- 4. SIMULATOR LOGIC (12 SCENARIOS) ---
     function initSimulator() {
         if(!window.currentData || window.currentData.length === 0) {
             getFreshData();
@@ -531,12 +529,10 @@
     }
 
     function runSimulation() {
-        // 1. Get Slider Values
         const pVal = parseInt(document.getElementById("slide-price").value);
         const vVal = parseInt(document.getElementById("slide-vol").value);
         const cVal = parseInt(document.getElementById("slide-cost").value);
 
-        // 2. Update Visual Labels
         document.getElementById("val-price").innerText = (pVal > 0 ? "+" : "") + pVal + "%";
         document.getElementById("val-vol").innerText = (vVal > 0 ? "+" : "") + vVal + "%";
         document.getElementById("val-cost").innerText = (cVal > 0 ? "+" : "") + cVal + "%";
@@ -549,23 +545,16 @@
         let newProfit = 0;
 
         if(!window.currentData) return;
-        
         window.currentData.forEach(item => {
-            const baseRev = item.sell * item.qty;
-            const baseCost = item.cost * item.qty;
-            const baseProfit = baseRev - baseCost;
-            
+            const baseProfit = (item.sell * item.qty) - (item.cost * item.qty);
             currentProfit += baseProfit;
-
             const newSell = item.sell * pMod;
             const newCost = item.cost * cMod;
             const newQty = item.qty * vMod;
             const simProfit = (newSell * newQty) - (newCost * newQty);
-            
             newProfit += simProfit;
         });
 
-        // 3. Update UI Numbers
         document.getElementById("sim-current").innerText = formatCurrency(currentProfit);
         document.getElementById("sim-projected").innerText = formatCurrency(newProfit);
         
@@ -574,135 +563,32 @@
         const diff = newProfit - currentProfit;
         const profitGrowth = currentProfit > 0 ? ((diff / currentProfit) * 100).toFixed(1) : 0;
 
-        // 4. THE "12-SCENARIO" LOGIC ENGINE 🧠
         insightEl.style.padding = "16px";
         insightEl.style.borderRadius = "8px";
         insightEl.style.lineHeight = "1.6";
 
         if(diff >= 0) {
-            // --- POSITIVE OUTCOMES (GREEN) ---
             deltaEl.innerText = "▲ " + formatCurrency(diff) + " (" + profitGrowth + "%)";
             deltaEl.className = "sim-delta delta-pos";
-            insightEl.style.color = "#064e3b";
-            insightEl.style.background = "#d1fae5";
-            insightEl.style.border = "1px solid #34d399";
+            insightEl.style.color = "#064e3b"; insightEl.style.background = "#d1fae5"; insightEl.style.border = "1px solid #34d399";
 
-            // 1. The Holy Grail (Price Up, Volume Up, Cost Down)
-            if (pVal > 0 && vVal > 0 && cVal < 0) {
-                insightEl.innerHTML = `<strong>🦄 The Unicorn Strategy:</strong> You pulled all three levers perfectly. By raising value, scaling volume, and cutting waste simultaneously, you have maximized total efficiency.`;
-            }
-            // 2. The Luxury Pivot (Price Up, Volume Down)
-            else if (pVal > 0 && vVal < 0) {
-                insightEl.innerHTML = `<strong>💎 Luxury Pivot:</strong> You are selling fewer units but making more money. You successfully repositioned your brand as "Premium" and fired your low-value customers.`;
-            }
-            // 3. The Mass Market Win (Price Down, Volume Way Up)
-            else if (pVal < 0 && vVal > 0) {
-                insightEl.innerHTML = `<strong>🔥 Mass Market Dominance:</strong> Your lower price point triggered huge demand. You are winning on volume and undercutting competitors to steal market share.`;
-            }
-            // 4. Pure Efficiency (Costs Down, Others Flat)
-            else if (cVal < 0 && pVal === 0 && vVal === 0) {
-                insightEl.innerHTML = `<strong>✂️ Lean Operations:</strong> Every rupee saved in costs flows 100% to the bottom line. This is the safest way to boost cash flow without risking customer churn.`;
-            }
-            // 5. Pricing Power (Price Up, Volume Flat/Up)
-            else if (pVal > 0 && vVal >= 0) {
-                insightEl.innerHTML = `<strong>📈 Pricing Power:</strong> Your brand is strong enough that customers accepted the price hike without leaving. This significantly boosts your Lifetime Value (LTV).`;
-            }
-            // 6. Growth Mode (Volume Up, Costs Up)
-            else if (vVal > 0 && cVal > 0) {
-                insightEl.innerHTML = `<strong>🚀 Aggressive Scale:</strong> You are spending more to grow, but the volume increase is paying off. Ensure your supply chain can handle the extra load.`;
-            }
-            // 7. General Win
-            else {
-                insightEl.innerHTML = `<strong>✅ Strategic Win:</strong> This configuration yields an extra <strong>${formatCurrency(diff)}</strong> in pure profit. A solid move for business health.`;
-            }
-
+            if (pVal > 0 && vVal > 0 && cVal < 0) { insightEl.innerHTML = `<strong>🦄 The Unicorn Strategy:</strong> Perfect efficiency. You raised value, scaled volume, and cut waste.`; }
+            else if (pVal > 0 && vVal < 0) { insightEl.innerHTML = `<strong>💎 Luxury Pivot:</strong> Selling fewer units but making more money. You successfully repositioned as Premium.`; }
+            else if (pVal < 0 && vVal > 0) { insightEl.innerHTML = `<strong>🔥 Mass Market Dominance:</strong> Lower price triggered huge demand. You are winning on volume.`; }
+            else if (cVal < 0 && pVal === 0 && vVal === 0) { insightEl.innerHTML = `<strong>✂️ Lean Operations:</strong> Every rupee saved in costs flows 100% to the bottom line.`; }
+            else if (pVal > 0 && vVal >= 0) { insightEl.innerHTML = `<strong>📈 Pricing Power:</strong> Your brand is strong enough that customers accepted the price hike.`; }
+            else if (vVal > 0 && cVal > 0) { insightEl.innerHTML = `<strong>🚀 Aggressive Scale:</strong> You are spending to grow, and it's paying off. Watch supply chain load.`; }
+            else { insightEl.innerHTML = `<strong>✅ Strategic Win:</strong> This configuration yields an extra <strong>${formatCurrency(diff)}</strong> in pure profit.`; }
         } else {
-            // --- NEGATIVE OUTCOMES (RED) ---
             deltaEl.innerText = "▼ " + formatCurrency(Math.abs(diff));
             deltaEl.className = "sim-delta delta-neg";
-            insightEl.style.color = "#7f1d1d";
-            insightEl.style.background = "#fecaca";
-            insightEl.style.border = "1px solid #f87171";
+            insightEl.style.color = "#7f1d1d"; insightEl.style.background = "#fecaca"; insightEl.style.border = "1px solid #f87171";
 
-            // 8. The Discount Trap (Price Down, Volume Up... but loss)
-            if (pVal < 0 && vVal > 0) {
-                insightEl.innerHTML = `<strong>⚠️ The Discount Trap:</strong> You are working harder for less money. The increase in volume (+${vVal}%) was not enough to cover the margin lost by lowering prices.`;
-            }
-            // 9. Price Shock (Price Up, Volume Crashed)
-            else if (pVal > 0 && vVal < 0) {
-                insightEl.innerHTML = `<strong>📉 Price Shock:</strong> The market rejected your price increase. You lost too many customers (-${Math.abs(vVal)}%) relative to the extra margin you gained.`;
-            }
-            // 10. Growing Broke (Volume Up, Costs Up... but loss)
-            else if (vVal > 0 && cVal > 0) {
-                insightEl.innerHTML = `<strong>💸 Growing Broke:</strong> You are scaling, but your costs are rising faster than your revenue. This is a dangerous "Unit Economics" failure. Stop scaling and fix margins first.`;
-            }
-            // 11. Brand Erosion (Price Down, Volume Down)
-            else if (pVal < 0 && vVal <= 0) {
-                insightEl.innerHTML = `<strong>🥀 Brand Erosion:</strong> Lowering prices didn't even stimulate demand. Your product may have lost its desirability. Re-evaluate your market fit immediately.`;
-            }
-            // 12. General Loss
-            else {
-                insightEl.innerHTML = `<strong>🛑 Profit Warning:</strong> This strategy destroys <strong>${formatCurrency(Math.abs(diff))}</strong> in value. Revert changes immediately.`;
-            }
-        }
-    }
-
-        // 4. Update UI Numbers
-        document.getElementById("sim-current").innerText = formatCurrency(currentProfit);
-        document.getElementById("sim-projected").innerText = formatCurrency(newProfit);
-        
-        const deltaEl = document.getElementById("sim-delta");
-        const insightEl = document.getElementById("sim-insight");
-        const diff = newProfit - currentProfit;
-        const profitGrowth = currentProfit > 0 ? ((diff / currentProfit) * 100).toFixed(1) : 0;
-
-        // 5. THE "SUPERB" LOGIC ENGINE 🧠
-        if(diff >= 0) {
-            deltaEl.innerText = "▲ " + formatCurrency(diff) + " (" + profitGrowth + "%)";
-            deltaEl.className = "sim-delta delta-pos";
-            insightEl.style.color = "#166534";
-            insightEl.style.background = "#dcfce7";
-            insightEl.style.padding = "12px";
-            insightEl.style.borderRadius = "8px";
-
-            // Scenario A: Price is the main driver (The "Pricing Power" Insight)
-            if (pVal > 0 && pVal >= vVal) {
-                insightEl.innerHTML = `<strong>💎 Pricing Power:</strong> Raising prices by ${pVal}% improved your bottom line by <strong>${profitGrowth}%</strong> without needing to ship a single extra unit. This is the most efficient way to scale.`;
-            } 
-            // Scenario B: Volume is the main driver (The "Scale" Insight)
-            else if (vVal > 0 && vVal > pVal) {
-                insightEl.innerHTML = `<strong>🚀 Scale Velocity:</strong> Aggressive volume growth is paying off. Ensure your supply chain can handle the <strong>${vVal}% extra load</strong> required to capture this profit.`;
-            }
-            // Scenario C: Cost Cutting is the driver (The "Efficiency" Insight)
-            else if (cVal < 0) {
-                insightEl.innerHTML = `<strong>✂️ Pure Efficiency:</strong> Cutting costs by ${Math.abs(cVal)}% flows directly to your bank account. This strategy improves cash flow instantly without risking customer churn.`;
-            }
-            // Scenario D: General Good News
-            else {
-                insightEl.innerHTML = `<strong>📈 Strategic Win:</strong> This configuration yields an extra <strong>${formatCurrency(diff)}</strong> in pure profit. A solid move for business health.`;
-            }
-
-        } else {
-            // Negative Scenarios
-            deltaEl.innerText = "▼ " + formatCurrency(Math.abs(diff));
-            deltaEl.className = "sim-delta delta-neg";
-            insightEl.style.color = "#991b1b";
-            insightEl.style.background = "#fee2e2";
-            insightEl.style.padding = "12px";
-            insightEl.style.borderRadius = "8px";
-
-            // Scenario E: Price drop didn't work
-            if (pVal < 0 && vVal > 0) {
-                insightEl.innerHTML = `<strong>⚠️ Margin Trap:</strong> You lowered prices to get ${vVal}% more volume, but it wasn't enough. You are now <strong>working harder for less money</strong>.`;
-            }
-            // Scenario F: Costs rose too high
-            else if (cVal > 0) {
-                insightEl.innerHTML = `<strong>⚠️ Cost Bloat:</strong> Rising costs are eating your margin faster than revenue can grow. You must either raise prices or cut overhead immediately.`;
-            }
-            // General Bad News
-            else {
-                insightEl.innerHTML = `<strong>📉 Warning:</strong> This strategy destroys <strong>${formatCurrency(Math.abs(diff))}</strong> in value. Revert changes or find a new angle.`;
-            }
+            if (pVal < 0 && vVal > 0) { insightEl.innerHTML = `<strong>⚠️ The Discount Trap:</strong> Working harder for less money. Volume didn't cover the price cut.`; }
+            else if (pVal > 0 && vVal < 0) { insightEl.innerHTML = `<strong>📉 Price Shock:</strong> The market rejected your price increase. You lost too many customers.`; }
+            else if (vVal > 0 && cVal > 0) { insightEl.innerHTML = `<strong>💸 Growing Broke:</strong> Scaling while costs rise faster than revenue. Fix unit economics first.`; }
+            else if (pVal < 0 && vVal <= 0) { insightEl.innerHTML = `<strong>🥀 Brand Erosion:</strong> Lowering prices didn't even stimulate demand. Re-evaluate market fit.`; }
+            else { insightEl.innerHTML = `<strong>🛑 Profit Warning:</strong> This strategy destroys <strong>${formatCurrency(Math.abs(diff))}</strong> in value. Revert changes.`; }
         }
     }
 
@@ -714,8 +600,6 @@
       }
 
       const element = document.getElementById('pdf-export-container');
-      
-      // Reveal the element but keep it hidden behind the dashboard
       element.style.visibility = 'visible';
 
       const opt = {
@@ -726,7 +610,6 @@
         jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
       };
       
-      // Wait 300ms for browser to paint the HTML, then take picture and hide it again
       setTimeout(() => {
           html2pdf().set(opt).from(element).save().then(() => {
               element.style.visibility = 'hidden';
@@ -946,5 +829,3 @@
 
 </body>
 </html>
-
-
