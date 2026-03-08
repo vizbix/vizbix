@@ -74,7 +74,7 @@
       </a>
 
       <a class="nav-item" onclick="switchView('ai', this)">
-        <span style="background:white;color:#08090d;padding:2px 5px;border-radius:4px;font-size:11px;font-weight:900;line-height:1;flex-shrink:0;font-family:'Syne',sans-serif;">Ai</span>
+        <span style="background:white;color:#08090d;padding:2px 5px;border-radius:4px;font-size:11px;font-weight:600;line-height:1;flex-shrink:0;font-family:'Inter',sans-serif;">Ai</span>
         <span class="nav-item-text">Strategy</span>
         <span class="nav-pro-badge">PRO</span>
       </a>
@@ -160,7 +160,7 @@
           </button>
         </div>
 
-        <p style="text-align:center;color:var(--slate-300);font-size:12px;margin-top:12px;font-family:'DM Sans',sans-serif;">
+        <p style="text-align:center;color:var(--slate-300);font-size:12px;margin-top:12px;font-family:'Inter',sans-serif;">
           <span class="kbd">Ctrl+Enter</span> to generate &nbsp;·&nbsp; <span class="kbd">Tab</span> from last field to add row
         </p>
       </div>
@@ -168,14 +168,14 @@
 
     <!-- ══ DASHBOARD ════════════════════ -->
     <div id="view-dashboard" class="app-view">
-      <div style="max-width:1040px;margin:0 auto;">
+      <div style="max-width:1040px;margin:0 auto;width:100%;box-sizing:border-box;">
 
         <div class="page-header">
           <h2>Financial Dashboard</h2>
-          <div style="display:flex;align-items:center;gap:10px;background:white;padding:8px 16px;border-radius:99px;border:1px solid var(--slate-100);box-shadow:0 1px 3px rgba(8,9,13,0.04);">
-            <span style="font-size:10px;font-weight:700;color:var(--slate-300);text-transform:uppercase;letter-spacing:0.9px;font-family:'DM Sans',sans-serif;">Health Score</span>
+          <div style="display:flex;align-items:center;gap:10px;background:white;padding:8px 16px;border-radius:10px;border:1px solid var(--slate-100);box-shadow:0 1px 3px rgba(8,9,13,0.04);">
+            <span style="font-size:10px;font-weight:600;color:var(--slate-300);text-transform:uppercase;letter-spacing:0.8px;">Health Score</span>
             <div id="health-circle">–</div>
-            <div id="health-label" style="font-size:12px;font-weight:600;color:var(--slate-300);font-family:'DM Sans',sans-serif;"></div>
+            <div id="health-label" style="font-size:12px;font-weight:500;color:var(--slate-300);"></div>
           </div>
         </div>
 
@@ -211,13 +211,13 @@
 
           <div class="dash-grid">
             <div class="data-card" style="padding:20px;margin:0;width:100%;">
-              <h4 style="margin:0 0 16px;font-family:'DM Sans',sans-serif;font-size:10.5px;font-weight:700;color:var(--slate-300);text-transform:uppercase;letter-spacing:0.9px;">Revenue vs Profit</h4>
-              <div style="position:relative;height:290px;width:100%;"><canvas id="profitChart"></canvas></div>
+              <h4 style="margin:0 0 16px;font-family:'Inter',sans-serif;font-size:10.5px;font-weight:700;color:var(--slate-300);text-transform:uppercase;letter-spacing:0.9px;">Revenue vs Profit</h4>
+              <div style="position:relative;height:260px;width:100%;max-width:100%;"><canvas id="profitChart"></canvas></div>
             </div>
 
             <div class="data-card" style="padding:22px;margin:0;background:var(--slate-50);">
-              <h4 style="margin:0 0 16px;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:8px;letter-spacing:-0.03em;">⚡ 3-Point Action Plan</h4>
-              <div id="auto-insights-list" style="font-size:13.5px;line-height:1.65;display:flex;flex-direction:column;gap:11px;font-family:'DM Sans',sans-serif;">
+              <h4 style="margin:0 0 16px;font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:8px;letter-spacing:-0.01em;">⚡ 3-Point Action Plan</h4>
+              <div id="auto-insights-list" style="font-size:13.5px;line-height:1.65;display:flex;flex-direction:column;gap:11px;font-family:'Inter',sans-serif;">
                 <p style="color:var(--slate-300);font-size:14px;">Generate a report to see your action plan.</p>
               </div>
               <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--slate-100);">
@@ -234,11 +234,11 @@
 
     <!-- ══ SIMULATOR ════════════════════ -->
     <div id="view-simulator" class="app-view">
-      <div style="max-width:880px;margin:0 auto;">
+      <div style="max-width:880px;margin:0 auto;width:100%;box-sizing:border-box;">
         <div class="page-header">
           <div>
             <h2>🧪 Profit Lab</h2>
-            <p style="font-size:13px;margin-top:3px;font-family:'DM Sans',sans-serif;">Drag sliders to simulate scenarios in real time.</p>
+            <p style="font-size:13px;margin-top:3px;font-family:'Inter',sans-serif;">Drag sliders to simulate scenarios in real time.</p>
           </div>
         </div>
 
@@ -273,7 +273,7 @@
         </div>
 
         <div class="data-card" style="margin-top:14px;text-align:center;background:#f0fdf4;border-color:#bbf7d0;">
-          <p id="sim-insight" style="font-weight:700;color:#166534;font-size:14px;line-height:1.6;font-family:'DM Sans',sans-serif;">
+          <p id="sim-insight" style="font-weight:700;color:#166534;font-size:14px;line-height:1.6;font-family:'Inter',sans-serif;">
             Adjust the sliders to see how small changes impact your bottom line.
           </p>
         </div>
@@ -282,11 +282,11 @@
 
     <!-- ══ AI STRATEGY ═══════════════════ -->
     <div id="view-ai" class="app-view">
-      <div style="max-width:840px;margin:0 auto;height:100%;">
+      <div style="max-width:840px;margin:0 auto;width:100%;box-sizing:border-box;">
 
         <div class="page-header">
           <h2 style="display:flex;align-items:center;gap:12px;">
-            <span style="font-size:22px;background:var(--ink);color:white;padding:5px 9px;border-radius:8px;line-height:1;font-weight:900;font-family:'Syne',sans-serif;">Ai</span>
+            <span style="font-size:22px;background:var(--ink);color:white;padding:5px 9px;border-radius:8px;line-height:1;font-weight:600;font-family:'Inter',sans-serif;">Ai</span>
             Strategy
           </h2>
           <button class="btn btn-secondary" style="font-size:13px;padding:9px 16px;border-radius:9px;" onclick="window.startAIAnalysis();">
@@ -297,14 +297,14 @@
         <div id="aiSplashScreen"
           style="height:calc(100vh - 200px);display:flex;flex-direction:column;align-items:center;justify-content:center;background:white;border:1px solid var(--slate-100);border-radius:16px;box-shadow:0 1px 3px rgba(8,9,13,0.04);">
           <div style="font-size:54px;margin-bottom:14px;">🤖</div>
-          <h3 style="margin:0 0 8px;font-size:20px;font-weight:800;letter-spacing:-0.04em;font-family:'Syne',sans-serif;">AI Business Analyst</h3>
-          <p style="color:var(--slate-300);margin-bottom:24px;font-size:15px;text-align:center;max-width:280px;line-height:1.6;font-family:'DM Sans',sans-serif;">
+          <h3 style="margin:0 0 8px;font-size:20px;font-weight:600;letter-spacing:-0.01em;font-family:'Inter',sans-serif;">AI Business Analyst</h3>
+          <p style="color:var(--slate-300);margin-bottom:24px;font-size:15px;text-align:center;max-width:280px;line-height:1.6;font-family:'Inter',sans-serif;">
             Get a personalized 3-step growth plan based on your actual numbers.
           </p>
-          <button class="btn btn-dark btn-large" style="border-radius:99px;padding:15px 44px;font-size:16px;font-weight:800;" onclick="window.startAIAnalysis();">
+          <button class="btn btn-dark btn-large" style="border-radius:99px;padding:15px 44px;font-size:16px;font-weight:600;" onclick="window.startAIAnalysis();">
             ✨ Generate Strategy
           </button>
-          <p style="margin-top:14px;font-size:12px;color:var(--slate-200);font-family:'DM Sans',sans-serif;">Analyzes your live data · ~5 seconds</p>
+          <p style="margin-top:14px;font-size:12px;color:var(--slate-200);font-family:'Inter',sans-serif;">Analyzes your live data · ~5 seconds</p>
         </div>
 
         <div id="aiChatContainer" class="chat-container" style="display:none;flex-direction:column;">
@@ -334,7 +334,7 @@
 
     <!-- ══ DETAILED REPORT ════════════════ -->
     <div id="view-report" class="app-view">
-      <div style="max-width:1040px;margin:0 auto;">
+      <div style="max-width:1040px;margin:0 auto;width:100%;box-sizing:border-box;">
 
         <div class="page-header">
           <h2>Detailed Profit Report</h2>
@@ -373,7 +373,7 @@
           <button class="btn btn-secondary" style="font-size:13px;" onclick="window.fetchHistory();">↻ Refresh</button>
         </div>
         <div id="historyList" style="min-height:140px;background:var(--slate-50);border:1.5px dashed var(--slate-100);border-radius:11px;padding:20px;">
-          <p style="text-align:center;color:var(--slate-300);font-family:'DM Sans',sans-serif;">Loading history…</p>
+          <p style="text-align:center;color:var(--slate-300);font-family:'Inter',sans-serif;">Loading history…</p>
         </div>
       </div>
     </div>
@@ -386,7 +386,7 @@
         <div class="settings-section">
           <div class="settings-section-label">Currency</div>
           <select id="currencySelect" onchange="updateCurrency()"
-            style="width:100%;padding:11px 14px;border-radius:9px;border:1.5px solid var(--slate-100);font-size:14px;font-weight:600;background:var(--slate-50);outline:none;color:var(--ink);font-family:'DM Sans',sans-serif;transition:border 0.18s,box-shadow 0.18s;"
+            style="width:100%;padding:11px 14px;border-radius:9px;border:1.5px solid var(--slate-100);font-size:14px;font-weight:600;background:var(--slate-50);outline:none;color:var(--ink);font-family:'Inter',sans-serif;transition:border 0.18s,box-shadow 0.18s;"
             onfocus="this.style.borderColor='var(--indigo)';this.style.boxShadow='0 0 0 3px var(--indigo-glow)'"
             onblur="this.style.borderColor='var(--slate-100)';this.style.boxShadow='none'">
             <option value="INR">₹ Indian Rupee (INR)</option>
@@ -398,16 +398,16 @@
 
         <div class="settings-section">
           <div class="settings-section-label">Account</div>
-          <div id="settingsEmail" style="font-weight:700;font-size:15px;color:var(--ink);font-family:'DM Sans',sans-serif;">Not logged in</div>
+          <div id="settingsEmail" style="font-weight:700;font-size:15px;color:var(--ink);font-family:'Inter',sans-serif;">Not logged in</div>
         </div>
 
         <div class="settings-section" style="background:var(--indigo-light);border-color:#c4b5fd;">
           <div class="settings-section-label" style="color:var(--indigo);">Subscription Plan</div>
-          <div id="settingsPlan" style="font-weight:800;font-size:15px;color:var(--slate-300);margin-bottom:16px;font-family:'DM Sans',sans-serif;">Free Plan</div>
+          <div id="settingsPlan" style="font-weight:600;font-size:15px;color:var(--slate-300);margin-bottom:16px;font-family:'Inter',sans-serif;">Free Plan</div>
 
           <!-- Feature comparison table -->
           <div id="freePlanComparison" style="background:white;border-radius:10px;padding:14px;margin-bottom:16px;border:1px solid #c4b5fd;">
-            <div style="display:flex;justify-content:space-between;font-size:10.5px;font-weight:800;margin-bottom:10px;color:var(--indigo);text-transform:uppercase;letter-spacing:0.5px;font-family:'DM Sans',sans-serif;">
+            <div style="display:flex;justify-content:space-between;font-size:10.5px;font-weight:600;margin-bottom:10px;color:var(--indigo);text-transform:uppercase;letter-spacing:0.5px;font-family:'Inter',sans-serif;">
               <span>Feature</span>
               <span style="display:flex;gap:28px;"><span>Free</span><span>Pro</span></span>
             </div>
@@ -417,11 +417,11 @@
           <button id="upgradeBtn" class="btn-upgrade" onclick="window.pay();">
             🚀 Upgrade to PRO — ₹499 / 30 days
           </button>
-          <p style="font-size:12px;color:var(--slate-300);text-align:center;margin-top:8px;font-family:'DM Sans',sans-serif;">Instant access · 200+ businesses trust Vizbix</p>
+          <p style="font-size:12px;color:var(--slate-300);text-align:center;margin-top:8px;font-family:'Inter',sans-serif;">Instant access · 200+ businesses trust Vizbix</p>
         </div>
 
         <button class="btn btn-secondary"
-          style="width:100%;color:var(--red);border-color:#fecaca;margin-top:4px;font-family:'DM Sans',sans-serif;"
+          style="width:100%;color:var(--red);border-color:#fecaca;margin-top:4px;font-family:'Inter',sans-serif;"
           onclick="window.handleLogout();">Log Out</button>
       </div>
     </div>
@@ -443,7 +443,7 @@
       <div style="display:flex;justify-content:space-between;border-bottom:1px solid #e2e8f0;padding:10px 0;font-size:17px;"><span>Net Profit</span>   <span id="pdf-profit" style="font-weight:bold;">0</span></div>
       <div style="margin-top:36px;">
         <p style="font-size:13px;color:#64748b;margin:0 0 4px 0;font-weight:700;text-transform:uppercase;">TOTAL UNITS SOLD</p>
-        <div id="pdf-units-sold" style="font-size:48px;font-weight:900;">0</div>
+        <div id="pdf-units-sold" style="font-size:48px;font-weight:600;">0</div>
       </div>
     </div>
     <div style="flex:2;">
@@ -451,9 +451,9 @@
       <div style="display:flex;gap:24px;">
         <div style="flex:1;">
           <p style="color:#64748b;font-size:13px;margin:0 0 4px 0;font-weight:700;text-transform:uppercase;">GROSS MARGIN</p>
-          <div id="pdf-margin"   style="font-size:48px;font-weight:900;">0%</div>
+          <div id="pdf-margin"   style="font-size:48px;font-weight:600;">0%</div>
           <p style="color:#64748b;font-size:13px;margin:18px 0 4px 0;font-weight:700;text-transform:uppercase;">TOP PRODUCT</p>
-          <div id="pdf-top-prod" style="font-size:22px;font-weight:800;">-</div>
+          <div id="pdf-top-prod" style="font-size:22px;font-weight:600;">-</div>
         </div>
         <div style="flex:2;">
           <p style="font-size:14px;color:#64748b;margin-bottom:10px;font-weight:700;text-transform:uppercase;">KEY INSIGHTS</p>
@@ -755,10 +755,10 @@ function runAnalysis(data) {
       : `<span class="status-pill status-leak">Leak</span>`;
 
     reportHTML += `<tr>
-      <td style="font-weight:700;font-family:'DM Sans',sans-serif;">${item.name}</td>
+      <td style="font-weight:700;font-family:'Inter',sans-serif;">${item.name}</td>
       <td>${fmt(rev)}</td>
       <td>${fmt(cost)}</td>
-      <td style="font-weight:800;color:${profit<0?'var(--red)':'var(--ink)'};">${fmt(profit)}</td>
+      <td style="font-weight:600;color:${profit<0?'var(--red)':'var(--ink)'};">${fmt(profit)}</td>
       <td>
         <div class="margin-bar">
           <span class="margin-label">${mNum.toFixed(1)}%</span>
@@ -797,26 +797,26 @@ function runAnalysis(data) {
   // 3-point action plan
   let ins = '';
   if(top.profit>0) {
-    ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'DM Sans',sans-serif;"><strong style="color:var(--ink);">1. Scale Winner:</strong> ${top.name} generated ${fmt(top.profit)}. Increase ad spend here.</div>`;
+    ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'Inter',sans-serif;"><strong style="color:var(--ink);">1. Scale Winner:</strong> ${top.name} generated ${fmt(top.profit)}. Increase ad spend here.</div>`;
     pdfIns += `<li style="margin-bottom:10px;"><strong>Scale Winner:</strong> ${top.name} is your most profitable product.</li>`;
   } else {
-    ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'DM Sans',sans-serif;"><strong style="color:var(--ink);">1. Raise Prices:</strong> No profitable products. Raise prices or renegotiate costs immediately.</div>`;
+    ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'Inter',sans-serif;"><strong style="color:var(--ink);">1. Raise Prices:</strong> No profitable products. Raise prices or renegotiate costs immediately.</div>`;
     pdfIns += `<li style="margin-bottom:10px;"><strong>Raise Prices:</strong> No profitable products detected.</li>`;
   }
 
   if(leaks.length>0) {
-    ins += `<div style="padding:11px 14px;background:var(--red-bg);border-radius:9px;border:1px solid #fecaca;color:var(--red);font-family:'DM Sans',sans-serif;"><strong>2. Stop Leaks:</strong> ${leaks.join(', ')} are losing money. Reprice or drop them.</div>`;
+    ins += `<div style="padding:11px 14px;background:var(--red-bg);border-radius:9px;border:1px solid #fecaca;color:var(--red);font-family:'Inter',sans-serif;"><strong>2. Stop Leaks:</strong> ${leaks.join(', ')} are losing money. Reprice or drop them.</div>`;
     pdfIns += `<li style="margin-bottom:10px;color:#dc2626;"><strong>Fix Leaks:</strong> ${leaks.join(', ')} are losing money.</li>`;
   } else {
-    ins += `<div style="padding:11px 14px;background:var(--green-bg);border-radius:9px;border:1px solid #a7f3d0;color:#065f46;font-family:'DM Sans',sans-serif;"><strong>2. Unit Economics Safe:</strong> Zero products losing money. Baseline is secure.</div>`;
+    ins += `<div style="padding:11px 14px;background:var(--green-bg);border-radius:9px;border:1px solid #a7f3d0;color:#065f46;font-family:'Inter',sans-serif;"><strong>2. Unit Economics Safe:</strong> Zero products losing money. Baseline is secure.</div>`;
     pdfIns += `<li style="margin-bottom:10px;"><strong>Secure Economics:</strong> No products operating at a loss.</li>`;
   }
 
   if(ovMargin<20) {
-    ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'DM Sans',sans-serif;"><strong style="color:var(--ink);">3. Margin Warning:</strong> ${ovMargin.toFixed(1)}% is tight. Bundle items to raise AOV.</div>`;
+    ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'Inter',sans-serif;"><strong style="color:var(--ink);">3. Margin Warning:</strong> ${ovMargin.toFixed(1)}% is tight. Bundle items to raise AOV.</div>`;
     pdfIns += `<li><strong>Improve Margin:</strong> ${ovMargin.toFixed(1)}% margin is tight.</li>`;
   } else {
-    ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'DM Sans',sans-serif;"><strong style="color:var(--ink);">3. Healthy Margin:</strong> ${ovMargin.toFixed(1)}% gives excellent cash flow for growth.</div>`;
+    ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'Inter',sans-serif;"><strong style="color:var(--ink);">3. Healthy Margin:</strong> ${ovMargin.toFixed(1)}% gives excellent cash flow for growth.</div>`;
     pdfIns += `<li><strong>Healthy Margin:</strong> ${ovMargin.toFixed(1)}% gives flexibility to scale.</li>`;
   }
 
@@ -831,8 +831,8 @@ function runAnalysis(data) {
     {l:'Margin',     v:ovMargin.toFixed(1)+'%',c:ovMargin>=20?'var(--green)':'var(--amber)'},
     {l:'Units Sold', v:tItems.toLocaleString(),c:'#8b5cf6'},
   ].map(s=>`<div style="background:white;border:1px solid var(--slate-100);border-radius:10px;padding:9px 14px;min-width:105px;">
-    <span style="font-size:10px;font-weight:700;color:var(--slate-300);text-transform:uppercase;letter-spacing:0.7px;font-family:'DM Sans',sans-serif;display:block;margin-bottom:3px;">${s.l}</span>
-    <span style="font-size:17px;font-weight:800;color:${s.c};font-family:'Syne',sans-serif;letter-spacing:-0.03em;">${s.v}</span>
+    <span style="font-size:10px;font-weight:700;color:var(--slate-300);text-transform:uppercase;letter-spacing:0.7px;font-family:'Inter',sans-serif;display:block;margin-bottom:3px;">${s.l}</span>
+    <span style="font-size:17px;font-weight:600;color:${s.c};font-family:'Inter',sans-serif;letter-spacing:-0.01em;">${s.v}</span>
   </div>`).join('');
 
   // PDF fields
@@ -857,10 +857,10 @@ function runAnalysis(data) {
     },
     options: {
       responsive:true, maintainAspectRatio:false,
-      plugins: { legend:{position:'top', labels:{font:{weight:'600',size:12,family:'DM Sans'}, color:'#94a3b8'}} },
+      plugins: { legend:{position:'top', labels:{font:{weight:'600',size:12,family:'Inter'}, color:'#94a3b8'}} },
       scales: {
-        x:{ grid:{display:false}, ticks:{color:'#94a3b8',font:{weight:'600',family:'DM Sans'}} },
-        y:{ beginAtZero:true, grid:{color:'#f4f7ff'}, ticks:{color:'#94a3b8',font:{family:'DM Sans'}} }
+        x:{ grid:{display:false}, ticks:{color:'#94a3b8',font:{weight:'600',family:'Inter'}} },
+        y:{ beginAtZero:true, grid:{color:'#f4f7ff'}, ticks:{color:'#94a3b8',font:{family:'Inter'}} }
       }
     }
   });
@@ -1141,7 +1141,7 @@ window.fetchHistory = async function() {
   const list = document.getElementById('historyList'); if(!list) return;
   if(!AppState.isProUser) {
     list.innerHTML=`<div style="text-align:center;padding:20px;">
-      <p style="color:var(--slate-300);margin-bottom:14px;font-family:'DM Sans',sans-serif;">Cloud History is a Pro feature.</p>
+      <p style="color:var(--slate-300);margin-bottom:14px;font-family:'Inter',sans-serif;">Cloud History is a Pro feature.</p>
       <button class="btn btn-primary" style="font-size:13px;" onclick="switchView('settings',document.querySelectorAll('.nav-item')[7])">Upgrade to Pro</button>
     </div>`; return;
   }
@@ -1156,7 +1156,7 @@ window.fetchHistory = async function() {
     d.forEach(item=>{
       const dt = new Date(item.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
       const div = document.createElement('div'); div.className='history-item';
-      div.innerHTML=`<div><div style="font-weight:700;font-size:14px;color:var(--ink);font-family:'DM Sans',sans-serif;">${dt}</div><div style="font-size:12px;color:var(--slate-300);font-family:'DM Sans',sans-serif;">${item.data.length} products</div></div><button class="btn btn-secondary" style="font-size:12px;padding:7px 12px;">Load</button>`;
+      div.innerHTML=`<div><div style="font-weight:700;font-size:14px;color:var(--ink);font-family:'Inter',sans-serif;">${dt}</div><div style="font-size:12px;color:var(--slate-300);font-family:'Inter',sans-serif;">${item.data.length} products</div></div><button class="btn btn-secondary" style="font-size:12px;padding:7px 12px;">Load</button>`;
       div.onclick = ()=>window.loadHistoryItem(item.data);
       list.appendChild(div);
     });
