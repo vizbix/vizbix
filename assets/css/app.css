@@ -1013,6 +1013,10 @@ input[type=range]::-webkit-slider-thumb:hover {
 .chart-wrap { box-sizing: border-box; }
 .chart-wrap canvas { display: block; max-width: 100% !important; }
 
+/* ─── MOBILE-ONLY ELEMENTS (hidden on desktop) ── */
+.mobile-app-bar { display: none; }
+.mobile-overlay  { display: none; }
+
 /* ─── KEYBOARD SHORTCUT HINT ─────────────── */
 .kbd {
   display: inline-block;
