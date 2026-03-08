@@ -1,10 +1,10 @@
 /* =========================================
    main.css v8.0 — Vizbix Global Styles
    Design: Refined editorial SaaS
-   Fonts: Syne (display) + DM Sans (body)
+   Fonts: Inter (all weights)
    ========================================= */
 
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
   --ink:           #08090d;
@@ -58,14 +58,14 @@ html, body {
 }
 
 body {
-  font-family: 'DM Sans', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   font-size: 15px;
   line-height: 1.6;
 }
 
-h1, h2, h3, h4, h5 {
-  font-family: 'Syne', sans-serif;
-  letter-spacing: -0.03em;
+h1, h2, h3, h4, h5 { /* unified Inter */
+  font-family: 'Inter', sans-serif;
+  letter-spacing: -0.01em;
   line-height: 1.15;
   color: var(--ink);
   margin: 0;
@@ -80,7 +80,7 @@ a { text-decoration: none; color: inherit; }
   align-items: center;
   justify-content: center;
   gap: 6px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 600;
   font-size: 14px;
   border-radius: 10px;
@@ -157,9 +157,9 @@ header {
 }
 
 .logo {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 19px;
-  font-weight: 800;
+  font-weight: 600;
   letter-spacing: -0.05em;
   color: var(--ink);
   display: flex;
@@ -250,10 +250,10 @@ header {
 }
 
 .drawer-title {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 700;
   font-size: 16px;
-  letter-spacing: -0.03em;
+  letter-spacing: -0.01em;
 }
 
 .drawer-close {
@@ -344,7 +344,7 @@ header {
   border: 1.5px solid var(--slate-100);
   margin-bottom: 12px;
   font-size: 14px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   outline: none;
   transition: border 0.2s, box-shadow 0.2s;
   color: var(--ink);
@@ -370,7 +370,7 @@ footer {
 }
 
 .footer-col h4 {
-  font-family: 'Syne', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 700;
   color: var(--ink);
