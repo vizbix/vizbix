@@ -5,828 +5,1235 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Profit Optimizer Pro | Vizbix</title>
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-  
-  <link rel="stylesheet" href="../assets/css/main.css?v=7.0">
-  <link rel="stylesheet" href="../assets/css/app.css?v=7.0">
-  
+  <link rel="stylesheet" href="../assets/css/main.css?v=8.0">
+  <link rel="stylesheet" href="../assets/css/app.css?v=8.0">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
-    .app-view { display: none; transition: filter 0.3s ease; }
-    .app-view.active { display: block; animation: fadeIn 0.3s ease; }
-    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
-    .pro-lock-hidden { display: none !important; }
-    .ai-typing { font-style: italic; color: #2563eb; font-size: 14px; font-weight: 600; padding: 10px 20px; display: none; }
+    .app-view { display: none; }
+    .app-view.active {
+      display: block;
+      animation: vzFadeIn 0.22s ease;
+    }
   </style>
 </head>
 <body>
 
-  <div id="vizbix-nav-container"></div>
+<div id="vizbix-nav-container"></div>
+<div id="toastContainer"></div>
 
-  <div class="app-wrapper">
-    
-    <div id="proLockOverlay" class="pro-lock-overlay pro-lock-hidden">
-      <div class="pro-lock-card">
-        <h2>🔒 Pro Feature</h2>
-        <p>Unlock detailed reports, AI strategy, and the Profit Simulator.</p>
-        <button class="btn btn-primary btn-large" style="width: 100%;" onclick="switchView('settings', document.querySelectorAll('.nav-item')[6])">Upgrade to Pro (₹499)</button>
-      </div>
+<div class="app-wrapper">
+
+  <!-- ── PAYWALL OVERLAY ───────────────── -->
+  <div id="proLockOverlay" class="pro-lock-overlay pro-lock-hidden">
+    <div class="pro-lock-card">
+      <button class="pro-lock-close" onclick="closePaywall()">×</button>
+      <span class="lock-icon">🚀</span>
+      <h2>Unlock Pro Features</h2>
+      <p>Everything you need to grow your business profitably.</p>
+      <div class="pro-price-badge"><strong>₹499</strong> <span>/ 30 days</span></div>
+      <ul class="pro-feature-list">
+        <li><span class="check">✓</span> AI Strategy Chat — unlimited messages</li>
+        <li><span class="check">✓</span> Detailed Profit Report + PDF Export</li>
+        <li><span class="check">✓</span> Profit Lab What-If Simulator</li>
+        <li><span class="check">✓</span> Cloud Save &amp; History</li>
+        <li><span class="check">✓</span> Financial Health Score</li>
+      </ul>
+      <button class="btn-upgrade" onclick="switchView('settings', document.querySelectorAll('.nav-item')[6]); closePaywall();">
+        Upgrade to Pro — ₹499
+      </button>
+      <p class="pro-social-proof">⭐ Trusted by 200+ business owners · Instant access</p>
     </div>
-    
-    <div class="mobile-overlay" id="mobileAppOverlay" onclick="toggleAppDrawer()"></div>
+  </div>
 
-    <aside class="app-sidebar" id="appSidebar">
-      <nav class="sidebar-nav">
-        <a class="nav-item" onclick="switchView('dashboard', this)" id="nav-dashboard">
-          <svg viewBox="0 0 24 24"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg><span class="nav-item-text">Dashboard</span>
-        </a>
-        
-        <a class="nav-item" onclick="switchView('simulator', this); initSimulator();">
-          <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.06-.94l2.03-1.58a.96.96 0 0 0 .12-.61l-1.92-3.32a.965.965 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.96.96 0 0 0-.48-.41h-3.84a.96.96 0 0 0-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.965.965 0 0 0-.59.22L2.73 8.87a.96.96 0 0 0 .12.61l2.03 1.58c-.04.3-.06.61-.06.94s.02.64.06.94l-2.03 1.58a.96.96 0 0 0-.12.61l1.92 3.32a.965.965 0 0 0 .59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96a.965.965 0 0 0 .59-.22l1.92-3.32a.96.96 0 0 0-.12-.61l-2.03-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
-          <span class="nav-item-text">Profit Lab</span>
-        </a>
+  <div class="mobile-overlay" id="mobileAppOverlay" onclick="toggleAppDrawer()"></div>
 
-        <a class="nav-item" onclick="switchView('ai', this)">
-          <span style="background: white; color: #0f172a; padding: 2px 4px; border-radius: 4px; font-size: 14px; font-weight: 900; line-height: 1;">Ai</span><span class="nav-item-text">Strategy</span>
-        </a>
-        <a class="nav-item" onclick="switchView('report', this)">
-          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg><span class="nav-item-text">Detailed Report</span>
-        </a>
-        <a class="nav-item active" onclick="switchView('data', this)">
-          <svg viewBox="0 0 24 24"><path d="M3 3v18h18V3H3zm16 16H5v-2h14v2zm0-4H5v-2h14v2zm0-4H5V9h14v2zm0-4H5V5h14v2z"/></svg><span class="nav-item-text">Data Input</span>
-        </a>
-        <a class="nav-item" onclick="switchView('history', this); window.fetchHistory();">
-          <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg><span class="nav-item-text">Cloud History</span>
-        </a>
-        <div style="flex-grow: 1;"></div>
-        <a class="nav-item" onclick="switchView('settings', this)">
-          <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg><span class="nav-item-text">Settings</span>
-        </a>
-      </nav>
-      <div class="sidebar-profile">
-        <div class="profile-label">Signed in as</div>
-        <div class="profile-email" id="sidebarEmail">Loading auth...</div>
-        <div class="profile-plan" id="sidebarPlan">Verifying Plan...</div>
-      </div>
-    </aside>
+  <!-- ── SIDEBAR ───────────────────────── -->
+  <aside class="app-sidebar" id="appSidebar">
+    <nav class="sidebar-nav">
 
-    <main class="app-main" id="mainContainer">
-      
-      <div class="mobile-app-bar">
-        <button onclick="toggleAppDrawer()">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-        </button>
-        <div class="page-title" id="mobilePageTitle">Data Input</div>
-      </div>
+      <div class="sidebar-section-label">Main</div>
 
-      <div id="view-data" class="app-view active">
-        <div class="data-card">
-          <div class="card-header">
-            <div class="card-title">Data Source</div>
-            <a class="demo-link" onclick="loadDemoData()">USE DEMO DATA</a>
-          </div>
-          <div class="data-table-headers">
-            <div>Name</div>
-            <div id="hdr-sell">Sell Price (₹)</div>
-            <div id="hdr-cost">Cost Price (₹)</div>
-            <div>Qty Sold</div>
-            <div></div>
-          </div>
-          <div id="items">
-            <div class="data-row">
-              <input type="text" placeholder="Product Name" class="input-name" value="Wireless Earbuds">
-              <input type="number" placeholder="Sell Price" class="input-sell" value="2500">
-              <input type="number" placeholder="Cost Price" class="input-cost" value="1200">
-              <input type="number" placeholder="Quantity" class="input-qty" value="140">
-              <button class="delete-btn" onclick="this.parentElement.remove()">×</button>
-            </div>
-          </div>
-          <button class="add-row-btn" onclick="addNewRow()">+ Add Product</button>
-          <div class="action-buttons-wrap">
-            <button class="btn btn-primary" style="flex: 1; padding: 16px; font-size: 16px;" onclick="processDataAndShowReport()">Generate Dashboard →</button>
-            <button id="saveCloudBtn" class="btn btn-secondary" style="padding: 16px;" onclick="window.saveToCloud();">💾 Save to Cloud</button>
+      <a class="nav-item active" onclick="switchView('data', this)" id="nav-data">
+        <svg viewBox="0 0 24 24"><path d="M3 3v18h18V3H3zm16 16H5v-2h14v2zm0-4H5v-2h14v2zm0-4H5V9h14v2zm0-4H5V5h14v2z"/></svg>
+        <span class="nav-item-text">Data Input</span>
+      </a>
+
+      <a class="nav-item" onclick="switchView('dashboard', this)" id="nav-dashboard">
+        <svg viewBox="0 0 24 24"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg>
+        <span class="nav-item-text">Dashboard</span>
+      </a>
+
+      <div class="sidebar-section-label">Pro Tools</div>
+
+      <a class="nav-item" onclick="switchView('simulator', this); initSimulator();">
+        <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.06-.94l2.03-1.58a.49.49 0 0 0 .12-.61l-1.92-3.32a.49.49 0 0 0-.59-.22l-2.39.96a7.27 7.27 0 0 0-1.62-.94l-.36-2.54a.484.484 0 0 0-.48-.41h-3.84c-.24 0-.43.17-.47.41l-.36 2.54a7.27 7.27 0 0 0-1.62.94l-2.39-.96a.49.49 0 0 0-.59.22L2.73 8.87a.48.48 0 0 0 .12.61l2.03 1.58a7.24 7.24 0 0 0-.06.94c0 .32.02.64.06.94l-2.03 1.58a.48.48 0 0 0-.12.61l1.92 3.32c.12.22.37.29.59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96c.22.08.47 0 .59-.22l1.92-3.32a.48.48 0 0 0-.12-.61l-2.03-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+        <span class="nav-item-text">Profit Lab</span>
+        <span class="nav-pro-badge">PRO</span>
+      </a>
+
+      <a class="nav-item" onclick="switchView('ai', this)">
+        <span style="background:white;color:#08090d;padding:2px 5px;border-radius:4px;font-size:11px;font-weight:900;line-height:1;flex-shrink:0;font-family:'Syne',sans-serif;">Ai</span>
+        <span class="nav-item-text">Strategy</span>
+        <span class="nav-pro-badge">PRO</span>
+      </a>
+
+      <a class="nav-item" onclick="switchView('report', this)">
+        <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg>
+        <span class="nav-item-text">Detailed Report</span>
+        <span class="nav-pro-badge">PRO</span>
+      </a>
+
+      <a class="nav-item" onclick="switchView('history', this); window.fetchHistory();">
+        <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg>
+        <span class="nav-item-text">Cloud History</span>
+        <span class="nav-pro-badge">PRO</span>
+      </a>
+
+      <div style="flex-grow:1;"></div>
+      <div class="sidebar-divider"></div>
+
+      <a class="nav-item" onclick="switchView('settings', this)">
+        <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94zM12,15.6c-1.98,0-3.6-1.62-3.6-3.6s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
+        <span class="nav-item-text">Settings</span>
+      </a>
+    </nav>
+
+    <div class="sidebar-profile">
+      <div class="profile-label">Signed in as</div>
+      <div class="profile-email" id="sidebarEmail">Loading...</div>
+      <div class="profile-plan" id="sidebarPlan">Verifying…</div>
+    </div>
+  </aside>
+
+  <!-- ── MAIN ──────────────────────────── -->
+  <main class="app-main" id="mainContainer">
+
+    <div class="mobile-app-bar">
+      <button onclick="toggleAppDrawer()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <div class="page-title" id="mobilePageTitle">Data Input</div>
+    </div>
+
+    <!-- ══ DATA INPUT ═══════════════════ -->
+    <div id="view-data" class="app-view active">
+      <div class="data-card">
+        <div class="card-header">
+          <div class="card-title">📋 Product Data</div>
+          <a class="demo-link" onclick="loadDemoData()">↗ Load Demo</a>
+        </div>
+
+        <div class="data-table-headers">
+          <div>Product Name</div>
+          <div id="hdr-sell">Sell Price (₹)</div>
+          <div id="hdr-cost">Cost Price (₹)</div>
+          <div>Qty Sold</div>
+          <div></div>
+        </div>
+
+        <div id="items">
+          <div class="data-row">
+            <input type="text"   placeholder="e.g. Wireless Earbuds" class="input-name" value="Wireless Earbuds">
+            <input type="number" placeholder="0" class="input-sell" value="2500">
+            <input type="number" placeholder="0" class="input-cost" value="1200">
+            <input type="number" placeholder="0" class="input-qty"  value="140">
+            <button class="delete-btn" onclick="removeRow(this)" title="Remove">×</button>
           </div>
         </div>
+
+        <button class="add-row-btn" onclick="addNewRow()">+ Add Product</button>
+
+        <div class="action-buttons-wrap">
+          <button class="btn btn-primary"
+            style="flex:1;padding:14px 20px;font-size:15px;font-weight:700;border-radius:11px;"
+            onclick="processDataAndShowReport()">
+            Generate Dashboard →
+          </button>
+          <button id="saveCloudBtn" class="btn btn-secondary"
+            style="padding:14px 18px;border-radius:11px;"
+            onclick="window.saveToCloud();">
+            💾 Save
+          </button>
+        </div>
+
+        <p style="text-align:center;color:var(--slate-300);font-size:12px;margin-top:12px;font-family:'DM Sans',sans-serif;">
+          <span class="kbd">Ctrl+Enter</span> to generate &nbsp;·&nbsp; <span class="kbd">Tab</span> from last field to add row
+        </p>
       </div>
+    </div>
 
-      <div id="view-dashboard" class="app-view">
-        <div style="max-width: 1000px; margin: 0 auto;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-            <h2 style="margin: 0;">Financial Dashboard</h2>
-            <div style="display: flex; align-items: center; gap: 12px; background: white; padding: 8px 16px; border-radius: 99px; border: 1px solid var(--border);">
-                <span style="font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Health Score</span>
-                <div id="health-circle" style="font-size: 16px; font-weight: 900; padding: 4px 12px; border-radius: 99px; background: #e2e8f0; color: #475569;">0%</div>
-            </div>
+    <!-- ══ DASHBOARD ════════════════════ -->
+    <div id="view-dashboard" class="app-view">
+      <div style="max-width:1040px;margin:0 auto;">
+
+        <div class="page-header">
+          <h2>Financial Dashboard</h2>
+          <div style="display:flex;align-items:center;gap:10px;background:white;padding:8px 16px;border-radius:99px;border:1px solid var(--slate-100);box-shadow:0 1px 3px rgba(8,9,13,0.04);">
+            <span style="font-size:10px;font-weight:700;color:var(--slate-300);text-transform:uppercase;letter-spacing:0.9px;font-family:'DM Sans',sans-serif;">Health Score</span>
+            <div id="health-circle">–</div>
+            <div id="health-label" style="font-size:12px;font-weight:600;color:var(--slate-300);font-family:'DM Sans',sans-serif;"></div>
           </div>
+        </div>
 
+        <!-- Skeleton (shown during compute) -->
+        <div id="dashboardSkeleton" style="display:none;">
+          <div class="metrics-grid" style="margin-bottom:18px;">
+            <div class="skeleton-card"><div class="skeleton skeleton-text" style="width:50%;"></div><div class="skeleton skeleton-value"></div></div>
+            <div class="skeleton-card"><div class="skeleton skeleton-text" style="width:50%;"></div><div class="skeleton skeleton-value"></div></div>
+            <div class="skeleton-card"><div class="skeleton skeleton-text" style="width:50%;"></div><div class="skeleton skeleton-value"></div></div>
+            <div class="skeleton-card"><div class="skeleton skeleton-text" style="width:50%;"></div><div class="skeleton skeleton-value"></div></div>
+          </div>
+        </div>
+
+        <div id="dashboardContent" style="transition:opacity 0.3s;">
           <div class="metrics-grid">
-            <div class="metric-card"><h4>Total Revenue</h4><div class="value" id="dash-revenue">0</div></div>
-            <div class="metric-card highlight"><h4>Total Net Profit</h4><div class="value" id="dash-profit">0</div></div>
-            <div class="metric-card"><h4>Avg Gross Margin</h4><div class="value" id="dash-margin">0%</div></div>
-            <div class="metric-card" style="border-left: 4px solid var(--primary);"><h4>Top Product</h4><div class="value" id="dash-top-product" style="font-size: 20px; line-height: 1.3; margin-top: 8px;">-</div></div>
+            <div class="metric-card">
+              <h4>Total Revenue</h4>
+              <div class="value" id="dash-revenue">—</div>
+            </div>
+            <div class="metric-card highlight">
+              <h4>Total Net Profit</h4>
+              <div class="value" id="dash-profit">—</div>
+            </div>
+            <div class="metric-card">
+              <h4>Avg Gross Margin</h4>
+              <div class="value" id="dash-margin">—</div>
+            </div>
+            <div class="metric-card">
+              <h4>Top Product</h4>
+              <div class="value" id="dash-top-product" style="font-size:18px;line-height:1.3;margin-top:6px;">—</div>
+            </div>
           </div>
 
           <div class="dash-grid">
-            <div class="data-card" style="padding: 20px; margin: 0; width: 100%;">
-              <h4 style="margin-top: 0; margin-bottom: 16px; color: var(--text-muted); text-transform: uppercase; font-size: 13px;">Revenue vs Profit</h4>
-              <div style="position: relative; height: 300px; width: 100%;"><canvas id="profitChart"></canvas></div>
+            <div class="data-card" style="padding:20px;margin:0;width:100%;">
+              <h4 style="margin:0 0 16px;font-family:'DM Sans',sans-serif;font-size:10.5px;font-weight:700;color:var(--slate-300);text-transform:uppercase;letter-spacing:0.9px;">Revenue vs Profit</h4>
+              <div style="position:relative;height:290px;width:100%;"><canvas id="profitChart"></canvas></div>
             </div>
-            <div class="data-card" style="padding: 24px; margin: 0; background: #f8fafc;">
-              <h4 style="margin-top: 0; margin-bottom: 16px; color: var(--dark); font-size: 16px; display: flex; align-items: center; gap: 8px;">⚡ 3-Point Action Plan</h4>
-              <div id="auto-insights-list" style="font-size: 14px; line-height: 1.6; display: flex; flex-direction: column; gap: 16px;">
-                <p>Run analysis to see insights.</p>
+
+            <div class="data-card" style="padding:22px;margin:0;background:var(--slate-50);">
+              <h4 style="margin:0 0 16px;font-family:'Syne',sans-serif;font-size:15px;font-weight:800;color:var(--ink);display:flex;align-items:center;gap:8px;letter-spacing:-0.03em;">⚡ 3-Point Action Plan</h4>
+              <div id="auto-insights-list" style="font-size:13.5px;line-height:1.65;display:flex;flex-direction:column;gap:11px;font-family:'DM Sans',sans-serif;">
+                <p style="color:var(--slate-300);font-size:14px;">Generate a report to see your action plan.</p>
+              </div>
+              <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--slate-100);">
+                <button class="btn btn-secondary" style="font-size:13px;width:100%;border-radius:9px;"
+                  onclick="switchView('ai', document.querySelectorAll('.nav-item')[3])">
+                  ✨ Get AI Deep Analysis →
+                </button>
               </div>
             </div>
           </div>
         </div>
       </div>
+    </div>
 
-      <div id="view-simulator" class="app-view">
-        <div style="max-width: 900px; margin: 0 auto;">
-            <h2 style="margin-bottom: 24px;">🧪 Profit Lab <span style="font-size: 14px; font-weight: 400; color: var(--text-muted);">What-If Simulator</span></h2>
-            
-            <div class="sim-controls">
-                <div class="slider-group">
-                    <div class="slider-label-row"><span>Price Change</span><span class="slider-val" id="val-price">0%</span></div>
-                    <input type="range" min="-50" max="50" value="0" id="slide-price" oninput="runSimulation()">
-                </div>
-                <div class="slider-group">
-                    <div class="slider-label-row"><span>Volume Change</span><span class="slider-val" id="val-vol">0%</span></div>
-                    <input type="range" min="-50" max="50" value="0" id="slide-vol" oninput="runSimulation()">
-                </div>
-                <div class="slider-group">
-                    <div class="slider-label-row"><span>Cost Change</span><span class="slider-val" id="val-cost">0%</span></div>
-                    <input type="range" min="-50" max="50" value="0" id="slide-cost" oninput="runSimulation()">
-                </div>
-                <div style="text-align: center; margin-top: 10px;">
-                    <button class="btn btn-secondary" style="font-size: 13px; padding: 6px 12px;" onclick="resetSimulation()">Reset All</button>
-                </div>
+    <!-- ══ SIMULATOR ════════════════════ -->
+    <div id="view-simulator" class="app-view">
+      <div style="max-width:880px;margin:0 auto;">
+        <div class="page-header">
+          <div>
+            <h2>🧪 Profit Lab</h2>
+            <p style="font-size:13px;margin-top:3px;font-family:'DM Sans',sans-serif;">Drag sliders to simulate scenarios in real time.</p>
+          </div>
+        </div>
+
+        <div class="sim-controls">
+          <div class="slider-group">
+            <div class="slider-label-row"><span>Price Change</span><span class="slider-val" id="val-price">0%</span></div>
+            <input type="range" min="-50" max="50" value="0" id="slide-price" oninput="runSimulation()">
+          </div>
+          <div class="slider-group">
+            <div class="slider-label-row"><span>Volume Change</span><span class="slider-val" id="val-vol">0%</span></div>
+            <input type="range" min="-50" max="50" value="0" id="slide-vol" oninput="runSimulation()">
+          </div>
+          <div class="slider-group">
+            <div class="slider-label-row"><span>Cost Change</span><span class="slider-val" id="val-cost">0%</span></div>
+            <input type="range" min="-50" max="50" value="0" id="slide-cost" oninput="runSimulation()">
+          </div>
+          <div style="text-align:center;margin-top:6px;">
+            <button class="btn btn-secondary" style="font-size:12px;padding:7px 16px;border-radius:8px;" onclick="resetSimulation()">↺ Reset All</button>
+          </div>
+        </div>
+
+        <div class="sim-results">
+          <div class="sim-card">
+            <h4>Current Profit</h4>
+            <div class="big-num" id="sim-current">—</div>
+          </div>
+          <div class="sim-card active">
+            <h4>Simulated Profit</h4>
+            <div class="big-num" id="sim-projected">—</div>
+            <div class="sim-delta" id="sim-delta">—</div>
+          </div>
+        </div>
+
+        <div class="data-card" style="margin-top:14px;text-align:center;background:#f0fdf4;border-color:#bbf7d0;">
+          <p id="sim-insight" style="font-weight:700;color:#166534;font-size:14px;line-height:1.6;font-family:'DM Sans',sans-serif;">
+            Adjust the sliders to see how small changes impact your bottom line.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ AI STRATEGY ═══════════════════ -->
+    <div id="view-ai" class="app-view">
+      <div style="max-width:840px;margin:0 auto;height:100%;">
+
+        <div class="page-header">
+          <h2 style="display:flex;align-items:center;gap:12px;">
+            <span style="font-size:22px;background:var(--ink);color:white;padding:5px 9px;border-radius:8px;line-height:1;font-weight:900;font-family:'Syne',sans-serif;">Ai</span>
+            Strategy
+          </h2>
+          <button class="btn btn-secondary" style="font-size:13px;padding:9px 16px;border-radius:9px;" onclick="window.startAIAnalysis();">
+            🔄 Re-Analyze Data
+          </button>
+        </div>
+
+        <div id="aiSplashScreen"
+          style="height:calc(100vh - 200px);display:flex;flex-direction:column;align-items:center;justify-content:center;background:white;border:1px solid var(--slate-100);border-radius:16px;box-shadow:0 1px 3px rgba(8,9,13,0.04);">
+          <div style="font-size:54px;margin-bottom:14px;">🤖</div>
+          <h3 style="margin:0 0 8px;font-size:20px;font-weight:800;letter-spacing:-0.04em;font-family:'Syne',sans-serif;">AI Business Analyst</h3>
+          <p style="color:var(--slate-300);margin-bottom:24px;font-size:15px;text-align:center;max-width:280px;line-height:1.6;font-family:'DM Sans',sans-serif;">
+            Get a personalized 3-step growth plan based on your actual numbers.
+          </p>
+          <button class="btn btn-dark btn-large" style="border-radius:99px;padding:15px 44px;font-size:16px;font-weight:800;" onclick="window.startAIAnalysis();">
+            ✨ Generate Strategy
+          </button>
+          <p style="margin-top:14px;font-size:12px;color:var(--slate-200);font-family:'DM Sans',sans-serif;">Analyzes your live data · ~5 seconds</p>
+        </div>
+
+        <div id="aiChatContainer" class="chat-container" style="display:none;flex-direction:column;">
+          <div class="chat-history" id="chatHistory">
+            <div class="chat-msg msg-ai">Hi! Click <strong>Re-Analyze Data</strong> to run your numbers, or ask me anything below.</div>
+          </div>
+
+          <div class="chat-suggestion-chips" id="suggestionChips">
+            <span class="chip" onclick="sendSuggestion(this.innerText)">💰 How to raise prices?</span>
+            <span class="chip" onclick="sendSuggestion(this.innerText)">📦 Which product to drop?</span>
+            <span class="chip" onclick="sendSuggestion(this.innerText)">📈 How to increase volume?</span>
+            <span class="chip" onclick="sendSuggestion(this.innerText)">✂️ How to cut costs?</span>
+          </div>
+
+          <div style="background:white;">
+            <div id="typingIndicator" class="ai-typing">AI is analyzing your business… ⏳</div>
+            <div class="chat-input-row">
+              <input type="text" id="aiChatInput"
+                placeholder="Ask about pricing, margins, bundling, growth…"
+                onkeypress="if(event.key==='Enter') window.sendChatMessage()" />
+              <button id="chatSendBtn" onclick="window.sendChatMessage()">➔</button>
             </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-            <div class="sim-results">
-                <div class="sim-card">
-                    <h4>Current Profit</h4>
-                    <div class="big-num" id="sim-current">0</div>
-                </div>
-                <div class="sim-card active">
-                    <h4>Simulated Profit</h4>
-                    <div class="big-num" id="sim-projected">0</div>
-                    <div class="sim-delta" id="sim-delta">-</div>
-                </div>
+    <!-- ══ DETAILED REPORT ════════════════ -->
+    <div id="view-report" class="app-view">
+      <div style="max-width:1040px;margin:0 auto;">
+
+        <div class="page-header">
+          <h2>Detailed Profit Report</h2>
+          <div style="display:flex;gap:9px;flex-wrap:wrap;">
+            <button class="btn btn-secondary" style="font-size:13px;" onclick="switchView('data', document.getElementById('nav-data'))">← Edit Data</button>
+            <button class="btn btn-primary"   style="font-size:13px;" onclick="exportExecutivePDF()">📥 Download PDF</button>
+          </div>
+        </div>
+
+        <!-- Summary bar above table -->
+        <div id="reportSummaryBar" style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;"></div>
+
+        <div style="overflow-x:auto;background:white;border:1px solid var(--slate-100);border-radius:14px;box-shadow:0 1px 3px rgba(8,9,13,0.04);">
+          <table class="report-table" style="border:none;">
+            <thead>
+              <tr>
+                <th>Product Name</th>
+                <th>Revenue</th>
+                <th>Total Cost</th>
+                <th>Total Profit</th>
+                <th>Margin %</th>
+                <th>Status</th>
+              </tr>
+            </thead>
+            <tbody id="reportTableBody"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CLOUD HISTORY ══════════════════ -->
+    <div id="view-history" class="app-view">
+      <div class="data-card" style="max-width:680px;margin:0 auto;">
+        <div class="page-header" style="margin-bottom:16px;">
+          <h2>Cloud History</h2>
+          <button class="btn btn-secondary" style="font-size:13px;" onclick="window.fetchHistory();">↻ Refresh</button>
+        </div>
+        <div id="historyList" style="min-height:140px;background:var(--slate-50);border:1.5px dashed var(--slate-100);border-radius:11px;padding:20px;">
+          <p style="text-align:center;color:var(--slate-300);font-family:'DM Sans',sans-serif;">Loading history…</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ SETTINGS ═══════════════════════ -->
+    <div id="view-settings" class="app-view">
+      <div class="data-card" style="max-width:580px;margin:0 auto;">
+        <h2 style="margin-bottom:22px;font-size:20px;">Account Settings</h2>
+
+        <div class="settings-section">
+          <div class="settings-section-label">Currency</div>
+          <select id="currencySelect" onchange="updateCurrency()"
+            style="width:100%;padding:11px 14px;border-radius:9px;border:1.5px solid var(--slate-100);font-size:14px;font-weight:600;background:var(--slate-50);outline:none;color:var(--ink);font-family:'DM Sans',sans-serif;transition:border 0.18s,box-shadow 0.18s;"
+            onfocus="this.style.borderColor='var(--indigo)';this.style.boxShadow='0 0 0 3px var(--indigo-glow)'"
+            onblur="this.style.borderColor='var(--slate-100)';this.style.boxShadow='none'">
+            <option value="INR">₹ Indian Rupee (INR)</option>
+            <option value="USD">$ US Dollar (USD)</option>
+            <option value="EUR">€ Euro (EUR)</option>
+            <option value="GBP">£ British Pound (GBP)</option>
+          </select>
+        </div>
+
+        <div class="settings-section">
+          <div class="settings-section-label">Account</div>
+          <div id="settingsEmail" style="font-weight:700;font-size:15px;color:var(--ink);font-family:'DM Sans',sans-serif;">Not logged in</div>
+        </div>
+
+        <div class="settings-section" style="background:var(--indigo-light);border-color:#c4b5fd;">
+          <div class="settings-section-label" style="color:var(--indigo);">Subscription Plan</div>
+          <div id="settingsPlan" style="font-weight:800;font-size:15px;color:var(--slate-300);margin-bottom:16px;font-family:'DM Sans',sans-serif;">Free Plan</div>
+
+          <!-- Feature comparison table -->
+          <div id="freePlanComparison" style="background:white;border-radius:10px;padding:14px;margin-bottom:16px;border:1px solid #c4b5fd;">
+            <div style="display:flex;justify-content:space-between;font-size:10.5px;font-weight:800;margin-bottom:10px;color:var(--indigo);text-transform:uppercase;letter-spacing:0.5px;font-family:'DM Sans',sans-serif;">
+              <span>Feature</span>
+              <span style="display:flex;gap:28px;"><span>Free</span><span>Pro</span></span>
             </div>
-            
-            <div class="data-card" style="margin-top: 24px; text-align: center; background: #f0fdf4; border-color: #bbf7d0;">
-                <p id="sim-insight" style="font-weight: 600; color: #166534; font-size: 15px;">Adjust the sliders to see how small changes impact your bottom line.</p>
-            </div>
+            <div id="featureRows"></div>
+          </div>
+
+          <button id="upgradeBtn" class="btn-upgrade" onclick="window.pay();">
+            🚀 Upgrade to PRO — ₹499 / 30 days
+          </button>
+          <p style="font-size:12px;color:var(--slate-300);text-align:center;margin-top:8px;font-family:'DM Sans',sans-serif;">Instant access · 200+ businesses trust Vizbix</p>
         </div>
+
+        <button class="btn btn-secondary"
+          style="width:100%;color:var(--red);border-color:#fecaca;margin-top:4px;font-family:'DM Sans',sans-serif;"
+          onclick="window.handleLogout();">Log Out</button>
       </div>
+    </div>
 
-      <div id="view-ai" class="app-view">
-        <div style="max-width: 850px; margin: 0 auto; height: 100%;">
-          
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-            <h2 style="margin: 0; display: flex; align-items: center; gap: 12px;">
-              <span style="font-size: 28px; background: var(--dark); color: white; padding: 6px 10px; border-radius: 8px; line-height: 1;">Ai</span> Strategy
-            </h2>
-            <button class="btn btn-secondary" style="padding: 10px 20px; font-size: 14px;" onclick="window.startAIAnalysis();">
-              🔄 Clear Chat & Re-Analyze Data
-            </button>
-          </div>
+  </main>
+</div>
 
-          <div id="aiSplashScreen" style="height: calc(100vh - 220px); display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.02);">
-              <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 18px;">Click below to analyze your numbers instantly.</p>
-              <button class="btn btn-dark" style="border-radius: 99px; padding: 18px 48px; font-size: 18px; box-shadow: 0 4px 15px rgba(15,23,42,0.2);" onclick="window.startAIAnalysis();">✨ Generate Strategy</button>
-          </div>
-
-          <div id="aiChatContainer" class="chat-container" style="display: none;">
-             <div class="chat-history" id="chatHistory">
-                <div class="chat-msg msg-ai">Hi! Click <strong>Analyze Latest Data</strong> to run your numbers, or type a custom question below!</div>
-             </div>
-             
-             <div style="background: white; border-top: 1px solid var(--border);">
-               <div id="typingIndicator" class="ai-typing">AI is analyzing your business... ⏳</div>
-               <div class="chat-input-row">
-                  <input type="text" id="aiChatInput" placeholder="Ask about raising prices, bundle ideas, or profit margins..." onkeypress="if(event.key === 'Enter') window.sendChatMessage()" />
-                  <button id="chatSendBtn" onclick="window.sendChatMessage()">➔</button>
-               </div>
-             </div>
-          </div>
-
-        </div>
-      </div>
-
-      <div id="view-report" class="app-view">
-        <div style="max-width: 1000px; margin: 0 auto;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2>Detailed Profit Report</h2>
-            <div style="display: flex; gap: 10px;">
-              <button class="btn btn-secondary" onclick="switchView('data', document.querySelectorAll('.nav-item')[3])">← Edit Data</button>
-              <button class="btn btn-primary" onclick="exportExecutivePDF()">📥 Download PDF</button>
-            </div>
-          </div>
-          <div style="overflow-x: auto; background: white; border: 1px solid var(--border); border-radius: 12px;">
-            <table class="report-table" style="border: none;">
-              <thead>
-                <tr>
-                  <th>Product Name</th>
-                  <th>Revenue</th>
-                  <th>Total Cost</th>
-                  <th>Total Profit</th>
-                  <th>Margin %</th>
-                  <th>Status</th>
-                </tr>
-              </thead>
-              <tbody id="reportTableBody"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <div id="view-history" class="app-view">
-        <div class="data-card" style="max-width: 700px; margin: 0 auto;">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-            <h2>Saved Cloud History</h2>
-            <button class="btn btn-secondary" onclick="window.fetchHistory();">↻ Refresh</button>
-          </div>
-          <div id="historyList" style="min-height: 150px; background: #f8fafc; border: 1px dashed var(--border); border-radius: 12px; padding: 20px;">
-            <p style="text-align: center; color: var(--text-muted);">Fetching history from database...</p>
-          </div>
-        </div>
-      </div>
-
-      <div id="view-settings" class="app-view">
-        <div class="data-card" style="max-width: 600px; margin: 0 auto;">
-          <h2 style="margin-bottom: 24px;">Account Settings</h2>
-          <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 24px;">
-            <h4 style="margin: 0 0 8px 0; color: var(--text-muted);">Currency Selector</h4>
-            <select id="currencySelect" onchange="updateCurrency()" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); font-size: 15px;">
-              <option value="INR">₹ Indian Rupee (INR)</option>
-              <option value="USD">$ US Dollar (USD)</option>
-              <option value="EUR">€ Euro (EUR)</option>
-              <option value="GBP">£ British Pound (GBP)</option>
-            </select>
-          </div>
-          <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 24px;">
-            <h4 style="margin: 0 0 8px 0; color: var(--text-muted);">Account Email</h4>
-            <div id="settingsEmail" style="font-weight: 700; font-size: 16px;">Not logged in</div>
-          </div>
-          <div style="background: #eff6ff; padding: 20px; border-radius: 12px; border: 1px solid #bfdbfe; margin-bottom: 24px;">
-            <h4 style="margin: 0 0 8px 0; color: #1e40af;">Subscription Plan</h4>
-            <div id="settingsPlan" style="font-weight: 700; font-size: 16px; color: var(--text-muted); margin-bottom: 16px;">Free Plan</div>
-            <button id="upgradeBtn" class="btn btn-primary" onclick="window.pay();">Upgrade to PRO (₹499)</button>
-          </div>
-          <button class="btn btn-secondary" style="width: 100%; color: #dc2626;" onclick="window.handleLogout();">Log Out</button>
-        </div>
-      </div>
-
-    </main>
+<!-- OFF-SCREEN PDF TEMPLATE -->
+<div id="pdf-export-container"
+  style="position:absolute;left:-9999px;top:0;width:1100px;background:white;font-family:Arial,sans-serif;padding:40px;box-sizing:border-box;color:#0f172a;visibility:hidden;">
+  <div style="margin-bottom:36px;border-bottom:2px solid #0f172a;padding-bottom:12px;">
+    <h1 style="font-size:38px;margin:0;text-transform:uppercase;letter-spacing:-1px;">Business Report</h1>
+    <p style="color:#64748b;font-size:15px;margin-top:4px;">EXECUTIVE SUMMARY · Generated by Vizbix</p>
   </div>
-
-  <div id="pdf-export-container" style="position: absolute; left: -9999px; top: 0; width: 1100px; background: white; font-family: Arial, sans-serif; padding: 40px; box-sizing: border-box; color: #0f172a; visibility: hidden;">
-      <div style="margin-bottom: 40px; border-bottom: 2px solid #0f172a; padding-bottom: 10px;">
-          <h1 style="font-size: 40px; margin: 0; text-transform: uppercase;">Business Report</h1>
-          <h4 style="color: #64748b; font-size: 16px; margin-top: 5px;">EXECUTIVE SUMMARY</h4>
+  <div style="display:flex;gap:40px;">
+    <div style="flex:1;">
+      <div style="display:flex;justify-content:space-between;border-bottom:1px solid #e2e8f0;padding:10px 0;font-size:17px;"><span>Total Revenue</span><span id="pdf-rev"  style="font-weight:bold;">0</span></div>
+      <div style="display:flex;justify-content:space-between;border-bottom:1px solid #e2e8f0;padding:10px 0;font-size:17px;"><span>Total Cost</span>   <span id="pdf-cost" style="font-weight:bold;">0</span></div>
+      <div style="display:flex;justify-content:space-between;border-bottom:1px solid #e2e8f0;padding:10px 0;font-size:17px;"><span>Net Profit</span>   <span id="pdf-profit" style="font-weight:bold;">0</span></div>
+      <div style="margin-top:36px;">
+        <p style="font-size:13px;color:#64748b;margin:0 0 4px 0;font-weight:700;text-transform:uppercase;">TOTAL UNITS SOLD</p>
+        <div id="pdf-units-sold" style="font-size:48px;font-weight:900;">0</div>
       </div>
-      <div style="display: flex; gap: 40px;">
-          <div style="flex: 1;">
-              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 10px 0; font-size: 18px;"><span>Total Revenue</span> <span id="pdf-rev" style="font-weight: bold;">0</span></div>
-              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 10px 0; font-size: 18px;"><span>Total Cost</span> <span id="pdf-cost" style="font-weight: bold;">0</span></div>
-              <div style="display: flex; justify-content: space-between; border-bottom: 1px solid #e2e8f0; padding: 10px 0; font-size: 18px;"><span>Net Profit</span> <span id="pdf-profit" style="font-weight: bold; color: #0f172a;">0</span></div>
-              <div style="margin-top: 40px;">
-                  <h4 style="font-size: 16px; color: #475569; margin: 0 0 5px 0;">TOTAL UNITS SOLD</h4>
-                  <div id="pdf-units-sold" style="font-size: 48px; font-weight: bold;">0</div>
-              </div>
-          </div>
-          <div style="flex: 2;">
-              <img id="pdf-chart-image" style="width: 100%; max-height: 250px; object-fit: contain; margin-bottom: 20px;" src="" alt="Chart">
-              <div style="display: flex; justify-content: space-between; gap: 20px;">
-                  <div style="flex: 1;">
-                      <h4 style="color: #64748b; font-size: 14px; margin: 0 0 5px 0;">GROSS MARGIN</h4>
-                      <div id="pdf-margin" style="font-size: 54px; font-weight: bold;">0%</div>
-                      <h4 style="color: #64748b; font-size: 14px; margin: 20px 0 5px 0;">TOP PRODUCT</h4>
-                      <div id="pdf-top-prod" style="font-size: 24px; font-weight: bold;">-</div>
-                  </div>
-                  <div style="flex: 2;">
-                      <h4 style="font-size: 16px; color: #475569; margin-bottom: 10px;">KEY INSIGHTS</h4>
-                      <ul id="pdf-insight-list" style="list-style: none; padding: 0; margin: 0; font-size: 14px; line-height: 1.5;">
-                          <li style="margin-bottom: 8px;">Insight 1</li>
-                      </ul>
-                  </div>
-              </div>
-          </div>
+    </div>
+    <div style="flex:2;">
+      <img id="pdf-chart-image" style="width:100%;max-height:240px;object-fit:contain;margin-bottom:20px;" src="" alt="Chart">
+      <div style="display:flex;gap:24px;">
+        <div style="flex:1;">
+          <p style="color:#64748b;font-size:13px;margin:0 0 4px 0;font-weight:700;text-transform:uppercase;">GROSS MARGIN</p>
+          <div id="pdf-margin"   style="font-size:48px;font-weight:900;">0%</div>
+          <p style="color:#64748b;font-size:13px;margin:18px 0 4px 0;font-weight:700;text-transform:uppercase;">TOP PRODUCT</p>
+          <div id="pdf-top-prod" style="font-size:22px;font-weight:800;">-</div>
+        </div>
+        <div style="flex:2;">
+          <p style="font-size:14px;color:#64748b;margin-bottom:10px;font-weight:700;text-transform:uppercase;">KEY INSIGHTS</p>
+          <ul id="pdf-insight-list" style="list-style:none;padding:0;margin:0;font-size:13px;line-height:1.6;"></ul>
+        </div>
       </div>
+    </div>
   </div>
+</div>
 
-  <script src="../assets/js/drawer.js?v=7.0"></script>
-  
-  <script>
-    // --- SYSTEM CONFIG ---
-    const workerURL = "https://vizbix-api.vizbixhq.workers.dev";
-    const PRICE = 49900; 
-    const KEY = "rzp_live_SCvIqUMzTNsXgq"; 
+<script src="../assets/js/drawer.js?v=8.0"></script>
 
-    window.currentMode = 'product'; window.currentData = []; window.currentView = 'data';
-    window.currentCurrency = 'INR'; window.currencySymbol = '₹';
-    window.chatConversation = []; let myChart = null; 
+<script>
+// ══════════════════════════════════════════
+//  CONFIG
+// ══════════════════════════════════════════
+const workerURL = "https://vizbix-api.vizbixhq.workers.dev";
+const PRICE = 49900;
+const KEY   = "rzp_live_SCvIqUMzTNsXgq";
 
-    // --- 1. DATA SCRAPER ---
-    function getFreshData() {
-        let data = [];
-        document.querySelectorAll('#items .data-row').forEach(row => {
-            const nameEl = row.querySelector('.input-name');
-            const sellEl = row.querySelector('.input-sell');
-            const costEl = row.querySelector('.input-cost');
-            const qtyEl = row.querySelector('.input-qty');
-            if(!nameEl || !sellEl || !costEl || !qtyEl) return;
+// ══════════════════════════════════════════
+//  CENTRALISED APP STATE
+// ══════════════════════════════════════════
+const AppState = {
+  currentData:      [],
+  currentView:      'data',
+  currentCurrency:  'INR',
+  currencySymbol:   '₹',
+  chatConversation: [],
+  isProUser:        null,
+  userEmail:        null,
+  proDaysLeft:      null,
+};
 
-            const name = nameEl.value.trim();
-            const sell = parseFloat(sellEl.value) || 0;
-            const cost = parseFloat(costEl.value) || 0;
-            const qty = parseFloat(qtyEl.value) || 0;
-            if(name !== '' || sell > 0 || cost > 0 || qty > 0) {
-                data.push({ name, sell, cost, qty });
-            }
+// window.* proxies — keep auth.js / old callbacks working unchanged
+Object.defineProperty(window,'isProUser',        {get:()=>AppState.isProUser,       set:v=>{AppState.isProUser=v;       onAuthChange();}});
+Object.defineProperty(window,'userEmail',         {get:()=>AppState.userEmail,       set:v=>{AppState.userEmail=v;       onAuthChange();}});
+Object.defineProperty(window,'currentData',       {get:()=>AppState.currentData,     set:v=>AppState.currentData=v});
+Object.defineProperty(window,'currentCurrency',   {get:()=>AppState.currentCurrency, set:v=>AppState.currentCurrency=v});
+Object.defineProperty(window,'currencySymbol',    {get:()=>AppState.currencySymbol,  set:v=>AppState.currencySymbol=v});
+Object.defineProperty(window,'chatConversation',  {get:()=>AppState.chatConversation,set:v=>AppState.chatConversation=v});
+Object.defineProperty(window,'proDaysLeft',       {get:()=>AppState.proDaysLeft,     set:v=>AppState.proDaysLeft=v});
+window.currentMode = 'product';
+
+let myChart = null;
+let authVerified = false;
+
+// ══════════════════════════════════════════
+//  TOAST
+// ══════════════════════════════════════════
+function showToast(msg, type='info', ms=3200) {
+  const c = document.getElementById('toastContainer');
+  const t = document.createElement('div');
+  const icons = {success:'✅', error:'❌', info:'💡'};
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${icons[type]||'ℹ️'}</span><span>${msg}</span>`;
+  t.onclick = ()=>t.remove();
+  c.appendChild(t);
+  setTimeout(()=>{
+    t.style.transition='opacity 0.25s';
+    t.style.opacity='0';
+    setTimeout(()=>t.remove(),260);
+  }, ms);
+}
+
+// ══════════════════════════════════════════
+//  AUTH — event-driven, no setInterval
+// ══════════════════════════════════════════
+function onAuthChange() {
+  const { userEmail:email, isProUser:pro } = AppState;
+
+  // Update email displays
+  if (email) {
+    setText('sidebarEmail',  email);
+    setText('settingsEmail', email);
+    const lb = document.getElementById('headerLoginBtn');
+    if (lb) lb.style.display = 'none';
+    if (!authVerified) { authVerified = true; window.verify(email); }
+  }
+
+  // Plan display
+  if (pro === true) {
+    const txt = `Pro Active${AppState.proDaysLeft ? ' ('+AppState.proDaysLeft+')' : ''}`;
+    setText('sidebarPlan',  txt);
+    setText('settingsPlan', txt);
+    const sp = document.getElementById('settingsPlan');
+    if (sp) sp.style.color = '#059669';
+    const ub = document.getElementById('upgradeBtn');
+    if (ub) ub.style.display = 'none';
+    const fc = document.getElementById('freePlanComparison');
+    if (fc) fc.style.display = 'none';
+    document.getElementById('proLockOverlay').classList.add('pro-lock-hidden');
+    document.querySelectorAll('.app-view').forEach(v=>v.style.filter='none');
+
+  } else if (pro === false) {
+    setText('sidebarPlan',  'Free User');
+    setText('settingsPlan', 'Free Plan (Limited)');
+    renderFeatureTable();
+  }
+}
+
+function setText(id, txt) { const el=document.getElementById(id); if(el) el.innerText=txt; }
+
+// ══════════════════════════════════════════
+//  FEATURE COMPARISON TABLE
+// ══════════════════════════════════════════
+const FEATURES = [
+  ['Financial Dashboard',  true,  true],
+  ['Data Input & Demo',    true,  true],
+  ['AI Strategy Chat',     false, true],
+  ['Detailed PDF Report',  false, true],
+  ['Profit Lab Simulator', false, true],
+  ['Cloud Save & History', false, true],
+  ['Health Score',         false, true],
+];
+
+function renderFeatureTable() {
+  const c = document.getElementById('featureRows'); if(!c) return;
+  c.innerHTML = FEATURES.map(([name,free,pro])=>`
+    <div class="feature-row">
+      <span>${name}</span>
+      <div class="feature-checks">
+        <span class="${free?'feature-check-yes':'feature-check-no'}">${free?'✓':'–'}</span>
+        <span class="${pro ?'feature-check-yes':'feature-check-no'}">${pro ?'✓':'–'}</span>
+      </div>
+    </div>`).join('');
+}
+
+// ══════════════════════════════════════════
+//  DATA SCRAPER
+// ══════════════════════════════════════════
+function getFreshData() {
+  let data = [];
+  document.querySelectorAll('#items .data-row').forEach(row=>{
+    const n = row.querySelector('.input-name')?.value.trim();
+    const s = parseFloat(row.querySelector('.input-sell')?.value)||0;
+    const c = parseFloat(row.querySelector('.input-cost')?.value)||0;
+    const q = parseFloat(row.querySelector('.input-qty')?.value) ||0;
+    if(n||s||c||q) data.push({name:n||'Unnamed',sell:s,cost:c,qty:q});
+  });
+  AppState.currentData = data;
+  return data;
+}
+
+// ══════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════
+function toggleAppDrawer() {
+  document.getElementById('appSidebar').classList.toggle('mobile-open');
+  document.getElementById('mobileAppOverlay').classList.toggle('active');
+}
+
+const PRO_VIEWS = ['ai','report','history','simulator'];
+
+function switchView(viewId, element, bypass=false) {
+  AppState.currentView = viewId;
+
+  if (PRO_VIEWS.includes(viewId) && AppState.isProUser===false && !bypass) {
+    document.getElementById('proLockOverlay').classList.remove('pro-lock-hidden');
+  } else {
+    document.getElementById('proLockOverlay').classList.add('pro-lock-hidden');
+    document.querySelectorAll('.app-view').forEach(v=>v.style.filter='none');
+  }
+
+  document.querySelectorAll('.app-view').forEach(v=>v.classList.remove('active'));
+  document.getElementById('view-'+viewId).classList.add('active');
+
+  if (element) {
+    document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+    element.classList.add('active');
+    const t = element.querySelector('.nav-item-text');
+    if(t) setText('mobilePageTitle', t.innerText);
+  }
+
+  // Close mobile drawer
+  const sb = document.getElementById('appSidebar');
+  if(sb?.classList.contains('mobile-open')) {
+    sb.classList.remove('mobile-open');
+    document.getElementById('mobileAppOverlay').classList.remove('active');
+  }
+}
+
+function closePaywall() {
+  document.getElementById('proLockOverlay').classList.add('pro-lock-hidden');
+  switchView('data', document.getElementById('nav-data'), true);
+}
+
+// ══════════════════════════════════════════
+//  CURRENCY
+// ══════════════════════════════════════════
+function updateCurrency() {
+  const sel = document.getElementById('currencySelect');
+  AppState.currentCurrency = sel.value;
+  AppState.currencySymbol  = sel.options[sel.selectedIndex].text.split(' ')[0];
+  setText('hdr-sell', `Sell Price (${AppState.currencySymbol})`);
+  setText('hdr-cost', `Cost Price (${AppState.currencySymbol})`);
+  showToast(`Currency set to ${AppState.currentCurrency}`, 'success');
+}
+
+function fmt(n) {
+  return new Intl.NumberFormat('en-US',{style:'currency',currency:AppState.currentCurrency,maximumFractionDigits:0}).format(n);
+}
+
+// ══════════════════════════════════════════
+//  DATA INPUT HELPERS
+// ══════════════════════════════════════════
+function addNewRow(name='',sell='',cost='',qty='') {
+  const c = document.getElementById('items');
+  const row = document.createElement('div');
+  row.className = 'data-row';
+  row.innerHTML = `
+    <input type="text"   placeholder="Product name" class="input-name" value="${name}">
+    <input type="number" placeholder="0"            class="input-sell" value="${sell}">
+    <input type="number" placeholder="0"            class="input-cost" value="${cost}">
+    <input type="number" placeholder="0"            class="input-qty"  value="${qty}">
+    <button class="delete-btn" onclick="removeRow(this)" title="Remove">×</button>`;
+
+  // Tab on last qty field → new row
+  row.querySelector('.input-qty').addEventListener('keydown', e=>{
+    if(e.key==='Tab' && !e.shiftKey) {
+      const rows = document.querySelectorAll('#items .data-row');
+      if(row === rows[rows.length-1]) {
+        e.preventDefault();
+        addNewRow();
+        setTimeout(()=>{
+          const nr = document.querySelectorAll('#items .data-row');
+          nr[nr.length-1].querySelector('.input-name').focus();
+        }, 40);
+      }
+    }
+  });
+
+  c.appendChild(row);
+  if(!name) setTimeout(()=>row.querySelector('.input-name').focus(), 40);
+}
+
+function removeRow(btn) {
+  const row = btn.parentElement;
+  row.style.transition='opacity 0.18s,transform 0.18s';
+  row.style.opacity='0'; row.style.transform='translateX(8px)';
+  setTimeout(()=>row.remove(), 190);
+}
+
+function loadDemoData() {
+  document.getElementById('items').innerHTML='';
+  [['Wireless Earbuds','2500','1200','140'],
+   ['Smart Watch',     '4500','2800', '85'],
+   ['USB-C Cable',      '400', '150','300'],
+   ['Phone Case',       '600', '700', '50']].forEach(r=>addNewRow(...r));
+  showToast('Demo data loaded!','info');
+}
+
+// ══════════════════════════════════════════
+//  ANALYSIS ENGINE
+// ══════════════════════════════════════════
+function processDataAndShowReport() {
+  const data = getFreshData();
+  if(!data.length) return showToast('Add at least one product first.','error');
+
+  // Show skeleton, fade content, switch view
+  document.getElementById('dashboardSkeleton').style.display='block';
+  document.getElementById('dashboardContent').style.opacity='0.3';
+  switchView('dashboard', document.getElementById('nav-dashboard'), true);
+
+  setTimeout(()=>{
+    runAnalysis(data);
+    document.getElementById('dashboardSkeleton').style.display='none';
+    document.getElementById('dashboardContent').style.opacity='1';
+  }, 420);
+}
+
+function runAnalysis(data) {
+  let tRev=0, tCost=0, tProfit=0, tItems=0;
+  let labels=[], revD=[], profD=[], reportHTML='', pdfIns='';
+  let top = {name:'–', profit:-Infinity};
+  let leaks = [];
+
+  data.forEach(item=>{
+    const rev    = item.sell * item.qty;
+    const cost   = item.cost * item.qty;
+    const profit = rev - cost;
+    const mNum   = rev>0 ? (profit/rev)*100 : 0;
+
+    tRev    += rev;
+    tCost   += cost;
+    tProfit += profit;
+    tItems  += item.qty;
+
+    if(profit>top.profit && item.qty>0) top = {name:item.name, profit};
+    if(profit<0) leaks.push(item.name);
+
+    labels.push(item.name); revD.push(rev); profD.push(profit);
+
+    // Margin bar color
+    const barC = mNum>=30?'#10b981':mNum>=10?'#f59e0b':'#ef4444';
+    const barW = Math.max(0, Math.min(100, mNum));
+    const pill = profit>0
+      ? `<span class="status-pill status-healthy">Healthy</span>`
+      : `<span class="status-pill status-leak">Leak</span>`;
+
+    reportHTML += `<tr>
+      <td style="font-weight:700;font-family:'DM Sans',sans-serif;">${item.name}</td>
+      <td>${fmt(rev)}</td>
+      <td>${fmt(cost)}</td>
+      <td style="font-weight:800;color:${profit<0?'var(--red)':'var(--ink)'};">${fmt(profit)}</td>
+      <td>
+        <div class="margin-bar">
+          <span class="margin-label">${mNum.toFixed(1)}%</span>
+          <div class="margin-bar-track"><div class="margin-bar-fill" style="width:${barW}%;background:${barC};"></div></div>
+        </div>
+      </td>
+      <td>${pill}</td>
+    </tr>`;
+  });
+
+  const ovMargin = tRev>0 ? (tProfit/tRev)*100 : 0;
+
+  // Weighted health score
+  let hs = 50;
+  if(ovMargin>=40) hs+=28; else if(ovMargin>=25) hs+=18; else if(ovMargin>=10) hs+=8; else if(ovMargin<0) hs-=20;
+  hs -= Math.min(leaks.length*14, 28);
+  if(tProfit>0) hs+=10;
+  if(data.length>=3) hs+=12;
+  hs = Math.max(0, Math.min(100, Math.round(hs)));
+
+  // Metric cards
+  setText('dash-revenue',     fmt(tRev));
+  setText('dash-profit',      fmt(tProfit));
+  setText('dash-margin',      ovMargin.toFixed(1)+'%');
+  setText('dash-top-product', top.name);
+  document.getElementById('reportTableBody').innerHTML = reportHTML;
+
+  // Health badge
+  const hc = document.getElementById('health-circle');
+  const hl = document.getElementById('health-label');
+  hc.innerText = hs+'%';
+  if(hs>=75) { hc.style.background='var(--green-bg)'; hc.style.color='#059669'; if(hl) hl.innerText='Strong'; }
+  else if(hs>=50) { hc.style.background='var(--amber-bg)'; hc.style.color='#d97706'; if(hl) hl.innerText='Fair'; }
+  else { hc.style.background='var(--red-bg)'; hc.style.color='var(--red)'; if(hl) hl.innerText='At Risk'; }
+
+  // 3-point action plan
+  let ins = '';
+  if(top.profit>0) {
+    ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'DM Sans',sans-serif;"><strong style="color:var(--ink);">1. Scale Winner:</strong> ${top.name} generated ${fmt(top.profit)}. Increase ad spend here.</div>`;
+    pdfIns += `<li style="margin-bottom:10px;"><strong>Scale Winner:</strong> ${top.name} is your most profitable product.</li>`;
+  } else {
+    ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'DM Sans',sans-serif;"><strong style="color:var(--ink);">1. Raise Prices:</strong> No profitable products. Raise prices or renegotiate costs immediately.</div>`;
+    pdfIns += `<li style="margin-bottom:10px;"><strong>Raise Prices:</strong> No profitable products detected.</li>`;
+  }
+
+  if(leaks.length>0) {
+    ins += `<div style="padding:11px 14px;background:var(--red-bg);border-radius:9px;border:1px solid #fecaca;color:var(--red);font-family:'DM Sans',sans-serif;"><strong>2. Stop Leaks:</strong> ${leaks.join(', ')} are losing money. Reprice or drop them.</div>`;
+    pdfIns += `<li style="margin-bottom:10px;color:#dc2626;"><strong>Fix Leaks:</strong> ${leaks.join(', ')} are losing money.</li>`;
+  } else {
+    ins += `<div style="padding:11px 14px;background:var(--green-bg);border-radius:9px;border:1px solid #a7f3d0;color:#065f46;font-family:'DM Sans',sans-serif;"><strong>2. Unit Economics Safe:</strong> Zero products losing money. Baseline is secure.</div>`;
+    pdfIns += `<li style="margin-bottom:10px;"><strong>Secure Economics:</strong> No products operating at a loss.</li>`;
+  }
+
+  if(ovMargin<20) {
+    ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'DM Sans',sans-serif;"><strong style="color:var(--ink);">3. Margin Warning:</strong> ${ovMargin.toFixed(1)}% is tight. Bundle items to raise AOV.</div>`;
+    pdfIns += `<li><strong>Improve Margin:</strong> ${ovMargin.toFixed(1)}% margin is tight.</li>`;
+  } else {
+    ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'DM Sans',sans-serif;"><strong style="color:var(--ink);">3. Healthy Margin:</strong> ${ovMargin.toFixed(1)}% gives excellent cash flow for growth.</div>`;
+    pdfIns += `<li><strong>Healthy Margin:</strong> ${ovMargin.toFixed(1)}% gives flexibility to scale.</li>`;
+  }
+
+  document.getElementById('auto-insights-list').innerHTML = ins;
+  document.getElementById('pdf-insight-list').innerHTML   = pdfIns;
+
+  // Report summary bar
+  const sb = document.getElementById('reportSummaryBar');
+  if(sb) sb.innerHTML = [
+    {l:'Revenue',    v:fmt(tRev),              c:'var(--indigo)'},
+    {l:'Net Profit', v:fmt(tProfit),           c:tProfit>=0?'var(--green)':'var(--red)'},
+    {l:'Margin',     v:ovMargin.toFixed(1)+'%',c:ovMargin>=20?'var(--green)':'var(--amber)'},
+    {l:'Units Sold', v:tItems.toLocaleString(),c:'#8b5cf6'},
+  ].map(s=>`<div style="background:white;border:1px solid var(--slate-100);border-radius:10px;padding:9px 14px;min-width:105px;">
+    <span style="font-size:10px;font-weight:700;color:var(--slate-300);text-transform:uppercase;letter-spacing:0.7px;font-family:'DM Sans',sans-serif;display:block;margin-bottom:3px;">${s.l}</span>
+    <span style="font-size:17px;font-weight:800;color:${s.c};font-family:'Syne',sans-serif;letter-spacing:-0.03em;">${s.v}</span>
+  </div>`).join('');
+
+  // PDF fields
+  setText('pdf-rev',       fmt(tRev));
+  setText('pdf-cost',      fmt(tCost));
+  setText('pdf-profit',    fmt(tProfit));
+  setText('pdf-units-sold', tItems);
+  setText('pdf-margin',    ovMargin.toFixed(1)+'%');
+  setText('pdf-top-prod',  top.name);
+
+  // Chart
+  const ctx = document.getElementById('profitChart').getContext('2d');
+  if(myChart) myChart.destroy();
+  myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels,
+      datasets: [
+        {label:'Revenue', data:revD,  backgroundColor:'#e0e7ff', borderRadius:5},
+        {label:'Profit',  data:profD, backgroundColor:'#5b5ef6', borderRadius:5}
+      ]
+    },
+    options: {
+      responsive:true, maintainAspectRatio:false,
+      plugins: { legend:{position:'top', labels:{font:{weight:'600',size:12,family:'DM Sans'}, color:'#94a3b8'}} },
+      scales: {
+        x:{ grid:{display:false}, ticks:{color:'#94a3b8',font:{weight:'600',family:'DM Sans'}} },
+        y:{ beginAtZero:true, grid:{color:'#f4f7ff'}, ticks:{color:'#94a3b8',font:{family:'DM Sans'}} }
+      }
+    }
+  });
+
+  showToast('Dashboard updated ✓', 'success');
+}
+
+// ══════════════════════════════════════════
+//  SIMULATOR
+// ══════════════════════════════════════════
+function initSimulator() {
+  if(!AppState.currentData?.length) {
+    getFreshData();
+    if(!AppState.currentData.length) { showToast('Enter data in Data Input first.','error'); return; }
+  }
+  resetSimulation();
+}
+
+function resetSimulation() {
+  ['price','vol','cost'].forEach(k=>{
+    document.getElementById('slide-'+k).value=0;
+    setText('val-'+k, '0%');
+  });
+  runSimulation();
+}
+
+function runSimulation() {
+  const pV = parseInt(document.getElementById('slide-price').value);
+  const vV = parseInt(document.getElementById('slide-vol').value);
+  const cV = parseInt(document.getElementById('slide-cost').value);
+
+  setText('val-price', (pV>0?'+':'')+pV+'%');
+  setText('val-vol',   (vV>0?'+':'')+vV+'%');
+  setText('val-cost',  (cV>0?'+':'')+cV+'%');
+
+  const pM=1+(pV/100), vM=1+(vV/100), cM=1+(cV/100);
+  let cur=0, sim=0;
+  AppState.currentData.forEach(i=>{
+    cur += (i.sell*i.qty)-(i.cost*i.qty);
+    sim += (i.sell*pM*i.qty*vM)-(i.cost*cM*i.qty*vM);
+  });
+
+  setText('sim-current',   fmt(cur));
+  setText('sim-projected', fmt(sim));
+
+  const dEl = document.getElementById('sim-delta');
+  const iEl = document.getElementById('sim-insight');
+  const diff = sim-cur;
+  const pct  = cur>0 ? ((diff/cur)*100).toFixed(1) : 0;
+
+  if(diff>=0) {
+    dEl.innerText = '▲ '+fmt(diff)+' ('+pct+'%)';
+    dEl.className = 'sim-delta delta-pos';
+    iEl.style.cssText = 'font-weight:700;font-size:14px;color:#064e3b;background:#d1fae5;border:1px solid #34d399;padding:14px;border-radius:9px;line-height:1.6;font-family:"DM Sans",sans-serif;';
+    if(pV>0&&vV>0&&cV<0)        iEl.innerHTML=`<strong>🦄 Unicorn Strategy:</strong> You raised value, scaled volume, and cut waste. Perfect efficiency.`;
+    else if(pV>0&&vV<0)         iEl.innerHTML=`<strong>💎 Luxury Pivot:</strong> Selling fewer units but making more. Repositioned as Premium.`;
+    else if(pV<0&&vV>0)         iEl.innerHTML=`<strong>🔥 Mass Market:</strong> Lower price triggered huge demand. Winning on volume.`;
+    else if(cV<0&&pV===0&&vV===0) iEl.innerHTML=`<strong>✂️ Lean Ops:</strong> Every rupee saved flows 100% to the bottom line.`;
+    else if(pV>0&&vV>=0)        iEl.innerHTML=`<strong>📈 Pricing Power:</strong> Brand is strong enough that customers accepted the price hike.`;
+    else                        iEl.innerHTML=`<strong>✅ Strategic Win:</strong> Extra <strong>${fmt(diff)}</strong> in pure profit.`;
+  } else {
+    dEl.innerText = '▼ '+fmt(Math.abs(diff));
+    dEl.className = 'sim-delta delta-neg';
+    iEl.style.cssText = 'font-weight:700;font-size:14px;color:#7f1d1d;background:var(--red-bg);border:1px solid #f87171;padding:14px;border-radius:9px;line-height:1.6;font-family:"DM Sans",sans-serif;';
+    if(pV<0&&vV>0)   iEl.innerHTML=`<strong>⚠️ Discount Trap:</strong> Volume didn't cover the price cut.`;
+    else if(pV>0&&vV<0) iEl.innerHTML=`<strong>📉 Price Shock:</strong> Market rejected the increase. Lost too many customers.`;
+    else if(vV>0&&cV>0) iEl.innerHTML=`<strong>💸 Growing Broke:</strong> Costs rising faster than revenue.`;
+    else             iEl.innerHTML=`<strong>🛑 Profit Warning:</strong> Destroys <strong>${fmt(Math.abs(diff))}</strong> in value. Revert.`;
+  }
+}
+
+// ══════════════════════════════════════════
+//  PDF EXPORT
+// ══════════════════════════════════════════
+function exportExecutivePDF() {
+  const cv = document.getElementById('profitChart');
+  if(cv) document.getElementById('pdf-chart-image').src = cv.toDataURL('image/png');
+  const el = document.getElementById('pdf-export-container');
+  el.style.visibility = 'visible';
+  const opt = {
+    margin:0.5, filename:'Vizbix_Report.pdf',
+    image:{type:'jpeg',quality:1},
+    html2canvas:{scale:2,useCORS:true,windowWidth:1100},
+    jsPDF:{unit:'in',format:'letter',orientation:'landscape'}
+  };
+  setTimeout(()=>{
+    html2pdf().set(opt).from(el).save().then(()=>{
+      el.style.visibility='hidden';
+      showToast('PDF downloaded!','success');
+    });
+  },300);
+}
+
+// ══════════════════════════════════════════
+//  AI CHAT
+// ══════════════════════════════════════════
+function sendSuggestion(text) {
+  const inp = document.getElementById('aiChatInput');
+  if(inp) inp.value = text;
+  window.sendChatMessage();
+}
+
+window.startAIAnalysis = async function() {
+  if(!AppState.isProUser || !AppState.userEmail) {
+    document.getElementById('proLockOverlay').classList.remove('pro-lock-hidden'); return;
+  }
+  const data = getFreshData();
+  if(!data.length) return showToast('Enter data in Data Input first.','error');
+
+  document.getElementById('aiSplashScreen').style.display  = 'none';
+  document.getElementById('aiChatContainer').style.display = 'flex';
+  document.getElementById('chatHistory').innerHTML = `<div class="chat-msg msg-ai" id="loadingAi">Analyzing your numbers… ⏳</div>`;
+  AppState.chatConversation = [];
+
+  await window.executeAIRequest(
+    `Analyze my catalog. Identify my hero product, spot any profit leaks, and give me a clear 3-step action plan to increase my net margin. Use ${AppState.currencySymbol}.`,
+    data
+  );
+};
+
+window.sendChatMessage = async function() {
+  if(!AppState.isProUser) { document.getElementById('proLockOverlay').classList.remove('pro-lock-hidden'); return; }
+  const inp = document.getElementById('aiChatInput');
+  const msg = inp?.value.trim();
+  if(!msg) return;
+
+  document.getElementById('aiSplashScreen').style.display  = 'none';
+  document.getElementById('aiChatContainer').style.display = 'flex';
+  window.appendChatBubble(msg, 'user');
+  inp.value = '';
+  await window.executeAIRequest(msg, getFreshData());
+};
+
+window.executeAIRequest = async function(userMsg, freshData) {
+  const ti  = document.getElementById('typingIndicator');
+  const btn = document.getElementById('chatSendBtn');
+  const inp = document.getElementById('aiChatInput');
+
+  if(ti)  ti.style.display = 'block';
+  if(btn) btn.disabled = true;
+  if(inp) inp.disabled = true;
+
+  AppState.chatConversation.push({role:'user', content:userMsg});
+  try { sessionStorage.setItem('vzx_chat', JSON.stringify(AppState.chatConversation)); } catch(e){}
+
+  try {
+    const r = await fetch(workerURL+'/ai-analyze', {
+      method:'POST',
+      headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({
+        email:   AppState.userEmail,
+        currency:AppState.currentCurrency||'INR',
+        symbol:  AppState.currencySymbol||'₹',
+        message: userMsg,
+        history: AppState.chatConversation,
+        products:freshData
+      })
+    });
+    const d = await r.json();
+    if(ti)  ti.style.display = 'none';
+    if(btn) btn.disabled = false;
+    if(inp) inp.disabled = false;
+    document.getElementById('loadingAi')?.remove();
+
+    if(d.ok) {
+      const fmt2 = d.response.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>');
+      window.appendChatBubble(fmt2, 'ai');
+      AppState.chatConversation.push({role:'assistant', content:d.response});
+      try { sessionStorage.setItem('vzx_chat', JSON.stringify(AppState.chatConversation)); } catch(e){}
+    } else {
+      window.appendChatBubble('⚠️ '+(d.error||'AI Error. Try again.'), 'ai');
+    }
+  } catch(e) {
+    if(ti)  ti.style.display = 'none';
+    if(btn) btn.disabled = false;
+    if(inp) inp.disabled = false;
+    window.appendChatBubble('⚠️ Connection error. Please try again.', 'ai');
+  }
+};
+
+window.appendChatBubble = function(text, sender) {
+  const box = document.getElementById('chatHistory'); if(!box) return;
+  const div = document.createElement('div');
+  div.className = `chat-msg msg-${sender}`;
+  div.innerHTML = text;
+  if(sender==='ai') {
+    const cb = document.createElement('button');
+    cb.className = 'copy-btn'; cb.innerText = 'Copy';
+    cb.onclick = ()=>{
+      navigator.clipboard.writeText(div.innerText.replace('Copy','').trim());
+      cb.innerText = 'Copied!'; setTimeout(()=>cb.innerText='Copy', 1600);
+    };
+    div.appendChild(cb);
+  }
+  box.appendChild(div);
+  box.scrollTop = box.scrollHeight;
+};
+
+// Restore chat session from sessionStorage
+function restoreChatSession() {
+  try {
+    const saved = sessionStorage.getItem('vzx_chat');
+    if(!saved) return;
+    AppState.chatConversation = JSON.parse(saved);
+    if(!AppState.chatConversation.length) return;
+    document.getElementById('aiSplashScreen').style.display='none';
+    document.getElementById('aiChatContainer').style.display='flex';
+    const box = document.getElementById('chatHistory'); box.innerHTML='';
+    AppState.chatConversation.forEach(m=>{
+      window.appendChatBubble(
+        m.content.replace(/\n/g,'<br>').replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>'),
+        m.role==='user' ? 'user' : 'ai'
+      );
+    });
+  } catch(e){}
+}
+
+// ══════════════════════════════════════════
+//  AUTH & CLOUD — original logic, unchanged
+// ══════════════════════════════════════════
+window.verify = async function(email) {
+  const e = email || AppState.userEmail; if(!e) return;
+  try {
+    const r = await fetch(workerURL+'/check?email='+e);
+    const d = await r.json();
+    if(d.valid) {
+      window.isProUser = true;
+      if(d.expiry) {
+        const diff = d.expiry - Date.now();
+        AppState.proDaysLeft = diff>0 ? Math.ceil(diff/(1000*60*60*24))+' Days Left' : 'Expired';
+        if(diff<=0) window.isProUser = false;
+      }
+    } else { window.isProUser = false; }
+    onAuthChange();
+  } catch(e){}
+};
+
+window.pay = function() {
+  if(!AppState.userEmail) return showToast('Please log in first.','error');
+  new Razorpay({
+    key:KEY, amount:PRICE, currency:'INR',
+    name:'Vizbix Pro', description:'30 Days Access',
+    prefill:{email:AppState.userEmail}, theme:{color:'#5b5ef6'},
+    handler: async function(response) {
+      try {
+        const req = await fetch(workerURL+'/verify-payment', {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({payment_id:response.razorpay_payment_id, email:AppState.userEmail})
         });
-        window.currentData = data;
-        return data;
+        const d = await req.json();
+        if(d.ok) { showToast('Welcome to Pro! 🎉','success',5000); window.verify(AppState.userEmail); }
+        else showToast('Verification failed. Contact support.','error');
+      } catch(e) { showToast('Error. Please contact support.','error'); }
     }
+  }).open();
+};
 
-    // --- 2. UI NAVIGATION ---
-    function toggleAppDrawer() {
-      document.getElementById("appSidebar").classList.toggle("mobile-open");
-      document.getElementById("mobileAppOverlay").classList.toggle("active");
+window.saveToCloud = async function() {
+  if(!AppState.isProUser) { document.getElementById('proLockOverlay').classList.remove('pro-lock-hidden'); return; }
+  const btn = document.getElementById('saveCloudBtn');
+  const data = getFreshData();
+  if(!data.length) return showToast('Nothing to save!','error');
+  if(btn) btn.innerHTML='⏳';
+  try {
+    await fetch(workerURL+'/save', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({email:AppState.userEmail, data, mode:'product', date:new Date().toISOString()})
+    });
+    showToast('Saved to cloud!','success');
+    if(btn) { btn.innerHTML='✅'; setTimeout(()=>btn.innerHTML='💾 Save', 2200); }
+  } catch(e) {
+    showToast('Save failed. Try again.','error');
+    if(btn) btn.innerHTML='💾 Save';
+  }
+};
+
+window.fetchHistory = async function() {
+  const list = document.getElementById('historyList'); if(!list) return;
+  if(!AppState.isProUser) {
+    list.innerHTML=`<div style="text-align:center;padding:20px;">
+      <p style="color:var(--slate-300);margin-bottom:14px;font-family:'DM Sans',sans-serif;">Cloud History is a Pro feature.</p>
+      <button class="btn btn-primary" style="font-size:13px;" onclick="switchView('settings',document.querySelectorAll('.nav-item')[7])">Upgrade to Pro</button>
+    </div>`; return;
+  }
+  list.innerHTML='<p style="text-align:center;color:var(--slate-300);font-family:\'DM Sans\',sans-serif;">Loading…</p>';
+  try {
+    const r = await fetch(workerURL+'/history?email='+AppState.userEmail);
+    const d = await r.json();
+    if(!d.length) {
+      list.innerHTML='<p style="text-align:center;color:var(--slate-300);font-family:\'DM Sans\',sans-serif;">No saved sessions yet.</p>'; return;
     }
+    list.innerHTML='';
+    d.forEach(item=>{
+      const dt = new Date(item.date).toLocaleDateString('en-IN',{day:'numeric',month:'short',year:'numeric'});
+      const div = document.createElement('div'); div.className='history-item';
+      div.innerHTML=`<div><div style="font-weight:700;font-size:14px;color:var(--ink);font-family:'DM Sans',sans-serif;">${dt}</div><div style="font-size:12px;color:var(--slate-300);font-family:'DM Sans',sans-serif;">${item.data.length} products</div></div><button class="btn btn-secondary" style="font-size:12px;padding:7px 12px;">Load</button>`;
+      div.onclick = ()=>window.loadHistoryItem(item.data);
+      list.appendChild(div);
+    });
+  } catch(e) { list.innerHTML='<p style="text-align:center;color:var(--red);">Error fetching history.</p>'; }
+};
 
-    const proViews = ['dashboard', 'ai', 'report', 'history', 'simulator'];
+window.loadHistoryItem = function(data) {
+  const c=document.getElementById('items'); if(!c) return;
+  c.innerHTML='';
+  data.forEach(r=>addNewRow(r.name||r.n||'', r.sell||r.v1||'', r.cost||r.v2||'', r.qty||r.v3||''));
+  showToast('History loaded! Generating Dashboard…','info');
+  processDataAndShowReport();
+};
 
-    function switchView(viewId, element, bypassPaywall = false) {
-      window.currentView = viewId;
-      if(proViews.includes(viewId) && window.isProUser === false && !bypassPaywall) {
-        document.getElementById('proLockOverlay').classList.remove('pro-lock-hidden');
-        document.querySelectorAll('.app-view').forEach(v => v.style.filter = "blur(6px)");
-      } else {
-        document.getElementById('proLockOverlay').classList.add('pro-lock-hidden');
-        document.querySelectorAll('.app-view').forEach(v => v.style.filter = "none");
-      }
-      
-      document.querySelectorAll('.app-view').forEach(view => view.classList.remove('active'));
-      document.getElementById('view-' + viewId).classList.add('active');
-      
-      if (element) {
-        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-        element.classList.add('active');
-        document.getElementById('mobilePageTitle').innerText = element.querySelector('.nav-item-text').innerText;
-      }
+// ══════════════════════════════════════════
+//  ONBOARDING (first visit)
+// ══════════════════════════════════════════
+const OB_STEPS = [
+  {target:'#nav-data',   title:'Start Here',        text:'Enter your products with sell price, cost, and quantity. Load demo data to try it instantly.'},
+  {target:'.add-row-btn',title:'Add Products',       text:'Click + or press Tab from the last row to add more. Supports unlimited products.'},
+  {target:'.btn-primary',title:'Generate Dashboard', text:'Click here (or Ctrl+Enter) to instantly analyze your numbers and see your full financial dashboard.'},
+];
+let obEl=null, obHl=null;
 
-      const sidebar = document.getElementById("appSidebar");
-      const overlay = document.getElementById("mobileAppOverlay");
-      if(sidebar && sidebar.classList.contains('mobile-open')) {
-          sidebar.classList.remove('mobile-open');
-          overlay.classList.remove('active');
-      }
-    }
+function startOnboarding() {
+  if(sessionStorage.getItem('vzx_v')) return;
+  sessionStorage.setItem('vzx_v','1');
+  setTimeout(()=>showOBStep(0), 900);
+}
 
-    // --- 3. CURRENCY & MATH ---
-    function updateCurrency() {
-      const sel = document.getElementById('currencySelect');
-      window.currentCurrency = sel.value;
-      window.currencySymbol = sel.options[sel.selectedIndex].text.split(' ')[0];
-      document.getElementById('hdr-sell').innerText = `Sell Price (${window.currencySymbol})`;
-      document.getElementById('hdr-cost').innerText = `Cost Price (${window.currencySymbol})`;
-    }
+function showOBStep(i) {
+  if(i>=OB_STEPS.length) { endOnboarding(); return; }
+  const s = OB_STEPS[i]; const target = document.querySelector(s.target);
+  if(!target) { showOBStep(i+1); return; }
+  if(obEl) obEl.remove(); if(obHl) obHl.remove();
 
-    function formatCurrency(num) {
-      return new Intl.NumberFormat('en-US', { style: 'currency', currency: window.currentCurrency, maximumFractionDigits: 0 }).format(num);
-    }
+  const r = target.getBoundingClientRect();
+  obHl = document.createElement('div'); obHl.className='onboarding-highlight';
+  obHl.style.cssText=`top:${r.top-4}px;left:${r.left-4}px;width:${r.width+8}px;height:${r.height+8}px;`;
+  document.body.appendChild(obHl);
 
-    function addNewRow(name='', sell='', cost='', qty='') {
-      const container = document.getElementById('items');
-      const row = document.createElement('div');
-      row.className = 'data-row';
-      row.innerHTML = `<input type="text" placeholder="Product Name" class="input-name" value="${name}"><input type="number" placeholder="Sell Price" class="input-sell" value="${sell}"><input type="number" placeholder="Cost Price" class="input-cost" value="${cost}"><input type="number" placeholder="Quantity" class="input-qty" value="${qty}"><button class="delete-btn" onclick="this.parentElement.remove()">×</button>`;
-      container.appendChild(row);
-    }
+  obEl = document.createElement('div'); obEl.className='onboarding-tooltip';
+  obEl.innerHTML=`
+    <h4>Step ${i+1}/${OB_STEPS.length}: ${s.title}</h4>
+    <p>${s.text}</p>
+    <div class="onboarding-nav">
+      <div class="onboarding-dots">${OB_STEPS.map((_,j)=>`<div class="onboarding-dot${j===i?' active':''}"></div>`).join('')}</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <button class="onboarding-skip" onclick="endOnboarding()">Skip</button>
+        <button class="onboarding-btn" onclick="showOBStep(${i+1})">${i===OB_STEPS.length-1?'Done ✓':'Next →'}</button>
+      </div>
+    </div>`;
+  obEl.style.cssText=`top:${Math.min(r.bottom+10, window.innerHeight-200)}px;left:${Math.max(10,Math.min(r.left,window.innerWidth-290))}px;`;
+  document.body.appendChild(obEl);
+}
 
-    function loadDemoData() {
-      document.getElementById('items').innerHTML = ''; 
-      addNewRow('Wireless Earbuds', '2500', '1200', '140');
-      addNewRow('Smart Watch', '4500', '2800', '85');
-      addNewRow('USB-C Cable', '400', '150', '300');
-      addNewRow('Phone Case', '600', '700', '50');
-    }
+function endOnboarding() { obEl?.remove(); obEl=null; obHl?.remove(); obHl=null; }
 
-    function processDataAndShowReport() {
-      if(window.isProUser === false) { switchView('dashboard', document.getElementById('nav-dashboard')); return; }
+// ══════════════════════════════════════════
+//  KEYBOARD SHORTCUTS
+// ══════════════════════════════════════════
+document.addEventListener('keydown', e=>{
+  if((e.ctrlKey||e.metaKey) && e.key==='Enter' && AppState.currentView==='data') processDataAndShowReport();
+  if(e.key==='Escape') document.getElementById('proLockOverlay').classList.add('pro-lock-hidden');
+});
 
-      const freshData = getFreshData();
-      if(freshData.length === 0) return alert("Please enter data first.");
+// ══════════════════════════════════════════
+//  INIT
+// ══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', ()=>{
+  restoreChatSession();
+  renderFeatureTable();
+  setTimeout(startOnboarding, 1000);
+});
+</script>
 
-      let totalRevenue = 0, totalCost = 0, totalProfit = 0, totalItems = 0;
-      let chartLabels = [], chartRevData = [], chartProfitData = [];
-      let reportHTML = '', topProduct = { name: '-', profit: -Infinity, qty: 0 }, profitLeaks = [];
-
-      freshData.forEach(item => {
-        const rev = item.sell * item.qty; 
-        const itemCost = item.cost * item.qty; 
-        const profit = rev - itemCost;
-        const margin = rev > 0 ? ((profit / rev) * 100).toFixed(1) : 0;
-
-        totalRevenue += rev; totalCost += itemCost; totalProfit += profit; totalItems += item.qty;
-        if(profit > topProduct.profit && item.qty > 0) topProduct = { name: item.name, profit, qty: item.qty };
-        if(profit < 0) profitLeaks.push(item.name);
-
-        chartLabels.push(item.name); chartRevData.push(rev); chartProfitData.push(profit);
-
-        let statusHtml = profit > 0 ? `<span class="status-pill status-healthy">Healthy</span>` : `<span class="status-pill status-leak">Leak</span>`;
-        reportHTML += `<tr><td style="font-weight: 600;">${item.name}</td><td>${formatCurrency(rev)}</td><td>${formatCurrency(itemCost)}</td><td style="font-weight: 700; color: ${profit < 0 ? '#dc2626' : 'inherit'};">${formatCurrency(profit)}</td><td>${margin}%</td><td>${statusHtml}</td></tr>`;
-      });
-
-      let overallMargin = totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100) : 0;
-      
-      let healthScore = 70; 
-      if(overallMargin > 40) healthScore += 20;
-      else if(overallMargin > 20) healthScore += 10;
-      else if(overallMargin < 10) healthScore -= 20;
-      healthScore -= (profitLeaks.length * 15);
-      healthScore = Math.max(0, Math.min(100, healthScore));
-
-      document.getElementById('dash-revenue').innerText = formatCurrency(totalRevenue);
-      document.getElementById('dash-profit').innerText = formatCurrency(totalProfit);
-      document.getElementById('dash-margin').innerText = overallMargin.toFixed(1) + '%';
-      document.getElementById('dash-top-product').innerText = topProduct.name;
-      document.getElementById('reportTableBody').innerHTML = reportHTML;
-
-      const hc = document.getElementById('health-circle');
-      hc.innerText = healthScore + '%';
-      if(healthScore >= 80) { hc.style.background = '#d1fae5'; hc.style.color = '#059669'; }
-      else if(healthScore >= 50) { hc.style.background = '#fef3c7'; hc.style.color = '#d97706'; }
-      else { hc.style.background = '#fee2e2'; hc.style.color = '#dc2626'; }
-
-      let insightsHTML = '';
-      let pdfInsights = '';
-      
-      if (topProduct.profit > 0) {
-        insightsHTML += `<div style="padding: 12px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;"><strong>1. Scale Top Performer:</strong> ${topProduct.name} generated ${formatCurrency(topProduct.profit)}. Increase ad spend on this item.</div>`;
-        pdfInsights += `<li style="margin-bottom: 12px;"><strong>Scale Winner:</strong> ${topProduct.name} generates the highest profit. Increase visibility.</li>`;
-      } else {
-        insightsHTML += `<div style="padding: 12px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;"><strong>1. Raise Prices:</strong> You have no highly profitable products. Raise prices immediately.</div>`;
-        pdfInsights += `<li style="margin-bottom: 12px;"><strong>Raise Prices:</strong> No core profitable products detected. Implement a price increase.</li>`;
-      }
-
-      if (profitLeaks.length > 0) {
-        insightsHTML += `<div style="padding: 12px; background: #fef2f2; border-radius: 8px; border: 1px solid #fecaca; color: #dc2626;"><strong>2. Stop Profit Leaks:</strong> ${profitLeaks.join(', ')} are currently operating at a loss. Reprice or drop them.</div>`;
-        pdfInsights += `<li style="margin-bottom: 12px; color: #dc2626;"><strong>Fix Leaks:</strong> ${profitLeaks.join(', ')} are losing money. Fix unit economics or drop them.</li>`;
-      } else {
-        insightsHTML += `<div style="padding: 12px; background: #ecfdf5; border-radius: 8px; border: 1px solid #a7f3d0; color: #059669;"><strong>2. Unit Economics Safe:</strong> Zero products are losing money. Your baseline is highly secure.</div>`;
-        pdfInsights += `<li style="margin-bottom: 12px;"><strong>Secure Economics:</strong> Zero products are currently operating at a net loss.</li>`;
-      }
-
-      if (overallMargin < 20) {
-        insightsHTML += `<div style="padding: 12px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;"><strong>3. Margin Warning:</strong> ${overallMargin.toFixed(1)}% is dangerous. Bundle items to increase Average Order Value.</div>`;
-        pdfInsights += `<li><strong>Increase Margin:</strong> Your ${overallMargin.toFixed(1)}% margin is tight. Implement product bundling.</li>`;
-      } else {
-        insightsHTML += `<div style="padding: 12px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;"><strong>3. Healthy Margin:</strong> ${overallMargin.toFixed(1)}% gives you excellent cash flow to invest in growth.</div>`;
-        pdfInsights += `<li><strong>Healthy Margin:</strong> ${overallMargin.toFixed(1)}% provides excellent flexibility for scaling operations.</li>`;
-      }
-      
-      document.getElementById('auto-insights-list').innerHTML = insightsHTML;
-      document.getElementById('pdf-insight-list').innerHTML = pdfInsights;
-
-      document.getElementById('pdf-rev').innerText = formatCurrency(totalRevenue);
-      document.getElementById('pdf-cost').innerText = formatCurrency(totalCost);
-      document.getElementById('pdf-profit').innerText = formatCurrency(totalProfit);
-      document.getElementById('pdf-units-sold').innerText = totalItems;
-      document.getElementById('pdf-margin').innerText = overallMargin.toFixed(1) + '%';
-      document.getElementById('pdf-top-prod').innerText = topProduct.name;
-
-      const ctx = document.getElementById('profitChart').getContext('2d');
-      if(myChart) myChart.destroy();
-      myChart = new Chart(ctx, {
-        type: 'bar',
-        data: { labels: chartLabels, datasets: [{ label: 'Revenue', data: chartRevData, backgroundColor: '#cbd5e1', borderRadius: 4 }, { label: 'Profit', data: chartProfitData, backgroundColor: '#4f46e5', borderRadius: 4 }] },
-        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { x: { grid: { display: false } }, y: { beginAtZero: true } } }
-      });
-
-      switchView('dashboard', document.getElementById('nav-dashboard'));
-    }
-
-    // --- 4. SIMULATOR LOGIC (12 SCENARIOS) ---
-    function initSimulator() {
-        if(!window.currentData || window.currentData.length === 0) {
-            getFreshData();
-            if(window.currentData.length === 0) return alert("Please enter data in Data Input first.");
-        }
-        resetSimulation();
-    }
-
-    function resetSimulation() {
-        document.getElementById("slide-price").value = 0; document.getElementById("val-price").innerText = "0%";
-        document.getElementById("slide-vol").value = 0; document.getElementById("val-vol").innerText = "0%";
-        document.getElementById("slide-cost").value = 0; document.getElementById("val-cost").innerText = "0%";
-        runSimulation();
-    }
-
-    function runSimulation() {
-        const pVal = parseInt(document.getElementById("slide-price").value);
-        const vVal = parseInt(document.getElementById("slide-vol").value);
-        const cVal = parseInt(document.getElementById("slide-cost").value);
-
-        document.getElementById("val-price").innerText = (pVal > 0 ? "+" : "") + pVal + "%";
-        document.getElementById("val-vol").innerText = (vVal > 0 ? "+" : "") + vVal + "%";
-        document.getElementById("val-cost").innerText = (cVal > 0 ? "+" : "") + cVal + "%";
-
-        const pMod = 1 + (pVal / 100);
-        const vMod = 1 + (vVal / 100);
-        const cMod = 1 + (cVal / 100);
-
-        let currentProfit = 0;
-        let newProfit = 0;
-
-        if(!window.currentData) return;
-        window.currentData.forEach(item => {
-            const baseProfit = (item.sell * item.qty) - (item.cost * item.qty);
-            currentProfit += baseProfit;
-            const newSell = item.sell * pMod;
-            const newCost = item.cost * cMod;
-            const newQty = item.qty * vMod;
-            const simProfit = (newSell * newQty) - (newCost * newQty);
-            newProfit += simProfit;
-        });
-
-        document.getElementById("sim-current").innerText = formatCurrency(currentProfit);
-        document.getElementById("sim-projected").innerText = formatCurrency(newProfit);
-        
-        const deltaEl = document.getElementById("sim-delta");
-        const insightEl = document.getElementById("sim-insight");
-        const diff = newProfit - currentProfit;
-        const profitGrowth = currentProfit > 0 ? ((diff / currentProfit) * 100).toFixed(1) : 0;
-
-        insightEl.style.padding = "16px";
-        insightEl.style.borderRadius = "8px";
-        insightEl.style.lineHeight = "1.6";
-
-        if(diff >= 0) {
-            deltaEl.innerText = "▲ " + formatCurrency(diff) + " (" + profitGrowth + "%)";
-            deltaEl.className = "sim-delta delta-pos";
-            insightEl.style.color = "#064e3b"; insightEl.style.background = "#d1fae5"; insightEl.style.border = "1px solid #34d399";
-
-            if (pVal > 0 && vVal > 0 && cVal < 0) { insightEl.innerHTML = `<strong>🦄 The Unicorn Strategy:</strong> Perfect efficiency. You raised value, scaled volume, and cut waste.`; }
-            else if (pVal > 0 && vVal < 0) { insightEl.innerHTML = `<strong>💎 Luxury Pivot:</strong> Selling fewer units but making more money. You successfully repositioned as Premium.`; }
-            else if (pVal < 0 && vVal > 0) { insightEl.innerHTML = `<strong>🔥 Mass Market Dominance:</strong> Lower price triggered huge demand. You are winning on volume.`; }
-            else if (cVal < 0 && pVal === 0 && vVal === 0) { insightEl.innerHTML = `<strong>✂️ Lean Operations:</strong> Every rupee saved in costs flows 100% to the bottom line.`; }
-            else if (pVal > 0 && vVal >= 0) { insightEl.innerHTML = `<strong>📈 Pricing Power:</strong> Your brand is strong enough that customers accepted the price hike.`; }
-            else if (vVal > 0 && cVal > 0) { insightEl.innerHTML = `<strong>🚀 Aggressive Scale:</strong> You are spending to grow, and it's paying off. Watch supply chain load.`; }
-            else { insightEl.innerHTML = `<strong>✅ Strategic Win:</strong> This configuration yields an extra <strong>${formatCurrency(diff)}</strong> in pure profit.`; }
-        } else {
-            deltaEl.innerText = "▼ " + formatCurrency(Math.abs(diff));
-            deltaEl.className = "sim-delta delta-neg";
-            insightEl.style.color = "#7f1d1d"; insightEl.style.background = "#fecaca"; insightEl.style.border = "1px solid #f87171";
-
-            if (pVal < 0 && vVal > 0) { insightEl.innerHTML = `<strong>⚠️ The Discount Trap:</strong> Working harder for less money. Volume didn't cover the price cut.`; }
-            else if (pVal > 0 && vVal < 0) { insightEl.innerHTML = `<strong>📉 Price Shock:</strong> The market rejected your price increase. You lost too many customers.`; }
-            else if (vVal > 0 && cVal > 0) { insightEl.innerHTML = `<strong>💸 Growing Broke:</strong> Scaling while costs rise faster than revenue. Fix unit economics first.`; }
-            else if (pVal < 0 && vVal <= 0) { insightEl.innerHTML = `<strong>🥀 Brand Erosion:</strong> Lowering prices didn't even stimulate demand. Re-evaluate market fit.`; }
-            else { insightEl.innerHTML = `<strong>🛑 Profit Warning:</strong> This strategy destroys <strong>${formatCurrency(Math.abs(diff))}</strong> in value. Revert changes.`; }
-        }
-    }
-
-    // --- 5. PERFECT PDF EXPORT ---
-    function exportExecutivePDF() {
-      const chartCanvas = document.getElementById('profitChart');
-      if(chartCanvas) {
-          document.getElementById('pdf-chart-image').src = chartCanvas.toDataURL('image/png');
-      }
-
-      const element = document.getElementById('pdf-export-container');
-      element.style.visibility = 'visible';
-
-      const opt = {
-        margin:       0.5,
-        filename:     'Vizbix_Executive_Summary.pdf',
-        image:        { type: 'jpeg', quality: 1 },
-        html2canvas:  { scale: 2, useCORS: true, windowWidth: 1100 },
-        jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
-      };
-      
-      setTimeout(() => {
-          html2pdf().set(opt).from(element).save().then(() => {
-              element.style.visibility = 'hidden';
-          });
-      }, 300);
-    }
-
-    // --- 6. AI CHAT ENGINE ---
-    window.startAIAnalysis = async function() {
-        if(!window.isProUser || !window.userEmail) return alert("Please Login (Pro Feature)");
-        
-        const freshData = getFreshData();
-        if(freshData.length === 0) return alert("Please enter data in the Data Input tab first!");
-
-        document.getElementById("aiSplashScreen").style.display = "none";
-        document.getElementById("aiChatContainer").style.display = "flex";
-
-        const promptMsg = `Analyze my catalog. Identify my hero product, spot any profit leaks, and give me a clear 3-step action plan to increase my net margin. Use ${window.currencySymbol}.`;
-        
-        document.getElementById("chatHistory").innerHTML = `<div class="chat-msg msg-ai" id="loadingAi">Analyzing your latest numbers in the cloud... This takes about 5 seconds ⏳</div>`;
-        window.chatConversation = []; 
-        
-        await window.executeAIRequest(promptMsg, freshData);
-    };
-
-    window.sendChatMessage = async function() {
-        if(!window.isProUser) return alert("Pro feature required.");
-        
-        const inputField = document.getElementById("aiChatInput");
-        if(!inputField) return;
-
-        const msg = inputField.value.trim();
-        if(!msg) return;
-
-        document.getElementById("aiSplashScreen").style.display = "none";
-        document.getElementById("aiChatContainer").style.display = "flex";
-
-        window.appendChatBubble(msg, 'user');
-        inputField.value = '';
-        
-        const freshData = getFreshData();
-        await window.executeAIRequest(msg, freshData);
-    };
-
-    window.executeAIRequest = async function(userMessage, freshData) {
-        const typingIndicator = document.getElementById("typingIndicator");
-        const sendBtn = document.getElementById("chatSendBtn");
-        
-        if(typingIndicator) typingIndicator.style.display = "block";
-        if(sendBtn) sendBtn.disabled = true;
-
-        let aiPayload = { 
-            email: window.userEmail, 
-            currency: window.currentCurrency || 'INR',
-            symbol: window.currencySymbol || '₹',
-            message: userMessage,
-            history: window.chatConversation,
-            products: freshData 
-        }; 
-        
-        window.chatConversation.push({ role: "user", content: userMessage });
-
-        try {
-            const r = await fetch(workerURL + "/ai-analyze", { 
-                method: "POST", 
-                headers: { "Content-Type": "application/json" }, 
-                body: JSON.stringify(aiPayload) 
-            });
-            const d = await r.json(); 
-            
-            if(typingIndicator) typingIndicator.style.display = "none";
-            if(sendBtn) sendBtn.disabled = false;
-            
-            const loadingElement = document.getElementById("loadingAi");
-            if(loadingElement) loadingElement.remove();
-
-            if(d.ok) { 
-                const formattedResponse = d.response.replace(/\n/g, "<br>").replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
-                window.appendChatBubble(formattedResponse, 'ai');
-                window.chatConversation.push({ role: "assistant", content: d.response });
-            } else { 
-                window.appendChatBubble("⚠️ " + (d.error || "AI Error"), 'ai'); 
-            }
-        } catch(e) { 
-            if(typingIndicator) typingIndicator.style.display = "none"; 
-            if(sendBtn) sendBtn.disabled = false; 
-            window.appendChatBubble("⚠️ Connection error. Please try again.", 'ai'); 
-        }
-    };
-
-    window.appendChatBubble = function(text, sender) {
-        const historyBox = document.getElementById("chatHistory");
-        if(!historyBox) return;
-        const div = document.createElement("div");
-        div.className = `chat-msg msg-${sender}`;
-        div.innerHTML = text;
-        historyBox.appendChild(div);
-        historyBox.scrollTop = historyBox.scrollHeight;
-    };
-
-    // --- 7. AUTH & CLOUD ---
-    window.verify = async function(email){
-        const targetEmail = email || window.userEmail;
-        if(!targetEmail) return;
-        try {
-            const r = await fetch(workerURL+"/check?email="+targetEmail); 
-            const d = await r.json();
-            if(d.valid) {
-                window.isProUser = true; 
-                if(d.expiry) { 
-                    const diff = d.expiry - Date.now();
-                    if(diff > 0) window.proDaysLeft = Math.ceil(diff / (1000 * 60 * 60 * 24)) + " Days Left";
-                    else { window.isProUser = false; window.proDaysLeft = "Expired"; }
-                }
-            } else { window.isProUser = false; }
-        } catch(e) {}
-    };
-
-    window.pay = function(){
-        if(!window.userEmail) return alert("Please log in.");
-        const options = {
-            key: KEY, amount: PRICE, currency: "INR", name: "Vizbix Pro", description: "30 Days Access",
-            prefill: { email: window.userEmail }, theme: { color: "#0F172A" },
-            handler: async function(response){ 
-                try {
-                    const req = await fetch(workerURL + "/verify-payment", { 
-                        method: "POST", headers: { "Content-Type": "application/json" }, 
-                        body: JSON.stringify({ payment_id: response.razorpay_payment_id, email: window.userEmail }) 
-                    });
-                    const d = await req.json();
-                    if (d.ok) { alert("Welcome to Pro."); window.verify(window.userEmail); } 
-                    else { alert("Verification Failed."); }
-                } catch (e) { alert("Error."); }
-            }
-        };
-        new Razorpay(options).open();
-    };
-
-    window.saveToCloud = async function() {
-        if(!window.isProUser) return alert("Pro Plan required."); 
-        const btn = document.getElementById("saveCloudBtn");
-        const freshData = getFreshData();
-        if(freshData.length === 0) return alert("Nothing to save!");
-        if(btn) btn.innerHTML = "⏳";
-        try { 
-            await fetch(workerURL + "/save", { 
-                method: "POST", 
-                headers: { "Content-Type": "application/json" }, 
-                body: JSON.stringify({ email: window.userEmail, data: freshData, mode: 'product', date: new Date().toISOString() }) 
-            }); 
-            if(btn) { btn.innerHTML = "✅ Saved"; setTimeout(() => btn.innerHTML = "💾 Save to Cloud", 2000); }
-        } catch(e) { if(btn) btn.innerHTML = "💾 Save to Cloud"; }
-    };
-
-    window.fetchHistory = async function() {
-        const list = document.getElementById("historyList"); 
-        if(!list) return;
-        if(!window.isProUser) { list.innerHTML = "<p style='text-align:center; color:#64748B;'>Unlock Pro to view history.</p>"; return; }
-        list.innerHTML = "Loading...";
-        try {
-            const r = await fetch(workerURL + "/history?email=" + window.userEmail); 
-            const d = await r.json();
-            if(d.length === 0) { list.innerHTML = "<p style='text-align:center'>No history.</p>"; return; }
-            list.innerHTML = "";
-            d.forEach(item => {
-                const dateStr = new Date(item.date).toLocaleDateString(); 
-                const div = document.createElement("div"); 
-                div.className = "history-item";
-                div.innerHTML = `<div><div style="font-weight:600; font-size:14px; color: var(--dark);">${dateStr}</div><div style="font-size:12px; color: var(--text-muted);">${item.data.length} Rows</div></div><button class="btn btn-secondary" style="font-size:12px; padding:8px 12px;">Load Data</button>`;
-                div.onclick = () => window.loadHistoryItem(item.data);
-                list.appendChild(div);
-            });
-        } catch(e) { list.innerHTML = "Error fetching history."; }
-    };
-
-    window.loadHistoryItem = function(data) {
-        const container = document.getElementById("items"); 
-        if(!container) return;
-        container.innerHTML = "";
-        data.forEach(row => { addNewRow(row.name||row.n||'', row.sell||row.v1||'', row.cost||row.v2||'', row.qty||row.v3||''); });
-        alert("History loaded! Generating Dashboard...");
-        processDataAndShowReport();
-    };
-
-    // --- 8. AUTH POLLER ---
-    let hasVerified = false;
-    setInterval(() => {
-      const globalLoginBtn = document.getElementById('headerLoginBtn');
-      if(window.userEmail) {
-        if(globalLoginBtn) globalLoginBtn.style.display = 'none';
-        document.getElementById('sidebarEmail').innerText = window.userEmail;
-        document.getElementById('settingsEmail').innerText = window.userEmail;
-        if(!hasVerified) { hasVerified = true; window.verify(window.userEmail); }
-      }
-      
-      if(window.isProUser) {
-        const planText = `Pro Active (${window.proDaysLeft || 'Active'})`;
-        document.getElementById('sidebarPlan').innerText = planText;
-        document.getElementById('settingsPlan').innerText = planText;
-        document.getElementById('settingsPlan').style.color = '#059669'; 
-        const upgradeBtn = document.getElementById('upgradeBtn');
-        if(upgradeBtn) upgradeBtn.style.display = 'none';
-
-        document.getElementById('proLockOverlay').classList.add('pro-lock-hidden');
-        document.querySelectorAll('.app-view').forEach(v => v.style.filter = "none");
-
-      } else if (window.isProUser === false) {
-        document.getElementById('sidebarPlan').innerText = "Free User";
-        document.getElementById('settingsPlan').innerText = "Free Plan (Limited)";
-        const upgradeBtn = document.getElementById('upgradeBtn');
-        if(upgradeBtn) upgradeBtn.style.display = 'block';
-      }
-    }, 1000);
-  </script>
-
-  <script type="module" src="../assets/js/auth.js?v=4.0"></script>
+<script type="module" src="../assets/js/auth.js?v=4.0"></script>
 
 </body>
 </html>
-
