@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Profit Optimizer Pro | Vizbix</title>
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
-  <link rel="stylesheet" href="../assets/css/main.css?v=8.0">
-  <link rel="stylesheet" href="../assets/css/app.css?v=8.0">
+  <link rel="stylesheet" href="../assets/css/main.css?v=9.0">
+  <link rel="stylesheet" href="../assets/css/app.css?v=9.0">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -184,8 +184,15 @@
       <div class="data-card">
         <div class="card-header">
           <div class="card-title">📋 Product Data</div>
-          <a class="demo-link" onclick="loadDemoData()">↗ Load Demo</a>
+          <div style="display:flex;align-items:center;gap:8px;">
+            <button class="btn btn-secondary" style="font-size:12px;padding:6px 12px;border-radius:8px;display:flex;align-items:center;gap:5px;" onclick="triggerImport()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+              Import CSV / Excel
+            </button>
+            <a class="demo-link" onclick="loadDemoData()">↗ Load Demo</a>
+          </div>
         </div>
+        <input type="file" id="importFileInput" accept=".csv,.xlsx,.xls" style="display:none;" onchange="handleImportFile(this)">
 
         <div class="data-table-headers">
           <div>Product Name</div>
@@ -524,7 +531,7 @@
   </div>
 </div>
 
-<script src="../assets/js/drawer.js?v=8.0"></script>
+<script src="../assets/js/drawer.js?v=9.0"></script>
 
 <script>
 // ══════════════════════════════════════════
@@ -1664,7 +1671,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 });
 </script>
 
-<script type="module" src="../assets/js/auth.js?v=4.0"></script>
+<script type="module" src="../assets/js/auth.js?v=4.1"></script>
 
 </body>
 </html>
