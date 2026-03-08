@@ -113,6 +113,11 @@
         <span class="nav-item-text">Data Input</span>
       </a>
 
+      <a class="nav-item" onclick="switchView('integrations', this)">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="8" rx="2" ry="2"></rect><rect x="2" y="14" width="20" height="8" rx="2" ry="2"></rect><line x1="6" y1="6" x2="6.01" y2="6"></line><line x1="6" y1="18" x2="6.01" y2="18"></line></svg>
+        <span class="nav-item-text">Integrations</span>
+      </a>
+
       <a class="nav-item" onclick="switchView('dashboard', this)" id="nav-dashboard">
         <svg viewBox="0 0 24 24"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg>
         <span class="nav-item-text">Dashboard</span>
@@ -224,6 +229,67 @@
         </p>
       </div>
     </div>
+      <div id="view-integrations" class="app-view">
+  <div style="max-width:900px; margin:0 auto;">
+    <div class="page-header">
+      <h2>Data Integrations</h2>
+    </div>
+
+    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
+      <div class="data-card" style="padding:24px; text-align:center;">
+        <div style="font-size:32px; margin-bottom:12px;">🛍️</div>
+        <h3 style="font-size:16px; font-weight:700; color:var(--ink);">WooCommerce</h3>
+        <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Sync products and sales history.</p>
+        <button class="btn btn-primary" style="width:100%; background:#7c3aed; border-color:#7c3aed;" onclick="openStoreModal('woo')">Connect Store</button>
+      </div>
+
+      <div class="data-card" style="padding:24px; text-align:center;">
+        <div style="font-size:32px; margin-bottom:12px;">🟢</div>
+        <h3 style="font-size:16px; font-weight:700; color:var(--ink);">Shopify</h3>
+        <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Sync inventory and pricing.</p>
+        <button class="btn btn-primary" style="width:100%; background:#059669; border-color:#059669;" onclick="openStoreModal('shopify')">Connect Store</button>
+      </div>
+
+      <div class="data-card" style="padding:24px; text-align:center;">
+        <div style="font-size:32px; margin-bottom:12px;">📊</div>
+        <h3 style="font-size:16px; font-weight:700; color:var(--ink);">CSV Import</h3>
+        <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Upload Excel or CSV files.</p>
+        <button class="btn btn-secondary" style="width:100%;" onclick="triggerImport()">Upload File</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="view-integrations" class="app-view">
+  <div style="max-width:900px; margin:0 auto;">
+    <div class="page-header">
+      <h2>Data Integrations</h2>
+    </div>
+
+    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
+      <div class="data-card" style="padding:24px; text-align:center;">
+        <div style="font-size:32px; margin-bottom:12px;">🛍️</div>
+        <h3 style="font-size:16px; font-weight:700; color:var(--ink);">WooCommerce</h3>
+        <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Sync products and sales history.</p>
+        <button class="btn btn-primary" style="width:100%; background:#7c3aed; border-color:#7c3aed;" onclick="openStoreModal('woo')">Connect Store</button>
+      </div>
+
+      <div class="data-card" style="padding:24px; text-align:center;">
+        <div style="font-size:32px; margin-bottom:12px;">🟢</div>
+        <h3 style="font-size:16px; font-weight:700; color:var(--ink);">Shopify</h3>
+        <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Sync inventory and pricing.</p>
+        <button class="btn btn-primary" style="width:100%; background:#059669; border-color:#059669;" onclick="openStoreModal('shopify')">Connect Store</button>
+      </div>
+
+      <div class="data-card" style="padding:24px; text-align:center;">
+        <div style="font-size:32px; margin-bottom:12px;">📊</div>
+        <h3 style="font-size:16px; font-weight:700; color:var(--ink);">CSV Import</h3>
+        <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Upload Excel or CSV files.</p>
+        <button class="btn btn-secondary" style="width:100%;" onclick="triggerImport()">Upload File</button>
+      </div>
+    </div>
+  </div>
+</div>
 
     <div id="view-dashboard" class="app-view">
       <div style="max-width:1040px;margin:0 auto;width:100%;box-sizing:border-box;">
@@ -2037,6 +2103,81 @@ function onAuthChange() {
   
   // ... rest of your existing plan display logic ...
 }
+
+// ─── STORE LOGIC ───
+function openStoreModal(tab='woo') {
+  document.getElementById('storeModal').style.display = 'flex';
+  switchStoreTab(tab);
+}
+
+function switchStoreTab(platform) {
+  const wForm = document.getElementById('form-woo');
+  const sForm = document.getElementById('form-shopify');
+  const wTab = document.getElementById('tab-woo');
+  const sTab = document.getElementById('tab-shopify');
+
+  if(platform === 'woo') {
+    wForm.style.display = 'block'; sForm.style.display = 'none';
+    wTab.style.background = 'var(--indigo)'; wTab.style.color = 'white';
+    sTab.style.background = '#f1f5f9'; sTab.style.color = '#64748b';
+  } else {
+    wForm.style.display = 'none'; sForm.style.display = 'block';
+    sTab.style.background = '#059669'; sTab.style.color = 'white';
+    wTab.style.background = '#f1f5f9'; wTab.style.color = '#64748b';
+  }
+}
+
+async function runStoreImport(platform) {
+  const payload = { platform };
+  let btnId = 'btnWoo';
+
+  if (platform === 'woo') {
+    payload.storeUrl = document.getElementById('wooUrl').value.trim();
+    payload.key = document.getElementById('wooKey').value.trim();
+    payload.secret = document.getElementById('wooSecret').value.trim();
+    if (!payload.storeUrl || !payload.key || !payload.secret) return showToast('Fill all fields', 'error');
+  } else {
+    btnId = 'btnShop';
+    payload.storeUrl = document.getElementById('shopUrl').value.trim();
+    payload.token = document.getElementById('shopToken').value.trim();
+    if (!payload.storeUrl || !payload.token) return showToast('Fill all fields', 'error');
+  }
+
+  const btn = document.getElementById(btnId);
+  const oldText = btn.innerText;
+  btn.innerText = 'Connecting...';
+  btn.disabled = true;
+
+  try {
+    const res = await fetch(workerURL + '/fetch-store', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload)
+    });
+    const d = await res.json();
+
+    if (d.ok) {
+      document.getElementById('items').innerHTML = ''; // Clear old data
+      d.data.forEach(p => addNewRow(p.name, p.sell, 0, p.qty)); // Cost is 0
+      
+      document.getElementById('storeModal').style.display = 'none';
+      showToast(`✅ Imported ${d.data.length} items!`, 'success');
+      
+      saveDataToStorage();
+      processDataAndShowReport();
+      
+      setTimeout(() => alert("Import Successful!\n\nNote: Cost Price is set to 0.\nPlease update your costs to see profit."), 500);
+    } else {
+      showToast('Error: ' + (d.error || 'Connection Failed'), 'error');
+    }
+  } catch (e) {
+    showToast('Network Error', 'error');
+  } finally {
+    btn.innerText = oldText;
+    btn.disabled = false;
+  }
+}
+
 </script>
 <script type="module" src="../assets/js/auth.js?v=4.4"></script>
 
@@ -2061,10 +2202,30 @@ function onAuthChange() {
   </div>
 </div>
   
+<div class="modal-overlay-login" id="storeModal" style="display:none; position:fixed; inset:0; background:rgba(8,9,13,0.6); z-index:9999; backdrop-filter:blur(4px); align-items:center; justify-content:center;">
+  <div class="login-box" style="background:white; padding:28px; border-radius:16px; width:90%; max-width:420px; position:relative;">
+    <button onclick="document.getElementById('storeModal').style.display='none'" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:24px; color:#94a3b8; cursor:pointer;">✕</button>
+    <h3 style="font-size: 20px; margin:0 0 16px; color:var(--ink); font-weight:700;">Connect Your Store</h3>
+    
+    <div style="display:flex; gap:10px; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:14px;">
+      <button onclick="switchStoreTab('woo')" id="tab-woo" style="flex:1; padding:8px; border-radius:8px; font-weight:600; font-size:13px; border:none; background:var(--indigo); color:white;">WooCommerce</button>
+      <button onclick="switchStoreTab('shopify')" id="tab-shopify" style="flex:1; padding:8px; border-radius:8px; font-weight:600; font-size:13px; border:none; background:#f1f5f9; color:#64748b;">Shopify</button>
+    </div>
 
+    <div id="form-woo">
+      <input type="text" id="wooUrl" placeholder="https://mystore.com" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px;">
+      <input type="text" id="wooKey" placeholder="Consumer Key (ck_...)" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px;">
+      <input type="password" id="wooSecret" placeholder="Consumer Secret (cs_...)" style="width:100%; padding:10px; margin-bottom:14px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px;">
+      <button class="btn btn-primary" id="btnWoo" style="width:100%; padding:12px;" onclick="runStoreImport('woo')">Import WooCommerce</button>
+    </div>
+
+    <div id="form-shopify" style="display:none;">
+      <input type="text" id="shopUrl" placeholder="my-store.myshopify.com" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px;">
+      <input type="password" id="shopToken" placeholder="Admin Access Token (shpat_...)" style="width:100%; padding:10px; margin-bottom:14px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px;">
+      <button class="btn btn-primary" id="btnShop" style="width:100%; background:#059669; border-color:#059669; padding:12px;" onclick="runStoreImport('shopify')">Import Shopify</button>
+    </div>
+  </div>
+</div>
   
 </body>
 </html>
-
-
-
