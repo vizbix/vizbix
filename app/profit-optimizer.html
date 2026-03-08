@@ -5,8 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Profit Optimizer Pro | Vizbix</title>
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
-  <link rel="stylesheet" href="../assets/css/main.css?v=9.1">
-  <link rel="stylesheet" href="../assets/css/app.css?v=9.1">
+  <link rel="stylesheet" href="../assets/css/main.css?v=9.2">
+  <link rel="stylesheet" href="../assets/css/app.css?v=9.2">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -213,6 +213,7 @@
         </div>
 
         <button class="add-row-btn" onclick="addNewRow()">+ Add Product</button>
+        <button class="add-row-btn" onclick="confirmResetData()" style="background:none;border:1.5px solid var(--slate-200);color:var(--red);margin-top:4px;font-size:12.5px;">🗑 Reset All Data</button>
 
         <div class="action-buttons-wrap">
           <button class="btn btn-primary"
@@ -453,14 +454,16 @@
         </div>
 
         <!-- Bottom charts row -->
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;" id="reportBottomGrid">
-          <div class="data-card" style="padding:18px;min-width:0;">
-            <h4 style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--slate-300);margin-bottom:14px;">Revenue Share by Product</h4>
-            <div style="position:relative;height:210px;"><canvas id="reportPieChart"></canvas></div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;" id="reportBottomGrid">
+          <div class="data-card" style="padding:20px;min-width:0;">
+            <h4 style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--slate-300);margin-bottom:4px;">Revenue Share by Product</h4>
+            <p style="font-size:11.5px;color:var(--slate-300);margin-bottom:12px;">Which products drive your revenue</p>
+            <div style="position:relative;height:260px;"><canvas id="reportPieChart"></canvas></div>
           </div>
-          <div class="data-card" style="padding:18px;min-width:0;">
-            <h4 style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--slate-300);margin-bottom:14px;">Margin % by Product</h4>
-            <div style="position:relative;height:210px;"><canvas id="reportMarginChart"></canvas></div>
+          <div class="data-card" style="padding:20px;min-width:0;">
+            <h4 style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--slate-300);margin-bottom:4px;">Profit vs Margin Analysis</h4>
+            <p style="font-size:11.5px;color:var(--slate-300);margin-bottom:12px;">Bubble size = revenue · Color = status</p>
+            <div style="position:relative;height:260px;"><canvas id="reportMarginChart"></canvas></div>
           </div>
         </div>
 
@@ -516,7 +519,7 @@
             <div id="featureRows"></div>
           </div>
 
-          <button id="upgradeBtn" class="btn-upgrade" onclick="window.pay();">
+          <button id="upgradeBtn" class="btn-upgrade" onclick="handleUpgradeClick();">
             🚀 Upgrade to PRO — ₹499 / 30 days
           </button>
           <p style="font-size:12px;color:var(--slate-300);text-align:center;margin-top:8px;font-family:'Inter',sans-serif;">Instant access · 200+ businesses trust Vizbix</p>
@@ -566,7 +569,7 @@
   </div>
 </div>
 
-<script src="../assets/js/drawer.js?v=9.1"></script>
+<script src="../assets/js/drawer.js?v=9.2"></script>
 
 <script>
 // ══════════════════════════════════════════
@@ -817,6 +820,7 @@ function loadDemoData() {
 //  ANALYSIS ENGINE
 // ══════════════════════════════════════════
 function processDataAndShowReport() {
+  saveDataToStorage();
   const data = getFreshData();
   if(!data.length) return showToast('Add at least one product first.','error');
 
@@ -1310,14 +1314,14 @@ function renderEnhancedReport(data) {
 
   // Totals footer
   const tfoot = document.getElementById('reportTableFoot');
-  if (tfoot) tfoot.innerHTML = `<tr style="background:var(--ink);color:white;font-weight:600;">
-    <td colspan="5" style="padding:11px 16px;font-size:12px;border-radius:0 0 0 12px;">TOTALS</td>
-    <td style="padding:11px 16px;">${fmt(tRev)}</td>
-    <td style="padding:11px 16px;">${fmt(tCost)}</td>
+  if (tfoot) tfoot.innerHTML = `<tr style="background:#0d0f18;color:white;font-weight:600;">
+    <td colspan="5" style="padding:11px 16px;font-size:12px;color:white;">TOTALS</td>
+    <td style="padding:11px 16px;color:white;">${fmt(tRev)}</td>
+    <td style="padding:11px 16px;color:white;">${fmt(tCost)}</td>
     <td style="padding:11px 16px;color:${tProfit>=0?'#6ee7b7':'#fca5a5'};">${tProfit<0?'-':''}${fmt(tProfit)}</td>
-    <td style="padding:11px 16px;">${ovMargin.toFixed(1)}%</td>
-    <td style="padding:11px 16px;">100%</td>
-    <td style="padding:11px 16px;border-radius:0 0 12px 0;"></td>
+    <td style="padding:11px 16px;color:white;">${ovMargin.toFixed(1)}%</td>
+    <td style="padding:11px 16px;color:white;">100%</td>
+    <td style="padding:11px 16px;color:white;"></td>
   </tr>`;
 
   // ── Pie chart ───────────────────────────
@@ -1339,26 +1343,58 @@ function renderEnhancedReport(data) {
   const margCtx = document.getElementById('reportMarginChart');
   if (margCtx) {
     if (reportMarginChart) reportMarginChart.destroy();
+    // Bubble chart: x=margin%, y=profit, r=revenue size
+    const maxRev = Math.max(...sorted.map(p => p.rev), 1);
+    const bubbleData = sorted.slice(0, 20).map(p => ({
+      x: parseFloat(p.margin.toFixed(1)),
+      y: p.profit,
+      r: Math.max(5, Math.round((p.rev / maxRev) * 28)),
+      name: p.name
+    }));
     reportMarginChart = new Chart(margCtx, {
-      type: 'bar',
+      type: 'bubble',
       data: {
-        labels: sorted.map(p => p.name),
         datasets: [{
-          label: 'Margin %',
-          data:  sorted.map(p => parseFloat(p.margin.toFixed(1))),
-          backgroundColor: sorted.map(p => p.margin >= 30 ? '#6ee7b7' : p.margin >= 0 ? '#fbbf24' : '#f87171'),
-          borderRadius: 5,
-          barThickness: 20,
+          label: 'Products',
+          data: bubbleData,
+          backgroundColor: sorted.slice(0,20).map(p =>
+            p.margin >= 30 ? 'rgba(110,231,183,0.75)' :
+            p.margin >= 0  ? 'rgba(251,191,36,0.75)'  :
+                             'rgba(248,113,113,0.75)'
+          ),
+          borderColor: sorted.slice(0,20).map(p =>
+            p.margin >= 30 ? '#059669' : p.margin >= 0 ? '#d97706' : '#dc2626'
+          ),
+          borderWidth: 1.5,
         }]
       },
       options: {
-        indexAxis: 'y',
         responsive: true,
         maintainAspectRatio: false,
-        plugins: { legend:{ display:false } },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => {
+                const d = ctx.raw;
+                const p = sorted.slice(0,20)[ctx.dataIndex];
+                const sym = AppState.currencySymbol || '₹';
+                return [p.name, `Margin: ${d.x}%`, `Profit: ${sym}${Math.abs(p.profit).toLocaleString('en-IN',{maximumFractionDigits:0})}`];
+              }
+            }
+          }
+        },
         scales: {
-          x: { beginAtZero:true, grid:{ color:'#f4f7ff' }, ticks:{ color:'#94a3b8', font:{size:11,family:'Inter'}, callback: v => v+'%' } },
-          y: { grid:{ display:false }, ticks:{ color:'#94a3b8', font:{size:11,family:'Inter'} } }
+          x: {
+            title: { display:true, text:'Margin %', color:'#94a3b8', font:{size:11,family:'Inter'} },
+            grid: { color:'#f4f7ff' },
+            ticks: { color:'#94a3b8', font:{size:10,family:'Inter'}, callback: v => v+'%' }
+          },
+          y: {
+            title: { display:true, text:'Gross Profit', color:'#94a3b8', font:{size:11,family:'Inter'} },
+            grid: { color:'#f4f7ff' },
+            ticks: { color:'#94a3b8', font:{size:10,family:'Inter'}, callback: v => { const sym=AppState.currencySymbol||'₹'; return v>=1000?sym+(v/1000).toFixed(0)+'k':sym+v; } }
+          }
         }
       }
     });
@@ -1836,13 +1872,89 @@ document.addEventListener('keydown', e=>{
 // ══════════════════════════════════════════
 //  INIT
 // ══════════════════════════════════════════
+
+// ══════════════════════════════════════════
+//  DATA PERSISTENCE (localStorage)
+// ══════════════════════════════════════════
+const STORAGE_KEY = 'vzx_product_data';
+
+function saveDataToStorage() {
+  try {
+    const data = getFreshData();
+    if (data.length) localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+  } catch(e) {}
+}
+
+function loadDataFromStorage() {
+  try {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (!saved) return false;
+    const data = JSON.parse(saved);
+    if (!data || !data.length) return false;
+    document.getElementById('items').innerHTML = '';
+    data.forEach(r => addNewRow(r.name||'', r.sell||'', r.cost||'', r.qty||''));
+    return true;
+  } catch(e) { return false; }
+}
+
+function confirmResetData() {
+  // Custom confirm modal instead of browser confirm()
+  const modal = document.createElement('div');
+  modal.style.cssText = 'position:fixed;inset:0;z-index:300;background:rgba(8,9,13,0.5);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px);';
+  modal.innerHTML = `
+    <div style="background:white;border-radius:16px;padding:28px;width:90%;max-width:360px;text-align:center;box-shadow:0 20px 60px rgba(8,9,13,0.2);">
+      <div style="font-size:32px;margin-bottom:12px;">🗑</div>
+      <div style="font-size:16px;font-weight:600;color:var(--ink);margin-bottom:8px;">Reset all data?</div>
+      <div style="font-size:13.5px;color:var(--slate-300);margin-bottom:22px;line-height:1.5;">This will clear all your products. This cannot be undone.</div>
+      <div style="display:flex;gap:10px;">
+        <button onclick="this.closest('div[style]').remove()" style="flex:1;padding:11px;border-radius:9px;border:1.5px solid var(--slate-200);background:white;font-size:14px;font-weight:600;cursor:pointer;color:var(--ink);">Cancel</button>
+        <button onclick="doResetData();this.closest('div[style]').remove()" style="flex:1;padding:11px;border-radius:9px;border:none;background:#dc2626;color:white;font-size:14px;font-weight:600;cursor:pointer;">Yes, Reset</button>
+      </div>
+    </div>`;
+  document.body.appendChild(modal);
+}
+
+function doResetData() {
+  document.getElementById('items').innerHTML = '';
+  addNewRow();
+  try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
+  showToast('Data cleared.', 'info');
+}
+
+// ── Auto-save on any input change ───────────
+document.addEventListener('input', e => {
+  if (e.target.closest('#items')) saveDataToStorage();
+});
+document.addEventListener('click', e => {
+  if (e.target.classList.contains('delete-btn') || e.target.classList.contains('add-row-btn')) {
+    setTimeout(saveDataToStorage, 50);
+  }
+});
+
+// ══════════════════════════════════════════
+//  UPGRADE GUARD
+// ══════════════════════════════════════════
+function handleUpgradeClick() {
+  if (!AppState.userEmail) {
+    showToast('Please log in first to upgrade.', 'error', 3500);
+    // Flash the login button
+    const lb = document.getElementById('headerLoginBtn');
+    if (lb) { lb.style.boxShadow='0 0 0 3px rgba(91,94,246,0.4)'; setTimeout(()=>lb.style.boxShadow='',1500); }
+    return;
+  }
+  window.pay();
+}
+
 document.addEventListener('DOMContentLoaded', ()=>{
   restoreChatSession();
   renderFeatureTable();
+  // Restore saved product data from localStorage
+  const restored = loadDataFromStorage();
+  if (restored) showToast('Your previous data has been restored ✓', 'info', 2500);
 });
 </script>
 
-<script type="module" src="../assets/js/auth.js?v=4.2"></script>
+<script type="module" src="../assets/js/auth.js?v=4.3"></script>
 
 </body>
 </html>
