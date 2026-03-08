@@ -28,12 +28,9 @@
 
 <div class="app-wrapper">
 
-  <!-- ── PAYWALL OVERLAY ───────────────── -->
-  <!-- ══ IMPORT MODAL ════════════════════ -->
   <div id="importModal" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(8,9,13,0.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
     <div style="background:white;border-radius:18px;padding:28px;width:92%;max-width:540px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(8,9,13,0.18);">
       
-      <!-- Step 1: Upload -->
       <div id="importStep1">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
           <h3 style="font-size:17px;font-weight:600;color:var(--ink);">Import Data</h3>
@@ -56,7 +53,6 @@
         </div>
       </div>
 
-      <!-- Step 2: Column Mapping -->
       <div id="importStep2" style="display:none;">
         <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
           <h3 style="font-size:17px;font-weight:600;color:var(--ink);">Map Your Columns</h3>
@@ -64,13 +60,10 @@
         </div>
         <p style="font-size:13px;color:var(--slate-300);margin-bottom:16px;" id="importFileInfo"></p>
 
-        <!-- Confidence banner -->
         <div id="importConfidenceBanner" style="padding:10px 14px;border-radius:9px;margin-bottom:16px;font-size:13px;"></div>
 
-        <!-- Mapping selects -->
         <div style="display:grid;gap:10px;margin-bottom:18px;" id="importMappingGrid"></div>
 
-        <!-- Preview table -->
         <div style="margin-bottom:18px;">
           <div style="font-size:11px;font-weight:600;color:var(--slate-300);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;">Preview (first 3 rows)</div>
           <div style="overflow-x:auto;border-radius:10px;border:1px solid var(--slate-100);">
@@ -101,7 +94,7 @@
         <li><span class="check">✓</span> Cloud Save &amp; History</li>
         <li><span class="check">✓</span> Financial Health Score</li>
       </ul>
-      <button class="btn-upgrade" onclick="switchView('settings', document.querySelectorAll('.nav-item')[6]); closePaywall();">
+      <button class="btn-upgrade" onclick="handleUpgradeClick(); closePaywall();">
         Upgrade to Pro — ₹499
       </button>
       <p class="pro-social-proof">⭐ Trusted by 200+ business owners · Instant access</p>
@@ -110,7 +103,6 @@
 
   <div class="mobile-overlay" id="mobileAppOverlay" onclick="toggleAppDrawer()"></div>
 
-  <!-- ── SIDEBAR ───────────────────────── -->
   <aside class="app-sidebar" id="appSidebar">
     <nav class="sidebar-nav">
 
@@ -168,7 +160,6 @@
     </div>
   </aside>
 
-  <!-- ── MAIN ──────────────────────────── -->
   <main class="app-main" id="mainContainer">
 
     <div class="mobile-app-bar">
@@ -180,7 +171,6 @@
       <div class="page-title" id="mobilePageTitle">Data Input</div>
     </div>
 
-    <!-- ══ DATA INPUT ═══════════════════ -->
     <div id="view-data" class="app-view active">
       <div class="data-card">
         <div class="card-header">
@@ -235,7 +225,6 @@
       </div>
     </div>
 
-    <!-- ══ DASHBOARD ════════════════════ -->
     <div id="view-dashboard" class="app-view">
       <div style="max-width:1040px;margin:0 auto;width:100%;box-sizing:border-box;">
 
@@ -248,7 +237,6 @@
           </div>
         </div>
 
-        <!-- Skeleton (shown during compute) -->
         <div id="dashboardSkeleton" style="display:none;">
           <div class="metrics-grid" style="margin-bottom:18px;">
             <div class="skeleton-card"><div class="skeleton skeleton-text" style="width:50%;"></div><div class="skeleton skeleton-value"></div></div>
@@ -301,7 +289,6 @@
       </div>
     </div>
 
-    <!-- ══ SIMULATOR ════════════════════ -->
     <div id="view-simulator" class="app-view">
       <div style="max-width:880px;margin:0 auto;width:100%;box-sizing:border-box;">
         <div class="page-header">
@@ -349,7 +336,6 @@
       </div>
     </div>
 
-    <!-- ══ AI STRATEGY ═══════════════════ -->
     <div id="view-ai" class="app-view">
       <div style="max-width:840px;margin:0 auto;width:100%;box-sizing:border-box;">
 
@@ -401,7 +387,6 @@
       </div>
     </div>
 
-    <!-- ══ DETAILED REPORT ════════════════ -->
     <div id="view-report" class="app-view">
       <div style="max-width:1040px;margin:0 auto;width:100%;box-sizing:border-box;">
 
@@ -413,13 +398,10 @@
           </div>
         </div>
 
-        <!-- KPI Summary Bar -->
         <div id="reportSummaryBar" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;"></div>
 
-        <!-- Performance Bands -->
         <div id="reportBands" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;"></div>
 
-        <!-- Search bar -->
         <div style="display:flex;align-items:center;gap:10px;margin-bottom:10px;flex-wrap:wrap;">
           <div style="position:relative;flex:1;min-width:200px;">
             <svg style="position:absolute;left:11px;top:50%;transform:translateY(-50%);pointer-events:none;" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#94a3b8" stroke-width="2.5" stroke-linecap="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
@@ -431,7 +413,6 @@
           <div id="reportSearchCount" style="font-size:12px;color:var(--slate-300);white-space:nowrap;"></div>
         </div>
 
-        <!-- Main Table -->
         <div style="overflow-x:auto;background:white;border:1px solid var(--slate-100);border-radius:14px;box-shadow:0 1px 3px rgba(8,9,13,0.04);margin-bottom:14px;">
           <table class="report-table" style="border:none;">
             <thead>
@@ -454,7 +435,6 @@
           </table>
         </div>
 
-        <!-- Bottom charts row -->
         <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;" id="reportBottomGrid">
           <div class="data-card" style="padding:20px;min-width:0;">
             <h4 style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--slate-300);margin-bottom:4px;">Revenue Share by Product</h4>
@@ -471,7 +451,6 @@
       </div>
     </div>
 
-    <!-- ══ CLOUD HISTORY ══════════════════ -->
     <div id="view-history" class="app-view">
       <div class="data-card" style="max-width:680px;margin:0 auto;">
         <div class="page-header" style="margin-bottom:16px;">
@@ -484,7 +463,6 @@
       </div>
     </div>
 
-    <!-- ══ SETTINGS ═══════════════════════ -->
     <div id="view-settings" class="app-view">
       <div class="data-card" style="max-width:580px;margin:0 auto;">
         <h2 style="margin-bottom:22px;font-size:20px;">Account Settings</h2>
@@ -511,7 +489,6 @@
           <div class="settings-section-label" style="color:var(--indigo);">Subscription Plan</div>
           <div id="settingsPlan" style="font-weight:600;font-size:15px;color:var(--slate-300);margin-bottom:16px;font-family:'Inter',sans-serif;">Free Plan</div>
 
-          <!-- Feature comparison table -->
           <div id="freePlanComparison" style="background:white;border-radius:10px;padding:14px;margin-bottom:16px;border:1px solid #c4b5fd;">
             <div style="display:flex;justify-content:space-between;font-size:10.5px;font-weight:600;margin-bottom:10px;color:var(--indigo);text-transform:uppercase;letter-spacing:0.5px;font-family:'Inter',sans-serif;">
               <span>Feature</span>
@@ -535,7 +512,6 @@
   </main>
 </div>
 
-<!-- OFF-SCREEN PDF TEMPLATE -->
 <div id="pdf-export-container"
   style="position:absolute;left:-9999px;top:0;width:1100px;background:white;font-family:Arial,sans-serif;padding:40px;box-sizing:border-box;color:#0f172a;visibility:hidden;">
   <div style="margin-bottom:36px;border-bottom:2px solid #0f172a;padding-bottom:12px;">
@@ -584,14 +560,14 @@ const KEY   = "rzp_live_SCvIqUMzTNsXgq";
 //  CENTRALISED APP STATE
 // ══════════════════════════════════════════
 const AppState = {
-  currentData:      [],
-  currentView:      'data',
-  currentCurrency:  'INR',
-  currencySymbol:   '₹',
+  currentData:       [],
+  currentView:       'data',
+  currentCurrency:   'INR',
+  currencySymbol:    '₹',
   chatConversation: [],
-  isProUser:        null,
-  userEmail:        null,
-  proDaysLeft:      null,
+  isProUser:         null,
+  userEmail:         null,
+  proDaysLeft:       null,
 };
 
 // window.* proxies — keep auth.js / old callbacks working unchanged
@@ -777,9 +753,9 @@ function addNewRow(name='',sell='',cost='',qty='') {
   row.className = 'data-row';
   row.innerHTML = `
     <input type="text"   placeholder="Product name" class="input-name" value="${name}">
-    <input type="number" placeholder="0"            class="input-sell" value="${sell}">
-    <input type="number" placeholder="0"            class="input-cost" value="${cost}">
-    <input type="number" placeholder="0"            class="input-qty"  value="${qty}">
+    <input type="number" placeholder="0"             class="input-sell" value="${sell}">
+    <input type="number" placeholder="0"             class="input-cost" value="${cost}">
+    <input type="number" placeholder="0"             class="input-qty"  value="${qty}">
     <button class="delete-btn" onclick="removeRow(this)" title="Remove">×</button>`;
 
   // Tab on last qty field → new row
@@ -1176,7 +1152,7 @@ function confirmImport() {
       name:      String(r[name]).trim(),
       sell:      parseFloat(String(r[sellPrice]??'').replace(/[^0-9.]/g,'')) || 0,
       cost:      parseFloat(String(r[costPrice]??'').replace(/[^0-9.]/g,'')) || 0,
-      qty:       parseInt(String(r[qty]??'').replace(/[^0-9]/g,''))          || 0,
+      qty:       parseInt(String(r[qty]??'').replace(/[^0-9]/g,''))           || 0,
     }));
 
   if (!rows.length) { showToast('No valid rows found.', 'error'); return; }
@@ -1241,7 +1217,7 @@ function renderEnhancedReport(data) {
   // ── Summary Bar ──────────────────────────
   const sb = document.getElementById('reportSummaryBar');
   if (sb) sb.innerHTML = [
-    { l:'Total Revenue',  v: fmt(tRev),               c:'var(--indigo)' },
+    { l:'Total Revenue',  v: fmt(tRev),                c:'var(--indigo)' },
     { l:'Net Profit',     v: fmt(tProfit),             c: tProfit >= 0 ? 'var(--green)' : 'var(--red)' },
     { l:'Avg Margin',     v: ovMargin.toFixed(1) + '%',c: ovMargin >= 25 ? 'var(--green)' : ovMargin >= 10 ? 'var(--amber)' : 'var(--red)' },
     { l:'Units Sold',     v: tQty.toLocaleString(),    c:'#8b5cf6' },
@@ -1582,7 +1558,7 @@ function exportExecutivePDF() {
 
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;">
       ${[
-        {l:'Total Revenue',  v:fmt(tRev),               c:'#5b5ef6'},
+        {l:'Total Revenue',  v:fmt(tRev),                c:'#5b5ef6'},
         {l:'Net Profit',     v:fmt(tProfit),             c:tProfit>=0?'#059669':'#dc2626'},
         {l:'Avg Margin',     v:ovMargin.toFixed(1)+'%',  c:ovMargin>=25?'#059669':ovMargin>=10?'#d97706':'#dc2626'},
         {l:'Units Sold',     v:tQty.toLocaleString(),    c:'#8b5cf6'},
@@ -1792,8 +1768,29 @@ window.verify = async function(email) {
   } catch(e){}
 };
 
+// RE-WRITTEN HANDLE UPGRADE
+window.handleUpgradeClick = function() {
+  if (!AppState.userEmail) {
+    showToast('Redirecting to Login...', 'info', 2000);
+    // Programmatically click the login button to force auth flow
+    const lb = document.getElementById('headerLoginBtn');
+    if (lb) { 
+      lb.click(); 
+    } else {
+      showToast('Please login using the button at top right.', 'error');
+    }
+    return;
+  }
+  window.pay();
+};
+
 window.pay = function() {
   if(!AppState.userEmail) return showToast('Please log in first.','error');
+  
+  if (typeof Razorpay === 'undefined') {
+    return showToast('Payment gateway loading... please try again in a moment.', 'info');
+  }
+
   new Razorpay({
     key:KEY, amount:PRICE, currency:'INR',
     name:'Vizbix Pro', description:'30 Days Access',
@@ -1992,10 +1989,14 @@ document.addEventListener('click', e => {
 // ══════════════════════════════════════════
 function handleUpgradeClick() {
   if (!AppState.userEmail) {
-    showToast('Please log in first to upgrade.', 'error', 3500);
-    // Flash the login button
+    showToast('Redirecting to Login...', 'info', 2000);
+    // Programmatically click the login button to force auth flow
     const lb = document.getElementById('headerLoginBtn');
-    if (lb) { lb.style.boxShadow='0 0 0 3px rgba(91,94,246,0.4)'; setTimeout(()=>lb.style.boxShadow='',1500); }
+    if (lb) { 
+      lb.click(); 
+    } else {
+      showToast('Please login using the button at top right.', 'error');
+    }
     return;
   }
   window.pay();
