@@ -614,6 +614,15 @@ function onAuthChange() {
     const lb = document.getElementById('headerLoginBtn');
     if (lb) lb.style.display = 'none';
     if (!authVerified) { authVerified = true; window.verify(email); }
+
+    // 🚀 MAGIC FIX: Check if user was trying to buy Pro before logging in
+    if (sessionStorage.getItem('vzx_pending_upgrade') === 'true') {
+        sessionStorage.removeItem('vzx_pending_upgrade'); // Clear flag
+        setTimeout(() => {
+            showToast('Login successful! Opening secure payment...', 'success', 4000);
+            window.pay(); // Auto-open Razorpay
+        }, 1500);
+    }
   }
 
   // Plan display
@@ -2010,8 +2019,8 @@ document.addEventListener('DOMContentLoaded', ()=>{
   if (restored) showToast('Your previous data has been restored ✓', 'info', 2500);
 });
 </script>
-
 <script type="module" src="../assets/js/auth.js?v=4.4"></script>
 
 </body>
 </html>
+
