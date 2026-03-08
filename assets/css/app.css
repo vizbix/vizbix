@@ -1008,9 +1008,10 @@ input[type=range]::-webkit-slider-thumb:hover {
   box-shadow: 0 4px 14px rgba(91,94,246,0.08);
 }
 
-/* ─── MOBILE APP BAR ─────────────────────── */
-.mobile-app-bar { display: none; }
-.mobile-overlay  { display: none; }
+/* ─── CHART CONTAINMENT ──────────────────── */
+.chart-card { box-sizing: border-box; }
+.chart-wrap { box-sizing: border-box; }
+.chart-wrap canvas { display: block; max-width: 100% !important; }
 
 /* ─── KEYBOARD SHORTCUT HINT ─────────────── */
 .kbd {
@@ -1162,33 +1163,54 @@ input[type=range]::-webkit-slider-thumb:hover {
     padding: 8px 14px;
   }
 
-  /* ── Metrics grid: 2 cols, no min-width overflow ── */
+  /* ── Metrics grid: 2 cols, contained ── */
   .metrics-grid {
     grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 12px;
+    gap: 8px;
+    margin-bottom: 10px;
   }
   .metric-card {
-    padding: 14px 14px 12px;
-    border-radius: 12px;
+    padding: 13px 12px 11px;
+    border-radius: 11px;
+    min-width: 0; /* prevent overflow */
   }
   .metric-card .value {
-    font-size: 18px;
+    font-size: 17px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
-  .metric-card h4 { font-size: 10px; margin-bottom: 6px; }
+  .metric-card h4 { font-size: 9.5px; margin-bottom: 5px; }
 
   /* ── Dash grid: single column ── */
   .dash-grid {
     grid-template-columns: 1fr !important;
-    gap: 12px;
+    gap: 10px;
   }
 
-  /* Chart: reduce height on mobile */
-  #profitChart { height: 220px !important; }
-  .data-card canvas { max-height: 220px; }
+  /* Chart card: prevent horizontal bleed */
+  .dash-grid > .data-card:first-child {
+    padding: 14px 12px;
+    overflow: hidden;
+  }
+  .dash-grid > .data-card:first-child > div[style] {
+    height: 200px !important;
+    max-width: 100%;
+    overflow: hidden;
+  }
 
-  /* Action plan card: full padding */
-  .dash-grid > .data-card:last-child { padding: 16px; }
+  /* Force chart canvas to stay inside its box */
+  #profitChart {
+    max-width: 100% !important;
+    height: 200px !important;
+  }
+
+  /* Action plan card */
+  .dash-grid > .data-card:last-child {
+    padding: 14px;
+    word-break: break-word;
+  }
+  .dash-grid > .data-card:last-child > div { word-break: break-word; }
 
   /* ── Sim results ── */
   .sim-results { grid-template-columns: 1fr !important; gap: 10px; }
