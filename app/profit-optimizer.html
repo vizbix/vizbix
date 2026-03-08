@@ -5,8 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Profit Optimizer Pro | Vizbix</title>
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
-  <link rel="stylesheet" href="../assets/css/main.css?v=9.2">
-  <link rel="stylesheet" href="../assets/css/app.css?v=9.2">
+  <link rel="stylesheet" href="../assets/css/main.css?v=9.3">
+  <link rel="stylesheet" href="../assets/css/app.css?v=9.3">
+  <script src="https://checkout.razorpay.com/v1/checkout.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
@@ -569,7 +570,7 @@
   </div>
 </div>
 
-<script src="../assets/js/drawer.js?v=9.2"></script>
+<script src="../assets/js/drawer.js?v=9.3"></script>
 
 <script>
 // ══════════════════════════════════════════
@@ -1329,13 +1330,48 @@ function renderEnhancedReport(data) {
   const pieCtx  = document.getElementById('reportPieChart');
   if (pieCtx) {
     if (reportPieChart) reportPieChart.destroy();
+    // Limit pie to top 10 + "Others" bucket
+    const PIE_MAX = 10;
+    const pieTop   = sorted.slice(0, PIE_MAX);
+    const pieRest  = sorted.slice(PIE_MAX);
+    const pieLabels = pieTop.map(p => p.name.length > 16 ? p.name.slice(0,15)+'…' : p.name);
+    const pieData   = pieTop.map(p => Math.max(0, p.rev));
+    const piePalette = ['#5b5ef6','#6ee7b7','#fbbf24','#f87171','#a78bfa','#34d399','#fb923c','#60a5fa','#e879f9','#38bdf8'];
+    if (pieRest.length > 0) {
+      const othersRev = pieRest.reduce((s,p) => s + Math.max(0,p.rev), 0);
+      pieLabels.push(`Others (${pieRest.length})`);
+      pieData.push(othersRev);
+      piePalette.push('#cbd5e1');
+    }
+    const showLegend = sorted.length <= 8;
     reportPieChart = new Chart(pieCtx, {
       type: 'doughnut',
       data: {
-        labels: sorted.map(p => p.name),
-        datasets: [{ data: sorted.map(p => Math.max(0,p.rev)), backgroundColor: sorted.map((_,i) => palette[i % palette.length]), borderWidth: 0, hoverOffset: 6 }]
+        labels: pieLabels,
+        datasets: [{ data: pieData, backgroundColor: piePalette, borderWidth: 2, borderColor: 'white', hoverOffset: 8 }]
       },
-      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ font:{size:11,family:'Inter'}, color:'#94a3b8', boxWidth:10, padding:8 } } } }
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: showLegend,
+            position: 'bottom',
+            labels: { font:{size:11,family:'Inter'}, color:'#94a3b8', boxWidth:10, padding:8 }
+          },
+          tooltip: {
+            callbacks: {
+              label: ctx => {
+                const sym = AppState.currencySymbol || '₹';
+                const val = ctx.raw;
+                const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
+                const pct = total > 0 ? ((val/total)*100).toFixed(1) : 0;
+                return ` ${ctx.label}: ${sym}${val.toLocaleString('en-IN',{maximumFractionDigits:0})} (${pct}%)`;
+              }
+            }
+          }
+        }
+      }
     });
   }
 
@@ -1344,27 +1380,31 @@ function renderEnhancedReport(data) {
   if (margCtx) {
     if (reportMarginChart) reportMarginChart.destroy();
     // Bubble chart: x=margin%, y=profit, r=revenue size
-    const maxRev = Math.max(...sorted.map(p => p.rev), 1);
-    const bubbleData = sorted.slice(0, 20).map(p => ({
+    // Show top 15 by revenue — better readability
+    const BUBBLE_MAX = 15;
+    const bubbleSrc  = sorted.slice(0, BUBBLE_MAX);
+    const maxRev     = Math.max(...bubbleSrc.map(p => p.rev), 1);
+    const bubbleData = bubbleSrc.map(p => ({
       x: parseFloat(p.margin.toFixed(1)),
       y: p.profit,
-      r: Math.max(5, Math.round((p.rev / maxRev) * 28)),
-      name: p.name
+      r: Math.max(6, Math.round((p.rev / maxRev) * 22)),
     }));
+    const bubbleColors = bubbleSrc.map(p =>
+      p.margin >= 30 ? 'rgba(110,231,183,0.8)' :
+      p.margin >= 0  ? 'rgba(251,191,36,0.8)'  :
+                       'rgba(248,113,113,0.8)'
+    );
+    const bubbleBorders = bubbleSrc.map(p =>
+      p.margin >= 30 ? '#059669' : p.margin >= 0 ? '#d97706' : '#dc2626'
+    );
     reportMarginChart = new Chart(margCtx, {
       type: 'bubble',
       data: {
         datasets: [{
           label: 'Products',
           data: bubbleData,
-          backgroundColor: sorted.slice(0,20).map(p =>
-            p.margin >= 30 ? 'rgba(110,231,183,0.75)' :
-            p.margin >= 0  ? 'rgba(251,191,36,0.75)'  :
-                             'rgba(248,113,113,0.75)'
-          ),
-          borderColor: sorted.slice(0,20).map(p =>
-            p.margin >= 30 ? '#059669' : p.margin >= 0 ? '#d97706' : '#dc2626'
-          ),
+          backgroundColor: bubbleColors,
+          borderColor: bubbleBorders,
           borderWidth: 1.5,
         }]
       },
@@ -1376,10 +1416,10 @@ function renderEnhancedReport(data) {
           tooltip: {
             callbacks: {
               label: ctx => {
-                const d = ctx.raw;
-                const p = sorted.slice(0,20)[ctx.dataIndex];
+                const p = bubbleSrc[ctx.dataIndex];
                 const sym = AppState.currencySymbol || '₹';
-                return [p.name, `Margin: ${d.x}%`, `Profit: ${sym}${Math.abs(p.profit).toLocaleString('en-IN',{maximumFractionDigits:0})}`];
+                const profStr = (p.profit < 0 ? '-' : '') + sym + Math.abs(p.profit).toLocaleString('en-IN',{maximumFractionDigits:0});
+                return [`📦 ${p.name}`, `Margin: ${p.margin.toFixed(1)}%`, `Profit: ${profStr}`];
               }
             }
           }
@@ -1393,7 +1433,15 @@ function renderEnhancedReport(data) {
           y: {
             title: { display:true, text:'Gross Profit', color:'#94a3b8', font:{size:11,family:'Inter'} },
             grid: { color:'#f4f7ff' },
-            ticks: { color:'#94a3b8', font:{size:10,family:'Inter'}, callback: v => { const sym=AppState.currencySymbol||'₹'; return v>=1000?sym+(v/1000).toFixed(0)+'k':sym+v; } }
+            ticks: {
+              color:'#94a3b8', font:{size:10,family:'Inter'},
+              callback: v => {
+                const sym = AppState.currencySymbol || '₹';
+                if (Math.abs(v) >= 100000) return sym+(v/100000).toFixed(1)+'L';
+                if (Math.abs(v) >= 1000)   return sym+(v/1000).toFixed(0)+'k';
+                return sym+v;
+              }
+            }
           }
         }
       }
@@ -1898,8 +1946,8 @@ function loadDataFromStorage() {
 }
 
 function confirmResetData() {
-  // Custom confirm modal instead of browser confirm()
   const modal = document.createElement('div');
+  modal.id = 'resetConfirmModal';
   modal.style.cssText = 'position:fixed;inset:0;z-index:300;background:rgba(8,9,13,0.5);display:flex;align-items:center;justify-content:center;backdrop-filter:blur(3px);';
   modal.innerHTML = `
     <div style="background:white;border-radius:16px;padding:28px;width:90%;max-width:360px;text-align:center;box-shadow:0 20px 60px rgba(8,9,13,0.2);">
@@ -1907,19 +1955,27 @@ function confirmResetData() {
       <div style="font-size:16px;font-weight:600;color:var(--ink);margin-bottom:8px;">Reset all data?</div>
       <div style="font-size:13.5px;color:var(--slate-300);margin-bottom:22px;line-height:1.5;">This will clear all your products. This cannot be undone.</div>
       <div style="display:flex;gap:10px;">
-        <button onclick="this.closest('div[style]').remove()" style="flex:1;padding:11px;border-radius:9px;border:1.5px solid var(--slate-200);background:white;font-size:14px;font-weight:600;cursor:pointer;color:var(--ink);">Cancel</button>
-        <button onclick="doResetData();this.closest('div[style]').remove()" style="flex:1;padding:11px;border-radius:9px;border:none;background:#dc2626;color:white;font-size:14px;font-weight:600;cursor:pointer;">Yes, Reset</button>
+        <button onclick="closeResetModal()" style="flex:1;padding:11px;border-radius:9px;border:1.5px solid var(--slate-200);background:white;font-size:14px;font-weight:600;cursor:pointer;color:var(--ink);">Cancel</button>
+        <button onclick="doResetData()" style="flex:1;padding:11px;border-radius:9px;border:none;background:#dc2626;color:white;font-size:14px;font-weight:600;cursor:pointer;">Yes, Reset</button>
       </div>
     </div>`;
   document.body.appendChild(modal);
 }
 
+function closeResetModal() {
+  const m = document.getElementById('resetConfirmModal');
+  if (m) m.remove();
+}
+
 function doResetData() {
+  closeResetModal();
   document.getElementById('items').innerHTML = '';
   addNewRow();
   try { localStorage.removeItem(STORAGE_KEY); } catch(e) {}
   showToast('Data cleared.', 'info');
 }
+
+
 
 // ── Auto-save on any input change ───────────
 document.addEventListener('input', e => {
@@ -1954,7 +2010,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 });
 </script>
 
-<script type="module" src="../assets/js/auth.js?v=4.3"></script>
+<script type="module" src="../assets/js/auth.js?v=4.4"></script>
 
 </body>
 </html>
