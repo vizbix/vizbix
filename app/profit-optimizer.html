@@ -7,66 +7,21 @@
   <link rel="icon" type="image/png" href="../assets/img/favicon.png">
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   
-  <link rel="stylesheet" href="../assets/css/main.css?v=12.0">
-  <link rel="stylesheet" href="../assets/css/app.css?v=12.0">
+  <link rel="stylesheet" href="../assets/css/main.css?v=7.0">
+  <link rel="stylesheet" href="../assets/css/app.css?v=7.0">
   
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
   <style>
-    /* CORE APP STYLES */
-    .app-view { display: none; opacity: 0; transform: translateY(10px); transition: opacity 0.3s ease, transform 0.3s ease; }
-    .app-view.active { display: block; opacity: 1; transform: translateY(0); }
+    .app-view { display: none; transition: filter 0.3s ease; }
+    .app-view.active { display: block; animation: fadeIn 0.3s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
     .pro-lock-hidden { display: none !important; }
-    
-    /* EXPENSES UI */
-    .expense-row { display: grid; grid-template-columns: 2fr 1fr 40px; gap: 16px; margin-bottom: 12px; }
-    .expense-row input { padding: 10px 12px; border: 1px solid #e2e8f0; border-radius: 8px; width: 100%; }
-    .expense-header { background: #f1f5f9; padding: 10px; border-radius: 8px; font-weight: 700; margin-bottom: 15px; display: flex; justify-content: space-between; }
-
-    /* GAMIFICATION: STREAK FLAME */
-    .streak-badge { background: #fff7ed; border: 1px solid #ffedd5; color: #c2410c; padding: 6px 12px; border-radius: 99px; font-size: 13px; font-weight: 700; display: flex; align-items: center; gap: 6px; }
-    .streak-active { background: #fef2f2; border-color: #fee2e2; color: #dc2626; animation: pulse 2s infinite; }
-    @keyframes pulse { 0% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0.4); } 70% { box-shadow: 0 0 0 6px rgba(220, 38, 38, 0); } 100% { box-shadow: 0 0 0 0 rgba(220, 38, 38, 0); } }
-
-    /* MORNING BRIEFING MODAL */
-    .modal-overlay { position: fixed; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); z-index: 100; display: none; align-items: center; justify-content: center; }
-    .modal-card { background: white; width: 100%; max-width: 450px; padding: 32px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.2); text-align: center; position: relative; }
-    .modal-icon { width: 64px; height: 64px; background: #dbeafe; color: #2563eb; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px auto; font-size: 28px; }
-    .modal-close { position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 20px; cursor: pointer; color: #94a3b8; }
-
-    /* INTEGRATIONS GRID */
-    .integrations-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
-    .integration-card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 24px; text-align: center; transition: all 0.2s; background: white; cursor: pointer; }
-    .integration-card:hover { border-color: #2563eb; transform: translateY(-2px); box-shadow: 0 10px 25px rgba(37, 99, 235, 0.1); }
-    .int-logo { width: 48px; height: 48px; margin: 0 auto 16px auto; }
-    .int-status { font-size: 12px; font-weight: 700; color: #94a3b8; margin-top: 12px; display: inline-block; padding: 4px 10px; border-radius: 99px; background: #f1f5f9; }
-    .int-connected .int-status { background: #dcfce7; color: #166534; }
+    .ai-typing { font-style: italic; color: #2563eb; font-size: 14px; font-weight: 600; padding: 10px 20px; display: none; }
   </style>
 </head>
 <body>
-
-  <div id="briefingModal" class="modal-overlay">
-      <div class="modal-card">
-          <button class="modal-close" onclick="closeBriefing()">×</button>
-          <div class="modal-icon">☀️</div>
-          <h2 style="margin: 0 0 10px 0; font-size: 22px;">Morning Briefing</h2>
-          <p style="color: #64748b; font-size: 15px; margin-bottom: 24px; line-height: 1.5;">Good morning! Here is your daily profit snapshot.</p>
-          
-          <div style="background: #f8fafc; padding: 16px; border-radius: 12px; margin-bottom: 24px; text-align: left;">
-              <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                  <span style="font-weight: 600; color: #475569;">Yesterday's Profit</span>
-                  <span style="font-weight: 700; color: #0f172a;">₹4,250</span>
-              </div>
-              <div style="display: flex; justify-content: space-between;">
-                  <span style="font-weight: 600; color: #475569;">Streak Status</span>
-                  <span style="font-weight: 700; color: #dc2626;">🔥 3 Day Streak</span>
-              </div>
-          </div>
-
-          <button class="btn btn-primary" style="width: 100%; padding: 14px; border-radius: 8px; border: none; font-weight: 700; background: #2563eb; color: white; cursor: pointer;" onclick="closeBriefing()">🚀 Let's Grow Today</button>
-      </div>
-  </div>
 
   <div id="vizbix-nav-container"></div>
 
@@ -75,8 +30,8 @@
     <div id="proLockOverlay" class="pro-lock-overlay pro-lock-hidden">
       <div class="pro-lock-card">
         <h2>🔒 Pro Feature</h2>
-        <p>Unlock Integrations, AI Strategy, and Profit Lab.</p>
-        <button class="btn btn-primary btn-large" style="width: 100%;" onclick="window.pay()">Upgrade to Pro (₹499)</button>
+        <p>Unlock detailed reports, AI strategy, and the Profit Simulator.</p>
+        <button class="btn btn-primary btn-large" style="width: 100%;" onclick="switchView('settings', document.querySelectorAll('.nav-item')[6])">Upgrade to Pro (₹499)</button>
       </div>
     </div>
     
@@ -87,197 +42,178 @@
         <a class="nav-item" onclick="switchView('dashboard', this)" id="nav-dashboard">
           <svg viewBox="0 0 24 24"><path d="M3 3h8v8H3zm10 0h8v8h-8zM3 13h8v8H3zm10 0h8v8h-8z"/></svg><span class="nav-item-text">Dashboard</span>
         </a>
-        <a class="nav-item active" onclick="switchView('data', this)">
-          <svg viewBox="0 0 24 24"><path d="M3 3v18h18V3H3zm16 16H5v-2h14v2zm0-4H5v-2h14v2zm0-4H5V9h14v2zm0-4H5V5h14v2z"/></svg><span class="nav-item-text">Data Input</span>
-        </a>
         
-        <a class="nav-item" onclick="switchView('integrations', this)">
-          <svg viewBox="0 0 24 24"><path d="M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z"/></svg><span class="nav-item-text">Integrations</span>
-        </a>
-
-        <a class="nav-item" onclick="switchView('expenses', this)">
-          <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 17h-2v-2h2v2zm2.07-7.75l-.9.92C13.45 12.9 13 13.5 13 15h-2v-.5c0-1.1.45-2.1 1.17-2.83l1.24-1.26c.37-.36.59-.86.59-1.41 0-1.1-.9-2-2-2s-2 .9-2 2H8c0-2.21 1.79-4 4-4s4 1.79 4 4c0 .88-.36 1.68-.93 2.25z"/></svg><span class="nav-item-text">Overhead & Ads</span>
-        </a>
-
         <a class="nav-item" onclick="switchView('simulator', this); initSimulator();">
-          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg><span class="nav-item-text">Profit Lab</span>
+          <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.06-.94l2.03-1.58a.96.96 0 0 0 .12-.61l-1.92-3.32a.965.965 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.96.96 0 0 0-.48-.41h-3.84a.96.96 0 0 0-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.965.965 0 0 0-.59.22L2.73 8.87a.96.96 0 0 0 .12.61l2.03 1.58c-.04.3-.06.61-.06.94s.02.64.06.94l-2.03 1.58a.96.96 0 0 0-.12.61l1.92 3.32a.965.965 0 0 0 .59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96a.965.965 0 0 0 .59-.22l1.92-3.32a.96.96 0 0 0-.12-.61l-2.03-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
+          <span class="nav-item-text">Profit Lab</span>
         </a>
+
         <a class="nav-item" onclick="switchView('ai', this)">
           <span style="background: white; color: #0f172a; padding: 2px 4px; border-radius: 4px; font-size: 14px; font-weight: 900; line-height: 1;">Ai</span><span class="nav-item-text">Strategy</span>
         </a>
         <a class="nav-item" onclick="switchView('report', this)">
-          <svg viewBox="0 0 24 24"><path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/></svg><span class="nav-item-text">Detailed Report</span>
+          <svg viewBox="0 0 24 24"><path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zM9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4z"/></svg><span class="nav-item-text">Detailed Report</span>
+        </a>
+        <a class="nav-item active" onclick="switchView('data', this)">
+          <svg viewBox="0 0 24 24"><path d="M3 3v18h18V3H3zm16 16H5v-2h14v2zm0-4H5v-2h14v2zm0-4H5V9h14v2zm0-4H5V5h14v2z"/></svg><span class="nav-item-text">Data Input</span>
+        </a>
+        <a class="nav-item" onclick="switchView('history', this); window.fetchHistory();">
+          <svg viewBox="0 0 24 24"><path d="M13 3a9 9 0 0 0-9 9H1l3.89 3.89.07.14L9 12H6c0-3.87 3.13-7 7-7s7 3.13 7 7-3.13 7-7 7c-1.93 0-3.68-.79-4.94-2.06l-1.42 1.42A8.954 8.954 0 0 0 13 21a9 9 0 0 0 0-18zm-1 5v5l4.28 2.54.72-1.21-3.5-2.08V8H12z"/></svg><span class="nav-item-text">Cloud History</span>
         </a>
         <div style="flex-grow: 1;"></div>
         <a class="nav-item" onclick="switchView('settings', this)">
-          <svg viewBox="0 0 24 24"><path d="M19.14 12.94c.04-.3.06-.61.06-.94 0-.32-.02-.64-.06-.94l2.03-1.58a.96.96 0 0 0 .12-.61l-1.92-3.32a.965.965 0 0 0-.59-.22l-2.39.96c-.5-.38-1.03-.7-1.62-.94l-.36-2.54a.96.96 0 0 0-.48-.41h-3.84a.96.96 0 0 0-.47.41l-.36 2.54c-.59.24-1.13.56-1.62.94l-2.39-.96a.965.965 0 0 0-.59.22L2.73 8.87a.96.96 0 0 0 .12.61l2.03 1.58c-.04.3-.06.61-.06.94s.02.64.06.94l-2.03 1.58a.96.96 0 0 0-.12.61l1.92 3.32a.965.965 0 0 0 .59.22l2.39-.96c.5.38 1.03.7 1.62.94l.36 2.54c.05.24.24.41.48.41h3.84c.24 0 .43-.17.47-.41l.36-2.54c.59-.24 1.13-.56 1.62-.94l2.39.96a.965.965 0 0 0 .59.22l1.92-3.32a.96.96 0 0 0-.12-.61l-2.03-1.58zM12 15.6c-1.98 0-3.6-1.62-3.6-3.6s1.62-3.6 3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg><span class="nav-item-text">Settings</span>
+          <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61 l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41 h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87 C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58 c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54 c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96 c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94z M12,15.6c-1.98,0-3.6-1.62-3.6-3.6 s1.62-3.6,3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg><span class="nav-item-text">Settings</span>
         </a>
       </nav>
       <div class="sidebar-profile">
-        <div class="profile-label">ACCOUNT</div>
-        <div class="profile-email" id="sidebarEmail">Loading...</div>
-        <div class="profile-plan" id="sidebarPlan">Verifying...</div>
+        <div class="profile-label">Signed in as</div>
+        <div class="profile-email" id="sidebarEmail">Loading auth...</div>
+        <div class="profile-plan" id="sidebarPlan">Verifying Plan...</div>
       </div>
     </aside>
 
     <main class="app-main" id="mainContainer">
       
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px;">
-          <div class="mobile-app-bar">
-            <button onclick="toggleAppDrawer()">☰</button>
-            <h1 id="mobilePageTitle">Data Input</h1>
-          </div>
-          
-          <div style="display: flex; align-items: center; gap: 16px; margin-left: auto;">
-              <div class="streak-badge streak-active" id="streakBadge">
-                  <span>🔥</span> <span id="streakCount">0 Day Streak</span>
-              </div>
-          </div>
+      <div class="mobile-app-bar">
+        <button onclick="toggleAppDrawer()">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+        </button>
+        <div class="page-title" id="mobilePageTitle">Data Input</div>
       </div>
 
       <div id="view-data" class="app-view active">
         <div class="data-card">
-          <div class="card-header"><div class="card-title">PRODUCT DATA</div><a class="demo-link" onclick="loadDemoData()">LOAD DEMO DATA</a></div>
-          <div class="data-table-headers"><div>PRODUCT NAME</div><div>SELL PRICE</div><div>COST PRICE</div><div>QTY SOLD</div><div></div></div>
-          <div id="items">
-             <div class="data-row">
-               <input type="text" class="input-name" placeholder="Name" value="Wireless Earbuds">
-               <input type="number" class="input-sell" placeholder="Sell" value="2500">
-               <input type="number" class="input-cost" placeholder="Cost" value="1200">
-               <input type="number" class="input-qty" placeholder="Qty" value="140">
-               <button class="delete-btn" onclick="this.parentElement.remove()">×</button>
-             </div>
+          <div class="card-header">
+            <div class="card-title">Data Source</div>
+            <a class="demo-link" onclick="loadDemoData()">USE DEMO DATA</a>
           </div>
-          <button class="add-row-btn" onclick="addNewRow()">+ Add Product Row</button>
+          <div class="data-table-headers">
+            <div>Name</div>
+            <div id="hdr-sell">Sell Price (₹)</div>
+            <div id="hdr-cost">Cost Price (₹)</div>
+            <div>Qty Sold</div>
+            <div></div>
+          </div>
+          <div id="items">
+            <div class="data-row">
+              <input type="text" placeholder="Product Name" class="input-name" value="Wireless Earbuds">
+              <input type="number" placeholder="Sell Price" class="input-sell" value="2500">
+              <input type="number" placeholder="Cost Price" class="input-cost" value="1200">
+              <input type="number" placeholder="Quantity" class="input-qty" value="140">
+              <button class="delete-btn" onclick="this.parentElement.remove()">×</button>
+            </div>
+          </div>
+          <button class="add-row-btn" onclick="addNewRow()">+ Add Product</button>
           <div class="action-buttons-wrap">
-            <button class="btn btn-primary" style="flex: 1; padding: 16px; font-size: 16px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;" onclick="processDataAndShowReport()">Generate Dashboard ➔</button>
-            <button id="saveCloudBtn" class="btn btn-secondary" style="padding: 16px; background: white; color: var(--dark); border: 1px solid var(--border); border-radius: 8px; cursor: pointer;" onclick="window.saveToCloud()">💾 Save</button>
+            <button class="btn btn-primary" style="flex: 1; padding: 16px; font-size: 16px;" onclick="processDataAndShowReport()">Generate Dashboard →</button>
+            <button id="saveCloudBtn" class="btn btn-secondary" style="padding: 16px;" onclick="window.saveToCloud();">💾 Save to Cloud</button>
           </div>
         </div>
-      </div>
-
-      <div id="view-integrations" class="app-view">
-          <div style="max-width: 900px; margin: 0 auto;">
-              <div style="margin-bottom: 30px;">
-                  <h2 style="margin: 0 0 10px 0;">Connect Your Store</h2>
-                  <p style="color: var(--text-muted); margin: 0;">Automatically sync orders to keep your Profit Streak alive.</p>
-              </div>
-              
-              <div class="integrations-grid">
-                  <div class="integration-card" onclick="connectIntegration('shopify')">
-                      <img src="https://cdn.icon-icons.com/icons2/2429/PNG/512/shopify_logo_icon_147230.png" class="int-logo" alt="Shopify">
-                      <h3 style="margin: 0; font-size: 16px;">Shopify</h3>
-                      <div class="int-status" id="status-shopify">Connect</div>
-                  </div>
-                  <div class="integration-card" onclick="connectIntegration('woo')">
-                      <img src="https://cdn.icon-icons.com/icons2/2699/PNG/512/woocommerce_logo_icon_170390.png" class="int-logo" alt="Woo">
-                      <h3 style="margin: 0; font-size: 16px;">WooCommerce</h3>
-                      <div class="int-status" id="status-woo">Connect</div>
-                  </div>
-                  <div class="integration-card" onclick="alert('Coming Soon!')">
-                      <div style="width: 48px; height: 48px; margin: 0 auto 16px auto; background: #f1f5f9; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-weight: 700;">+</div>
-                      <h3 style="margin: 0; font-size: 16px;">Upload CSV</h3>
-                      <div class="int-status">Import</div>
-                  </div>
-              </div>
-          </div>
       </div>
 
       <div id="view-dashboard" class="app-view">
         <div style="max-width: 1000px; margin: 0 auto;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
             <h2 style="margin: 0;">Financial Dashboard</h2>
-            <div style="display: flex; align-items: center; gap: 12px; background: white; padding: 8px 16px; border-radius: 99px; border: 1px solid var(--border);"><span style="font-size: 13px; font-weight: 700; color: var(--text-muted);">Health Score</span><div id="health-circle" style="font-size: 16px; font-weight: 900; padding: 4px 12px; border-radius: 99px; background: #e2e8f0; color: #475569;">0%</div></div>
+            <div style="display: flex; align-items: center; gap: 12px; background: white; padding: 8px 16px; border-radius: 99px; border: 1px solid var(--border);">
+                <span style="font-size: 13px; font-weight: 700; color: var(--text-muted); text-transform: uppercase;">Health Score</span>
+                <div id="health-circle" style="font-size: 16px; font-weight: 900; padding: 4px 12px; border-radius: 99px; background: #e2e8f0; color: #475569;">0%</div>
+            </div>
           </div>
 
           <div class="metrics-grid">
             <div class="metric-card"><h4>Total Revenue</h4><div class="value" id="dash-revenue">0</div></div>
-            <div class="metric-card"><h4>Gross Profit</h4><div class="value" id="dash-profit">0</div></div>
-            <div class="metric-card highlight" style="background: #0f172a;">
-                <h4>True Net Profit</h4>
-                <div class="value" id="dash-net-profit" style="color: white;">0</div>
-                <div style="font-size: 11px; color: #64748b; margin-top: 4px;">After Expenses</div>
-            </div>
-            <div class="metric-card"><h4>Avg Margin</h4><div class="value" id="dash-margin">0%</div></div>
-          </div>
-
-          <div class="data-card" style="padding: 24px; margin-bottom: 24px;">
-             <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                <span style="font-size: 13px; font-weight: 700; color: var(--dark);">BREAK-EVEN PROGRESS</span>
-                <span id="be-status" style="font-size: 13px; font-weight: 600; color: var(--text-muted);">0% Covered</span>
-             </div>
-             <div style="background: #f1f5f9; height: 10px; border-radius: 99px; overflow: hidden;">
-                <div id="be-bar" style="width: 0%; background: var(--primary); height: 100%; transition: width 1s;"></div>
-             </div>
-             <div style="margin-top: 8px; font-size: 12px; color: var(--text-muted); display: flex; justify-content: space-between;">
-                <span id="be-expenses">Total Costs: 0</span>
-                <span id="be-remaining">Profit Zone Reached</span>
-             </div>
+            <div class="metric-card highlight"><h4>Total Net Profit</h4><div class="value" id="dash-profit">0</div></div>
+            <div class="metric-card"><h4>Avg Gross Margin</h4><div class="value" id="dash-margin">0%</div></div>
+            <div class="metric-card" style="border-left: 4px solid var(--primary);"><h4>Top Product</h4><div class="value" id="dash-top-product" style="font-size: 20px; line-height: 1.3; margin-top: 8px;">-</div></div>
           </div>
 
           <div class="dash-grid">
-            <div class="data-card" style="padding: 20px; width: 100%;"><h4 style="margin-top: 0; margin-bottom: 16px; color: var(--text-muted); text-transform: uppercase; font-size: 13px;">Revenue vs Profit</h4><div style="position: relative; height: 300px; width: 100%;"><canvas id="profitChart"></canvas></div></div>
-            <div class="data-card" style="padding: 24px; background: #f8fafc;"><h4 style="margin-top: 0; margin-bottom: 16px; color: var(--dark); font-size: 16px; display: flex; align-items: center; gap: 8px;">⚡ 3-Point Action Plan</h4><div id="auto-insights-list" style="font-size: 14px; line-height: 1.6; display: flex; flex-direction: column; gap: 16px;"><p>Run analysis to see insights.</p></div></div>
+            <div class="data-card" style="padding: 20px; margin: 0; width: 100%;">
+              <h4 style="margin-top: 0; margin-bottom: 16px; color: var(--text-muted); text-transform: uppercase; font-size: 13px;">Revenue vs Profit</h4>
+              <div style="position: relative; height: 300px; width: 100%;"><canvas id="profitChart"></canvas></div>
+            </div>
+            <div class="data-card" style="padding: 24px; margin: 0; background: #f8fafc;">
+              <h4 style="margin-top: 0; margin-bottom: 16px; color: var(--dark); font-size: 16px; display: flex; align-items: center; gap: 8px;">⚡ 3-Point Action Plan</h4>
+              <div id="auto-insights-list" style="font-size: 14px; line-height: 1.6; display: flex; flex-direction: column; gap: 16px;">
+                <p>Run analysis to see insights.</p>
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
-
-      <div id="view-expenses" class="app-view">
-        <div style="max-width: 900px; margin: 0 auto;">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2 style="margin: 0;">Overhead & Expenses</h2>
-            </div>
-            <div class="data-card">
-                <div class="expense-header"><span>FIXED COSTS (Monthly)</span><span id="total-fixed">0</span></div>
-                <div id="fixed-items"><div class="expense-row"><input type="text" placeholder="Cost Name" value="Rent"><input type="number" class="input-fixed" placeholder="Amount" value="0"><button class="delete-btn" onclick="this.parentElement.remove()">×</button></div></div>
-                <button class="add-row-btn" onclick="addFixedRow()">+ Add Fixed Cost</button>
-            </div>
-            <div class="data-card">
-                <div class="expense-header"><span>VARIABLE COSTS (Per Unit Sold)</span><span>Dynamic</span></div>
-                <div id="variable-items"><div class="expense-row"><input type="text" placeholder="Cost Name" value="Ads (CPA)"><input type="number" class="input-variable" placeholder="Cost Per Unit" value="0"><button class="delete-btn" onclick="this.parentElement.remove()">×</button></div></div>
-                <button class="add-row-btn" onclick="addVariableRow()">+ Add Variable Cost</button>
-            </div>
-            <button class="btn btn-primary" style="width: 100%; padding: 16px; font-size: 16px; background: var(--primary); color: white; border: none; border-radius: 8px; font-weight: 600; cursor: pointer;" onclick="processDataAndShowReport()">Update Dashboard with Expenses →</button>
         </div>
       </div>
 
       <div id="view-simulator" class="app-view">
         <div style="max-width: 900px; margin: 0 auto;">
             <h2 style="margin-bottom: 24px;">🧪 Profit Lab <span style="font-size: 14px; font-weight: 400; color: var(--text-muted);">What-If Simulator</span></h2>
+            
             <div class="sim-controls">
-                <div class="slider-group"><div class="slider-label-row"><span>Price Change</span><span class="slider-val" id="val-price">0%</span></div><input type="range" min="-50" max="50" value="0" id="slide-price" oninput="runSimulation()"></div>
-                <div class="slider-group"><div class="slider-label-row"><span>Volume Change</span><span class="slider-val" id="val-vol">0%</span></div><input type="range" min="-50" max="50" value="0" id="slide-vol" oninput="runSimulation()"></div>
-                <div class="slider-group"><div class="slider-label-row"><span>Cost Change</span><span class="slider-val" id="val-cost">0%</span></div><input type="range" min="-50" max="50" value="0" id="slide-cost" oninput="runSimulation()"></div>
-                <div style="text-align: center; margin-top: 10px;"><button class="btn btn-secondary" style="font-size: 13px; padding: 6px 12px; background: white; border: 1px solid var(--border); border-radius: 6px; cursor: pointer;" onclick="resetSimulation()">Reset All</button></div>
+                <div class="slider-group">
+                    <div class="slider-label-row"><span>Price Change</span><span class="slider-val" id="val-price">0%</span></div>
+                    <input type="range" min="-50" max="50" value="0" id="slide-price" oninput="runSimulation()">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label-row"><span>Volume Change</span><span class="slider-val" id="val-vol">0%</span></div>
+                    <input type="range" min="-50" max="50" value="0" id="slide-vol" oninput="runSimulation()">
+                </div>
+                <div class="slider-group">
+                    <div class="slider-label-row"><span>Cost Change</span><span class="slider-val" id="val-cost">0%</span></div>
+                    <input type="range" min="-50" max="50" value="0" id="slide-cost" oninput="runSimulation()">
+                </div>
+                <div style="text-align: center; margin-top: 10px;">
+                    <button class="btn btn-secondary" style="font-size: 13px; padding: 6px 12px;" onclick="resetSimulation()">Reset All</button>
+                </div>
             </div>
+
             <div class="sim-results">
-                <div class="sim-card"><h4>Current Profit</h4><div class="big-num" id="sim-current">0</div></div>
-                <div class="sim-card active"><h4>Simulated Profit</h4><div class="big-num" id="sim-projected">0</div><div class="sim-delta" id="sim-delta">-</div></div>
+                <div class="sim-card">
+                    <h4>Current Profit</h4>
+                    <div class="big-num" id="sim-current">0</div>
+                </div>
+                <div class="sim-card active">
+                    <h4>Simulated Profit</h4>
+                    <div class="big-num" id="sim-projected">0</div>
+                    <div class="sim-delta" id="sim-delta">-</div>
+                </div>
             </div>
-            <div class="data-card" style="margin-top: 24px; text-align: center; background: #f0fdf4; border-color: #bbf7d0;"><p id="sim-insight" style="font-weight: 600; color: #166534; font-size: 15px;">Adjust sliders to analyze scenarios.</p></div>
+            
+            <div class="data-card" style="margin-top: 24px; text-align: center; background: #f0fdf4; border-color: #bbf7d0;">
+                <p id="sim-insight" style="font-weight: 600; color: #166534; font-size: 15px;">Adjust the sliders to see how small changes impact your bottom line.</p>
+            </div>
         </div>
       </div>
 
       <div id="view-ai" class="app-view">
         <div style="max-width: 850px; margin: 0 auto; height: 100%;">
+          
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px;">
-            <h2 style="margin: 0; display: flex; align-items: center; gap: 12px;"><span style="font-size: 28px; background: var(--dark); color: white; padding: 6px 10px; border-radius: 8px; line-height: 1;">Ai</span> Strategy</h2>
-            <button class="btn btn-secondary" style="padding: 10px 20px; font-size: 14px; background: #f1f5f9; border: 1px solid var(--border); border-radius: 6px; cursor: pointer;" onclick="window.startAIAnalysis()">🔄 Re-Analyze</button>
+            <h2 style="margin: 0; display: flex; align-items: center; gap: 12px;">
+              <span style="font-size: 28px; background: var(--dark); color: white; padding: 6px 10px; border-radius: 8px; line-height: 1;">Ai</span> Strategy
+            </h2>
+            <button class="btn btn-secondary" style="padding: 10px 20px; font-size: 14px;" onclick="window.startAIAnalysis();">
+              🔄 Clear Chat & Re-Analyze Data
+            </button>
           </div>
-          <div id="aiSplashScreen" style="height: calc(100vh - 220px); display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; border: 1px solid var(--border); border-radius: 16px;">
+
+          <div id="aiSplashScreen" style="height: calc(100vh - 220px); display: flex; flex-direction: column; align-items: center; justify-content: center; background: white; border: 1px solid var(--border); border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.02);">
               <p style="color: var(--text-muted); margin-bottom: 24px; font-size: 18px;">Click below to analyze your numbers instantly.</p>
-              <button class="btn btn-dark" style="border-radius: 99px; padding: 18px 48px; font-size: 18px; background: var(--dark); color: white; border: none; font-weight: 700; cursor: pointer;" onclick="window.startAIAnalysis()">✨ Generate Strategy</button>
+              <button class="btn btn-dark" style="border-radius: 99px; padding: 18px 48px; font-size: 18px; box-shadow: 0 4px 15px rgba(15,23,42,0.2);" onclick="window.startAIAnalysis();">✨ Generate Strategy</button>
           </div>
+
           <div id="aiChatContainer" class="chat-container" style="display: none;">
-             <div class="chat-history" id="chatHistory"></div>
-             <div style="background: white; border-top: 1px solid var(--border); padding: 16px;">
-               <div id="typingIndicator" class="ai-typing">AI is analyzing...</div>
+             <div class="chat-history" id="chatHistory">
+                <div class="chat-msg msg-ai">Hi! Click <strong>Analyze Latest Data</strong> to run your numbers, or type a custom question below!</div>
+             </div>
+             
+             <div style="background: white; border-top: 1px solid var(--border);">
+               <div id="typingIndicator" class="ai-typing">AI is analyzing your business... ⏳</div>
                <div class="chat-input-row">
-                  <input type="text" id="aiChatInput" placeholder="Ask question..." onkeypress="if(event.key === 'Enter') window.sendChatMessage()" />
+                  <input type="text" id="aiChatInput" placeholder="Ask about raising prices, bundle ideas, or profit margins..." onkeypress="if(event.key === 'Enter') window.sendChatMessage()" />
                   <button id="chatSendBtn" onclick="window.sendChatMessage()">➔</button>
                </div>
              </div>
           </div>
+
         </div>
       </div>
 
@@ -286,13 +222,22 @@
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h2>Detailed Profit Report</h2>
             <div style="display: flex; gap: 10px;">
-              <button class="btn btn-secondary" onclick="switchView('data', document.querySelectorAll('.nav-item')[1])" style="background: white; border: 1px solid var(--border); padding: 10px 20px; border-radius: 8px; cursor: pointer;">← Edit Data</button>
-              <button class="btn btn-primary" onclick="exportExecutivePDF()" style="background: var(--primary); color: white; border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer;">📥 Download PDF</button>
+              <button class="btn btn-secondary" onclick="switchView('data', document.querySelectorAll('.nav-item')[3])">← Edit Data</button>
+              <button class="btn btn-primary" onclick="exportExecutivePDF()">📥 Download PDF</button>
             </div>
           </div>
           <div style="overflow-x: auto; background: white; border: 1px solid var(--border); border-radius: 12px;">
             <table class="report-table" style="border: none;">
-              <thead><tr><th>Product Name</th><th>Revenue</th><th>Total Cost</th><th>Total Profit</th><th>Margin %</th><th>Status</th></tr></thead>
+              <thead>
+                <tr>
+                  <th>Product Name</th>
+                  <th>Revenue</th>
+                  <th>Total Cost</th>
+                  <th>Total Profit</th>
+                  <th>Margin %</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
               <tbody id="reportTableBody"></tbody>
             </table>
           </div>
@@ -303,10 +248,10 @@
         <div class="data-card" style="max-width: 700px; margin: 0 auto;">
           <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h2>Saved Cloud History</h2>
-            <button class="btn btn-secondary" onclick="window.fetchHistory()" style="background: white; border: 1px solid var(--border); padding: 8px 16px; border-radius: 6px; cursor: pointer;">↻ Refresh</button>
+            <button class="btn btn-secondary" onclick="window.fetchHistory();">↻ Refresh</button>
           </div>
           <div id="historyList" style="min-height: 150px; background: #f8fafc; border: 1px dashed var(--border); border-radius: 12px; padding: 20px;">
-            <p style="text-align: center; color: var(--text-muted);">Fetching history...</p>
+            <p style="text-align: center; color: var(--text-muted);">Fetching history from database...</p>
           </div>
         </div>
       </div>
@@ -319,6 +264,8 @@
             <select id="currencySelect" onchange="updateCurrency()" style="width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border); font-size: 15px;">
               <option value="INR">₹ Indian Rupee (INR)</option>
               <option value="USD">$ US Dollar (USD)</option>
+              <option value="EUR">€ Euro (EUR)</option>
+              <option value="GBP">£ British Pound (GBP)</option>
             </select>
           </div>
           <div style="background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid var(--border); margin-bottom: 24px;">
@@ -328,9 +275,9 @@
           <div style="background: #eff6ff; padding: 20px; border-radius: 12px; border: 1px solid #bfdbfe; margin-bottom: 24px;">
             <h4 style="margin: 0 0 8px 0; color: #1e40af;">Subscription Plan</h4>
             <div id="settingsPlan" style="font-weight: 700; font-size: 16px; color: var(--text-muted); margin-bottom: 16px;">Free Plan</div>
-            <button id="upgradeBtn" class="btn btn-primary" onclick="window.pay()" style="background: var(--primary); color: white; padding: 12px; border: none; border-radius: 8px; width: 100%; font-weight: 700; cursor: pointer;">Upgrade to PRO (₹499)</button>
+            <button id="upgradeBtn" class="btn btn-primary" onclick="window.pay();">Upgrade to PRO (₹499)</button>
           </div>
-          <button class="btn btn-secondary" style="width: 100%; color: #dc2626; background: none; border: none; cursor: pointer;" onclick="window.handleLogout()">Log Out</button>
+          <button class="btn btn-secondary" style="width: 100%; color: #dc2626;" onclick="window.handleLogout();">Log Out</button>
         </div>
       </div>
 
@@ -372,237 +319,514 @@
       </div>
   </div>
 
-  <script src="../assets/js/drawer.js?v=99.0"></script>
+  <script src="../assets/js/drawer.js?v=7.0"></script>
   
   <script>
+    // --- SYSTEM CONFIG ---
     const workerURL = "https://vizbix-api.vizbixhq.workers.dev";
-    const PRICE = 49900; const KEY = "rzp_live_SCvIqUMzTNsXgq"; 
+    const PRICE = 49900; 
+    const KEY = "rzp_live_SCvIqUMzTNsXgq"; 
 
     window.currentMode = 'product'; window.currentData = []; window.currentView = 'data';
-    window.currentCurrency = 'INR'; window.currencySymbol = '₹'; window.chatConversation = []; let myChart = null; 
+    window.currentCurrency = 'INR'; window.currencySymbol = '₹';
+    window.chatConversation = []; let myChart = null; 
 
-    // --- DATA HANDLING ---
+    // --- 1. DATA SCRAPER ---
     function getFreshData() {
         let data = [];
         document.querySelectorAll('#items .data-row').forEach(row => {
-            const n = row.querySelector('.input-name').value;
-            const s = parseFloat(row.querySelector('.input-sell').value) || 0;
-            const c = parseFloat(row.querySelector('.input-cost').value) || 0;
-            const q = parseFloat(row.querySelector('.input-qty').value) || 0;
-            if(n && (s||c||q)) data.push({ name:n, sell:s, cost:c, qty:q });
+            const nameEl = row.querySelector('.input-name');
+            const sellEl = row.querySelector('.input-sell');
+            const costEl = row.querySelector('.input-cost');
+            const qtyEl = row.querySelector('.input-qty');
+            if(!nameEl || !sellEl || !costEl || !qtyEl) return;
+
+            const name = nameEl.value.trim();
+            const sell = parseFloat(sellEl.value) || 0;
+            const cost = parseFloat(costEl.value) || 0;
+            const qty = parseFloat(qtyEl.value) || 0;
+            if(name !== '' || sell > 0 || cost > 0 || qty > 0) {
+                data.push({ name, sell, cost, qty });
+            }
         });
-        window.currentData = data; return data;
+        window.currentData = data;
+        return data;
     }
 
-    // --- EXPENSES LOGIC (FIXED UI) ---
-    function getExpenses() {
-        let fixed = 0; let variable = 0;
-        document.querySelectorAll('.input-fixed').forEach(el => fixed += (parseFloat(el.value) || 0));
-        document.querySelectorAll('.input-variable').forEach(el => variable += (parseFloat(el.value) || 0));
-        if(document.getElementById('total-fixed')) document.getElementById('total-fixed').innerText = formatCurrency(fixed);
-        return { fixed, variable };
-    }
-    function addFixedRow() { const d = document.createElement('div'); d.className='expense-row'; d.innerHTML=`<input type="text" placeholder="Cost Name"><input type="number" class="input-fixed" placeholder="Amount" value="0"><button class="delete-btn" onclick="this.parentElement.remove()">×</button>`; document.getElementById('fixed-items').appendChild(d); }
-    function addVariableRow() { const d = document.createElement('div'); d.className='expense-row'; d.innerHTML=`<input type="text" placeholder="Cost Name"><input type="number" class="input-variable" placeholder="0"><button class="delete-btn" onclick="this.parentElement.remove()">×</button>`; document.getElementById('variable-items').appendChild(d); }
-
-    // --- UTILS ---
-    function updateCurrency() { const s = document.getElementById('currencySelect'); window.currentCurrency = s.value; window.currencySymbol = s.options[s.selectedIndex].text.split(' ')[0]; }
-    function formatCurrency(n) { return new Intl.NumberFormat('en-US', { style: 'currency', currency: window.currentCurrency, maximumFractionDigits: 0 }).format(n); }
-    function addNewRow(n='',s='',c='',q='') { const d=document.createElement('div'); d.className='data-row'; d.innerHTML=`<input type="text" class="input-name" placeholder="Name" value="${n}"><input type="number" class="input-sell" placeholder="Sell" value="${s}"><input type="number" class="input-cost" placeholder="Cost" value="${c}"><input type="number" class="input-qty" placeholder="Qty" value="${q}"><button class="delete-btn" onclick="this.parentElement.remove()">×</button>`; document.getElementById('items').appendChild(d); }
-    function loadDemoData() { document.getElementById('items').innerHTML=''; addNewRow('Earbuds','2500','1200','140'); addNewRow('Watch','4500','2800','85'); }
-    function toggleAppDrawer() { document.getElementById("appSidebar").classList.toggle("mobile-open"); document.getElementById("mobileAppOverlay").classList.toggle("active"); }
-    
-    function switchView(id, el) {
-        const pro = ['dashboard','ai','report','history','simulator','expenses','integrations'];
-        if(pro.includes(id) && window.isProUser === false) { document.getElementById('proLockOverlay').classList.remove('pro-lock-hidden'); }
-        else { document.getElementById('proLockOverlay').classList.add('pro-lock-hidden'); }
-        document.querySelectorAll('.app-view').forEach(v => v.classList.remove('active'));
-        document.getElementById('view-' + id).classList.add('active');
-        if(el) { document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active')); el.classList.add('active'); document.getElementById('mobilePageTitle').innerText = el.querySelector('.nav-item-text').innerText; }
-        if(document.getElementById("appSidebar").classList.contains("mobile-open")) toggleAppDrawer();
+    // --- 2. UI NAVIGATION ---
+    function toggleAppDrawer() {
+      document.getElementById("appSidebar").classList.toggle("mobile-open");
+      document.getElementById("mobileAppOverlay").classList.toggle("active");
     }
 
-    // --- DASHBOARD ---
+    const proViews = ['dashboard', 'ai', 'report', 'history', 'simulator'];
+
+    function switchView(viewId, element, bypassPaywall = false) {
+      window.currentView = viewId;
+      if(proViews.includes(viewId) && window.isProUser === false && !bypassPaywall) {
+        document.getElementById('proLockOverlay').classList.remove('pro-lock-hidden');
+        document.querySelectorAll('.app-view').forEach(v => v.style.filter = "blur(6px)");
+      } else {
+        document.getElementById('proLockOverlay').classList.add('pro-lock-hidden');
+        document.querySelectorAll('.app-view').forEach(v => v.style.filter = "none");
+      }
+      
+      document.querySelectorAll('.app-view').forEach(view => view.classList.remove('active'));
+      document.getElementById('view-' + viewId).classList.add('active');
+      
+      if (element) {
+        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        element.classList.add('active');
+        document.getElementById('mobilePageTitle').innerText = element.querySelector('.nav-item-text').innerText;
+      }
+
+      const sidebar = document.getElementById("appSidebar");
+      const overlay = document.getElementById("mobileAppOverlay");
+      if(sidebar && sidebar.classList.contains('mobile-open')) {
+          sidebar.classList.remove('mobile-open');
+          overlay.classList.remove('active');
+      }
+    }
+
+    // --- 3. CURRENCY & MATH ---
+    function updateCurrency() {
+      const sel = document.getElementById('currencySelect');
+      window.currentCurrency = sel.value;
+      window.currencySymbol = sel.options[sel.selectedIndex].text.split(' ')[0];
+      document.getElementById('hdr-sell').innerText = `Sell Price (${window.currencySymbol})`;
+      document.getElementById('hdr-cost').innerText = `Cost Price (${window.currencySymbol})`;
+    }
+
+    function formatCurrency(num) {
+      return new Intl.NumberFormat('en-US', { style: 'currency', currency: window.currentCurrency, maximumFractionDigits: 0 }).format(num);
+    }
+
+    function addNewRow(name='', sell='', cost='', qty='') {
+      const container = document.getElementById('items');
+      const row = document.createElement('div');
+      row.className = 'data-row';
+      row.innerHTML = `<input type="text" placeholder="Product Name" class="input-name" value="${name}"><input type="number" placeholder="Sell Price" class="input-sell" value="${sell}"><input type="number" placeholder="Cost Price" class="input-cost" value="${cost}"><input type="number" placeholder="Quantity" class="input-qty" value="${qty}"><button class="delete-btn" onclick="this.parentElement.remove()">×</button>`;
+      container.appendChild(row);
+    }
+
+    function loadDemoData() {
+      document.getElementById('items').innerHTML = ''; 
+      addNewRow('Wireless Earbuds', '2500', '1200', '140');
+      addNewRow('Smart Watch', '4500', '2800', '85');
+      addNewRow('USB-C Cable', '400', '150', '300');
+      addNewRow('Phone Case', '600', '700', '50');
+    }
+
     function processDataAndShowReport() {
-        if(window.isProUser === false) { switchView('dashboard', document.getElementById('nav-dashboard')); return; }
-        const data = getFreshData();
-        if(data.length === 0) return alert("Please enter data first.");
-        const exp = getExpenses();
+      if(window.isProUser === false) { switchView('dashboard', document.getElementById('nav-dashboard')); return; }
 
-        let rev=0, cost=0, gross=0, items=0, html=''; let topProd={name:'-', profit:-Infinity};
-        let labels=[], revData=[], profData=[];
+      const freshData = getFreshData();
+      if(freshData.length === 0) return alert("Please enter data first.");
 
-        data.forEach(i => {
-            const r = i.sell * i.qty; const c = i.cost * i.qty; const p = r - c;
-            const m = r > 0 ? ((p/r)*100).toFixed(1) : 0;
-            rev+=r; cost+=c; gross+=p; items+=i.qty;
-            if(p > topProd.profit) topProd = {name: i.name, profit: p};
-            labels.push(i.name); revData.push(r); profData.push(p);
-            html += `<tr><td>${i.name}</td><td>${formatCurrency(r)}</td><td>${formatCurrency(c)}</td><td>${formatCurrency(p)}</td><td>${m}%</td><td>${p>0?'Healthy':'Leak'}</td></tr>`;
-        });
+      let totalRevenue = 0, totalCost = 0, totalProfit = 0, totalItems = 0;
+      let chartLabels = [], chartRevData = [], chartProfitData = [];
+      let reportHTML = '', topProduct = { name: '-', profit: -Infinity, qty: 0 }, profitLeaks = [];
 
-        // CALCULATE NET
-        const totalVar = exp.variable * items;
-        const netProfit = gross - exp.fixed - totalVar;
-        const totalOutflow = cost + exp.fixed + totalVar;
-        const margin = rev > 0 ? ((gross/rev)*100).toFixed(1) : 0;
+      freshData.forEach(item => {
+        const rev = item.sell * item.qty; 
+        const itemCost = item.cost * item.qty; 
+        const profit = rev - itemCost;
+        const margin = rev > 0 ? ((profit / rev) * 100).toFixed(1) : 0;
 
-        document.getElementById('dash-revenue').innerText = formatCurrency(rev);
-        document.getElementById('dash-profit').innerText = formatCurrency(gross);
-        const netEl = document.getElementById('dash-net-profit'); 
-        if(netEl) { netEl.innerText = formatCurrency(netProfit); netEl.style.color = netProfit>=0 ? '#4ade80' : '#f87171'; }
-        document.getElementById('dash-margin').innerText = margin + "%";
-        document.getElementById('dash-top-product').innerText = topProd.name;
-        document.getElementById('reportTableBody').innerHTML = html;
+        totalRevenue += rev; totalCost += itemCost; totalProfit += profit; totalItems += item.qty;
+        if(profit > topProduct.profit && item.qty > 0) topProduct = { name: item.name, profit, qty: item.qty };
+        if(profit < 0) profitLeaks.push(item.name);
 
-        // Break Even
-        const bePercent = totalOutflow > 0 ? Math.min(100, (rev / totalOutflow) * 100) : 100;
-        document.getElementById('be-bar').style.width = bePercent + "%";
-        document.getElementById('be-status').innerText = bePercent.toFixed(0) + "% Covered";
-        document.getElementById('be-expenses').innerText = "Costs: " + formatCurrency(totalOutflow);
+        chartLabels.push(item.name); chartRevData.push(rev); chartProfitData.push(profit);
 
-        // PDF Data
-        document.getElementById('pdf-rev').innerText = formatCurrency(rev);
-        document.getElementById('pdf-cost').innerText = formatCurrency(totalOutflow);
-        document.getElementById('pdf-profit').innerText = formatCurrency(netProfit);
+        let statusHtml = profit > 0 ? `<span class="status-pill status-healthy">Healthy</span>` : `<span class="status-pill status-leak">Leak</span>`;
+        reportHTML += `<tr><td style="font-weight: 600;">${item.name}</td><td>${formatCurrency(rev)}</td><td>${formatCurrency(itemCost)}</td><td style="font-weight: 700; color: ${profit < 0 ? '#dc2626' : 'inherit'};">${formatCurrency(profit)}</td><td>${margin}%</td><td>${statusHtml}</td></tr>`;
+      });
 
-        if(myChart) myChart.destroy();
-        myChart = new Chart(document.getElementById('profitChart'), { type: 'bar', data: { labels: labels, datasets: [{ label: 'Revenue', data: revData, backgroundColor: '#cbd5e1' }, { label: 'Profit', data: profData, backgroundColor: '#2563eb' }] } });
+      let overallMargin = totalRevenue > 0 ? ((totalProfit / totalRevenue) * 100) : 0;
+      
+      let healthScore = 70; 
+      if(overallMargin > 40) healthScore += 20;
+      else if(overallMargin > 20) healthScore += 10;
+      else if(overallMargin < 10) healthScore -= 20;
+      healthScore -= (profitLeaks.length * 15);
+      healthScore = Math.max(0, Math.min(100, healthScore));
 
-        switchView('dashboard', document.querySelectorAll('.nav-item')[1]);
-        
-        // GAMIFICATION HOOK
-        updateStreak();
+      document.getElementById('dash-revenue').innerText = formatCurrency(totalRevenue);
+      document.getElementById('dash-profit').innerText = formatCurrency(totalProfit);
+      document.getElementById('dash-margin').innerText = overallMargin.toFixed(1) + '%';
+      document.getElementById('dash-top-product').innerText = topProduct.name;
+      document.getElementById('reportTableBody').innerHTML = reportHTML;
+
+      const hc = document.getElementById('health-circle');
+      hc.innerText = healthScore + '%';
+      if(healthScore >= 80) { hc.style.background = '#d1fae5'; hc.style.color = '#059669'; }
+      else if(healthScore >= 50) { hc.style.background = '#fef3c7'; hc.style.color = '#d97706'; }
+      else { hc.style.background = '#fee2e2'; hc.style.color = '#dc2626'; }
+
+      let insightsHTML = '';
+      let pdfInsights = '';
+      
+      if (topProduct.profit > 0) {
+        insightsHTML += `<div style="padding: 12px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;"><strong>1. Scale Top Performer:</strong> ${topProduct.name} generated ${formatCurrency(topProduct.profit)}. Increase ad spend on this item.</div>`;
+        pdfInsights += `<li style="margin-bottom: 12px;"><strong>Scale Winner:</strong> ${topProduct.name} generates the highest profit. Increase visibility.</li>`;
+      } else {
+        insightsHTML += `<div style="padding: 12px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;"><strong>1. Raise Prices:</strong> You have no highly profitable products. Raise prices immediately.</div>`;
+        pdfInsights += `<li style="margin-bottom: 12px;"><strong>Raise Prices:</strong> No core profitable products detected. Implement a price increase.</li>`;
+      }
+
+      if (profitLeaks.length > 0) {
+        insightsHTML += `<div style="padding: 12px; background: #fef2f2; border-radius: 8px; border: 1px solid #fecaca; color: #dc2626;"><strong>2. Stop Profit Leaks:</strong> ${profitLeaks.join(', ')} are currently operating at a loss. Reprice or drop them.</div>`;
+        pdfInsights += `<li style="margin-bottom: 12px; color: #dc2626;"><strong>Fix Leaks:</strong> ${profitLeaks.join(', ')} are losing money. Fix unit economics or drop them.</li>`;
+      } else {
+        insightsHTML += `<div style="padding: 12px; background: #ecfdf5; border-radius: 8px; border: 1px solid #a7f3d0; color: #059669;"><strong>2. Unit Economics Safe:</strong> Zero products are losing money. Your baseline is highly secure.</div>`;
+        pdfInsights += `<li style="margin-bottom: 12px;"><strong>Secure Economics:</strong> Zero products are currently operating at a net loss.</li>`;
+      }
+
+      if (overallMargin < 20) {
+        insightsHTML += `<div style="padding: 12px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;"><strong>3. Margin Warning:</strong> ${overallMargin.toFixed(1)}% is dangerous. Bundle items to increase Average Order Value.</div>`;
+        pdfInsights += `<li><strong>Increase Margin:</strong> Your ${overallMargin.toFixed(1)}% margin is tight. Implement product bundling.</li>`;
+      } else {
+        insightsHTML += `<div style="padding: 12px; background: white; border-radius: 8px; border: 1px solid #e2e8f0;"><strong>3. Healthy Margin:</strong> ${overallMargin.toFixed(1)}% gives you excellent cash flow to invest in growth.</div>`;
+        pdfInsights += `<li><strong>Healthy Margin:</strong> ${overallMargin.toFixed(1)}% provides excellent flexibility for scaling operations.</li>`;
+      }
+      
+      document.getElementById('auto-insights-list').innerHTML = insightsHTML;
+      document.getElementById('pdf-insight-list').innerHTML = pdfInsights;
+
+      document.getElementById('pdf-rev').innerText = formatCurrency(totalRevenue);
+      document.getElementById('pdf-cost').innerText = formatCurrency(totalCost);
+      document.getElementById('pdf-profit').innerText = formatCurrency(totalProfit);
+      document.getElementById('pdf-units-sold').innerText = totalItems;
+      document.getElementById('pdf-margin').innerText = overallMargin.toFixed(1) + '%';
+      document.getElementById('pdf-top-prod').innerText = topProduct.name;
+
+      const ctx = document.getElementById('profitChart').getContext('2d');
+      if(myChart) myChart.destroy();
+      myChart = new Chart(ctx, {
+        type: 'bar',
+        data: { labels: chartLabels, datasets: [{ label: 'Revenue', data: chartRevData, backgroundColor: '#cbd5e1', borderRadius: 4 }, { label: 'Profit', data: chartProfitData, backgroundColor: '#4f46e5', borderRadius: 4 }] },
+        options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'top' } }, scales: { x: { grid: { display: false } }, y: { beginAtZero: true } } }
+      });
+
+      switchView('dashboard', document.getElementById('nav-dashboard'));
     }
 
-    // --- GAMIFICATION: STREAK & MORNING BRIEFING ---
-    function updateStreak() {
-        const today = new Date().toLocaleDateString();
-        const lastLogin = localStorage.getItem('lastLoginDate');
-        let streak = parseInt(localStorage.getItem('vizbixStreak')) || 0;
-
-        if (lastLogin !== today) {
-            streak++;
-            localStorage.setItem('vizbixStreak', streak);
-            localStorage.setItem('lastLoginDate', today);
+    // --- 4. SIMULATOR LOGIC (12 SCENARIOS) ---
+    function initSimulator() {
+        if(!window.currentData || window.currentData.length === 0) {
+            getFreshData();
+            if(window.currentData.length === 0) return alert("Please enter data in Data Input first.");
         }
-        document.getElementById('streakCount').innerText = streak + " Day Streak";
+        resetSimulation();
     }
 
-    function checkBriefing() {
-        const today = new Date().toLocaleDateString();
-        const lastBriefing = localStorage.getItem('lastBriefingDate');
-        
-        if (lastBriefing !== today) {
-            document.getElementById('briefingModal').style.display = 'flex';
-            localStorage.setItem('lastBriefingDate', today);
-        }
-    }
-    
-    function closeBriefing() {
-        document.getElementById('briefingModal').style.display = 'none';
+    function resetSimulation() {
+        document.getElementById("slide-price").value = 0; document.getElementById("val-price").innerText = "0%";
+        document.getElementById("slide-vol").value = 0; document.getElementById("val-vol").innerText = "0%";
+        document.getElementById("slide-cost").value = 0; document.getElementById("val-cost").innerText = "0%";
+        runSimulation();
     }
 
-    function connectIntegration(type) {
-        const btn = document.getElementById(`status-${type}`);
-        btn.innerText = "Syncing...";
-        setTimeout(() => {
-            btn.innerText = "Connected";
-            btn.parentNode.classList.add("int-connected");
-            btn.style.background = "#dcfce7";
-            btn.style.color = "#166534";
-            alert(`${type.toUpperCase()} connected successfully! (Simulation Mode)`);
-        }, 1500);
-    }
-
-    // --- SIMULATOR ---
-    function initSimulator() { if(window.currentData.length==0) getFreshData(); resetSimulation(); }
-    function resetSimulation() { document.getElementById('slide-price').value=0; document.getElementById('slide-vol').value=0; document.getElementById('slide-cost').value=0; runSimulation(); }
     function runSimulation() {
         const pVal = parseInt(document.getElementById("slide-price").value);
         const vVal = parseInt(document.getElementById("slide-vol").value);
         const cVal = parseInt(document.getElementById("slide-cost").value);
-        
-        document.getElementById('val-price').innerText = (pVal>0?"+":"")+pVal+"%";
-        document.getElementById('val-vol').innerText = (vVal>0?"+":"")+vVal+"%";
-        document.getElementById('val-cost').innerText = (cVal>0?"+":"")+cVal+"%";
 
-        let curr=0, proj=0;
+        document.getElementById("val-price").innerText = (pVal > 0 ? "+" : "") + pVal + "%";
+        document.getElementById("val-vol").innerText = (vVal > 0 ? "+" : "") + vVal + "%";
+        document.getElementById("val-cost").innerText = (cVal > 0 ? "+" : "") + cVal + "%";
+
+        const pMod = 1 + (pVal / 100);
+        const vMod = 1 + (vVal / 100);
+        const cMod = 1 + (cVal / 100);
+
+        let currentProfit = 0;
+        let newProfit = 0;
+
         if(!window.currentData) return;
-        window.currentData.forEach(i => {
-            curr += (i.sell * i.qty) - (i.cost * i.qty);
-            proj += ((i.sell * (1+pVal/100)) * (i.qty * (1+vVal/100))) - ((i.cost * (1+cVal/100)) * (i.qty * (1+vVal/100)));
+        window.currentData.forEach(item => {
+            const baseProfit = (item.sell * item.qty) - (item.cost * item.qty);
+            currentProfit += baseProfit;
+            const newSell = item.sell * pMod;
+            const newCost = item.cost * cMod;
+            const newQty = item.qty * vMod;
+            const simProfit = (newSell * newQty) - (newCost * newQty);
+            newProfit += simProfit;
         });
 
-        document.getElementById('sim-current').innerText = formatCurrency(curr);
-        document.getElementById('sim-projected').innerText = formatCurrency(proj);
-        const diff = proj - curr;
-        const el = document.getElementById('sim-insight');
-        const delta = document.getElementById('sim-delta');
+        document.getElementById("sim-current").innerText = formatCurrency(currentProfit);
+        document.getElementById("sim-projected").innerText = formatCurrency(newProfit);
         
-        if(diff >= 0) { delta.innerText = "▲ " + formatCurrency(diff); delta.className = "sim-delta delta-pos"; el.style.color = "#166534"; el.innerHTML = `<strong>✅ Strategic Win:</strong> Adds <strong>${formatCurrency(diff)}</strong> to profit.`; }
-        else { delta.innerText = "▼ " + formatCurrency(Math.abs(diff)); delta.className = "sim-delta delta-neg"; el.style.color = "#dc2626"; el.innerHTML = `<strong>🛑 Warning:</strong> Loses <strong>${formatCurrency(Math.abs(diff))}</strong>.`; }
+        const deltaEl = document.getElementById("sim-delta");
+        const insightEl = document.getElementById("sim-insight");
+        const diff = newProfit - currentProfit;
+        const profitGrowth = currentProfit > 0 ? ((diff / currentProfit) * 100).toFixed(1) : 0;
+
+        insightEl.style.padding = "16px";
+        insightEl.style.borderRadius = "8px";
+        insightEl.style.lineHeight = "1.6";
+
+        if(diff >= 0) {
+            deltaEl.innerText = "▲ " + formatCurrency(diff) + " (" + profitGrowth + "%)";
+            deltaEl.className = "sim-delta delta-pos";
+            insightEl.style.color = "#064e3b"; insightEl.style.background = "#d1fae5"; insightEl.style.border = "1px solid #34d399";
+
+            if (pVal > 0 && vVal > 0 && cVal < 0) { insightEl.innerHTML = `<strong>🦄 The Unicorn Strategy:</strong> Perfect efficiency. You raised value, scaled volume, and cut waste.`; }
+            else if (pVal > 0 && vVal < 0) { insightEl.innerHTML = `<strong>💎 Luxury Pivot:</strong> Selling fewer units but making more money. You successfully repositioned as Premium.`; }
+            else if (pVal < 0 && vVal > 0) { insightEl.innerHTML = `<strong>🔥 Mass Market Dominance:</strong> Lower price triggered huge demand. You are winning on volume.`; }
+            else if (cVal < 0 && pVal === 0 && vVal === 0) { insightEl.innerHTML = `<strong>✂️ Lean Operations:</strong> Every rupee saved in costs flows 100% to the bottom line.`; }
+            else if (pVal > 0 && vVal >= 0) { insightEl.innerHTML = `<strong>📈 Pricing Power:</strong> Your brand is strong enough that customers accepted the price hike.`; }
+            else if (vVal > 0 && cVal > 0) { insightEl.innerHTML = `<strong>🚀 Aggressive Scale:</strong> You are spending to grow, and it's paying off. Watch supply chain load.`; }
+            else { insightEl.innerHTML = `<strong>✅ Strategic Win:</strong> This configuration yields an extra <strong>${formatCurrency(diff)}</strong> in pure profit.`; }
+        } else {
+            deltaEl.innerText = "▼ " + formatCurrency(Math.abs(diff));
+            deltaEl.className = "sim-delta delta-neg";
+            insightEl.style.color = "#7f1d1d"; insightEl.style.background = "#fecaca"; insightEl.style.border = "1px solid #f87171";
+
+            if (pVal < 0 && vVal > 0) { insightEl.innerHTML = `<strong>⚠️ The Discount Trap:</strong> Working harder for less money. Volume didn't cover the price cut.`; }
+            else if (pVal > 0 && vVal < 0) { insightEl.innerHTML = `<strong>📉 Price Shock:</strong> The market rejected your price increase. You lost too many customers.`; }
+            else if (vVal > 0 && cVal > 0) { insightEl.innerHTML = `<strong>💸 Growing Broke:</strong> Scaling while costs rise faster than revenue. Fix unit economics first.`; }
+            else if (pVal < 0 && vVal <= 0) { insightEl.innerHTML = `<strong>🥀 Brand Erosion:</strong> Lowering prices didn't even stimulate demand. Re-evaluate market fit.`; }
+            else { insightEl.innerHTML = `<strong>🛑 Profit Warning:</strong> This strategy destroys <strong>${formatCurrency(Math.abs(diff))}</strong> in value. Revert changes.`; }
+        }
     }
 
-    // --- AI ---
-    window.startAIAnalysis = async function() {
-        const data = getFreshData(); if(data.length==0) return alert("Enter data first.");
-        document.getElementById("aiSplashScreen").style.display = "none";
-        document.getElementById("aiChatContainer").style.display = "flex";
-        window.chatConversation = [];
-        await executeAI(`Analyze my catalog using ${window.currencySymbol}. Focus on Net Profit.`, data);
-    };
-    window.sendChatMessage = async function() {
-        const i = document.getElementById("aiChatInput"); const msg = i.value.trim(); if(!msg) return;
-        document.getElementById("aiSplashScreen").style.display = "none";
-        document.getElementById("aiChatContainer").style.display = "flex";
-        appendChat(msg, 'user'); i.value = '';
-        await executeAI(msg, getFreshData());
-    };
-    async function executeAI(msg, data) {
-        document.getElementById("typingIndicator").style.display = "block";
-        window.chatConversation.push({role:"user", content:msg});
-        try {
-            const r = await fetch(workerURL + "/ai-analyze", { method: "POST", headers: {"Content-Type":"application/json"}, body: JSON.stringify({email:window.userEmail, currency:window.currentCurrency, symbol:window.currencySymbol, message:msg, history:window.chatConversation, products:data}) });
-            const d = await r.json();
-            document.getElementById("typingIndicator").style.display = "none";
-            if(d.ok) { appendChat(d.response.replace(/\n/g, "<br>").replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>"), 'ai'); window.chatConversation.push({role:"assistant", content:d.response}); }
-            else appendChat("⚠️ " + d.error, 'ai');
-        } catch(e) { appendChat("⚠️ Error", 'ai'); }
-    }
-    function appendChat(t, r) { const d=document.createElement('div'); d.className=`chat-msg msg-${r}`; d.innerHTML=t; document.getElementById("chatHistory").appendChild(d); }
-
-    // --- PDF ---
+    // --- 5. PERFECT PDF EXPORT ---
     function exportExecutivePDF() {
-        const c = document.getElementById('profitChart'); if(c) document.getElementById('pdf-chart-image').src = c.toDataURL('image/png');
-        const e = document.getElementById('pdf-export-container'); e.style.visibility = 'visible';
-        html2pdf().set({ margin:0.5, filename:'Report.pdf', image:{type:'jpeg',quality:1}, html2canvas:{scale:2, useCORS:true, windowWidth:1100}, jsPDF:{unit:'in', format:'letter', orientation:'landscape'} }).from(e).save().then(() => e.style.visibility = 'hidden');
+      const chartCanvas = document.getElementById('profitChart');
+      if(chartCanvas) {
+          document.getElementById('pdf-chart-image').src = chartCanvas.toDataURL('image/png');
+      }
+
+      const element = document.getElementById('pdf-export-container');
+      element.style.visibility = 'visible';
+
+      const opt = {
+        margin:       0.5,
+        filename:     'Vizbix_Executive_Summary.pdf',
+        image:        { type: 'jpeg', quality: 1 },
+        html2canvas:  { scale: 2, useCORS: true, windowWidth: 1100 },
+        jsPDF:        { unit: 'in', format: 'letter', orientation: 'landscape' }
+      };
+      
+      setTimeout(() => {
+          html2pdf().set(opt).from(element).save().then(() => {
+              element.style.visibility = 'hidden';
+          });
+      }, 300);
     }
 
-    // --- AUTH ---
-    window.verify = async function(e){ try{const r=await fetch(workerURL+"/check?email="+e);const d=await r.json(); window.isProUser=d.valid; }catch(e){} };
-    window.pay = function(){ new Razorpay({ key: KEY, amount: PRICE, currency: "INR", name: "Vizbix Pro", prefill:{email:window.userEmail}, handler: async function(r){ await fetch(workerURL+"/verify-payment", {method:"POST", body:JSON.stringify({payment_id:r.razorpay_payment_id, email:window.userEmail})}); window.verify(window.userEmail); } }).open(); };
-    window.saveToCloud = async function(){ const d=getFreshData(); if(d.length==0) return alert("Empty!"); await fetch(workerURL+"/save", {method:"POST", body:JSON.stringify({email:window.userEmail, data:d, date:new Date().toISOString()})}); alert("Saved!"); };
-    window.fetchHistory = async function(){ const l=document.getElementById("historyList"); if(!window.isProUser){l.innerHTML="Pro Only";return;} l.innerHTML="Loading..."; const r=await fetch(workerURL+"/history?email="+window.userEmail); const d=await r.json(); l.innerHTML=""; d.forEach(i=>{ const div=document.createElement("div"); div.className="history-item"; div.innerHTML=`<div><strong>${new Date(i.date).toLocaleDateString()}</strong></div>`; div.onclick=()=> { document.getElementById("items").innerHTML=""; i.data.forEach(r=>addNewRow(r.name, r.sell, r.cost, r.qty)); processDataAndShowReport(); }; l.appendChild(div); }); };
+    // --- 6. AI CHAT ENGINE ---
+    window.startAIAnalysis = async function() {
+        if(!window.isProUser || !window.userEmail) return alert("Please Login (Pro Feature)");
+        
+        const freshData = getFreshData();
+        if(freshData.length === 0) return alert("Please enter data in the Data Input tab first!");
 
+        document.getElementById("aiSplashScreen").style.display = "none";
+        document.getElementById("aiChatContainer").style.display = "flex";
+
+        const promptMsg = `Analyze my catalog. Identify my hero product, spot any profit leaks, and give me a clear 3-step action plan to increase my net margin. Use ${window.currencySymbol}.`;
+        
+        document.getElementById("chatHistory").innerHTML = `<div class="chat-msg msg-ai" id="loadingAi">Analyzing your latest numbers in the cloud... This takes about 5 seconds ⏳</div>`;
+        window.chatConversation = []; 
+        
+        await window.executeAIRequest(promptMsg, freshData);
+    };
+
+    window.sendChatMessage = async function() {
+        if(!window.isProUser) return alert("Pro feature required.");
+        
+        const inputField = document.getElementById("aiChatInput");
+        if(!inputField) return;
+
+        const msg = inputField.value.trim();
+        if(!msg) return;
+
+        document.getElementById("aiSplashScreen").style.display = "none";
+        document.getElementById("aiChatContainer").style.display = "flex";
+
+        window.appendChatBubble(msg, 'user');
+        inputField.value = '';
+        
+        const freshData = getFreshData();
+        await window.executeAIRequest(msg, freshData);
+    };
+
+    window.executeAIRequest = async function(userMessage, freshData) {
+        const typingIndicator = document.getElementById("typingIndicator");
+        const sendBtn = document.getElementById("chatSendBtn");
+        
+        if(typingIndicator) typingIndicator.style.display = "block";
+        if(sendBtn) sendBtn.disabled = true;
+
+        let aiPayload = { 
+            email: window.userEmail, 
+            currency: window.currentCurrency || 'INR',
+            symbol: window.currencySymbol || '₹',
+            message: userMessage,
+            history: window.chatConversation,
+            products: freshData 
+        }; 
+        
+        window.chatConversation.push({ role: "user", content: userMessage });
+
+        try {
+            const r = await fetch(workerURL + "/ai-analyze", { 
+                method: "POST", 
+                headers: { "Content-Type": "application/json" }, 
+                body: JSON.stringify(aiPayload) 
+            });
+            const d = await r.json(); 
+            
+            if(typingIndicator) typingIndicator.style.display = "none";
+            if(sendBtn) sendBtn.disabled = false;
+            
+            const loadingElement = document.getElementById("loadingAi");
+            if(loadingElement) loadingElement.remove();
+
+            if(d.ok) { 
+                const formattedResponse = d.response.replace(/\n/g, "<br>").replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>");
+                window.appendChatBubble(formattedResponse, 'ai');
+                window.chatConversation.push({ role: "assistant", content: d.response });
+            } else { 
+                window.appendChatBubble("⚠️ " + (d.error || "AI Error"), 'ai'); 
+            }
+        } catch(e) { 
+            if(typingIndicator) typingIndicator.style.display = "none"; 
+            if(sendBtn) sendBtn.disabled = false; 
+            window.appendChatBubble("⚠️ Connection error. Please try again.", 'ai'); 
+        }
+    };
+
+    window.appendChatBubble = function(text, sender) {
+        const historyBox = document.getElementById("chatHistory");
+        if(!historyBox) return;
+        const div = document.createElement("div");
+        div.className = `chat-msg msg-${sender}`;
+        div.innerHTML = text;
+        historyBox.appendChild(div);
+        historyBox.scrollTop = historyBox.scrollHeight;
+    };
+
+    // --- 7. AUTH & CLOUD ---
+    window.verify = async function(email){
+        const targetEmail = email || window.userEmail;
+        if(!targetEmail) return;
+        try {
+            const r = await fetch(workerURL+"/check?email="+targetEmail); 
+            const d = await r.json();
+            if(d.valid) {
+                window.isProUser = true; 
+                if(d.expiry) { 
+                    const diff = d.expiry - Date.now();
+                    if(diff > 0) window.proDaysLeft = Math.ceil(diff / (1000 * 60 * 60 * 24)) + " Days Left";
+                    else { window.isProUser = false; window.proDaysLeft = "Expired"; }
+                }
+            } else { window.isProUser = false; }
+        } catch(e) {}
+    };
+
+    window.pay = function(){
+        if(!window.userEmail) return alert("Please log in.");
+        const options = {
+            key: KEY, amount: PRICE, currency: "INR", name: "Vizbix Pro", description: "30 Days Access",
+            prefill: { email: window.userEmail }, theme: { color: "#0F172A" },
+            handler: async function(response){ 
+                try {
+                    const req = await fetch(workerURL + "/verify-payment", { 
+                        method: "POST", headers: { "Content-Type": "application/json" }, 
+                        body: JSON.stringify({ payment_id: response.razorpay_payment_id, email: window.userEmail }) 
+                    });
+                    const d = await req.json();
+                    if (d.ok) { alert("Welcome to Pro."); window.verify(window.userEmail); } 
+                    else { alert("Verification Failed."); }
+                } catch (e) { alert("Error."); }
+            }
+        };
+        new Razorpay(options).open();
+    };
+
+    window.saveToCloud = async function() {
+        if(!window.isProUser) return alert("Pro Plan required."); 
+        const btn = document.getElementById("saveCloudBtn");
+        const freshData = getFreshData();
+        if(freshData.length === 0) return alert("Nothing to save!");
+        if(btn) btn.innerHTML = "⏳";
+        try { 
+            await fetch(workerURL + "/save", { 
+                method: "POST", 
+                headers: { "Content-Type": "application/json" }, 
+                body: JSON.stringify({ email: window.userEmail, data: freshData, mode: 'product', date: new Date().toISOString() }) 
+            }); 
+            if(btn) { btn.innerHTML = "✅ Saved"; setTimeout(() => btn.innerHTML = "💾 Save to Cloud", 2000); }
+        } catch(e) { if(btn) btn.innerHTML = "💾 Save to Cloud"; }
+    };
+
+    window.fetchHistory = async function() {
+        const list = document.getElementById("historyList"); 
+        if(!list) return;
+        if(!window.isProUser) { list.innerHTML = "<p style='text-align:center; color:#64748B;'>Unlock Pro to view history.</p>"; return; }
+        list.innerHTML = "Loading...";
+        try {
+            const r = await fetch(workerURL + "/history?email=" + window.userEmail); 
+            const d = await r.json();
+            if(d.length === 0) { list.innerHTML = "<p style='text-align:center'>No history.</p>"; return; }
+            list.innerHTML = "";
+            d.forEach(item => {
+                const dateStr = new Date(item.date).toLocaleDateString(); 
+                const div = document.createElement("div"); 
+                div.className = "history-item";
+                div.innerHTML = `<div><div style="font-weight:600; font-size:14px; color: var(--dark);">${dateStr}</div><div style="font-size:12px; color: var(--text-muted);">${item.data.length} Rows</div></div><button class="btn btn-secondary" style="font-size:12px; padding:8px 12px;">Load Data</button>`;
+                div.onclick = () => window.loadHistoryItem(item.data);
+                list.appendChild(div);
+            });
+        } catch(e) { list.innerHTML = "Error fetching history."; }
+    };
+
+    window.loadHistoryItem = function(data) {
+        const container = document.getElementById("items"); 
+        if(!container) return;
+        container.innerHTML = "";
+        data.forEach(row => { addNewRow(row.name||row.n||'', row.sell||row.v1||'', row.cost||row.v2||'', row.qty||row.v3||''); });
+        alert("History loaded! Generating Dashboard...");
+        processDataAndShowReport();
+    };
+
+    // --- 8. AUTH POLLER ---
     let hasVerified = false;
     setInterval(() => {
-      const btn = document.getElementById('headerLoginBtn');
+      const globalLoginBtn = document.getElementById('headerLoginBtn');
       if(window.userEmail) {
-        if(btn) btn.style.display = 'none';
+        if(globalLoginBtn) globalLoginBtn.style.display = 'none';
         document.getElementById('sidebarEmail').innerText = window.userEmail;
         document.getElementById('settingsEmail').innerText = window.userEmail;
-        if(!hasVerified) { hasVerified=true; window.verify(window.userEmail); checkBriefing(); }
+        if(!hasVerified) { hasVerified = true; window.verify(window.userEmail); }
       }
+      
       if(window.isProUser) {
-         document.getElementById('sidebarPlan').innerText = "PRO ACTIVE";
-         document.getElementById('upgradeBtn').style.display = "none";
-         document.getElementById('proLockOverlay').classList.add('pro-lock-hidden');
+        const planText = `Pro Active (${window.proDaysLeft || 'Active'})`;
+        document.getElementById('sidebarPlan').innerText = planText;
+        document.getElementById('settingsPlan').innerText = planText;
+        document.getElementById('settingsPlan').style.color = '#059669'; 
+        const upgradeBtn = document.getElementById('upgradeBtn');
+        if(upgradeBtn) upgradeBtn.style.display = 'none';
+
+        document.getElementById('proLockOverlay').classList.add('pro-lock-hidden');
+        document.querySelectorAll('.app-view').forEach(v => v.style.filter = "none");
+
+      } else if (window.isProUser === false) {
+        document.getElementById('sidebarPlan').innerText = "Free User";
+        document.getElementById('settingsPlan').innerText = "Free Plan (Limited)";
+        const upgradeBtn = document.getElementById('upgradeBtn');
+        if(upgradeBtn) upgradeBtn.style.display = 'block';
       }
     }, 1000);
   </script>
 
-  <script type="module" src="../assets/js/auth.js?v=99.0"></script>
+  <script type="module" src="../assets/js/auth.js?v=4.0"></script>
 
 </body>
 </html>
+
