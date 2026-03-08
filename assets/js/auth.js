@@ -68,7 +68,8 @@ onAuthStateChanged(auth, async (user) => {
         if(headerLoginBtn) {
             headerLoginBtn.innerText = "Log in";
             // If function exists (in app), open modal. Else (landing page), redirect.
-            headerLoginBtn.onclick = () => window.openLogin ? window.openLogin() : (window.location.href='/index.html');
+            // NEW (Fix): Opens modal if on the app page, otherwise redirects
+headerLoginBtn.onclick = () => window.openLogin ? window.openLogin() : (window.location.href='/index.html');
             headerLoginBtn.className = "btn btn-secondary";
         }
         if(drawerProfile) drawerProfile.style.display = "none";
@@ -176,3 +177,4 @@ window.handleEmailSignUp = async function() {
         btn.innerText = originalText;
     }
 };
+
