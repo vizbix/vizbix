@@ -22,22 +22,27 @@ const googleProvider = new GoogleAuthProvider();
 const workerURL = "https://vizbix-api.vizbixhq.workers.dev";
 
 // --- AUTH STATE LISTENER ---
-// This runs automatically on every page load to check if the user is logged in
+// This runs automatically whenever login state changes (login, logout, page load)
 onAuthStateChanged(auth, async (user) => {
     
-    // Elements that exist on both pages (injected by drawer.js)
+    // Elements that exist on both pages
     const headerLoginBtn = document.getElementById("headerLoginBtn");
     const drawerProfile = document.getElementById("drawerProfile");
     const drawerEmailDisplay = document.getElementById("drawerEmailDisplay");
     
+    // Check if we are inside the App (Profit Optimizer)
+    const isAppPage = window.location.pathname.includes('profit-optimizer');
+
     if (user) {
         // === USER IS LOGGED IN ===
-        window.userEmail = user.email; // Save globally for app.js to use
+        if (window.AppState) window.userEmail = user.email; // Sync with HTML AppState if present
         
         // 1. Update Header Button
         if(headerLoginBtn) {
             headerLoginBtn.innerText = "Dashboard →";
-            headerLoginBtn.onclick = () => window.location.href = "/app/profit-optimizer.html";
+            headerLoginBtn.onclick = () => {
+                if (!isAppPage) window.location.href = "/app/profit-optimizer.html";
+            };
             headerLoginBtn.className = "btn btn-primary";
         }
         
@@ -45,46 +50,41 @@ onAuthStateChanged(auth, async (user) => {
         if(drawerProfile) drawerProfile.style.display = "block";
         if(drawerEmailDisplay) drawerEmailDisplay.innerText = user.email;
         
-        // 3. If on the SaaS page, check Pro Status & unlock UI
-        if(window.location.pathname.includes('profit-optimizer')) {
-            document.getElementById("emailInput").value = user.email;
-            document.getElementById("emailInput").style.display = "none";
-            window.verify(user.email); // Calls the verify function from app.js
+        // 3. Logic for App Page vs Landing Page
+        if(isAppPage) {
+            // We are already in the app: Unlock features immediately without reload
+            if (window.closeLogin) window.closeLogin(); // Close modal if open
+            if (window.verify) window.verify(user.email); // Re-run verification check
         } else {
-            // If on landing page, just fetch plan text for the drawer
+            // We are on landing page: Just fetch plan info
             fetchPlanDetails(user.email);
         }
 
     } else {
         // === USER IS NOT LOGGED IN ===
-        window.userEmail = null;
-        window.isProUser = false;
+        if (window.AppState) window.userEmail = null;
         
-        // 1. Reset Header & Drawer
+        // 1. Reset Header
         if(headerLoginBtn) {
             headerLoginBtn.innerText = "Log in";
+            // If function exists (in app), open modal. Else (landing page), redirect.
             headerLoginBtn.onclick = () => window.openLogin ? window.openLogin() : (window.location.href='/index.html');
             headerLoginBtn.className = "btn btn-secondary";
         }
         if(drawerProfile) drawerProfile.style.display = "none";
         
-        // 2. If on the SaaS page, lock the UI
-        if(window.location.pathname.includes('profit-optimizer')) {
-            const proContainer = document.getElementById("proContainer");
-            const lockOverlay = document.getElementById("lockOverlay");
-            if(proContainer) proContainer.classList.add("locked-container");
-            if(lockOverlay) lockOverlay.style.display = "flex";
-            
-            const payBtn = document.querySelector("button[onclick='window.pay()']");
+        // 2. If inside App, show locked state
+        if(isAppPage) {
+            const payBtn = document.getElementById("upgradeBtn"); // Matches your HTML ID
             if(payBtn) {
-                payBtn.innerText = "Log in to unlock Pro";
-                payBtn.onclick = () => window.location.href = "/index.html"; 
+                payBtn.innerText = "Log in to Upgrade";
+                payBtn.onclick = () => window.openLogin(); 
             }
         }
     }
 });
 
-// Helper to fetch plan details just for the drawer text
+// Helper to fetch plan details (Drawer only)
 async function fetchPlanDetails(email) {
     try {
         const r = await fetch(workerURL + "/check?email=" + email);
@@ -107,17 +107,34 @@ async function fetchPlanDetails(email) {
     } catch(e) { console.error("Plan check failed"); }
 }
 
-// --- GLOBAL EXPORTS FOR HTML ONCLICK BUTTONS ---
+// --- GLOBAL EXPORTS FOR HTML BUTTONS ---
+
+// Handles routing after login success
+function handleLoginSuccess() {
+    // If on landing page, go to app. If on app, just close modal.
+    if (!window.location.pathname.includes('profit-optimizer')) {
+        window.location.href = "/app/profit-optimizer.html";
+    } else if (window.closeLogin) {
+        window.closeLogin();
+    }
+}
+
 window.handleLogout = function() {
     if(confirm("Are you sure you want to log out?")) {
-        signOut(auth).then(() => { window.location.href = "/index.html"; });
+        signOut(auth).then(() => { 
+            if (window.location.pathname.includes('profit-optimizer')) {
+                window.location.reload(); // Reload app to reset state
+            } else {
+                window.location.href = "/index.html"; 
+            }
+        });
     }
 };
 
 window.handleGoogleLogin = async function() {
     try {
         await signInWithPopup(auth, googleProvider);
-        window.location.href = "/app/profit-optimizer.html"; 
+        handleLoginSuccess();
     } catch (error) { alert("Google Login Failed: " + error.message); }
 };
 
@@ -125,14 +142,18 @@ window.handleEmailLogin = async function() {
     const e = document.getElementById('emailInput').value;
     const p = document.getElementById('passwordInput').value;
     if(!e || !p) return alert("Please enter both email and password.");
+    
+    const btn = document.querySelector("button[onclick='window.handleEmailLogin()']");
+    const originalText = btn.innerText;
+    btn.innerText = "Logging in...";
+    
     try {
-        const btn = document.querySelector("button[onclick='window.handleEmailLogin()']");
-        btn.innerText = "Logging in...";
         await signInWithEmailAndPassword(auth, e, p);
-        window.location.href = "/app/profit-optimizer.html";
+        handleLoginSuccess();
     } catch (error) { 
         alert("Login failed. Check your password or sign up.");
-        document.querySelector("button[onclick='window.handleEmailLogin()']").innerText = "Log In";
+    } finally {
+        btn.innerText = originalText;
     }
 };
 
@@ -141,13 +162,17 @@ window.handleEmailSignUp = async function() {
     const p = document.getElementById('passwordInput').value;
     if(!e || !p) return alert("Please enter both email and password.");
     if(p.length < 6) return alert("Password must be at least 6 characters.");
+    
+    const btn = document.querySelector("button[onclick='window.handleEmailSignUp()']");
+    const originalText = btn.innerText;
+    btn.innerText = "Creating account...";
+    
     try {
-        const btn = document.querySelector("button[onclick='window.handleEmailSignUp()']");
-        btn.innerText = "Creating account...";
         await createUserWithEmailAndPassword(auth, e, p);
-        window.location.href = "/app/profit-optimizer.html";
+        handleLoginSuccess();
     } catch (error) { 
         alert("Sign Up failed: " + error.message); 
-        document.querySelector("button[onclick='window.handleEmailSignUp()']").innerText = "Sign Up";
+    } finally {
+        btn.innerText = originalText;
     }
 };
