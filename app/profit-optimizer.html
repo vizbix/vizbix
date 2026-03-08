@@ -153,7 +153,7 @@
       <div class="sidebar-divider"></div>
 
       <a class="nav-item" onclick="switchView('settings', this)">
-        <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94zM12,15.6c-1.98,0-3.6-1.62-3.6-3.6s1.62-3.6,3.6-3.6s3.6,1.62,3.6,3.6S13.98,15.6,12,15.6z"/></svg>
+        <svg viewBox="0 0 24 24"><path d="M19.14,12.94c0.04-0.3,0.06-0.61,0.06-0.94c0-0.32-0.02-0.64-0.06-0.94l2.03-1.58c0.18-0.14,0.23-0.41,0.12-0.61l-1.92-3.32c-0.12-0.22-0.37-0.29-0.59-0.22l-2.39,0.96c-0.5-0.38-1.03-0.7-1.62-0.94L14.4,2.81c-0.04-0.24-0.24-0.41-0.48-0.41h-3.84c-0.24,0-0.43,0.17-0.47,0.41L9.25,5.35C8.66,5.59,8.12,5.92,7.63,6.29L5.24,5.33c-0.22-0.08-0.47,0-0.59,0.22L2.73,8.87C2.62,9.08,2.66,9.34,2.86,9.48l2.03,1.58C4.84,11.36,4.8,11.69,4.8,12s0.02,0.64,0.06,0.94l-2.03,1.58c-0.18,0.14-0.23,0.41-0.12,0.61l1.92,3.32c0.12,0.22,0.37,0.29,0.59,0.22l2.39-0.96c0.5,0.38,1.03,0.7,1.62,0.94l0.36,2.54c0.05,0.24,0.24,0.41,0.48,0.41h3.84c0.24,0,0.43-0.17,0.47-0.41l0.36-2.54c0.59-0.24,1.13-0.56,1.62-0.94l2.39,0.96c0.22,0.08,0.47,0,0.59-0.22l1.92-3.32c0.12-0.22,0.07-0.49-0.12-0.61L19.14,12.94zM12,15.6c-1.98,0-3.6-1.62-3.6-3.6s1.62-3.6,3.6-3.6 3.6 1.62 3.6 3.6-1.62 3.6-3.6 3.6z"/></svg>
         <span class="nav-item-text">Settings</span>
       </a>
     </nav>
@@ -201,9 +201,9 @@
         <div id="items">
           <div class="data-row">
             <input type="text"   placeholder="e.g. Wireless Earbuds" class="input-name" value="Wireless Earbuds">
-            <input type="number" placeholder="0" class="input-sell" value="2500">
-            <input type="number" placeholder="0" class="input-cost" value="1200">
-            <input type="number" placeholder="0" class="input-qty"  value="140">
+            <input type="number" placeholder="0"             class="input-sell" value="2500">
+            <input type="number" placeholder="0"             class="input-cost" value="1200">
+            <input type="number" placeholder="0"             class="input-qty"  value="140">
             <button class="delete-btn" onclick="removeRow(this)" title="Remove">×</button>
           </div>
         </div>
@@ -229,67 +229,37 @@
         </p>
       </div>
     </div>
-      <div id="view-integrations" class="app-view">
-  <div style="max-width:900px; margin:0 auto;">
-    <div class="page-header">
-      <h2>Data Integrations</h2>
-    </div>
 
-    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
-      <div class="data-card" style="padding:24px; text-align:center;">
-        <div style="font-size:32px; margin-bottom:12px;">🛍️</div>
-        <h3 style="font-size:16px; font-weight:700; color:var(--ink);">WooCommerce</h3>
-        <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Sync products and sales history.</p>
-        <button class="btn btn-primary" style="width:100%; background:#7c3aed; border-color:#7c3aed;" onclick="openStoreModal('woo')">Connect Store</button>
-      </div>
+    <div id="view-integrations" class="app-view">
+      <div style="max-width:900px; margin:0 auto;">
+        <div class="page-header">
+          <h2>Data Integrations</h2>
+        </div>
 
-      <div class="data-card" style="padding:24px; text-align:center;">
-        <div style="font-size:32px; margin-bottom:12px;">🟢</div>
-        <h3 style="font-size:16px; font-weight:700; color:var(--ink);">Shopify</h3>
-        <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Sync inventory and pricing.</p>
-        <button class="btn btn-primary" style="width:100%; background:#059669; border-color:#059669;" onclick="openStoreModal('shopify')">Connect Store</button>
-      </div>
+        <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
+          <div class="data-card" style="padding:24px; text-align:center;">
+            <div style="font-size:32px; margin-bottom:12px;">🛍️</div>
+            <h3 style="font-size:16px; font-weight:700; color:var(--ink);">WooCommerce</h3>
+            <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Sync products and sales history.</p>
+            <button class="btn btn-primary" style="width:100%; background:#7c3aed; border-color:#7c3aed;" onclick="openStoreModal('woo')">Connect Store</button>
+          </div>
 
-      <div class="data-card" style="padding:24px; text-align:center;">
-        <div style="font-size:32px; margin-bottom:12px;">📊</div>
-        <h3 style="font-size:16px; font-weight:700; color:var(--ink);">CSV Import</h3>
-        <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Upload Excel or CSV files.</p>
-        <button class="btn btn-secondary" style="width:100%;" onclick="triggerImport()">Upload File</button>
-      </div>
-    </div>
-  </div>
-</div>
+          <div class="data-card" style="padding:24px; text-align:center;">
+            <div style="font-size:32px; margin-bottom:12px;">🟢</div>
+            <h3 style="font-size:16px; font-weight:700; color:var(--ink);">Shopify</h3>
+            <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Sync inventory and pricing.</p>
+            <button class="btn btn-primary" style="width:100%; background:#059669; border-color:#059669;" onclick="openStoreModal('shopify')">Connect Store</button>
+          </div>
 
-<div id="view-integrations" class="app-view">
-  <div style="max-width:900px; margin:0 auto;">
-    <div class="page-header">
-      <h2>Data Integrations</h2>
-    </div>
-
-    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
-      <div class="data-card" style="padding:24px; text-align:center;">
-        <div style="font-size:32px; margin-bottom:12px;">🛍️</div>
-        <h3 style="font-size:16px; font-weight:700; color:var(--ink);">WooCommerce</h3>
-        <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Sync products and sales history.</p>
-        <button class="btn btn-primary" style="width:100%; background:#7c3aed; border-color:#7c3aed;" onclick="openStoreModal('woo')">Connect Store</button>
-      </div>
-
-      <div class="data-card" style="padding:24px; text-align:center;">
-        <div style="font-size:32px; margin-bottom:12px;">🟢</div>
-        <h3 style="font-size:16px; font-weight:700; color:var(--ink);">Shopify</h3>
-        <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Sync inventory and pricing.</p>
-        <button class="btn btn-primary" style="width:100%; background:#059669; border-color:#059669;" onclick="openStoreModal('shopify')">Connect Store</button>
-      </div>
-
-      <div class="data-card" style="padding:24px; text-align:center;">
-        <div style="font-size:32px; margin-bottom:12px;">📊</div>
-        <h3 style="font-size:16px; font-weight:700; color:var(--ink);">CSV Import</h3>
-        <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Upload Excel or CSV files.</p>
-        <button class="btn btn-secondary" style="width:100%;" onclick="triggerImport()">Upload File</button>
+          <div class="data-card" style="padding:24px; text-align:center;">
+            <div style="font-size:32px; margin-bottom:12px;">📊</div>
+            <h3 style="font-size:16px; font-weight:700; color:var(--ink);">CSV Import</h3>
+            <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Upload Excel or CSV files.</p>
+            <button class="btn btn-secondary" style="width:100%;" onclick="triggerImport()">Upload File</button>
+          </div>
+        </div>
       </div>
     </div>
-  </div>
-</div>
 
     <div id="view-dashboard" class="app-view">
       <div style="max-width:1040px;margin:0 auto;width:100%;box-sizing:border-box;">
@@ -2178,6 +2148,45 @@ async function runStoreImport(platform) {
   }
 }
 
+function showHelp(platform) {
+  const modal = document.getElementById('helpModal');
+  const title = document.getElementById('helpTitle');
+  const content = document.getElementById('helpContent');
+
+  modal.style.display = 'flex';
+
+  if (platform === 'woo') {
+    title.innerText = "How to get WooCommerce Keys";
+    content.innerHTML = `
+      <ol style="padding-left:20px; margin:0;">
+        <li style="margin-bottom:10px;">Log in to your <strong>WordPress Admin</strong>.</li>
+        <li style="margin-bottom:10px;">Go to <strong>WooCommerce > Settings</strong>.</li>
+        <li style="margin-bottom:10px;">Click the <strong>Advanced</strong> tab, then <strong>REST API</strong>.</li>
+        <li style="margin-bottom:10px;">Click <strong>Add Key</strong>. Name it "Vizbix".</li>
+        <li style="margin-bottom:10px;"><strong>Important:</strong> Set Permissions to <strong>Read/Write</strong>.</li>
+        <li>Click <strong>Generate API Key</strong> and copy the codes here.</li>
+      </ol>`;
+  } else {
+    title.innerText = "How to get Shopify Token";
+    content.innerHTML = `
+      <ol style="padding-left:20px; margin:0;">
+        <li style="margin-bottom:10px;">Log in to <strong>Shopify Admin</strong> > <strong>Settings</strong>.</li>
+        <li style="margin-bottom:10px;">Go to <strong>Apps and sales channels</strong> > <strong>Develop apps</strong>.</li>
+        <li style="margin-bottom:10px;">Click <strong>Create an app</strong>. Name it "Vizbix".</li>
+        <li style="margin-bottom:10px;">Click <strong>Configure Admin API scopes</strong>.</li>
+        <li style="margin-bottom:10px;">Search for "Products" and check <strong>read_products</strong>.</li>
+        <li>Click <strong>Save</strong>, then <strong>Install App</strong> to reveal your token.</li>
+      </ol>`;
+  }
+}
+
+document.addEventListener('DOMContentLoaded', ()=>{
+  restoreChatSession();
+  renderFeatureTable();
+  // Restore saved product data from localStorage
+  const restored = loadDataFromStorage();
+  if (restored) showToast('Your previous data has been restored ✓', 'info', 2500);
+});
 </script>
 <script type="module" src="../assets/js/auth.js?v=4.4"></script>
 
@@ -2201,31 +2210,59 @@ async function runStoreImport(platform) {
     </button>
   </div>
 </div>
-  
+
 <div class="modal-overlay-login" id="storeModal" style="display:none; position:fixed; inset:0; background:rgba(8,9,13,0.6); z-index:9999; backdrop-filter:blur(4px); align-items:center; justify-content:center;">
   <div class="login-box" style="background:white; padding:28px; border-radius:16px; width:90%; max-width:420px; position:relative;">
     <button onclick="document.getElementById('storeModal').style.display='none'" style="position:absolute; top:16px; right:16px; background:none; border:none; font-size:24px; color:#94a3b8; cursor:pointer;">✕</button>
+    
     <h3 style="font-size: 20px; margin:0 0 16px; color:var(--ink); font-weight:700;">Connect Your Store</h3>
     
     <div style="display:flex; gap:10px; margin-bottom:20px; border-bottom:1px solid #e2e8f0; padding-bottom:14px;">
-      <button onclick="switchStoreTab('woo')" id="tab-woo" style="flex:1; padding:8px; border-radius:8px; font-weight:600; font-size:13px; border:none; background:var(--indigo); color:white;">WooCommerce</button>
-      <button onclick="switchStoreTab('shopify')" id="tab-shopify" style="flex:1; padding:8px; border-radius:8px; font-weight:600; font-size:13px; border:none; background:#f1f5f9; color:#64748b;">Shopify</button>
+      <button onclick="switchStoreTab('woo')" id="tab-woo" style="flex:1; padding:8px; border-radius:8px; font-weight:600; font-size:13px; border:none; background:var(--indigo); color:white; cursor:pointer;">WooCommerce</button>
+      <button onclick="switchStoreTab('shopify')" id="tab-shopify" style="flex:1; padding:8px; border-radius:8px; font-weight:600; font-size:13px; border:none; background:#f1f5f9; color:#64748b; cursor:pointer;">Shopify</button>
     </div>
 
     <div id="form-woo">
-      <input type="text" id="wooUrl" placeholder="https://mystore.com" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px;">
-      <input type="text" id="wooKey" placeholder="Consumer Key (ck_...)" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px;">
-      <input type="password" id="wooSecret" placeholder="Consumer Secret (cs_...)" style="width:100%; padding:10px; margin-bottom:14px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px;">
-      <button class="btn btn-primary" id="btnWoo" style="width:100%; padding:12px;" onclick="runStoreImport('woo')">Import WooCommerce</button>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Store URL</label>
+        <input type="text" id="wooUrl" placeholder="https://mystore.com" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px; margin-top:4px;">
+      </div>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Consumer Key</label>
+        <input type="text" id="wooKey" placeholder="ck_xxxxxxxxxxxx" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px; margin-top:4px;">
+      </div>
+      <div style="margin-bottom:20px;">
+        <label style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Consumer Secret</label>
+        <input type="password" id="wooSecret" placeholder="cs_xxxxxxxxxxxx" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px; margin-top:4px;">
+        <a onclick="showHelp('woo')" style="font-size:12px; color:var(--indigo); cursor:pointer; text-decoration:underline; float:right; margin-top:8px;">Where do I find these?</a>
+      </div>
+      <button class="btn btn-primary" id="btnWoo" style="width:100%; padding:12px; margin-top:10px;" onclick="runStoreImport('woo')">Import WooCommerce</button>
     </div>
 
     <div id="form-shopify" style="display:none;">
-      <input type="text" id="shopUrl" placeholder="my-store.myshopify.com" style="width:100%; padding:10px; margin-bottom:10px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px;">
-      <input type="password" id="shopToken" placeholder="Admin Access Token (shpat_...)" style="width:100%; padding:10px; margin-bottom:14px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px;">
-      <button class="btn btn-primary" id="btnShop" style="width:100%; background:#059669; border-color:#059669; padding:12px;" onclick="runStoreImport('shopify')">Import Shopify</button>
+      <div style="margin-bottom:12px;">
+        <label style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Shop URL</label>
+        <input type="text" id="shopUrl" placeholder="mybrand.myshopify.com" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px; margin-top:4px;">
+      </div>
+      <div style="margin-bottom:20px;">
+        <label style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Admin Access Token</label>
+        <input type="password" id="shopToken" placeholder="shpat_xxxxxxxxxxxx" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px; margin-top:4px;">
+        <a onclick="showHelp('shopify')" style="font-size:12px; color:#059669; cursor:pointer; text-decoration:underline; float:right; margin-top:8px;">Where do I find this?</a>
+      </div>
+      <button class="btn btn-primary" id="btnShop" style="width:100%; background:#059669; border-color:#059669; padding:12px; margin-top:10px;" onclick="runStoreImport('shopify')">Import Shopify</button>
     </div>
+
   </div>
 </div>
-  
+
+<div id="helpModal" style="display:none; position:fixed; inset:0; background:rgba(255,255,255,0.98); z-index:10000; align-items:center; justify-content:center;">
+  <div style="background:white; width:90%; max-width:500px; padding:32px; border-radius:16px; border:1px solid #e2e8f0; box-shadow:0 20px 60px rgba(0,0,0,0.1); position:relative;">
+    <button onclick="document.getElementById('helpModal').style.display='none'" style="position:absolute; top:20px; right:20px; background:none; border:none; font-size:24px; color:#94a3b8; cursor:pointer;">✕</button>
+    <h3 id="helpTitle" style="font-size:20px; font-weight:700; color:var(--ink); margin-bottom:16px;"></h3>
+    <div id="helpContent" style="font-size:14px; line-height:1.6; color:#475569;"></div>
+    <button onclick="document.getElementById('helpModal').style.display='none'" class="btn btn-secondary" style="width:100%; margin-top:24px;">Got it, back to setup</button>
+  </div>
+</div>
+
 </body>
 </html>
