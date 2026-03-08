@@ -387,7 +387,7 @@
   background: var(--ink-900);
   border-color: var(--ink-800);
 }
-.metric-card.highlight h4 { color: #304060; }
+.metric-card.highlight h4 { color: rgba(255,255,255,0.45); }
 .metric-card.highlight .value { color: #ecf5ff; }
 
 /* ─── DASHBOARD LAYOUT ───────────────────── */
