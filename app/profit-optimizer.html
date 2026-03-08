@@ -553,6 +553,11 @@ function onAuthChange() {
     setText('settingsPlan', 'Free Plan (Limited)');
     renderFeatureTable();
   }
+
+  // Start onboarding only after auth confirms user is NOT logged in
+  if (!email && pro === false) {
+    startOnboarding();
+  }
 }
 
 function setText(id, txt) { const el=document.getElementById(id); if(el) el.innerText=txt; }
@@ -1186,8 +1191,8 @@ let obEl=null, obHl=null;
 
 function startOnboarding() {
   if(sessionStorage.getItem('vzx_v')) return;
-  sessionStorage.setItem('vzx_v','1');
-  setTimeout(()=>showOBStep(0), 900);
+  sessionStorage.setItem('vzx_v', '1');
+  setTimeout(()=>showOBStep(0), 800);
 }
 
 function showOBStep(i) {
@@ -1232,7 +1237,6 @@ document.addEventListener('keydown', e=>{
 document.addEventListener('DOMContentLoaded', ()=>{
   restoreChatSession();
   renderFeatureTable();
-  setTimeout(startOnboarding, 1000);
 });
 </script>
 
