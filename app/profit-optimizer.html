@@ -210,14 +210,14 @@
           </div>
 
           <div class="dash-grid">
-            <div class="data-card" style="padding:20px;margin:0;width:100%;">
-              <h4 style="margin:0 0 16px;font-family:'Inter',sans-serif;font-size:10.5px;font-weight:700;color:var(--slate-300);text-transform:uppercase;letter-spacing:0.9px;">Revenue vs Profit</h4>
-              <div style="position:relative;height:260px;width:100%;max-width:100%;"><canvas id="profitChart"></canvas></div>
+            <div class="data-card chart-card" style="padding:16px;margin:0;width:100%;min-width:0;overflow:hidden;box-sizing:border-box;">
+              <h4 style="margin:0 0 12px;font-size:10.5px;font-weight:700;color:var(--slate-300);text-transform:uppercase;letter-spacing:0.9px;">Revenue vs Profit</h4>
+              <div class="chart-wrap" style="position:relative;height:240px;width:100%;max-width:100%;overflow:hidden;"><canvas id="profitChart"></canvas></div>
             </div>
 
-            <div class="data-card" style="padding:22px;margin:0;background:var(--slate-50);">
-              <h4 style="margin:0 0 16px;font-family:'Inter',sans-serif;font-size:15px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:8px;letter-spacing:-0.01em;">⚡ 3-Point Action Plan</h4>
-              <div id="auto-insights-list" style="font-size:13.5px;line-height:1.65;display:flex;flex-direction:column;gap:11px;font-family:'Inter',sans-serif;">
+            <div class="data-card" style="padding:16px;margin:0;background:var(--slate-50);min-width:0;overflow:hidden;box-sizing:border-box;">
+              <h4 style="margin:0 0 14px;font-size:14px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:8px;">⚡ 3-Point Action Plan</h4>
+              <div id="auto-insights-list" style="font-size:13px;line-height:1.6;display:flex;flex-direction:column;gap:10px;word-break:break-word;">
                 <p style="color:var(--slate-300);font-size:14px;">Generate a report to see your action plan.</p>
               </div>
               <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--slate-100);">
@@ -856,11 +856,14 @@ function runAnalysis(data) {
       ]
     },
     options: {
-      responsive:true, maintainAspectRatio:false,
-      plugins: { legend:{position:'top', labels:{font:{weight:'600',size:12,family:'Inter'}, color:'#94a3b8'}} },
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position:'top', labels:{ font:{weight:'600',size:11,family:'Inter'}, color:'#94a3b8', boxWidth:12, padding:12 } }
+      },
       scales: {
-        x:{ grid:{display:false}, ticks:{color:'#94a3b8',font:{weight:'600',family:'Inter'}} },
-        y:{ beginAtZero:true, grid:{color:'#f4f7ff'}, ticks:{color:'#94a3b8',font:{family:'Inter'}} }
+        x:{ grid:{display:false}, ticks:{color:'#94a3b8', font:{weight:'600',size:11,family:'Inter'}, maxRotation:30} },
+        y:{ beginAtZero:true, grid:{color:'#f4f7ff'}, ticks:{color:'#94a3b8', font:{size:11,family:'Inter'}} }
       }
     }
   });
