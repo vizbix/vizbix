@@ -9,6 +9,8 @@
   <link rel="stylesheet" href="../assets/css/app.css?v=8.0">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
   <style>
     .app-view { display: none; }
@@ -26,6 +28,64 @@
 <div class="app-wrapper">
 
   <!-- ── PAYWALL OVERLAY ───────────────── -->
+  <!-- ══ IMPORT MODAL ════════════════════ -->
+  <div id="importModal" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(8,9,13,0.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
+    <div style="background:white;border-radius:18px;padding:28px;width:92%;max-width:540px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(8,9,13,0.18);">
+      
+      <!-- Step 1: Upload -->
+      <div id="importStep1">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <h3 style="font-size:17px;font-weight:600;color:var(--ink);">Import Data</h3>
+          <button onclick="closeImportModal()" style="background:none;border:none;cursor:pointer;font-size:22px;color:var(--slate-300);line-height:1;">×</button>
+        </div>
+        <div id="importDropZone" style="border:2px dashed var(--slate-200);border-radius:14px;padding:36px 24px;text-align:center;cursor:pointer;transition:all 0.2s;"
+          onclick="document.getElementById('importFileInput').click()"
+          ondragover="event.preventDefault();this.style.borderColor='var(--indigo)';this.style.background='var(--indigo-light)'"
+          ondragleave="this.style.borderColor='var(--slate-200)';this.style.background=''"
+          ondrop="handleImportDrop(event)">
+          <div style="font-size:36px;margin-bottom:10px;">📂</div>
+          <div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:6px;">Drop your file here or click to browse</div>
+          <div style="font-size:12px;color:var(--slate-300);">Supports CSV, Excel (.xlsx, .xls) · Any column names</div>
+        </div>
+        <div style="margin-top:14px;padding:12px 14px;background:var(--slate-50);border-radius:10px;border:1px solid var(--slate-100);">
+          <div style="font-size:11px;font-weight:600;color:var(--slate-300);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px;">What we look for</div>
+          <div style="font-size:12.5px;color:var(--ink);line-height:1.7;">
+            We automatically detect columns for <strong>product name</strong>, <strong>selling price</strong>, <strong>cost price</strong>, and <strong>quantity sold</strong> — regardless of what you call them. Extra columns are ignored.
+          </div>
+        </div>
+      </div>
+
+      <!-- Step 2: Column Mapping -->
+      <div id="importStep2" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <h3 style="font-size:17px;font-weight:600;color:var(--ink);">Map Your Columns</h3>
+          <button onclick="closeImportModal()" style="background:none;border:none;cursor:pointer;font-size:22px;color:var(--slate-300);line-height:1;">×</button>
+        </div>
+        <p style="font-size:13px;color:var(--slate-300);margin-bottom:16px;" id="importFileInfo"></p>
+
+        <!-- Confidence banner -->
+        <div id="importConfidenceBanner" style="padding:10px 14px;border-radius:9px;margin-bottom:16px;font-size:13px;"></div>
+
+        <!-- Mapping selects -->
+        <div style="display:grid;gap:10px;margin-bottom:18px;" id="importMappingGrid"></div>
+
+        <!-- Preview table -->
+        <div style="margin-bottom:18px;">
+          <div style="font-size:11px;font-weight:600;color:var(--slate-300);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;">Preview (first 3 rows)</div>
+          <div style="overflow-x:auto;border-radius:10px;border:1px solid var(--slate-100);">
+            <table style="width:100%;border-collapse:collapse;font-size:12.5px;" id="importPreviewTable"></table>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:9px;">
+          <button class="btn btn-secondary" style="flex:1;" onclick="showImportStep1()">← Back</button>
+          <button class="btn btn-primary"   style="flex:2;" onclick="confirmImport()" id="importConfirmBtn">Import <span id="importRowCount"></span> Products →</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
   <div id="proLockOverlay" class="pro-lock-overlay pro-lock-hidden">
     <div class="pro-lock-card">
       <button class="pro-lock-close" onclick="closePaywall()">×</button>
@@ -874,7 +934,371 @@ function runAnalysis(data) {
   });
 
   showToast('Dashboard updated ✓', 'success');
+  renderEnhancedReport(data);
 }
+
+// ══════════════════════════════════════════
+//  CSV / EXCEL SMART IMPORT
+// ══════════════════════════════════════════
+
+let importRawData = [];  // parsed rows (array of objects)
+let importHeaders = [];  // column names from file
+let importMapping = {};  // { vizbixField: columnName }
+
+const FIELD_ALIASES = {
+  name:     ['name','product','item','title','description','product name','item name','sku','product title','goods','service'],
+  sellPrice:['sell','selling','price','sale price','mrp','sp','sell price','selling price','unit price','rate','amount','revenue per unit','sale'],
+  costPrice:['cost','cogs','purchase','buy price','cost price','buying price','unit cost','purchase price','cp','landed cost','expense'],
+  qty:      ['qty','quantity','units','sold','sales','volume','units sold','qty sold','pieces','count','no of units','no. of units','pcs']
+};
+
+function triggerImport() {
+  document.getElementById('importModal').style.display = 'flex';
+  showImportStep1();
+}
+
+function closeImportModal() {
+  document.getElementById('importModal').style.display = 'none';
+  document.getElementById('importFileInput').value = '';
+}
+
+function showImportStep1() {
+  document.getElementById('importStep1').style.display = '';
+  document.getElementById('importStep2').style.display = 'none';
+}
+
+function handleImportDrop(e) {
+  e.preventDefault();
+  e.currentTarget.style.borderColor = 'var(--slate-200)';
+  e.currentTarget.style.background = '';
+  const file = e.dataTransfer.files[0];
+  if (file) processImportFile(file);
+}
+
+function handleImportFile(input) {
+  const file = input.files[0];
+  if (file) processImportFile(file);
+}
+
+function processImportFile(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  if (ext === 'csv') {
+    Papa.parse(file, {
+      header: true, skipEmptyLines: true,
+      complete: (r) => setupImportMapping(r.data, r.meta.fields, file.name)
+    });
+  } else if (['xlsx','xls'].includes(ext)) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const wb = XLSX.read(e.target.result, {type:'array'});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const data = XLSX.utils.sheet_to_json(ws, {defval:''});
+      const headers = data.length ? Object.keys(data[0]) : [];
+      setupImportMapping(data, headers, file.name);
+    };
+    reader.readAsArrayBuffer(file);
+  } else {
+    showToast('Please upload a CSV or Excel file.', 'error');
+  }
+}
+
+function detectColumn(headers, fieldKey) {
+  const aliases = FIELD_ALIASES[fieldKey];
+  const lower = headers.map(h => h.toLowerCase().trim());
+  // Exact match first
+  for (const alias of aliases) {
+    const idx = lower.indexOf(alias);
+    if (idx !== -1) return headers[idx];
+  }
+  // Partial match
+  for (const alias of aliases) {
+    const idx = lower.findIndex(h => h.includes(alias) || alias.includes(h));
+    if (idx !== -1) return headers[idx];
+  }
+  return '';
+}
+
+function setupImportMapping(data, headers, filename) {
+  importRawData = data;
+  importHeaders = headers;
+
+  // Auto-detect
+  importMapping = {
+    name:      detectColumn(headers, 'name'),
+    sellPrice: detectColumn(headers, 'sellPrice'),
+    costPrice: detectColumn(headers, 'costPrice'),
+    qty:       detectColumn(headers, 'qty'),
+  };
+
+  const matched = Object.values(importMapping).filter(Boolean).length;
+  const confidence = matched === 4 ? 'high' : matched >= 2 ? 'medium' : 'low';
+
+  // Show step 2
+  document.getElementById('importStep1').style.display = 'none';
+  document.getElementById('importStep2').style.display = '';
+  document.getElementById('importFileInfo').textContent = `${filename} · ${data.length} rows · ${headers.length} columns detected`;
+
+  // Confidence banner
+  const banner = document.getElementById('importConfidenceBanner');
+  if (confidence === 'high') {
+    banner.style.cssText = 'background:#d1fae5;border:1px solid #a7f3d0;color:#065f46;padding:10px 14px;border-radius:9px;margin-bottom:16px;font-size:13px;';
+    banner.innerHTML = '✅ <strong>All 4 columns detected automatically.</strong> Review below and confirm.';
+  } else if (confidence === 'medium') {
+    banner.style.cssText = 'background:#fef3c7;border:1px solid #fde68a;color:#92400e;padding:10px 14px;border-radius:9px;margin-bottom:16px;font-size:13px;';
+    banner.innerHTML = `⚠️ <strong>${matched} of 4 columns detected.</strong> Please map the missing ones below.`;
+  } else {
+    banner.style.cssText = 'background:#fee2e2;border:1px solid #fecaca;color:#991b1b;padding:10px 14px;border-radius:9px;margin-bottom:16px;font-size:13px;';
+    banner.innerHTML = '❌ <strong>Could not auto-detect columns.</strong> Please select them manually below.';
+  }
+
+  // Mapping dropdowns
+  const fieldLabels = { name:'Product Name', sellPrice:'Sell Price', costPrice:'Cost Price', qty:'Qty Sold' };
+  const grid = document.getElementById('importMappingGrid');
+  grid.innerHTML = Object.entries(fieldLabels).map(([key, label]) => `
+    <div style="display:flex;align-items:center;gap:10px;">
+      <label style="font-size:12.5px;font-weight:600;color:var(--ink);width:100px;flex-shrink:0;">${label}</label>
+      <select id="mapSelect_${key}" onchange="importMapping['${key}']=this.value;updateImportPreview()"
+        style="flex:1;padding:8px 12px;border-radius:8px;border:1.5px solid ${importMapping[key]?'var(--indigo)':'var(--slate-200)'};font-size:13px;background:${importMapping[key]?'var(--indigo-light)':'white'};outline:none;">
+        <option value="">— not mapped —</option>
+        ${headers.map(h=>`<option value="${h}" ${importMapping[key]===h?'selected':''}>${h}</option>`).join('')}
+      </select>
+    </div>
+  `).join('');
+
+  updateImportPreview();
+}
+
+function updateImportPreview() {
+  // Re-read mapping from selects
+  ['name','sellPrice','costPrice','qty'].forEach(k => {
+    const sel = document.getElementById('mapSelect_'+k);
+    if (sel) {
+      importMapping[k] = sel.value;
+      sel.style.borderColor = sel.value ? 'var(--indigo)' : 'var(--slate-200)';
+      sel.style.background  = sel.value ? 'var(--indigo-light)' : 'white';
+    }
+  });
+
+  const preview = importRawData.slice(0, 3);
+  const mapped  = Object.values(importMapping).filter(Boolean);
+  const tbl     = document.getElementById('importPreviewTable');
+
+  if (!mapped.length) { tbl.innerHTML = '<tr><td style="padding:10px;color:var(--slate-300);text-align:center;">Map at least one column to preview</td></tr>'; return; }
+
+  const cols = Object.entries(importMapping).filter(([,v])=>v);
+  const labels = { name:'Name', sellPrice:'Sell ₹', costPrice:'Cost ₹', qty:'Qty' };
+
+  tbl.innerHTML = `
+    <thead><tr style="background:var(--slate-50);">${cols.map(([k])=>`<th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--slate-300);text-align:left;text-transform:uppercase;letter-spacing:0.5px;">${labels[k]}</th>`).join('')}</tr></thead>
+    <tbody>${preview.map(row=>`<tr style="border-top:1px solid var(--slate-100);">${cols.map(([,col])=>`<td style="padding:8px 12px;font-size:12.5px;color:var(--ink);">${row[col]??'—'}</td>`).join('')}</tr>`).join('')}</tbody>
+  `;
+
+  // Update confirm button
+  const validRows = importRawData.filter(r => importMapping.name && r[importMapping.name]).length;
+  document.getElementById('importRowCount').textContent = validRows;
+}
+
+function confirmImport() {
+  const { name, sellPrice, costPrice, qty } = importMapping;
+  if (!name) { showToast('Please map the Product Name column.', 'error'); return; }
+
+  const rows = importRawData
+    .filter(r => r[name] && String(r[name]).trim())
+    .map(r => ({
+      name:      String(r[name]).trim(),
+      sell:      parseFloat(String(r[sellPrice]??'').replace(/[^0-9.]/g,'')) || 0,
+      cost:      parseFloat(String(r[costPrice]??'').replace(/[^0-9.]/g,'')) || 0,
+      qty:       parseInt(String(r[qty]??'').replace(/[^0-9]/g,''))          || 0,
+    }));
+
+  if (!rows.length) { showToast('No valid rows found.', 'error'); return; }
+
+  // Clear existing rows and populate
+  document.getElementById('items').innerHTML = '';
+  rows.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'data-row';
+    div.innerHTML = `
+      <input type="text"   class="input-name" value="${r.name.replace(/"/g,'&quot;')}">
+      <input type="number" class="input-sell" value="${r.sell}">
+      <input type="number" class="input-cost" value="${r.cost}">
+      <input type="number" class="input-qty"  value="${r.qty}">
+      <button class="delete-btn" onclick="removeRow(this)" title="Remove">×</button>
+    `;
+    document.getElementById('items').appendChild(div);
+  });
+
+  closeImportModal();
+  showToast(`✅ ${rows.length} products imported successfully!`, 'success', 3500);
+  switchView('data', document.getElementById('nav-data'));
+}
+
+// ══════════════════════════════════════════
+//  ENHANCED REPORT RENDERING
+// ══════════════════════════════════════════
+
+let reportPieChart   = null;
+let reportMarginChart = null;
+
+function renderEnhancedReport(data) {
+  if (!data || !data.length) return;
+
+  const fmt = (n) => {
+    const sym = AppState.currencySymbol || '₹';
+    return sym + Math.abs(n).toLocaleString('en-IN', {maximumFractionDigits:0});
+  };
+
+  // Compute per-product stats
+  let tRev = 0, tCost = 0, tProfit = 0, tQty = 0;
+  const products = data.map(item => {
+    const rev    = item.sellPrice * item.qty;
+    const cost   = item.costPrice * item.qty;
+    const profit = rev - cost;
+    const margin = rev > 0 ? (profit / rev) * 100 : 0;
+    tRev    += rev;
+    tCost   += cost;
+    tProfit += profit;
+    tQty    += item.qty;
+    return { ...item, rev, cost, profit, margin };
+  });
+
+  const ovMargin = tRev > 0 ? (tProfit / tRev) * 100 : 0;
+
+  // Sort by revenue desc for display
+  const sorted = [...products].sort((a, b) => b.rev - a.rev);
+
+  // ── Summary Bar ──────────────────────────
+  const sb = document.getElementById('reportSummaryBar');
+  if (sb) sb.innerHTML = [
+    { l:'Total Revenue',  v: fmt(tRev),               c:'var(--indigo)' },
+    { l:'Net Profit',     v: fmt(tProfit),             c: tProfit >= 0 ? 'var(--green)' : 'var(--red)' },
+    { l:'Avg Margin',     v: ovMargin.toFixed(1) + '%',c: ovMargin >= 25 ? 'var(--green)' : ovMargin >= 10 ? 'var(--amber)' : 'var(--red)' },
+    { l:'Units Sold',     v: tQty.toLocaleString(),    c:'#8b5cf6' },
+    { l:'Products',       v: data.length,              c:'var(--ink)' },
+    { l:'Profit / Unit',  v: tQty > 0 ? fmt(tProfit / tQty) : '—', c:'var(--ink)' },
+  ].map(s => `
+    <div style="background:white;border:1px solid var(--slate-100);border-radius:10px;padding:10px 14px;min-width:100px;flex:1;">
+      <span style="font-size:10px;font-weight:700;color:var(--slate-300);text-transform:uppercase;letter-spacing:0.7px;display:block;margin-bottom:3px;">${s.l}</span>
+      <span style="font-size:17px;font-weight:600;color:${s.c};">${s.v}</span>
+    </div>
+  `).join('');
+
+  // ── Performance Bands ────────────────────
+  const stars   = sorted.filter(p => p.margin >= 30);
+  const average = sorted.filter(p => p.margin >= 0 && p.margin < 30);
+  const leakers = sorted.filter(p => p.margin < 0);
+
+  const bands = document.getElementById('reportBands');
+  if (bands) bands.innerHTML = [
+    { label:'⭐ Star Products',  items: stars,   bg:'#d1fae5', border:'#a7f3d0', color:'#065f46' },
+    { label:'📊 Average Margin', items: average, bg:'#fef3c7', border:'#fde68a', color:'#92400e' },
+    { label:'🔴 Loss Makers',    items: leakers, bg:'#fee2e2', border:'#fecaca', color:'#991b1b' },
+  ].map(band => `
+    <div style="background:${band.bg};border:1px solid ${band.border};border-radius:12px;padding:14px;">
+      <div style="font-size:11px;font-weight:700;color:${band.color};text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;">${band.label} (${band.items.length})</div>
+      ${band.items.length
+        ? band.items.map(p => `<div style="font-size:13px;color:${band.color};margin-bottom:3px;font-weight:500;">• ${p.name} <span style="opacity:0.7;">${p.margin.toFixed(1)}%</span></div>`).join('')
+        : `<div style="font-size:12.5px;color:${band.color};opacity:0.6;">None</div>`
+      }
+    </div>
+  `).join('');
+
+  // ── Main Table ───────────────────────────
+  const tbody = document.getElementById('reportTableBody');
+  if (tbody) tbody.innerHTML = sorted.map((p, i) => {
+    const barW = tRev > 0 ? Math.round((p.rev / tRev) * 100) : 0;
+    const barC = p.margin >= 30 ? 'var(--green)' : p.margin >= 0 ? 'var(--amber)' : 'var(--red)';
+    const pill = p.margin >= 30
+      ? `<span class="status-pill status-ok">Star</span>`
+      : p.margin >= 0
+        ? `<span class="status-pill" style="background:#fef3c7;color:#92400e;">Average</span>`
+        : `<span class="status-pill status-leak">Loss</span>`;
+    return `<tr style="${i % 2 === 0 ? '' : 'background:var(--slate-50);'}">
+      <td style="color:var(--slate-300);font-size:12px;">${i+1}</td>
+      <td style="font-weight:600;">${p.name}</td>
+      <td>${fmt(p.sellPrice)}</td>
+      <td>${fmt(p.costPrice)}</td>
+      <td style="color:var(--slate-300);">${p.qty.toLocaleString()}</td>
+      <td style="font-weight:500;">${fmt(p.rev)}</td>
+      <td>${fmt(p.cost)}</td>
+      <td style="font-weight:600;color:${p.profit<0?'var(--red)':'var(--green)'};">${p.profit<0?'-':''}${fmt(p.profit)}</td>
+      <td>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-weight:600;font-size:13px;color:${barC};min-width:38px;">${p.margin.toFixed(1)}%</span>
+          <div style="flex:1;background:var(--slate-100);border-radius:99px;height:5px;min-width:36px;">
+            <div style="width:${Math.max(0,Math.min(100,p.margin)).toFixed(0)}%;background:${barC};height:5px;border-radius:99px;"></div>
+          </div>
+        </div>
+      </td>
+      <td>
+        <div style="display:flex;align-items:center;gap:5px;">
+          <span style="font-size:12px;color:var(--slate-300);min-width:28px;">${barW}%</span>
+          <div style="flex:1;background:var(--slate-100);border-radius:99px;height:5px;min-width:36px;">
+            <div style="width:${barW}%;background:var(--indigo);height:5px;border-radius:99px;opacity:0.5;"></div>
+          </div>
+        </div>
+      </td>
+      <td>${pill}</td>
+    </tr>`;
+  }).join('');
+
+  // Totals footer
+  const tfoot = document.getElementById('reportTableFoot');
+  if (tfoot) tfoot.innerHTML = `<tr style="background:var(--ink);color:white;font-weight:600;">
+    <td colspan="5" style="padding:11px 16px;font-size:12px;border-radius:0 0 0 12px;">TOTALS</td>
+    <td style="padding:11px 16px;">${fmt(tRev)}</td>
+    <td style="padding:11px 16px;">${fmt(tCost)}</td>
+    <td style="padding:11px 16px;color:${tProfit>=0?'#6ee7b7':'#fca5a5'};">${tProfit<0?'-':''}${fmt(tProfit)}</td>
+    <td style="padding:11px 16px;">${ovMargin.toFixed(1)}%</td>
+    <td style="padding:11px 16px;">100%</td>
+    <td style="padding:11px 16px;border-radius:0 0 12px 0;"></td>
+  </tr>`;
+
+  // ── Pie chart ───────────────────────────
+  const palette = ['#5b5ef6','#6ee7b7','#fbbf24','#f87171','#a78bfa','#34d399','#fb923c','#60a5fa'];
+  const pieCtx  = document.getElementById('reportPieChart');
+  if (pieCtx) {
+    if (reportPieChart) reportPieChart.destroy();
+    reportPieChart = new Chart(pieCtx, {
+      type: 'doughnut',
+      data: {
+        labels: sorted.map(p => p.name),
+        datasets: [{ data: sorted.map(p => Math.max(0,p.rev)), backgroundColor: sorted.map((_,i) => palette[i % palette.length]), borderWidth: 0, hoverOffset: 6 }]
+      },
+      options: { responsive:true, maintainAspectRatio:false, plugins:{ legend:{ position:'bottom', labels:{ font:{size:11,family:'Inter'}, color:'#94a3b8', boxWidth:10, padding:8 } } } }
+    });
+  }
+
+  // ── Margin horizontal bar chart ──────────
+  const margCtx = document.getElementById('reportMarginChart');
+  if (margCtx) {
+    if (reportMarginChart) reportMarginChart.destroy();
+    reportMarginChart = new Chart(margCtx, {
+      type: 'bar',
+      data: {
+        labels: sorted.map(p => p.name),
+        datasets: [{
+          label: 'Margin %',
+          data:  sorted.map(p => parseFloat(p.margin.toFixed(1))),
+          backgroundColor: sorted.map(p => p.margin >= 30 ? '#6ee7b7' : p.margin >= 0 ? '#fbbf24' : '#f87171'),
+          borderRadius: 5,
+          barThickness: 20,
+        }]
+      },
+      options: {
+        indexAxis: 'y',
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend:{ display:false } },
+        scales: {
+          x: { beginAtZero:true, grid:{ color:'#f4f7ff' }, ticks:{ color:'#94a3b8', font:{size:11,family:'Inter'}, callback: v => v+'%' } },
+          y: { grid:{ display:false }, ticks:{ color:'#94a3b8', font:{size:11,family:'Inter'} } }
+        }
+      }
+    });
+  }
+}
+
 
 // ══════════════════════════════════════════
 //  SIMULATOR
