@@ -7,6 +7,9 @@ window.currentData = [];
 window.monthlyStats = null;
 window.currentMode = 'product';
 
+window.userEmail = null;
+window.isProUser = false;
+
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     // Slight delay ensures the HTML from drawer.js has settled
@@ -281,3 +284,4 @@ window.toggleHistory = function(show) {
     document.getElementById("historyModal").style.display = show ? "flex" : "none"; 
     if(show && window.userEmail) window.fetchHistory(); 
 };
+
