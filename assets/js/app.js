@@ -10,6 +10,19 @@ window.currentMode = 'product';
 window.userEmail = null;
 window.isProUser = false;
 
+// --- EMAIL BRIDGE (safe helper) ---
+window.getCurrentEmail = function () {
+  if (window.userEmail) return window.userEmail;
+
+  const el = document.getElementById("drawerEmailDisplay");
+  if (el && el.innerText && el.innerText.includes("@")) {
+    window.userEmail = el.innerText.trim();
+    return window.userEmail;
+  }
+
+  return null;
+};
+
 // Initialize when DOM is ready
 document.addEventListener('DOMContentLoaded', () => {
     // Slight delay ensures the HTML from drawer.js has settled
@@ -282,6 +295,8 @@ window.downloadPDF = async function() {
 // Modals
 window.toggleHistory = function(show) { 
     document.getElementById("historyModal").style.display = show ? "flex" : "none"; 
-    if(show && window.userEmail) window.fetchHistory(); 
+    const email = window.getCurrentEmail();
+    if(show && email) window.fetchHistory();
 };
+
 
