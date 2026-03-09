@@ -35,7 +35,7 @@ onAuthStateChanged(auth, async (user) => {
 
     if (user) {
         // === USER IS LOGGED IN ===
-        if (window.AppState) window.userEmail = user.email; // Sync with HTML AppState if present
+        window.userEmail = user.email; // Sync with HTML AppState if present
         
         // 1. Update Header Button
         if(headerLoginBtn) {
@@ -54,15 +54,17 @@ onAuthStateChanged(auth, async (user) => {
         if(isAppPage) {
             // We are already in the app: Unlock features immediately without reload
             if (window.closeLogin) window.closeLogin(); // Close modal if open
-            if (window.verify) window.verify(user.email); // Re-run verification check
-        } else {
+            setTimeout(() => {
+              if (window.verify) window.verify(user.email);
+              }, 100); // Re-run verification check
+              } else {
             // We are on landing page: Just fetch plan info
             fetchPlanDetails(user.email);
         }
 
     } else {
         // === USER IS NOT LOGGED IN ===
-        if (window.AppState) window.userEmail = null;
+        window.userEmail = null;
         
         // 1. Reset Header
         if(headerLoginBtn) {
@@ -177,3 +179,4 @@ window.handleEmailSignUp = async function() {
         btn.innerText = originalText;
     }
 };
+
