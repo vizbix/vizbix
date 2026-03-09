@@ -242,7 +242,7 @@
           <h2>Data Integrations</h2>
         </div>
 
-        <<div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
+        <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
   
   <div class="data-card" style="padding:24px; text-align:center;">
     <img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/woocommerce.svg" style="height:32px; margin-bottom:12px; filter: invert(34%) sepia(87%) saturate(2253%) hue-rotate(242deg) brightness(97%) contrast(92%);" alt="WooCommerce">
@@ -1026,54 +1026,58 @@ function runAnalysis(data) {
 
   // Show "showing top N" notice
   // 1. Wrap Chart logic in try-catch so it never crashes the app
+  // Safe Chart Logic
   try {
     const ctxEl = document.getElementById('profitChart');
     if (ctxEl) {
       const ctx = ctxEl.getContext('2d');
+      
+      // 1. Remove old note if it exists to prevent duplicates
+      const oldNote = document.getElementById('chartTopNote');
+      if (oldNote) oldNote.remove();
 
-      // Top Note Logic
-      let chartNote = document.getElementById('chartTopNote');
-      if (!chartNote) {
-        chartNote = document.createElement('div');
+      // 2. Add new note
+      // We limit the chart to top 12 items for readability
+      const CHART_MAX = 12;
+      const extraCount = data.length - CHART_MAX;
+      
+      if (extraCount > 0) {
+        let chartNote = document.createElement('div');
         chartNote.id = 'chartTopNote';
         chartNote.style.cssText = 'font-size:11px;color:var(--slate-300);text-align:right;margin-bottom:4px;';
+        chartNote.textContent = `Top ${CHART_MAX} of ${data.length} products by revenue`;
         ctx.canvas.parentNode.insertBefore(chartNote, ctx.canvas);
       }
-      // Note: We need 'extraCount' defined. If not defined earlier in runAnalysis, remove this line or define it.
-      // Assuming extraCount and CHART_MAX are defined above this block.
-      if (typeof extraCount !== 'undefined' && typeof CHART_MAX !== 'undefined') {
-         chartNote.textContent = extraCount > 0 ? `Top ${CHART_MAX} of ${data.length} products by revenue` : '';
-      }
 
-      // Destroy old chart to prevent "flickering"
-      if (myChart) myChart.destroy();
+      if(myChart) myChart.destroy();
+      
+      // Limit data for chart to avoid overcrowding
+      // Sort by revenue (revD) desc is complex here because arrays are separate. 
+      // Simplified: Just slice the top 12 from the existing arrays (assuming data was passed in loosely sorted or just taking first 12)
+      const safeLabels = labels.slice(0, CHART_MAX);
+      const safeRev = revD.slice(0, CHART_MAX);
+      const safeProf = profD.slice(0, CHART_MAX);
 
-      // Create New Chart
       myChart = new Chart(ctx, {
         type: 'bar',
-        data: {
-          labels: chartLabels, // Ensure chartLabels is defined above
-          datasets: [
-            {label:'Revenue', data:chartRevD,  backgroundColor:'#e0e7ff', borderRadius:5},
-            {label:'Profit',  data:chartProfD, backgroundColor:'#5b5ef6', borderRadius:5}
-          ]
+        data: { 
+            labels: safeLabels, 
+            datasets: [
+                {label:'Revenue', data:safeRev, backgroundColor:'#e0e7ff', borderRadius:4}, 
+                {label:'Profit', data:safeProf, backgroundColor:'#7c3aed', borderRadius:4}
+            ]
         },
         options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position:'top', labels:{ font:{weight:'600',size:11,family:'Inter'}, color:'#94a3b8', boxWidth:12, padding:12 } }
-          },
-          scales: {
-            x:{ grid:{display:false}, ticks:{color:'#94a3b8', font:{weight:'500',size:10,family:'Inter'}, maxRotation:40, autoSkip:false} },
-            y:{ beginAtZero:true, grid:{color:'#f4f7ff'}, ticks:{color:'#94a3b8', font:{size:10,family:'Inter'}} }
-          }
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                x: { grid: {display:false} },
+                y: { beginAtZero: true }
+            }
         }
       });
     }
-  } catch (e) {
-    console.warn("Chart rendering failed (non-critical):", e);
-  }
+  } catch(e) { console.warn("Chart failed", e); }
 
   // 2. IMPORTANT: These run even if the chart crashes
   showToast('Dashboard updated ✓', 'success');
@@ -2543,6 +2547,7 @@ function resetDashboardToBlank() {
 
 </body>
 </html>
+
 
 
 
