@@ -1833,7 +1833,7 @@ function restoreChatSession() {
 //  AUTH & CLOUD — original logic, unchanged
 // ══════════════════════════════════════════
 window.verify = async function(email) {
-  const e = email || AppState.userEmail; if(!e) return;
+  const e = email || window.userEmail; if(!e) return;
   try {
     const r = await fetch(workerURL+'/check?email='+e);
     const d = await r.json();
@@ -2438,6 +2438,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
 </body>
 </html>
+
 
 
 
