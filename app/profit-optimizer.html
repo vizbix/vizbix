@@ -14,16 +14,14 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
   <style>
-    /* 1. Keyframes must be at the top level */
-    @keyframes spin {
-      from { transform: rotate(0deg); }
-      to   { transform: rotate(360deg); }
-    }
-
     .app-view { display: none; }
     .app-view.active {
       display: block;
       animation: vzFadeIn 0.22s ease;
+      @keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
     }
   </style>
 </head>
@@ -242,7 +240,7 @@
           <h2>Data Integrations</h2>
         </div>
 
-        <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
+        <<div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
   
   <div class="data-card" style="padding:24px; text-align:center;">
     <img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/woocommerce.svg" style="height:32px; margin-bottom:12px; filter: invert(34%) sepia(87%) saturate(2253%) hue-rotate(242deg) brightness(97%) contrast(92%);" alt="WooCommerce">
@@ -643,7 +641,7 @@ window.currentMode = 'product';
 
 let myChart = null;
 let authVerified = false;
-let storeSyncing = false; 
+let storeSyncing = false;
 
 // ══════════════════════════════════════════
 //  TOAST
@@ -675,10 +673,23 @@ function onAuthChange() {
     setText('settingsEmail', email);
     const lb = document.getElementById('headerLoginBtn');
     if (lb) lb.style.display = 'none';
-    if (!authVerified) { authVerified = true; window.verify(email); checkSavedStoreConnections(); }
+    if (!authVerified) {
+      authVerified = true;
+      window.verify(email).then(() => {
+        // Only auto-sync after Pro status is confirmed
+        if (AppState.isProUser) {
+          checkSavedStoreConnections();
+        }
+      });
+    }
+
+    // 🚀 MAGIC FIX: Check if user was trying to buy Pro before logging in
     if (sessionStorage.getItem('vzx_pending_upgrade') === 'true') {
-      sessionStorage.removeItem('vzx_pending_upgrade');
-      setTimeout(() => { showToast('Login successful! Opening secure payment...', 'success', 4000); window.pay(); }, 1500);
+        sessionStorage.removeItem('vzx_pending_upgrade'); // Clear flag
+        setTimeout(() => {
+            showToast('Login successful! Opening secure payment...', 'success', 4000);
+            window.pay(); // Auto-open Razorpay
+        }, 1500);
     }
   }
 
@@ -934,9 +945,9 @@ function runAnalysis(data) {
   hs = Math.max(0, Math.min(100, Math.round(hs)));
 
   // Metric cards
-  setText('dash-revenue',      fmt(tRev));
-  setText('dash-profit',       fmt(tProfit));
-  setText('dash-margin',       ovMargin.toFixed(1)+'%');
+  setText('dash-revenue',     fmt(tRev));
+  setText('dash-profit',      fmt(tProfit));
+  setText('dash-margin',      ovMargin.toFixed(1)+'%');
   setText('dash-top-product', top.name);
   document.getElementById('reportTableBody').innerHTML = reportHTML;
 
@@ -980,8 +991,8 @@ function runAnalysis(data) {
   // Report summary bar
   const sb = document.getElementById('reportSummaryBar');
   if(sb) sb.innerHTML = [
-    {l:'Revenue',    v:fmt(tRev),               c:'var(--indigo)'},
-    {l:'Net Profit', v:fmt(tProfit),            c:tProfit>=0?'var(--green)':'var(--red)'},
+    {l:'Revenue',    v:fmt(tRev),              c:'var(--indigo)'},
+    {l:'Net Profit', v:fmt(tProfit),           c:tProfit>=0?'var(--green)':'var(--red)'},
     {l:'Margin',     v:ovMargin.toFixed(1)+'%',c:ovMargin>=20?'var(--green)':'var(--amber)'},
     {l:'Units Sold', v:tItems.toLocaleString(),c:'#8b5cf6'},
   ].map(s=>`<div style="background:white;border:1px solid var(--slate-100);border-radius:10px;padding:9px 14px;min-width:105px;">
@@ -998,63 +1009,55 @@ function runAnalysis(data) {
   setText('pdf-top-prod',  top.name);
 
   // Chart
-  try {
-    const ctxEl = document.getElementById('profitChart');
-    if (ctxEl) {
-      const ctx = ctxEl.getContext('2d');
-      
-      // Top Note Logic
-      let chartNote = document.getElementById('chartTopNote');
-      if (!chartNote) {
-        chartNote = document.createElement('div');
-        chartNote.id = 'chartTopNote';
-        chartNote.style.cssText = 'font-size:11px;color:var(--slate-300);text-align:right;margin-bottom:4px;';
-        ctx.canvas.parentNode.insertBefore(chartNote, ctx.canvas);
-      }
-      
-      const CHART_MAX = 12;
-      const extraCount = data.length - CHART_MAX;
-      if (extraCount > 0) {
-         chartNote.textContent = `Top ${CHART_MAX} of ${data.length} products by revenue`;
-      } else {
-         chartNote.textContent = '';
-      }
+  const ctx = document.getElementById('profitChart').getContext('2d');
+  if(myChart) myChart.destroy();
+  // Limit chart to top 12 products by revenue to stay readable
+  const CHART_MAX = 12;
+  const chartData = data
+    .map(d => ({ name: d.name, rev: d.sell*d.qty, profit: (d.sell-d.cost)*d.qty }))
+    .sort((a,b) => b.rev - a.rev);
+  const chartSlice   = chartData.slice(0, CHART_MAX);
+  const chartLabels  = chartSlice.map(d => d.name.length > 14 ? d.name.slice(0,13)+'…' : d.name);
+  const chartRevD    = chartSlice.map(d => d.rev);
+  const chartProfD   = chartSlice.map(d => d.profit);
+  const extraCount   = chartData.length - CHART_MAX;
 
-      if(myChart) myChart.destroy();
-      
-      const safeLabels = labels.slice(0, CHART_MAX);
-      const safeRev = revD.slice(0, CHART_MAX);
-      const safeProf = profD.slice(0, CHART_MAX);
-
-      myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: safeLabels,
-          datasets: [
-            {label:'Revenue', data:safeRev,  backgroundColor:'#e0e7ff', borderRadius:5},
-            {label:'Profit',  data:safeProf, backgroundColor:'#5b5ef6', borderRadius:5}
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position:'top', labels:{ font:{weight:'600',size:11,family:'Inter'}, color:'#94a3b8', boxWidth:12, padding:12 } }
-          },
-          scales: {
-            x:{ grid:{display:false}, ticks:{color:'#94a3b8', font:{weight:'500',size:10,family:'Inter'}, maxRotation:40, autoSkip:false} },
-            y:{ beginAtZero:true, grid:{color:'#f4f7ff'}, ticks:{color:'#94a3b8', font:{size:10,family:'Inter'}} }
-          }
-        }
-      });
-    }
-  } catch(e) {
-    console.warn("Chart rendering failed:", e);
+  // Show "showing top N" notice
+  let chartNote = document.getElementById('chartTopNote');
+  if (!chartNote) {
+    chartNote = document.createElement('div');
+    chartNote.id = 'chartTopNote';
+    chartNote.style.cssText = 'font-size:11px;color:var(--slate-300);text-align:right;margin-bottom:4px;';
+    ctx.canvas.parentNode.insertBefore(chartNote, ctx.canvas);
   }
+  chartNote.textContent = extraCount > 0 ? `Top ${CHART_MAX} of ${data.length} products by revenue` : '';
+
+  myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: chartLabels,
+      datasets: [
+        {label:'Revenue', data:chartRevD,  backgroundColor:'#e0e7ff', borderRadius:5},
+        {label:'Profit',  data:chartProfD, backgroundColor:'#5b5ef6', borderRadius:5}
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position:'top', labels:{ font:{weight:'600',size:11,family:'Inter'}, color:'#94a3b8', boxWidth:12, padding:12 } }
+      },
+      scales: {
+        x:{ grid:{display:false}, ticks:{color:'#94a3b8', font:{weight:'500',size:10,family:'Inter'}, maxRotation:40, autoSkip:false} },
+        y:{ beginAtZero:true, grid:{color:'#f4f7ff'}, ticks:{color:'#94a3b8', font:{size:10,family:'Inter'}} }
+      }
+    }
+  });
 
   showToast('Dashboard updated ✓', 'success');
   renderEnhancedReport(data);
 }
+
 // ══════════════════════════════════════════
 //  CSV / EXCEL SMART IMPORT
 // ══════════════════════════════════════════
@@ -2078,6 +2081,31 @@ window.handleUpgradeClick = function() {
   window.pay();
 };
 
+// 3. UPDATE YOUR onAuthChange FUNCTION (Add the "Pending Upgrade" check inside)
+function onAuthChange() {
+  const { userEmail:email, isProUser:pro } = AppState;
+
+  if (email) {
+    setText('sidebarEmail', email);
+    setText('settingsEmail', email);
+    // ... existing UI updates ...
+
+    // ADD THIS BLOCK: Check if they just logged in to buy Pro
+    if (sessionStorage.getItem('vzx_pending_upgrade') === 'true') {
+        sessionStorage.removeItem('vzx_pending_upgrade'); // Clear flag
+        window.closeLogin(); // Close modal
+        
+        // Wait 1s for UI to settle, then open Razorpay
+        setTimeout(() => {
+            showToast('Login successful! Opening payment...', 'success');
+            window.pay(); 
+        }, 1000);
+    }
+  }
+  
+  // ... rest of your existing plan display logic ...
+}
+
 // ─── STORE LOGIC ───
 function openStoreModal(tab='woo') {
   document.getElementById('storeModal').style.display = 'flex';
@@ -2226,90 +2254,55 @@ function showSyncBadge(state, lastSynced) {
   }
 }
 
-// ── Auto sync on login (Bulletproof Version) ──
+// ── Auto sync on login ──
 async function checkSavedStoreConnections() {
-  // 1. Safety Checks
-  if (!AppState.userEmail || storeSyncing) return;
-  
-  // FIX: Force update sidebar status immediately if we know they are Pro
-  if (AppState.isProUser) {
-     const planEl = document.getElementById('sidebarPlan');
-     if(planEl) {
-        planEl.innerText = "Pro Active";
-        planEl.style.color = "#059669";
-     }
-  }
-
+  if (!AppState.userEmail) return;
   for (const platform of ['woo', 'shopify']) {
     try {
-      // 2. Check if credentials exist in Cloudflare
-      const res = await fetch(`${workerURL}/woo/get-creds?email=${AppState.userEmail}&platform=${platform}`);
-      if (!res.ok) continue; 
-      
+      const res = await fetch(
+        `${workerURL}/woo/get-creds?email=${AppState.userEmail}&platform=${platform}`
+      );
       const d = await res.json();
       if (!d.connected) continue;
 
-      // 3. START SYNC: Lock the process
-      storeSyncing = true;
+      updateIntegrationCard(platform, d.storeUrl, d.lastSynced);
       showSyncBadge('syncing');
-      
-      // 4. SWITCH VIEW: Show Skeleton
-      // Only switch if we are NOT already on the dashboard to prevent flickering
-      if (AppState.currentView !== 'dashboard') {
-          switchView('dashboard', document.getElementById('nav-dashboard'));
-      }
-      document.getElementById('dashboardSkeleton').style.display = 'block';
-      document.getElementById('dashboardContent').style.display = 'none';
 
-      // 5. CALL WORKER
+      // ── Show skeleton + switch to dashboard IMMEDIATELY so user never sees Data Input ──
+      document.getElementById('dashboardSkeleton').style.display = 'block';
+      document.getElementById('dashboardContent').style.opacity = '0.3';
+      switchView('dashboard', document.getElementById('nav-dashboard'), true);
+
       const syncRes = await fetch(workerURL + '/resync-store', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: AppState.userEmail, platform })
       });
-      
-      if (!syncRes.ok) throw new Error("Sync API failed");
-      
       const syncData = await syncRes.json();
 
-      // 6. SUCCESS: Populate Data
       if (syncData.ok && syncData.data.length) {
-        const itemsContainer = document.getElementById('items');
-        if(itemsContainer) {
-            itemsContainer.innerHTML = '';
-            syncData.data.forEach(p => addNewRow(p.name, p.sell, 0, p.qty));
-        }
-        
-        // SAFE ANALYSIS: Run this in a try/catch so it doesn't kill the page
-        try {
-            saveDataToStorage();
-            runAnalysis(getFreshData()); 
-        } catch (analysisErr) {
-            console.error("Analysis Error:", analysisErr);
-        }
-        
+        document.getElementById('items').innerHTML = '';
+        syncData.data.forEach(p => addNewRow(p.name, p.sell, 0, p.qty));
+        saveDataToStorage();
         showSyncBadge('done', syncData.lastSynced);
-        updateIntegrationCard(platform, d.storeUrl, syncData.lastSynced);
+        // Go straight to dashboard — guard prevents re-entry
+        if (!storeSyncing) {
+          storeSyncing = true;
+          setTimeout(() => {
+            processDataAndShowReport();
+            storeSyncing = false;
+          }, 300);
+        }
       } else {
         showSyncBadge('failed');
       }
-      
-      // Stop after first connected store found
-      break; 
-      
+      break; // Only sync first connected platform
     } catch(e) {
-      console.error("Sync Critical Fail:", e);
       showSyncBadge('failed');
-    } finally {
-      // 7. ALWAYS RELEASE THE LOCK & SHOW CONTENT
-      // This is the specific fix for the "Blank Screen"
-      storeSyncing = false;
-      document.getElementById('dashboardSkeleton').style.display = 'none';
-      document.getElementById('dashboardContent').style.display = 'block';
-      document.getElementById('dashboardContent').style.opacity = '1';
     }
   }
 }
+
 // ── Manual refresh from badge click ──
 async function manualRefresh() {
   if (!AppState.userEmail) return;
@@ -2400,123 +2393,13 @@ function showHelp(platform) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', ()=>{
+  restoreChatSession();
+  renderFeatureTable();
+  // Restore saved product data from localStorage
   const restored = loadDataFromStorage();
-  if (restored) showToast('Your previous data has been restored ✓', 'success', 2500);
+  if (restored) showToast('Your previous data has been restored ✓', 'info', 2500);
 });
-
-// ══════════════════════════════════════════
-//  AUTO SYNC — checks saved store on login
-// ══════════════════════════════════════════
-async function checkSavedStoreConnections() {
-  if (!AppState.userEmail) return;
-  // Wait for Pro verification to complete (max 5 seconds)
-  let waited = 0;
-  while (AppState.isProUser === null && waited < 5000) {
-    await new Promise(r => setTimeout(r, 200));
-    waited += 200;
-  }
-  if (!AppState.isProUser) return; // Free users don't auto-sync
-
-  if (storeSyncing) return;
-  storeSyncing = true;
-
-  try {
-    const res = await fetch(`${workerURL}/woo/get-creds?email=${encodeURIComponent(AppState.userEmail)}`);
-    const d = await res.json();
-    if (!d.connected) { storeSyncing = false; return; }
-
-    // Show skeleton immediately — user goes straight to dashboard
-    document.getElementById('dashboardSkeleton').style.display = 'block';
-    document.getElementById('dashboardContent').style.opacity = '0.3';
-    switchView('dashboard', document.getElementById('nav-dashboard'), true);
-    showSyncBadge('syncing');
-
-    // Fetch fresh data using saved credentials
-    const syncRes = await fetch(`${workerURL}/resync-store`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: AppState.userEmail, platform: 'woo' })
-    });
-    const syncData = await syncRes.json();
-
-    if (syncData.ok && syncData.data && syncData.data.length) {
-      document.getElementById('items').innerHTML = '';
-      syncData.data.forEach(p => addNewRow(p.name, p.sell, p.cost || 0, p.qty));
-      saveDataToStorage();
-      processDataAndShowReport();
-      showSyncBadge('done', syncData.lastSynced);
-    } else {
-      document.getElementById('dashboardSkeleton').style.display = 'none';
-      document.getElementById('dashboardContent').style.opacity = '1';
-      showSyncBadge('failed');
-    }
-  } catch(e) {
-    showSyncBadge('failed');
-  } finally {
-    storeSyncing = false;
-  }
-}
-
-function showSyncBadge(state, lastSynced) {
-  let badge = document.getElementById('syncStatusBadge');
-  if (!badge) {
-    const header = document.querySelector('#view-dashboard .page-header');
-    if (!header) return;
-    badge = document.createElement('div');
-    badge.id = 'syncStatusBadge';
-    badge.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:5px 12px;border-radius:99px;cursor:pointer;transition:all 0.2s;font-family:Inter,sans-serif;';
-    badge.onclick = () => manualRefresh();
-    header.appendChild(badge);
-  }
-  if (state === 'syncing') {
-    badge.style.background = '#eff6ff'; badge.style.color = '#3b82f6'; badge.style.border = '1px solid #bfdbfe';
-    badge.innerHTML = '<span style="animation:spin 1s linear infinite;display:inline-block;">↻</span>&nbsp;Syncing...';
-  } else if (state === 'done') {
-    const t = lastSynced ? new Date(lastSynced).toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'}) : 'Just now';
-    badge.style.background = '#f0fdf4'; badge.style.color = '#059669'; badge.style.border = '1px solid #bbf7d0';
-    badge.innerHTML = `✓ Synced ${t} &nbsp;<span style="opacity:0.5;font-size:10px;">↻ refresh</span>`;
-  } else {
-    badge.style.background = '#fef2f2'; badge.style.color = '#dc2626'; badge.style.border = '1px solid #fecaca';
-    badge.innerHTML = '⚠ Sync failed &nbsp;<span style="opacity:0.5;font-size:10px;">↻ retry</span>';
-  }
-}
-
-async function manualRefresh() {
-  if (!AppState.userEmail || storeSyncing) return;
-  storeSyncing = true;
-  showSyncBadge('syncing');
-  try {
-    const syncRes = await fetch(`${workerURL}/resync-store`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email: AppState.userEmail, platform: 'woo' })
-    });
-    const syncData = await syncRes.json();
-    if (syncData.ok && syncData.data && syncData.data.length) {
-      document.getElementById('items').innerHTML = '';
-      syncData.data.forEach(p => addNewRow(p.name, p.sell, p.cost || 0, p.qty));
-      saveDataToStorage();
-      processDataAndShowReport();
-      showSyncBadge('done', syncData.lastSynced);
-      showToast('Dashboard refreshed ✓', 'success');
-    } else {
-      showSyncBadge('failed');
-    }
-  } catch(e) {
-    showSyncBadge('failed');
-  } finally {
-    storeSyncing = false;
-  }
-}
-
-function resetDashboardToBlank() {
-  // Hide skeleton, show content (even if empty) so the user isn't stuck
-  document.getElementById('dashboardSkeleton').style.display = 'none';
-  document.getElementById('dashboardContent').style.display = 'block';
-  document.getElementById('dashboardContent').style.opacity = '1';
-}
-  
 </script>
 <script type="module" src="../assets/js/auth.js?v=4.4"></script>
 
@@ -2596,16 +2479,3 @@ function resetDashboardToBlank() {
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
