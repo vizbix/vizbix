@@ -668,6 +668,12 @@ function showToast(msg, type='info', ms=3200) {
 // ══════════════════════════════════════════
 function onAuthChange() {
   const { userEmail:email, isProUser:pro } = AppState;
+  
+  // Force UI email sync
+if (email) {
+  setText('settingsEmail', email);
+  setText('sidebarEmail', email);
+}
 
   // Update email displays
   if (email) {
@@ -1709,7 +1715,7 @@ function sendSuggestion(text) {
 }
 
 window.startAIAnalysis = async function() {
-  if(!AppState.isProUser || !AppState.userEmail) {
+if(AppState.isProUser !== true) {
     document.getElementById('proLockOverlay').classList.remove('pro-lock-hidden'); return;
   }
   const data = getFreshData();
@@ -2432,6 +2438,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
 </body>
 </html>
+
 
 
 
