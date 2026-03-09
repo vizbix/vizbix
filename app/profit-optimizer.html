@@ -626,6 +626,7 @@ window.currentMode = 'product';
 
 let myChart = null;
 let authVerified = false;
+let storeSyncing = false;
 
 // ══════════════════════════════════════════
 //  TOAST
@@ -658,9 +659,13 @@ function onAuthChange() {
     const lb = document.getElementById('headerLoginBtn');
     if (lb) lb.style.display = 'none';
     if (!authVerified) {
-    authVerified = true;
-    window.verify(email);
-    checkSavedStoreConnections();
+      authVerified = true;
+      window.verify(email).then(() => {
+        // Only auto-sync after Pro status is confirmed
+        if (AppState.isProUser) {
+          checkSavedStoreConnections();
+        }
+      });
     }
 
     // 🚀 MAGIC FIX: Check if user was trying to buy Pro before logging in
@@ -2260,8 +2265,14 @@ async function checkSavedStoreConnections() {
         syncData.data.forEach(p => addNewRow(p.name, p.sell, 0, p.qty));
         saveDataToStorage();
         showSyncBadge('done', syncData.lastSynced);
-        // Go straight to dashboard
-        setTimeout(() => processDataAndShowReport(), 300);
+        // Go straight to dashboard — guard prevents re-entry
+        if (!storeSyncing) {
+          storeSyncing = true;
+          setTimeout(() => {
+            processDataAndShowReport();
+            storeSyncing = false;
+          }, 300);
+        }
       } else {
         showSyncBadge('failed');
       }
@@ -2448,3 +2459,4 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
 </body>
 </html>
+
