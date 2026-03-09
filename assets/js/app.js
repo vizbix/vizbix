@@ -7,14 +7,14 @@ window.currentData = [];
 window.monthlyStats = null;
 window.currentMode = 'product';
 
-// Initialize when DOM is ready
-document.addEventListener('DOMContentLoaded', () => {
-    // Slight delay ensures the HTML from drawer.js has settled
-    setTimeout(() => {
-        if(document.getElementById("items")) {
-            window.loadDrafts();
-        }
-    }, 100);
+// --- SIMPLE AUTH SYNC ---
+Object.defineProperty(window, "userEmail", {
+  set: function(email) {
+    const s = document.getElementById("sidebarEmail");
+    const st = document.getElementById("settingsEmail");
+    if (s) s.innerText = email || "Not logged in";
+    if (st) st.innerText = email || "Not logged in";
+  }
 });
 
 window.setMode = function(mode) {
@@ -281,3 +281,4 @@ window.toggleHistory = function(show) {
     document.getElementById("historyModal").style.display = show ? "flex" : "none"; 
     if(show && window.userEmail) window.fetchHistory(); 
 };
+
