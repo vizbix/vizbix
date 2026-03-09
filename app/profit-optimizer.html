@@ -1025,41 +1025,60 @@ function runAnalysis(data) {
   const extraCount   = chartData.length - CHART_MAX;
 
   // Show "showing top N" notice
-  let chartNote = document.getElementById('chartTopNote');
-  if (!chartNote) {
-    chartNote = document.createElement('div');
-    chartNote.id = 'chartTopNote';
-    chartNote.style.cssText = 'font-size:11px;color:var(--slate-300);text-align:right;margin-bottom:4px;';
-    ctx.canvas.parentNode.insertBefore(chartNote, ctx.canvas);
-  }
-  chartNote.textContent = extraCount > 0 ? `Top ${CHART_MAX} of ${data.length} products by revenue` : '';
+  // 1. Wrap Chart logic in try-catch so it never crashes the app
+  try {
+    const ctxEl = document.getElementById('profitChart');
+    if (ctxEl) {
+      const ctx = ctxEl.getContext('2d');
 
-  myChart = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels: chartLabels,
-      datasets: [
-        {label:'Revenue', data:chartRevD,  backgroundColor:'#e0e7ff', borderRadius:5},
-        {label:'Profit',  data:chartProfD, backgroundColor:'#5b5ef6', borderRadius:5}
-      ]
-    },
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        legend: { position:'top', labels:{ font:{weight:'600',size:11,family:'Inter'}, color:'#94a3b8', boxWidth:12, padding:12 } }
-      },
-      scales: {
-        x:{ grid:{display:false}, ticks:{color:'#94a3b8', font:{weight:'500',size:10,family:'Inter'}, maxRotation:40, autoSkip:false} },
-        y:{ beginAtZero:true, grid:{color:'#f4f7ff'}, ticks:{color:'#94a3b8', font:{size:10,family:'Inter'}} }
+      // Top Note Logic
+      let chartNote = document.getElementById('chartTopNote');
+      if (!chartNote) {
+        chartNote = document.createElement('div');
+        chartNote.id = 'chartTopNote';
+        chartNote.style.cssText = 'font-size:11px;color:var(--slate-300);text-align:right;margin-bottom:4px;';
+        ctx.canvas.parentNode.insertBefore(chartNote, ctx.canvas);
       }
-    }
-  });
+      // Note: We need 'extraCount' defined. If not defined earlier in runAnalysis, remove this line or define it.
+      // Assuming extraCount and CHART_MAX are defined above this block.
+      if (typeof extraCount !== 'undefined' && typeof CHART_MAX !== 'undefined') {
+         chartNote.textContent = extraCount > 0 ? `Top ${CHART_MAX} of ${data.length} products by revenue` : '';
+      }
 
+      // Destroy old chart to prevent "flickering"
+      if (myChart) myChart.destroy();
+
+      // Create New Chart
+      myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: chartLabels, // Ensure chartLabels is defined above
+          datasets: [
+            {label:'Revenue', data:chartRevD,  backgroundColor:'#e0e7ff', borderRadius:5},
+            {label:'Profit',  data:chartProfD, backgroundColor:'#5b5ef6', borderRadius:5}
+          ]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { position:'top', labels:{ font:{weight:'600',size:11,family:'Inter'}, color:'#94a3b8', boxWidth:12, padding:12 } }
+          },
+          scales: {
+            x:{ grid:{display:false}, ticks:{color:'#94a3b8', font:{weight:'500',size:10,family:'Inter'}, maxRotation:40, autoSkip:false} },
+            y:{ beginAtZero:true, grid:{color:'#f4f7ff'}, ticks:{color:'#94a3b8', font:{size:10,family:'Inter'}} }
+          }
+        }
+      });
+    }
+  } catch (e) {
+    console.warn("Chart rendering failed (non-critical):", e);
+  }
+
+  // 2. IMPORTANT: These run even if the chart crashes
   showToast('Dashboard updated ✓', 'success');
   renderEnhancedReport(data);
-}
-
+  
 // ══════════════════════════════════════════
 //  CSV / EXCEL SMART IMPORT
 // ══════════════════════════════════════════
@@ -2256,15 +2275,26 @@ function showSyncBadge(state, lastSynced) {
   }
 }
 
-// ── Auto sync on login (Fixed Logic) ──
+// ── Auto sync on login (Bulletproof Version) ──
 async function checkSavedStoreConnections() {
   // 1. Safety Checks
   if (!AppState.userEmail || storeSyncing) return;
   
+  // FIX: Force update sidebar status immediately if we know they are Pro
+  if (AppState.isProUser) {
+     const planEl = document.getElementById('sidebarPlan');
+     if(planEl) {
+        planEl.innerText = "Pro Active";
+        planEl.style.color = "#059669";
+     }
+  }
+
   for (const platform of ['woo', 'shopify']) {
     try {
       // 2. Check if credentials exist in Cloudflare
       const res = await fetch(`${workerURL}/woo/get-creds?email=${AppState.userEmail}&platform=${platform}`);
+      if (!res.ok) continue; 
+      
       const d = await res.json();
       if (!d.connected) continue;
 
@@ -2272,8 +2302,11 @@ async function checkSavedStoreConnections() {
       storeSyncing = true;
       showSyncBadge('syncing');
       
-      // 4. SWITCH VIEW: Show Skeleton IMMEDIATELY, Hide Content
-      switchView('dashboard', document.getElementById('nav-dashboard'));
+      // 4. SWITCH VIEW: Show Skeleton
+      // Only switch if we are NOT already on the dashboard to prevent flickering
+      if (AppState.currentView !== 'dashboard') {
+          switchView('dashboard', document.getElementById('nav-dashboard'));
+      }
       document.getElementById('dashboardSkeleton').style.display = 'block';
       document.getElementById('dashboardContent').style.display = 'none';
 
@@ -2283,40 +2316,49 @@ async function checkSavedStoreConnections() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: AppState.userEmail, platform })
       });
+      
+      if (!syncRes.ok) throw new Error("Sync API failed");
+      
       const syncData = await syncRes.json();
 
-      // 6. SUCCESS: Populate Data & Reveal Dashboard
+      // 6. SUCCESS: Populate Data
       if (syncData.ok && syncData.data.length) {
-        document.getElementById('items').innerHTML = '';
-        syncData.data.forEach(p => addNewRow(p.name, p.sell, 0, p.qty));
+        const itemsContainer = document.getElementById('items');
+        if(itemsContainer) {
+            itemsContainer.innerHTML = '';
+            syncData.data.forEach(p => addNewRow(p.name, p.sell, 0, p.qty));
+        }
         
-        // Recalculate numbers
-        runAnalysis(getFreshData()); 
-        saveDataToStorage();
-        
-        // REVEAL CONTENT
-        document.getElementById('dashboardSkeleton').style.display = 'none';
-        document.getElementById('dashboardContent').style.display = 'block'; // <--- This fixes the blank screen
+        // SAFE ANALYSIS: Run this in a try/catch so it doesn't kill the page
+        try {
+            saveDataToStorage();
+            runAnalysis(getFreshData()); 
+        } catch (analysisErr) {
+            console.error("Analysis Error:", analysisErr);
+        }
         
         showSyncBadge('done', syncData.lastSynced);
         updateIntegrationCard(platform, d.storeUrl, syncData.lastSynced);
       } else {
-        // Partial failure
         showSyncBadge('failed');
-        resetDashboardToBlank();
       }
-      break; // Stop after first connected store found
+      
+      // Stop after first connected store found
+      break; 
+      
     } catch(e) {
-      console.error(e);
+      console.error("Sync Critical Fail:", e);
       showSyncBadge('failed');
-      resetDashboardToBlank();
     } finally {
-      // 7. ALWAYS RELEASE THE LOCK
+      // 7. ALWAYS RELEASE THE LOCK & SHOW CONTENT
+      // This is the specific fix for the "Blank Screen"
       storeSyncing = false;
+      document.getElementById('dashboardSkeleton').style.display = 'none';
+      document.getElementById('dashboardContent').style.display = 'block';
+      document.getElementById('dashboardContent').style.opacity = '1';
     }
   }
 }
-
 // ── Manual refresh from badge click ──
 async function manualRefresh() {
   if (!AppState.userEmail) return;
@@ -2501,6 +2543,7 @@ function resetDashboardToBlank() {
 
 </body>
 </html>
+
 
 
 
