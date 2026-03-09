@@ -240,34 +240,48 @@
           <h2>Data Integrations</h2>
         </div>
 
-        <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
-          <div class="data-card" style="padding:24px; text-align:center;">
-            <div style="font-size:32px; margin-bottom:12px;">🛍️</div>
-            <h3 style="font-size:16px; font-weight:700; color:var(--ink);">WooCommerce</h3>
-            <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Sync products and sales history.</p>
-            <div id="woo-card-status">
-               <button class="btn btn-primary" style="width:100%; background:#7c3aed; border-color:#7c3aed;" onclick="openStoreModal('woo')">Connect Store</button>
-          </div>
-          </div>
-
-          <div class="data-card" style="padding:24px; text-align:center;">
-            <div style="font-size:32px; margin-bottom:12px;">🟢</div>
-            <h3 style="font-size:16px; font-weight:700; color:var(--ink);">Shopify</h3>
-            <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Sync inventory and pricing.</p>
-            <div id="shopify-card-status">
-           <button class="btn btn-primary" style="width:100%; background:#059669; border-color:#059669;" onclick="openStoreModal('shopify')">Connect Store</button>
-          </div>
-          </div>
-
-          <div class="data-card" style="padding:24px; text-align:center;">
-            <div style="font-size:32px; margin-bottom:12px;">📊</div>
-            <h3 style="font-size:16px; font-weight:700; color:var(--ink);">CSV Import</h3>
-            <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Upload Excel or CSV files.</p>
-            <button class="btn btn-secondary" style="width:100%;" onclick="triggerImport()">Upload File</button>
-          </div>
-        </div>
-      </div>
+        <<div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
+  
+  <div class="data-card" style="padding:24px; text-align:center;">
+    <img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/woocommerce.svg" style="height:32px; margin-bottom:12px; filter: invert(34%) sepia(87%) saturate(2253%) hue-rotate(242deg) brightness(97%) contrast(92%);" alt="WooCommerce">
+    <h3 style="font-size:16px; font-weight:700; color:var(--ink);">WooCommerce</h3>
+    <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Sync products and sales history instantly.</p>
+    <div id="woo-card-status">
+       <button class="btn btn-primary" style="width:100%; background:#7c3aed; border-color:#7c3aed;" onclick="openStoreModal('woo')">Connect Store</button>
     </div>
+  </div>
+
+  <div class="data-card" style="padding:24px; text-align:center;">
+    <img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/shopify.svg" style="height:32px; margin-bottom:12px; filter: invert(41%) sepia(98%) saturate(1209%) hue-rotate(124deg) brightness(95%) contrast(101%);" alt="Shopify">
+    <h3 style="font-size:16px; font-weight:700; color:var(--ink);">Shopify</h3>
+    <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Sync live inventory and pricing data.</p>
+    <div id="shopify-card-status">
+       <button class="btn btn-primary" style="width:100%; background:#059669; border-color:#059669;" onclick="openStoreModal('shopify')">Connect Store</button>
+    </div>
+  </div>
+
+  <div class="data-card" style="padding:24px; text-align:center; position:relative; border-style: dashed; background: var(--slate-50); opacity: 0.8;">
+    <div style="position:absolute; top:12px; right:12px; background:#e0f2fe; color:#0369a1; font-size:10px; font-weight:800; padding:2px 8px; border-radius:4px; text-transform:uppercase; letter-spacing: 0.5px;">Soon</div>
+    <img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/razorpay.svg" style="height:28px; margin: 4px 0 12px; filter: grayscale(1); opacity: 0.4;" alt="Razorpay">
+    <h3 style="font-size:16px; font-weight:700; color:var(--slate-300);">Razorpay</h3>
+    <p style="font-size:12px; color:var(--slate-200); margin-bottom:20px;">Connect gateway for verified, bank-matched revenue.</p>
+    <button class="btn btn-secondary" disabled style="width:100%; cursor:not-allowed; border-color: var(--slate-100); color: var(--slate-200);">Notify Me</button>
+  </div>
+
+  <div class="data-card" style="padding:24px; text-align:center;">
+    <div style="font-size:32px; margin-bottom:12px;">📊</div>
+    <h3 style="font-size:16px; font-weight:700; color:var(--ink);">CSV / Excel</h3>
+    <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Upload data from any other platform or POS.</p>
+    <button class="btn btn-secondary" style="width:100%;" onclick="triggerImport()">Upload File</button>
+  </div>
+</div>
+
+<div style="margin-top:40px; text-align:center; padding:20px; border-top:1px solid var(--slate-100);">
+  <p style="font-size:12px; color:var(--slate-300); display:flex; align-items:center; justify-content:center; gap:8px;">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:#059669;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+    Vizbix uses official Read-Only APIs. Your credentials are encrypted and never shared.
+  </p>
+</div>
 
     <div id="view-dashboard" class="app-view">
       <div style="max-width:1040px;margin:0 auto;width:100%;box-sizing:border-box;">
@@ -2464,6 +2478,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
 </body>
 </html>
+
 
 
 
