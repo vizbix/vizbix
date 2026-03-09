@@ -15,13 +15,13 @@
 
   <style>
     .app-view { display: none; }
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
     .app-view.active {
       display: block;
       animation: vzFadeIn 0.22s ease;
-      @keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
     }
   </style>
 </head>
@@ -283,6 +283,10 @@
     Vizbix uses official Read-Only APIs. Your credentials are encrypted and never shared.
   </p>
 </div>
+</div>
+</div>
+
+    <div id="view-dashboard" class="app-view">
 
     <div id="view-dashboard" class="app-view">
       <div style="max-width:1040px;margin:0 auto;width:100%;box-sizing:border-box;">
@@ -675,12 +679,8 @@ function onAuthChange() {
     if (lb) lb.style.display = 'none';
     if (!authVerified) {
       authVerified = true;
-      window.verify(email).then(() => {
-        // Only auto-sync after Pro status is confirmed
-        if (AppState.isProUser) {
-          checkSavedStoreConnections();
-        }
-      });
+      window.verify(email);
+      checkSavedStoreConnections();
     }
 
     // 🚀 MAGIC FIX: Check if user was trying to buy Pro before logging in
@@ -2080,28 +2080,6 @@ window.handleUpgradeClick = function() {
   }
   window.pay();
 };
-
-// 3. UPDATE YOUR onAuthChange FUNCTION (Add the "Pending Upgrade" check inside)
-function onAuthChange() {
-  const { userEmail:email, isProUser:pro } = AppState;
-
-  if (email) {
-    setText('sidebarEmail', email);
-    setText('settingsEmail', email);
-    // ... existing UI updates ...
-
-    // ADD THIS BLOCK: Check if they just logged in to buy Pro
-    if (sessionStorage.getItem('vzx_pending_upgrade') === 'true') {
-        sessionStorage.removeItem('vzx_pending_upgrade'); // Clear flag
-        window.closeLogin(); // Close modal
-        
-        // Wait 1s for UI to settle, then open Razorpay
-        setTimeout(() => {
-            showToast('Login successful! Opening payment...', 'success');
-            window.pay(); 
-        }, 1000);
-    }
-  }
   
   // ... rest of your existing plan display logic ...
 }
@@ -2479,5 +2457,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
 </body>
 </html>
+
 
 
