@@ -18,6 +18,10 @@
     .app-view.active {
       display: block;
       animation: vzFadeIn 0.22s ease;
+      @keyframes spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
     }
   </style>
 </head>
@@ -241,14 +245,18 @@
             <div style="font-size:32px; margin-bottom:12px;">🛍️</div>
             <h3 style="font-size:16px; font-weight:700; color:var(--ink);">WooCommerce</h3>
             <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Sync products and sales history.</p>
-            <button class="btn btn-primary" style="width:100%; background:#7c3aed; border-color:#7c3aed;" onclick="openStoreModal('woo')">Connect Store</button>
+            <div id="woo-card-status">
+               <button class="btn btn-primary" style="width:100%; background:#7c3aed; border-color:#7c3aed;" onclick="openStoreModal('woo')">Connect Store</button>
+          </div>
           </div>
 
           <div class="data-card" style="padding:24px; text-align:center;">
             <div style="font-size:32px; margin-bottom:12px;">🟢</div>
             <h3 style="font-size:16px; font-weight:700; color:var(--ink);">Shopify</h3>
             <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Sync inventory and pricing.</p>
-            <button class="btn btn-primary" style="width:100%; background:#059669; border-color:#059669;" onclick="openStoreModal('shopify')">Connect Store</button>
+            <div id="shopify-card-status">
+           <button class="btn btn-primary" style="width:100%; background:#059669; border-color:#059669;" onclick="openStoreModal('shopify')">Connect Store</button>
+          </div>
           </div>
 
           <div class="data-card" style="padding:24px; text-align:center;">
@@ -649,7 +657,11 @@ function onAuthChange() {
     setText('settingsEmail', email);
     const lb = document.getElementById('headerLoginBtn');
     if (lb) lb.style.display = 'none';
-    if (!authVerified) { authVerified = true; window.verify(email); }
+    if (!authVerified) {
+    authVerified = true;
+    window.verify(email);
+    checkSavedStoreConnections();
+    }
 
     // 🚀 MAGIC FIX: Check if user was trying to buy Pro before logging in
     if (sessionStorage.getItem('vzx_pending_upgrade') === 'true') {
@@ -2119,6 +2131,23 @@ async function runStoreImport(platform) {
   btn.disabled = true;
 
   try {
+    
+    // Save credentials to KV first
+if (AppState.userEmail) {
+  await fetch(workerURL + '/woo/save-creds', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email: AppState.userEmail,
+      platform,
+      storeUrl: payload.storeUrl,
+      key: payload.key || null,
+      secret: payload.secret || null,
+      token: payload.token || null,
+    })
+  });
+}
+
     const res = await fetch(workerURL + '/fetch-store', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -2131,7 +2160,8 @@ async function runStoreImport(platform) {
       d.data.forEach(p => addNewRow(p.name, p.sell, 0, p.qty)); // Cost is 0
       
       document.getElementById('storeModal').style.display = 'none';
-      showToast(`✅ Imported ${d.data.length} items!`, 'success');
+      updateIntegrationCard(platform, payload.storeUrl, Date.now());
+      showToast(`✅ Imported ${d.data.length} items! Loading dashboard...`, 'success', 3000);
       
       saveDataToStorage();
       processDataAndShowReport();
@@ -2145,6 +2175,158 @@ async function runStoreImport(platform) {
   } finally {
     btn.innerText = oldText;
     btn.disabled = false;
+  }
+}
+
+// ── Update integration card to connected state ──
+function updateIntegrationCard(platform, storeUrl, lastSynced) {
+  const cardId = platform === 'woo' ? 'woo-card-status' : 'shopify-card-status';
+  const el = document.getElementById(cardId);
+  if (!el) return;
+  const domain = storeUrl.replace(/https?:\/\//, '').replace(/\/$/, '');
+  const syncTime = lastSynced
+    ? new Date(lastSynced).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })
+    : 'Never';
+  el.innerHTML = `
+    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+      <span style="background:#d1fae5;color:#065f46;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;">✓ Connected</span>
+      <span style="font-size:12px;color:var(--slate-300);">${domain}</span>
+    </div>
+    <div style="font-size:11px;color:var(--slate-300);margin-bottom:10px;">Last synced: ${syncTime}</div>
+    <div style="display:flex;gap:8px;">
+      <button class="btn btn-primary" style="flex:1;font-size:12px;padding:8px;"
+        onclick="manualRefresh()">↻ Sync Now</button>
+      <button class="btn btn-secondary" style="font-size:12px;padding:8px;"
+        onclick="disconnectStore('${platform}')">Disconnect</button>
+    </div>`;
+}
+
+// ── Sync badge on dashboard header ──
+function showSyncBadge(state, lastSynced) {
+  let badge = document.getElementById('syncStatusBadge');
+  if (!badge) {
+    const header = document.querySelector('#view-dashboard .page-header');
+    if (!header) return;
+    badge = document.createElement('div');
+    badge.id = 'syncStatusBadge';
+    badge.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:5px 12px;border-radius:99px;font-family:Inter,sans-serif;cursor:pointer;transition:all 0.2s;';
+    badge.onclick = () => manualRefresh();
+    header.appendChild(badge);
+  }
+  if (state === 'syncing') {
+    badge.style.background = '#eff6ff';
+    badge.style.color = '#3b82f6';
+    badge.style.border = '1px solid #bfdbfe';
+    badge.innerHTML = '<span style="animation:spin 1s linear infinite;display:inline-block;">↻</span> &nbsp;Syncing...';
+  } else if (state === 'done') {
+    const t = lastSynced
+      ? new Date(lastSynced).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })
+      : 'Just now';
+    badge.style.background = '#f0fdf4';
+    badge.style.color = '#059669';
+    badge.style.border = '1px solid #bbf7d0';
+    badge.innerHTML = `✓ Synced ${t} &nbsp;<span style="opacity:0.5;font-size:10px;">↻ refresh</span>`;
+  } else if (state === 'failed') {
+    badge.style.background = '#fef2f2';
+    badge.style.color = '#dc2626';
+    badge.style.border = '1px solid #fecaca';
+    badge.innerHTML = '⚠ Sync failed &nbsp;<span style="opacity:0.5;font-size:10px;">↻ retry</span>';
+  }
+}
+
+// ── Auto sync on login ──
+async function checkSavedStoreConnections() {
+  if (!AppState.userEmail) return;
+  for (const platform of ['woo', 'shopify']) {
+    try {
+      const res = await fetch(
+        `${workerURL}/woo/get-creds?email=${AppState.userEmail}&platform=${platform}`
+      );
+      const d = await res.json();
+      if (!d.connected) continue;
+
+      updateIntegrationCard(platform, d.storeUrl, d.lastSynced);
+      showSyncBadge('syncing');
+
+      const syncRes = await fetch(workerURL + '/resync-store', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: AppState.userEmail, platform })
+      });
+      const syncData = await syncRes.json();
+
+      if (syncData.ok && syncData.data.length) {
+        document.getElementById('items').innerHTML = '';
+        syncData.data.forEach(p => addNewRow(p.name, p.sell, 0, p.qty));
+        saveDataToStorage();
+        showSyncBadge('done', syncData.lastSynced);
+        // Go straight to dashboard
+        setTimeout(() => processDataAndShowReport(), 300);
+      } else {
+        showSyncBadge('failed');
+      }
+      break; // Only sync first connected platform
+    } catch(e) {
+      showSyncBadge('failed');
+    }
+  }
+}
+
+// ── Manual refresh from badge click ──
+async function manualRefresh() {
+  if (!AppState.userEmail) return;
+  showSyncBadge('syncing');
+  for (const platform of ['woo', 'shopify']) {
+    try {
+      const res = await fetch(
+        `${workerURL}/woo/get-creds?email=${AppState.userEmail}&platform=${platform}`
+      );
+      const d = await res.json();
+      if (!d.connected) continue;
+
+      const syncRes = await fetch(workerURL + '/resync-store', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: AppState.userEmail, platform })
+      });
+      const syncData = await syncRes.json();
+
+      if (syncData.ok && syncData.data.length) {
+        document.getElementById('items').innerHTML = '';
+        syncData.data.forEach(p => addNewRow(p.name, p.sell, 0, p.qty));
+        saveDataToStorage();
+        processDataAndShowReport();
+        showSyncBadge('done', syncData.lastSynced);
+        updateIntegrationCard(platform, d.storeUrl, syncData.lastSynced);
+        showToast('Dashboard refreshed ✓', 'success');
+      } else {
+        showSyncBadge('failed');
+      }
+      break;
+    } catch(e) {
+      showSyncBadge('failed');
+    }
+  }
+}
+
+// ── Disconnect store ──
+async function disconnectStore(platform) {
+  if (!confirm(`Disconnect your ${platform === 'woo' ? 'WooCommerce' : 'Shopify'} store?`)) return;
+  try {
+    await fetch(workerURL + '/woo/delete-creds', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: AppState.userEmail, platform })
+    });
+    const cardId = platform === 'woo' ? 'woo-card-status' : 'shopify-card-status';
+    const el = document.getElementById(cardId);
+    const color = platform === 'woo' ? '#7c3aed' : '#059669';
+    if (el) el.innerHTML = `<button class="btn btn-primary" style="width:100%;background:${color};border-color:${color};" onclick="openStoreModal('${platform}')">Connect Store</button>`;
+    // Remove sync badge
+    document.getElementById('syncStatusBadge')?.remove();
+    showToast('Store disconnected.', 'info');
+  } catch(e) {
+    showToast('Error disconnecting.', 'error');
   }
 }
 
