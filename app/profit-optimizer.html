@@ -675,14 +675,7 @@ function onAuthChange() {
     setText('settingsEmail', email);
     const lb = document.getElementById('headerLoginBtn');
     if (lb) lb.style.display = 'none';
-    if (!authVerified) {
-      authVerified = true;
-      window.verify(email).then(() => {
-        // Only auto-sync after Pro status is confirmed
-        if (AppState.isProUser) {
-          checkSavedStoreConnections();
-        }
-      });
+    if (!authVerified) { authVerified = true; window.verify(email); checkSavedStoreConnections(); }
     }
 
     // 🚀 MAGIC FIX: Check if user was trying to buy Pro before logging in
@@ -2453,13 +2446,115 @@ function showHelp(platform) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', ()=>{
-  restoreChatSession();
-  renderFeatureTable();
-  // Restore saved product data from localStorage
+document.addEventListener('DOMContentLoaded', () => {
   const restored = loadDataFromStorage();
-  if (restored) showToast('Your previous data has been restored ✓', 'info', 2500);
+  if (restored) showToast('Your previous data has been restored ✓', 'success', 2500);
 });
+
+// ══════════════════════════════════════════
+//  AUTO SYNC — checks saved store on login
+// ══════════════════════════════════════════
+async function checkSavedStoreConnections() {
+  if (!AppState.userEmail) return;
+  // Wait for Pro verification to complete (max 5 seconds)
+  let waited = 0;
+  while (AppState.isProUser === null && waited < 5000) {
+    await new Promise(r => setTimeout(r, 200));
+    waited += 200;
+  }
+  if (!AppState.isProUser) return; // Free users don't auto-sync
+
+  if (storeSyncing) return;
+  storeSyncing = true;
+
+  try {
+    const res = await fetch(`${workerURL}/woo/get-creds?email=${encodeURIComponent(AppState.userEmail)}`);
+    const d = await res.json();
+    if (!d.connected) { storeSyncing = false; return; }
+
+    // Show skeleton immediately — user goes straight to dashboard
+    document.getElementById('dashboardSkeleton').style.display = 'block';
+    document.getElementById('dashboardContent').style.opacity = '0.3';
+    switchView('dashboard', document.getElementById('nav-dashboard'), true);
+    showSyncBadge('syncing');
+
+    // Fetch fresh data using saved credentials
+    const syncRes = await fetch(`${workerURL}/resync-store`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: AppState.userEmail, platform: 'woo' })
+    });
+    const syncData = await syncRes.json();
+
+    if (syncData.ok && syncData.data && syncData.data.length) {
+      document.getElementById('items').innerHTML = '';
+      syncData.data.forEach(p => addNewRow(p.name, p.sell, p.cost || 0, p.qty));
+      saveDataToStorage();
+      processDataAndShowReport();
+      showSyncBadge('done', syncData.lastSynced);
+    } else {
+      document.getElementById('dashboardSkeleton').style.display = 'none';
+      document.getElementById('dashboardContent').style.opacity = '1';
+      showSyncBadge('failed');
+    }
+  } catch(e) {
+    showSyncBadge('failed');
+  } finally {
+    storeSyncing = false;
+  }
+}
+
+function showSyncBadge(state, lastSynced) {
+  let badge = document.getElementById('syncStatusBadge');
+  if (!badge) {
+    const header = document.querySelector('#view-dashboard .page-header');
+    if (!header) return;
+    badge = document.createElement('div');
+    badge.id = 'syncStatusBadge';
+    badge.style.cssText = 'display:flex;align-items:center;gap:6px;font-size:11px;font-weight:600;padding:5px 12px;border-radius:99px;cursor:pointer;transition:all 0.2s;font-family:Inter,sans-serif;';
+    badge.onclick = () => manualRefresh();
+    header.appendChild(badge);
+  }
+  if (state === 'syncing') {
+    badge.style.background = '#eff6ff'; badge.style.color = '#3b82f6'; badge.style.border = '1px solid #bfdbfe';
+    badge.innerHTML = '<span style="animation:spin 1s linear infinite;display:inline-block;">↻</span>&nbsp;Syncing...';
+  } else if (state === 'done') {
+    const t = lastSynced ? new Date(lastSynced).toLocaleTimeString('en-IN', {hour:'2-digit', minute:'2-digit'}) : 'Just now';
+    badge.style.background = '#f0fdf4'; badge.style.color = '#059669'; badge.style.border = '1px solid #bbf7d0';
+    badge.innerHTML = `✓ Synced ${t} &nbsp;<span style="opacity:0.5;font-size:10px;">↻ refresh</span>`;
+  } else {
+    badge.style.background = '#fef2f2'; badge.style.color = '#dc2626'; badge.style.border = '1px solid #fecaca';
+    badge.innerHTML = '⚠ Sync failed &nbsp;<span style="opacity:0.5;font-size:10px;">↻ retry</span>';
+  }
+}
+
+async function manualRefresh() {
+  if (!AppState.userEmail || storeSyncing) return;
+  storeSyncing = true;
+  showSyncBadge('syncing');
+  try {
+    const syncRes = await fetch(`${workerURL}/resync-store`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: AppState.userEmail, platform: 'woo' })
+    });
+    const syncData = await syncRes.json();
+    if (syncData.ok && syncData.data && syncData.data.length) {
+      document.getElementById('items').innerHTML = '';
+      syncData.data.forEach(p => addNewRow(p.name, p.sell, p.cost || 0, p.qty));
+      saveDataToStorage();
+      processDataAndShowReport();
+      showSyncBadge('done', syncData.lastSynced);
+      showToast('Dashboard refreshed ✓', 'success');
+    } else {
+      showSyncBadge('failed');
+    }
+  } catch(e) {
+    showSyncBadge('failed');
+  } finally {
+    storeSyncing = false;
+  }
+}
 
 function resetDashboardToBlank() {
   // Hide skeleton, show content (even if empty) so the user isn't stuck
@@ -2547,6 +2642,7 @@ function resetDashboardToBlank() {
 
 </body>
 </html>
+
 
 
 
