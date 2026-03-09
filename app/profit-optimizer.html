@@ -2253,6 +2253,11 @@ async function checkSavedStoreConnections() {
       updateIntegrationCard(platform, d.storeUrl, d.lastSynced);
       showSyncBadge('syncing');
 
+      // ── Show skeleton + switch to dashboard IMMEDIATELY so user never sees Data Input ──
+      document.getElementById('dashboardSkeleton').style.display = 'block';
+      document.getElementById('dashboardContent').style.opacity = '0.3';
+      switchView('dashboard', document.getElementById('nav-dashboard'), true);
+
       const syncRes = await fetch(workerURL + '/resync-store', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -2459,4 +2464,5 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
 </body>
 </html>
+
 
