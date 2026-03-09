@@ -676,16 +676,11 @@ function onAuthChange() {
     const lb = document.getElementById('headerLoginBtn');
     if (lb) lb.style.display = 'none';
     if (!authVerified) { authVerified = true; window.verify(email); checkSavedStoreConnections(); }
-    }
-
-    // 🚀 MAGIC FIX: Check if user was trying to buy Pro before logging in
     if (sessionStorage.getItem('vzx_pending_upgrade') === 'true') {
-        sessionStorage.removeItem('vzx_pending_upgrade'); // Clear flag
-        setTimeout(() => {
-            showToast('Login successful! Opening secure payment...', 'success', 4000);
-            window.pay(); // Auto-open Razorpay
-        }, 1500);
+      sessionStorage.removeItem('vzx_pending_upgrade');
+      setTimeout(() => { showToast('Login successful! Opening secure payment...', 'success', 4000); window.pay(); }, 1500);
     }
+  }
   }
 
   // Plan display
@@ -2099,31 +2094,6 @@ window.handleUpgradeClick = function() {
   window.pay();
 };
 
-// 3. UPDATE YOUR onAuthChange FUNCTION (Add the "Pending Upgrade" check inside)
-function onAuthChange() {
-  const { userEmail:email, isProUser:pro } = AppState;
-
-  if (email) {
-    setText('sidebarEmail', email);
-    setText('settingsEmail', email);
-    // ... existing UI updates ...
-
-    // ADD THIS BLOCK: Check if they just logged in to buy Pro
-    if (sessionStorage.getItem('vzx_pending_upgrade') === 'true') {
-        sessionStorage.removeItem('vzx_pending_upgrade'); // Clear flag
-        window.closeLogin(); // Close modal
-        
-        // Wait 1s for UI to settle, then open Razorpay
-        setTimeout(() => {
-            showToast('Login successful! Opening payment...', 'success');
-            window.pay(); 
-        }, 1000);
-    }
-  }
-  
-  // ... rest of your existing plan display logic ...
-}
-
 // ─── STORE LOGIC ───
 function openStoreModal(tab='woo') {
   document.getElementById('storeModal').style.display = 'flex';
@@ -2642,6 +2612,7 @@ function resetDashboardToBlank() {
 
 </body>
 </html>
+
 
 
 
