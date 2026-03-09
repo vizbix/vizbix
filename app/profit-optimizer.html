@@ -14,13 +14,11 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
   <style>
-    /* 1. Keyframes must be at the top level */
+    .app-view { display: none; }
     @keyframes spin {
       from { transform: rotate(0deg); }
       to   { transform: rotate(360deg); }
     }
-
-    .app-view { display: none; }
     .app-view.active {
       display: block;
       animation: vzFadeIn 0.22s ease;
@@ -103,7 +101,7 @@
       <button class="btn-upgrade" onclick="handleUpgradeClick(); closePaywall();">
         Upgrade to Pro — ₹499
       </button>
-      <p class="pro-social-proof">⭐ Trusted by 200+ business owners · Instant access</p>
+      <p class="pro-social-proof">⭐ Trusted by 50+ business owners · Instant access</p>
     </div>
   </div>
 
@@ -242,7 +240,7 @@
           <h2>Data Integrations</h2>
         </div>
 
-        <<div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
+        <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
   
   <div class="data-card" style="padding:24px; text-align:center;">
     <img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/woocommerce.svg" style="height:32px; margin-bottom:12px; filter: invert(34%) sepia(87%) saturate(2253%) hue-rotate(242deg) brightness(97%) contrast(92%);" alt="WooCommerce">
@@ -284,6 +282,8 @@
     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:#059669;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
     Vizbix uses official Read-Only APIs. Your credentials are encrypted and never shared.
   </p>
+</div>
+</div>
 </div>
 
     <div id="view-dashboard" class="app-view">
@@ -561,7 +561,7 @@
           <button id="upgradeBtn" class="btn-upgrade" onclick="handleUpgradeClick();">
             🚀 Upgrade to PRO — ₹499 / 30 days
           </button>
-          <p style="font-size:12px;color:var(--slate-300);text-align:center;margin-top:8px;font-family:'Inter',sans-serif;">Instant access · 200+ businesses trust Vizbix</p>
+          <p style="font-size:12px;color:var(--slate-300);text-align:center;margin-top:8px;font-family:'Inter',sans-serif;">Instant access · 50+ businesses trust Vizbix</p>
         </div>
 
         <button class="btn btn-secondary"
@@ -643,7 +643,7 @@ window.currentMode = 'product';
 
 let myChart = null;
 let authVerified = false;
-let storeSyncing = false; 
+let storeSyncing = false;
 
 // ══════════════════════════════════════════
 //  TOAST
@@ -677,12 +677,8 @@ function onAuthChange() {
     if (lb) lb.style.display = 'none';
     if (!authVerified) {
       authVerified = true;
-      window.verify(email).then(() => {
-        // Only auto-sync after Pro status is confirmed
-        if (AppState.isProUser) {
-          checkSavedStoreConnections();
-        }
-      });
+      window.verify(email);
+      checkSavedStoreConnections();
     }
 
     // 🚀 MAGIC FIX: Check if user was trying to buy Pro before logging in
@@ -1025,60 +1021,41 @@ function runAnalysis(data) {
   const extraCount   = chartData.length - CHART_MAX;
 
   // Show "showing top N" notice
-  // 1. Wrap Chart logic in try-catch so it never crashes the app
-  try {
-    const ctxEl = document.getElementById('profitChart');
-    if (ctxEl) {
-      const ctx = ctxEl.getContext('2d');
-
-      // Top Note Logic
-      let chartNote = document.getElementById('chartTopNote');
-      if (!chartNote) {
-        chartNote = document.createElement('div');
-        chartNote.id = 'chartTopNote';
-        chartNote.style.cssText = 'font-size:11px;color:var(--slate-300);text-align:right;margin-bottom:4px;';
-        ctx.canvas.parentNode.insertBefore(chartNote, ctx.canvas);
-      }
-      // Note: We need 'extraCount' defined. If not defined earlier in runAnalysis, remove this line or define it.
-      // Assuming extraCount and CHART_MAX are defined above this block.
-      if (typeof extraCount !== 'undefined' && typeof CHART_MAX !== 'undefined') {
-         chartNote.textContent = extraCount > 0 ? `Top ${CHART_MAX} of ${data.length} products by revenue` : '';
-      }
-
-      // Destroy old chart to prevent "flickering"
-      if (myChart) myChart.destroy();
-
-      // Create New Chart
-      myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-          labels: chartLabels, // Ensure chartLabels is defined above
-          datasets: [
-            {label:'Revenue', data:chartRevD,  backgroundColor:'#e0e7ff', borderRadius:5},
-            {label:'Profit',  data:chartProfD, backgroundColor:'#5b5ef6', borderRadius:5}
-          ]
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          plugins: {
-            legend: { position:'top', labels:{ font:{weight:'600',size:11,family:'Inter'}, color:'#94a3b8', boxWidth:12, padding:12 } }
-          },
-          scales: {
-            x:{ grid:{display:false}, ticks:{color:'#94a3b8', font:{weight:'500',size:10,family:'Inter'}, maxRotation:40, autoSkip:false} },
-            y:{ beginAtZero:true, grid:{color:'#f4f7ff'}, ticks:{color:'#94a3b8', font:{size:10,family:'Inter'}} }
-          }
-        }
-      });
-    }
-  } catch (e) {
-    console.warn("Chart rendering failed (non-critical):", e);
+  let chartNote = document.getElementById('chartTopNote');
+  if (!chartNote) {
+    chartNote = document.createElement('div');
+    chartNote.id = 'chartTopNote';
+    chartNote.style.cssText = 'font-size:11px;color:var(--slate-300);text-align:right;margin-bottom:4px;';
+    ctx.canvas.parentNode.insertBefore(chartNote, ctx.canvas);
   }
+  chartNote.textContent = extraCount > 0 ? `Top ${CHART_MAX} of ${data.length} products by revenue` : '';
 
-  // 2. IMPORTANT: These run even if the chart crashes
+  myChart = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: chartLabels,
+      datasets: [
+        {label:'Revenue', data:chartRevD,  backgroundColor:'#e0e7ff', borderRadius:5},
+        {label:'Profit',  data:chartProfD, backgroundColor:'#5b5ef6', borderRadius:5}
+      ]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { position:'top', labels:{ font:{weight:'600',size:11,family:'Inter'}, color:'#94a3b8', boxWidth:12, padding:12 } }
+      },
+      scales: {
+        x:{ grid:{display:false}, ticks:{color:'#94a3b8', font:{weight:'500',size:10,family:'Inter'}, maxRotation:40, autoSkip:false} },
+        y:{ beginAtZero:true, grid:{color:'#f4f7ff'}, ticks:{color:'#94a3b8', font:{size:10,family:'Inter'}} }
+      }
+    }
+  });
+
   showToast('Dashboard updated ✓', 'success');
   renderEnhancedReport(data);
-  
+}
+
 // ══════════════════════════════════════════
 //  CSV / EXCEL SMART IMPORT
 // ══════════════════════════════════════════
@@ -2082,51 +2059,6 @@ document.addEventListener('click', e => {
   }
 });
 
-// ══════════════════════════════════════════
-//  UPGRADE GUARD
-// ══════════════════════════════════════════
-// 1. ADD THESE HELPER FUNCTIONS (Anywhere in your script)
-window.openLogin = function() { document.getElementById('loginModal').style.display = 'flex'; };
-window.closeLogin = function() { document.getElementById('loginModal').style.display = 'none'; };
-window.onclick = function(e) { if(e.target == document.getElementById('loginModal')) window.closeLogin(); };
-
-// 2. REPLACE YOUR EXISTING handleUpgradeClick WITH THIS
-window.handleUpgradeClick = function() {
-  if (!AppState.userEmail) {
-    // Set a flag so we know to open payment immediately after they log in
-    sessionStorage.setItem('vzx_pending_upgrade', 'true');
-    // Open the modal directly on this page
-    window.openLogin(); 
-    return;
-  }
-  window.pay();
-};
-
-// 3. UPDATE YOUR onAuthChange FUNCTION (Add the "Pending Upgrade" check inside)
-function onAuthChange() {
-  const { userEmail:email, isProUser:pro } = AppState;
-
-  if (email) {
-    setText('sidebarEmail', email);
-    setText('settingsEmail', email);
-    // ... existing UI updates ...
-
-    // ADD THIS BLOCK: Check if they just logged in to buy Pro
-    if (sessionStorage.getItem('vzx_pending_upgrade') === 'true') {
-        sessionStorage.removeItem('vzx_pending_upgrade'); // Clear flag
-        window.closeLogin(); // Close modal
-        
-        // Wait 1s for UI to settle, then open Razorpay
-        setTimeout(() => {
-            showToast('Login successful! Opening payment...', 'success');
-            window.pay(); 
-        }, 1000);
-    }
-  }
-  
-  // ... rest of your existing plan display logic ...
-}
-
 // ─── STORE LOGIC ───
 function openStoreModal(tab='woo') {
   document.getElementById('storeModal').style.display = 'flex';
@@ -2275,90 +2207,55 @@ function showSyncBadge(state, lastSynced) {
   }
 }
 
-// ── Auto sync on login (Bulletproof Version) ──
+// ── Auto sync on login ──
 async function checkSavedStoreConnections() {
-  // 1. Safety Checks
-  if (!AppState.userEmail || storeSyncing) return;
-  
-  // FIX: Force update sidebar status immediately if we know they are Pro
-  if (AppState.isProUser) {
-     const planEl = document.getElementById('sidebarPlan');
-     if(planEl) {
-        planEl.innerText = "Pro Active";
-        planEl.style.color = "#059669";
-     }
-  }
-
+  if (!AppState.userEmail) return;
   for (const platform of ['woo', 'shopify']) {
     try {
-      // 2. Check if credentials exist in Cloudflare
-      const res = await fetch(`${workerURL}/woo/get-creds?email=${AppState.userEmail}&platform=${platform}`);
-      if (!res.ok) continue; 
-      
+      const res = await fetch(
+        `${workerURL}/woo/get-creds?email=${AppState.userEmail}&platform=${platform}`
+      );
       const d = await res.json();
       if (!d.connected) continue;
 
-      // 3. START SYNC: Lock the process
-      storeSyncing = true;
+      updateIntegrationCard(platform, d.storeUrl, d.lastSynced);
       showSyncBadge('syncing');
-      
-      // 4. SWITCH VIEW: Show Skeleton
-      // Only switch if we are NOT already on the dashboard to prevent flickering
-      if (AppState.currentView !== 'dashboard') {
-          switchView('dashboard', document.getElementById('nav-dashboard'));
-      }
-      document.getElementById('dashboardSkeleton').style.display = 'block';
-      document.getElementById('dashboardContent').style.display = 'none';
 
-      // 5. CALL WORKER
+      // ── Show skeleton + switch to dashboard IMMEDIATELY so user never sees Data Input ──
+      document.getElementById('dashboardSkeleton').style.display = 'block';
+      document.getElementById('dashboardContent').style.opacity = '0.3';
+      switchView('dashboard', document.getElementById('nav-dashboard'), true);
+
       const syncRes = await fetch(workerURL + '/resync-store', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email: AppState.userEmail, platform })
       });
-      
-      if (!syncRes.ok) throw new Error("Sync API failed");
-      
       const syncData = await syncRes.json();
 
-      // 6. SUCCESS: Populate Data
       if (syncData.ok && syncData.data.length) {
-        const itemsContainer = document.getElementById('items');
-        if(itemsContainer) {
-            itemsContainer.innerHTML = '';
-            syncData.data.forEach(p => addNewRow(p.name, p.sell, 0, p.qty));
-        }
-        
-        // SAFE ANALYSIS: Run this in a try/catch so it doesn't kill the page
-        try {
-            saveDataToStorage();
-            runAnalysis(getFreshData()); 
-        } catch (analysisErr) {
-            console.error("Analysis Error:", analysisErr);
-        }
-        
+        document.getElementById('items').innerHTML = '';
+        syncData.data.forEach(p => addNewRow(p.name, p.sell, 0, p.qty));
+        saveDataToStorage();
         showSyncBadge('done', syncData.lastSynced);
-        updateIntegrationCard(platform, d.storeUrl, syncData.lastSynced);
+        // Go straight to dashboard — guard prevents re-entry
+        if (!storeSyncing) {
+          storeSyncing = true;
+          setTimeout(() => {
+            processDataAndShowReport();
+            storeSyncing = false;
+          }, 300);
+        }
       } else {
         showSyncBadge('failed');
       }
-      
-      // Stop after first connected store found
-      break; 
-      
+      break; // Only sync first connected platform
     } catch(e) {
-      console.error("Sync Critical Fail:", e);
       showSyncBadge('failed');
-    } finally {
-      // 7. ALWAYS RELEASE THE LOCK & SHOW CONTENT
-      // This is the specific fix for the "Blank Screen"
-      storeSyncing = false;
-      document.getElementById('dashboardSkeleton').style.display = 'none';
-      document.getElementById('dashboardContent').style.display = 'block';
-      document.getElementById('dashboardContent').style.opacity = '1';
     }
   }
 }
+
 // ── Manual refresh from badge click ──
 async function manualRefresh() {
   if (!AppState.userEmail) return;
@@ -2456,14 +2353,6 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const restored = loadDataFromStorage();
   if (restored) showToast('Your previous data has been restored ✓', 'info', 2500);
 });
-
-function resetDashboardToBlank() {
-  // Hide skeleton, show content (even if empty) so the user isn't stuck
-  document.getElementById('dashboardSkeleton').style.display = 'none';
-  document.getElementById('dashboardContent').style.display = 'block';
-  document.getElementById('dashboardContent').style.opacity = '1';
-}
-  
 </script>
 <script type="module" src="../assets/js/auth.js?v=4.4"></script>
 
