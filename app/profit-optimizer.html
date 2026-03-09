@@ -14,14 +14,16 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
   <style>
+    /* 1. Keyframes must be at the top level */
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to   { transform: rotate(360deg); }
+    }
+
     .app-view { display: none; }
     .app-view.active {
       display: block;
       animation: vzFadeIn 0.22s ease;
-      @keyframes spin {
-  from { transform: rotate(0deg); }
-  to   { transform: rotate(360deg); }
-}
     }
   </style>
 </head>
@@ -641,7 +643,7 @@ window.currentMode = 'product';
 
 let myChart = null;
 let authVerified = false;
-let storeSyncing = false;
+let storeSyncing = false; 
 
 // ══════════════════════════════════════════
 //  TOAST
@@ -2254,25 +2256,28 @@ function showSyncBadge(state, lastSynced) {
   }
 }
 
-// ── Auto sync on login ──
+// ── Auto sync on login (Fixed Logic) ──
 async function checkSavedStoreConnections() {
-  if (!AppState.userEmail) return;
+  // 1. Safety Checks
+  if (!AppState.userEmail || storeSyncing) return;
+  
   for (const platform of ['woo', 'shopify']) {
     try {
-      const res = await fetch(
-        `${workerURL}/woo/get-creds?email=${AppState.userEmail}&platform=${platform}`
-      );
+      // 2. Check if credentials exist in Cloudflare
+      const res = await fetch(`${workerURL}/woo/get-creds?email=${AppState.userEmail}&platform=${platform}`);
       const d = await res.json();
       if (!d.connected) continue;
 
-      updateIntegrationCard(platform, d.storeUrl, d.lastSynced);
+      // 3. START SYNC: Lock the process
+      storeSyncing = true;
       showSyncBadge('syncing');
-
-      // ── Show skeleton + switch to dashboard IMMEDIATELY so user never sees Data Input ──
+      
+      // 4. SWITCH VIEW: Show Skeleton IMMEDIATELY, Hide Content
+      switchView('dashboard', document.getElementById('nav-dashboard'));
       document.getElementById('dashboardSkeleton').style.display = 'block';
-      document.getElementById('dashboardContent').style.opacity = '0.3';
-      switchView('dashboard', document.getElementById('nav-dashboard'), true);
+      document.getElementById('dashboardContent').style.display = 'none';
 
+      // 5. CALL WORKER
       const syncRes = await fetch(workerURL + '/resync-store', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -2280,25 +2285,34 @@ async function checkSavedStoreConnections() {
       });
       const syncData = await syncRes.json();
 
+      // 6. SUCCESS: Populate Data & Reveal Dashboard
       if (syncData.ok && syncData.data.length) {
         document.getElementById('items').innerHTML = '';
         syncData.data.forEach(p => addNewRow(p.name, p.sell, 0, p.qty));
+        
+        // Recalculate numbers
+        runAnalysis(getFreshData()); 
         saveDataToStorage();
+        
+        // REVEAL CONTENT
+        document.getElementById('dashboardSkeleton').style.display = 'none';
+        document.getElementById('dashboardContent').style.display = 'block'; // <--- This fixes the blank screen
+        
         showSyncBadge('done', syncData.lastSynced);
-        // Go straight to dashboard — guard prevents re-entry
-        if (!storeSyncing) {
-          storeSyncing = true;
-          setTimeout(() => {
-            processDataAndShowReport();
-            storeSyncing = false;
-          }, 300);
-        }
+        updateIntegrationCard(platform, d.storeUrl, syncData.lastSynced);
       } else {
+        // Partial failure
         showSyncBadge('failed');
+        resetDashboardToBlank();
       }
-      break; // Only sync first connected platform
+      break; // Stop after first connected store found
     } catch(e) {
+      console.error(e);
       showSyncBadge('failed');
+      resetDashboardToBlank();
+    } finally {
+      // 7. ALWAYS RELEASE THE LOCK
+      storeSyncing = false;
     }
   }
 }
@@ -2400,6 +2414,14 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const restored = loadDataFromStorage();
   if (restored) showToast('Your previous data has been restored ✓', 'info', 2500);
 });
+
+function resetDashboardToBlank() {
+  // Hide skeleton, show content (even if empty) so the user isn't stuck
+  document.getElementById('dashboardSkeleton').style.display = 'none';
+  document.getElementById('dashboardContent').style.display = 'block';
+  document.getElementById('dashboardContent').style.opacity = '1';
+}
+  
 </script>
 <script type="module" src="../assets/js/auth.js?v=4.4"></script>
 
@@ -2479,6 +2501,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
 </body>
 </html>
+
 
 
 
