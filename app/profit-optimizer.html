@@ -1733,7 +1733,7 @@ if(AppState.isProUser !== true) {
 };
 
 window.sendChatMessage = async function() {
-  if(!AppState.isProUser) { document.getElementById('proLockOverlay').classList.remove('pro-lock-hidden'); return; }
+  if(AppState.isProUser !== true) { document.getElementById('proLockOverlay').classList.remove('pro-lock-hidden'); return; }
   const inp = document.getElementById('aiChatInput');
   const msg = inp?.value.trim();
   if(!msg) return;
@@ -1911,7 +1911,7 @@ window.saveToCloud = async function() {
 
 window.fetchHistory = async function() {
   const list = document.getElementById('historyList'); if(!list) return;
-  if(!AppState.isProUser) {
+  if(AppState.isProUser !== true) {
     list.innerHTML=`<div style="text-align:center;padding:20px;">
       <p style="color:var(--slate-300);margin-bottom:14px;font-family:'Inter',sans-serif;">Cloud History is a Pro feature.</p>
       <button class="btn btn-primary" style="font-size:13px;" onclick="switchView('settings',document.querySelectorAll('.nav-item')[7])">Upgrade to Pro</button>
@@ -2438,6 +2438,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
 </body>
 </html>
+
 
 
 
