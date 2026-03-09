@@ -34,15 +34,8 @@ onAuthStateChanged(auth, async (user) => {
     const isAppPage = window.location.pathname.includes('profit-optimizer');
 
     if (user) {
-    window.userEmail = user.email;
-
-    // Direct UI update (ensures email appears even if Proxy not ready)
-    const sidebarEmail = document.getElementById("sidebarEmail");
-    const settingsEmail = document.getElementById("settingsEmail");
-
-    if (sidebarEmail) sidebarEmail.innerText = user.email;
-    if (settingsEmail) settingsEmail.innerText = user.email;
-        } // Sync with HTML AppState if present
+        // === USER IS LOGGED IN ===
+        if (window.AppState) window.userEmail = user.email; // Sync with HTML AppState if present
         
         // 1. Update Header Button
         if(headerLoginBtn) {
@@ -69,13 +62,7 @@ onAuthStateChanged(auth, async (user) => {
 
     } else {
         // === USER IS NOT LOGGED IN ===
-        window.userEmail = null;
-
-const sidebarEmail = document.getElementById("sidebarEmail");
-const settingsEmail = document.getElementById("settingsEmail");
-
-if (sidebarEmail) sidebarEmail.innerText = "Not logged in";
-if (settingsEmail) settingsEmail.innerText = "Not logged in";
+        if (window.AppState) window.userEmail = null;
         
         // 1. Reset Header
         if(headerLoginBtn) {
@@ -190,6 +177,5 @@ window.handleEmailSignUp = async function() {
         btn.innerText = originalText;
     }
 };
-
 
 
