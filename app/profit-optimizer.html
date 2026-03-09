@@ -1046,6 +1046,27 @@ function runAnalysis(data) {
       const safeRev = revD.slice(0, CHART_MAX);
       const safeProf = profD.slice(0, CHART_MAX);
 
+     // 1. Slicing logic to limit chart items (Fixes undefined safeLabels)
+      const CHART_MAX = 12;
+      const extraCount = data.length - CHART_MAX;
+      
+      // Update the "Top X" note text
+      let chartNote = document.getElementById('chartTopNote');
+      if (!chartNote) {
+        chartNote = document.createElement('div');
+        chartNote.id = 'chartTopNote';
+        chartNote.style.cssText = 'font-size:11px;color:var(--slate-300);text-align:right;margin-bottom:4px;';
+        ctx.canvas.parentNode.insertBefore(chartNote, ctx.canvas);
+      }
+      chartNote.textContent = extraCount > 0 ? `Top ${CHART_MAX} of ${data.length} products by revenue` : '';
+
+      // Create the safe data subsets
+      const safeLabels = labels.slice(0, CHART_MAX);
+      const safeRev = revD.slice(0, CHART_MAX);
+      const safeProf = profD.slice(0, CHART_MAX);
+
+      if(myChart) myChart.destroy();
+
       myChart = new Chart(ctx, {
         type: 'bar',
         data: { 
@@ -1070,7 +1091,7 @@ function runAnalysis(data) {
   // 2. IMPORTANT: These run even if the chart crashes
   showToast('Dashboard updated ✓', 'success');
   renderEnhancedReport(data);
-  
+}
 // ══════════════════════════════════════════
 //  CSV / EXCEL SMART IMPORT
 // ══════════════════════════════════════════
@@ -2612,6 +2633,7 @@ function resetDashboardToBlank() {
 
 </body>
 </html>
+
 
 
 
