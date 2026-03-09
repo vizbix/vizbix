@@ -2061,28 +2061,6 @@ document.addEventListener('click', e => {
   }
 });
 
-// ══════════════════════════════════════════
-//  UPGRADE GUARD
-// ══════════════════════════════════════════
-// 1. ADD THESE HELPER FUNCTIONS (Anywhere in your script)
-window.openLogin = function() { document.getElementById('loginModal').style.display = 'flex'; };
-window.closeLogin = function() { document.getElementById('loginModal').style.display = 'none'; };
-window.onclick = function(e) { if(e.target == document.getElementById('loginModal')) window.closeLogin(); };
-
-// 2. REPLACE YOUR EXISTING handleUpgradeClick WITH THIS
-window.handleUpgradeClick = function() {
-  if (!AppState.userEmail) {
-    // Set a flag so we know to open payment immediately after they log in
-    sessionStorage.setItem('vzx_pending_upgrade', 'true');
-    // Open the modal directly on this page
-    window.openLogin(); 
-    return;
-  }
-  window.pay();
-};
-  
-  // ... rest of your existing plan display logic ...
-
 // ─── STORE LOGIC ───
 function openStoreModal(tab='woo') {
   document.getElementById('storeModal').style.display = 'flex';
@@ -2456,6 +2434,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
 </body>
 </html>
+
 
 
 
