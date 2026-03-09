@@ -29,7 +29,6 @@ onAuthStateChanged(auth, async (user) => {
     const headerLoginBtn = document.getElementById("headerLoginBtn");
     const drawerProfile = document.getElementById("drawerProfile");
     const drawerEmailDisplay = document.getElementById("drawerEmailDisplay");
-    const sidebarEmail = document.getElementById("sidebarEmail");
     
     // Check if we are inside the App (Profit Optimizer)
     const isAppPage = window.location.pathname.includes('profit-optimizer');
@@ -50,7 +49,6 @@ onAuthStateChanged(auth, async (user) => {
         // 2. Update Drawer UI
         if(drawerProfile) drawerProfile.style.display = "block";
         if(drawerEmailDisplay) drawerEmailDisplay.innerText = user.email;
-        if(sidebarEmail) sidebarEmail.innerText = user.email;
         
         // 3. Logic for App Page vs Landing Page
         if(isAppPage) {
@@ -179,6 +177,3 @@ window.handleEmailSignUp = async function() {
         btn.innerText = originalText;
     }
 };
-
-
-
