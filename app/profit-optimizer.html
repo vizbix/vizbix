@@ -533,7 +533,7 @@
           </table>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;width:100%;" id="reportBottomGrid">cccccccccccccccccccccccc
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;width:100%;" id="reportBottomGrid">
           <div class="data-card" style="padding:20px;min-width:0;width:100%;box-sizing:border-box;">
             <h4 style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--slate-300);margin-bottom:4px;">Revenue Share by Product</h4>
             <p style="font-size:11.5px;color:var(--slate-300);margin-bottom:12px;">Which products drive your revenue</p>
@@ -1492,7 +1492,7 @@ function renderEnhancedReport(data) {
       return `${name} (${pct}%)`;
     });
     const pieData    = pieTop.map(p => Math.max(0, p.rev));
-    const piePalette = ['#5b5ef6','#f87171','#fbbf24','#34d399','#a78bfa','#fb923c','#60a5fa','#e879f9','#38bdf8','#6ee7b7'];
+    const piePalette = ['#312e81','#3730a3','#4338ca','#4f46e5','#6366f1','#818cf8','#a5b4fc','#c7d2fe','#e0e7ff','#eef2ff'];
 
     reportPieChart = new Chart(pieCtx, {
       type: 'pie',
@@ -1501,9 +1501,9 @@ function renderEnhancedReport(data) {
         datasets: [{
           data: pieData,
           backgroundColor: piePalette,
-          borderWidth: 3,
+          borderWidth: 4,
           borderColor: 'white',
-          hoverOffset: 16,
+          hoverOffset: 18,
         }]
       },
       options: {
