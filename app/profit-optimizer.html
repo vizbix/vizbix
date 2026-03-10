@@ -913,6 +913,18 @@ function processDataAndShowReport() {
   saveDataToStorage();
   const data = getFreshData();
   if(!data.length) return showToast('Add at least one product first.','error');
+  // ── NEW: Sell price warning ──
+  const missingSell = data.filter(p => !p.sell || p.sell === 0);
+  if (missingSell.length) {
+    showToast(`⚠️ ${missingSell.length} product(s) missing sell price. Dashboard may be inaccurate.`, 'error', 5000);
+    return; // Block dashboard generation entirely
+  }
+
+  // ── NEW: Missing cost warning (non-blocking) ──
+  const missingCost = data.filter(p => !p.cost || p.cost === 0);
+  if (missingCost.length && !window.revenueOnlyMode && !window.costEstimateMode) {
+    showToast(`💡 ${missingCost.length} product(s) have no cost price. Profit data will be inaccurate.`, 'info', 4000);
+  }
 
   // Show skeleton, fade content, switch view
   document.getElementById('dashboardSkeleton').style.display='block';
@@ -980,11 +992,41 @@ function runAnalysis(data) {
   if(data.length>=3) hs+=12;
   hs = Math.max(0, Math.min(100, Math.round(hs)));
 
+  // ── NEW: Show estimated data warning if applicable ──
+  const existingBanner = document.getElementById('dashEstimateBanner');
+  if (existingBanner) existingBanner.remove();
+
+  if (window.costEstimateMode) {
+    const banner = document.createElement('div');
+    banner.id = 'dashEstimateBanner';
+    banner.style.cssText = 'background:#fef3c7;border:1px solid #fde68a;border-radius:10px;padding:10px 16px;margin-bottom:14px;font-size:13px;color:#92400e;display:flex;align-items:center;gap:8px;';
+    banner.innerHTML = `⚠️ <strong>Estimated Data:</strong> Cost prices are estimated at ${window.costEstimateMargin}% margin. Update real costs in Data Input for accurate profit figures. <button onclick="switchView('data', document.getElementById('nav-data'))" style="margin-left:auto;font-size:12px;padding:4px 10px;border-radius:6px;border:1px solid #f59e0b;background:white;color:#92400e;cursor:pointer;">Edit Costs →</button>`;
+    document.getElementById('dashboardContent').insertBefore(banner, document.getElementById('dashboardContent').firstChild);
+  }
+
+  if (window.revenueOnlyMode) {
+    const banner = document.createElement('div');
+    banner.id = 'dashEstimateBanner';
+    banner.style.cssText = 'background:#eff6ff;border:1px solid #bfdbfe;border-radius:10px;padding:10px 16px;margin-bottom:14px;font-size:13px;color:#1e40af;display:flex;align-items:center;gap:8px;';
+    banner.innerHTML = `📈 <strong>Revenue-Only Mode:</strong> Add cost prices to unlock Profit, Margin & Health Score. <button onclick="showCostMissingModal(getFreshData())" style="margin-left:auto;font-size:12px;padding:4px 10px;border-radius:6px;border:1px solid #93c5fd;background:white;color:#1e40af;cursor:pointer;">Add Costs →</button>`;
+    document.getElementById('dashboardContent').insertBefore(banner, document.getElementById('dashboardContent').firstChild);
+  }
+  // Metric cards
   // Metric cards
   setText('dash-revenue',     fmt(tRev));
-  setText('dash-profit',      fmt(tProfit));
-  setText('dash-margin',      ovMargin.toFixed(1)+'%');
   setText('dash-top-product', top.name);
+
+  if (window.revenueOnlyMode) {
+    setText('dash-profit',  '—');
+    setText('dash-margin',  '—');
+    document.getElementById('dash-profit').closest('.metric-card').style.filter = 'blur(4px)';
+    document.getElementById('dash-margin').closest('.metric-card').style.filter = 'blur(4px)';
+  } else {
+    setText('dash-profit', fmt(tProfit));
+    setText('dash-margin', ovMargin.toFixed(1)+'%');
+    document.getElementById('dash-profit').closest('.metric-card').style.filter = 'none';
+    document.getElementById('dash-margin').closest('.metric-card').style.filter = 'none';
+  }
   document.getElementById('reportTableBody').innerHTML = reportHTML;
 
   // Health badge
@@ -2189,7 +2231,6 @@ if (AppState.userEmail) {
         processDataAndShowReport();
       }
       
-      setTimeout(() => alert("Import Successful!\n\nNote: Cost Price is set to 0.\nPlease update your costs to see profit."), 500);
     } else {
       showToast('Error: ' + (d.error || 'Connection Failed'), 'error');
     }
@@ -2421,6 +2462,11 @@ function showCostMissingModal(products) {
   costModalShown = true;        // ← add
   document.getElementById('costMissingCount').textContent = products.length;
   document.getElementById('costMissingModal').style.display = 'flex';
+  // ── NEW: Auto-select revenue mode if ALL costs are 0 ──
+  const allZero = products.every(p => !p.cost || p.cost === 0);
+  if (allZero) {
+    setTimeout(() => selectCostOption('revenue'), 100);
+  }
   // Pre-populate manual table
   const tbody = document.getElementById('costManualBody');
   tbody.innerHTML = products.map((p, i) => `
@@ -2457,9 +2503,18 @@ function selectCostOption(opt) {
 function applyCostOption() {
   const data = getFreshData();
   if (!data.length) return;
+  // ── NEW: Check for missing sell prices ──
+  const missingSell = data.filter(p => !p.sell || p.sell === 0);
+  if (missingSell.length) {
+    showToast(`⚠️ ${missingSell.length} product(s) have no sell price. Please fill them in Data Input first.`, 'error', 5000);
+    return;
+  }
 
   if (selectedCostOption === 'margin') {
     const margin = parseInt(document.getElementById('marginSlider').value);
+    window.costEstimateMode = true;
+    window.costEstimateMargin = margin;
+    window.revenueOnlyMode = false;
     data.forEach((p, i) => {
       // cost = sell * (1 - margin/100)
       const cost = parseFloat((p.sell * (1 - margin / 100)).toFixed(2));
@@ -2475,6 +2530,8 @@ function applyCostOption() {
       const row = document.querySelectorAll('#items .data-row')[i];
       if (row) row.querySelector('.input-cost').value = cost;
     });
+    window.costEstimateMode = false;
+    window.revenueOnlyMode = false;
     showToast('Costs saved manually ✓', 'success');
 
   } else if (selectedCostOption === 'csv') {
@@ -2490,6 +2547,8 @@ function applyCostOption() {
         if (row) row.querySelector('.input-cost').value = match.cost;
       }
     });
+    window.costEstimateMode = false;
+    window.revenueOnlyMode = false;
     showToast('Costs matched from CSV ✓', 'success');
 
   } else if (selectedCostOption === 'revenue') {
@@ -2756,6 +2815,3 @@ function showCostCsvResult() {
 
 </body>
 </html>
-
-
-
