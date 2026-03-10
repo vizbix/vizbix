@@ -1478,6 +1478,26 @@ let reportMarginChart = null;
 
 function renderEnhancedReport(data) {
   if (!data || !data.length) return;
+  
+  // Hide all report content in revenue mode
+  if (AppState.analyticsMode === 'revenue') {
+    document.getElementById('reportSummaryBar').style.display = 'none';
+    document.getElementById('reportBands').style.display = 'none';
+    document.getElementById('reportSearch')?.closest('div[style]').style.display = 'none';
+    document.querySelector('#view-report .report-table')?.closest('div[style]').style.display = 'none';
+    document.getElementById('reportBottomGrid').style.display = 'none';
+    return;
+  }
+
+  // Restore all report content in profit mode
+  document.getElementById('reportSummaryBar').style.display = '';
+  document.getElementById('reportBands').style.display = '';
+  document.getElementById('reportBottomGrid').style.display = '';
+  const searchWrap = document.getElementById('reportSearch')?.closest('div[style]');
+  if (searchWrap) searchWrap.style.display = '';
+  const tableWrap = document.querySelector('#view-report .report-table')?.closest('div[style]');
+  if (tableWrap) tableWrap.style.display = '';
+  
   // ── Warning bar at top of report ──
   const existingWarn = document.getElementById('reportWarningBar');
   if (existingWarn) existingWarn.remove();
