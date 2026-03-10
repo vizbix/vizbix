@@ -1478,25 +1478,29 @@ let reportMarginChart = null;
 
 function renderEnhancedReport(data) {
   if (!data || !data.length) return;
-  
-  // Hide all report content in revenue mode
+
+  const summaryBar  = document.getElementById('reportSummaryBar');
+  const bandsEl     = document.getElementById('reportBands');
+  const bottomGrid  = document.getElementById('reportBottomGrid');
+  const searchWrap  = document.getElementById('reportSearch')?.closest('div');
+  const tableWrap   = document.querySelector('#view-report [style*="overflow-x:auto"]');
+
   if (AppState.analyticsMode === 'revenue') {
-    document.getElementById('reportSummaryBar').style.display = 'none';
-    document.getElementById('reportBands').style.display = 'none';
-    document.getElementById('reportSearch')?.closest('div[style]').style.display = 'none';
-    document.querySelector('#view-report .report-table')?.closest('div[style]').style.display = 'none';
-    document.getElementById('reportBottomGrid').style.display = 'none';
+    if (summaryBar) summaryBar.style.display = 'none';
+    if (bandsEl)    bandsEl.style.display    = 'none';
+    if (bottomGrid) bottomGrid.style.display = 'none';
+    if (searchWrap) searchWrap.style.display = 'none';
+    if (tableWrap)  tableWrap.style.display  = 'none';
     return;
   }
 
-  // Restore all report content in profit mode
-  document.getElementById('reportSummaryBar').style.display = '';
-  document.getElementById('reportBands').style.display = '';
-  document.getElementById('reportBottomGrid').style.display = '';
-  const searchWrap = document.getElementById('reportSearch')?.closest('div[style]');
+  // Restore all in profit mode
+  if (summaryBar) summaryBar.style.display = '';
+  if (bandsEl)    bandsEl.style.display    = '';
+  if (bottomGrid) bottomGrid.style.display = '';
   if (searchWrap) searchWrap.style.display = '';
-  const tableWrap = document.querySelector('#view-report .report-table')?.closest('div[style]');
-  if (tableWrap) tableWrap.style.display = '';
+  if (tableWrap)  tableWrap.style.display  = '';
+
   // ── Warning bar at top of report ──
   const existingWarn = document.getElementById('reportWarningBar');
   if (existingWarn) existingWarn.remove();
