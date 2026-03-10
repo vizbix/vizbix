@@ -938,6 +938,28 @@ function processDataAndShowReport() {
   }, 420);
 }
 
+function getDataWarningHTML() {
+  const data = getFreshData();
+  const missingSell = data.filter(p => !p.sell || p.sell === 0);
+  const missingCost = data.filter(p => !p.cost || p.cost === 0);
+
+  let msg = '';
+  if (missingSell.length)
+    msg = `⚠️ ${missingSell.length} product(s) are missing sell prices — revenue data may be incomplete`;
+  else if (window.revenueOnlyMode)
+    msg = `⚠️ Revenue-Only Mode — profit & margin data is hidden. Add real costs for full analysis`;
+  else if (window.costEstimateMode)
+    msg = `⚠️ Cost prices are estimated at ${window.costEstimateMargin}% margin — profit figures may not reflect reality`;
+  else if (missingCost.length)
+    msg = `⚠️ ${missingCost.length} product(s) are missing cost prices — profit data may be inaccurate`;
+
+  if (!msg) return '';
+  return `<div id="dataWarningBar" style="display:flex;align-items:center;justify-content:space-between;gap:10px;background:#fef2f2;border:1px solid #fecaca;border-radius:9px;padding:9px 14px;font-size:12.5px;font-weight:600;color:#dc2626;margin-bottom:14px;">
+    <span>${msg}</span>
+    <button onclick="this.parentElement.remove()" style="background:none;border:none;color:#dc2626;font-size:16px;cursor:pointer;flex-shrink:0;line-height:1;padding:0 2px;">×</button>
+  </div>`;
+}
+
 function runAnalysis(data) {
   let tRev=0, tCost=0, tProfit=0, tItems=0;
   let labels=[], revD=[], profD=[], reportHTML='', pdfIns='';
@@ -1131,6 +1153,13 @@ function runAnalysis(data) {
       }
     }
   });
+
+  // ── Warning bar at bottom of dashboard ──
+  document.getElementById('dataWarningBar')?.remove();
+  const warnHTML = getDataWarningHTML();
+  if (warnHTML) {
+    document.getElementById('dashboardContent').insertAdjacentHTML('beforeend', warnHTML);
+  }
 
   showToast('Dashboard updated ✓', 'success');
   renderEnhancedReport(data);
@@ -1346,7 +1375,14 @@ let reportMarginChart = null;
 
 function renderEnhancedReport(data) {
   if (!data || !data.length) return;
-
+  // ── Warning bar at top of report ──
+  const existingWarn = document.getElementById('reportWarningBar');
+  if (existingWarn) existingWarn.remove();
+  const reportWarnHTML = getDataWarningHTML()?.replace('id="dataWarningBar"', 'id="reportWarningBar"');
+  if (reportWarnHTML) {
+    const reportHeader = document.getElementById('reportSummaryBar');
+    if (reportHeader) reportHeader.insertAdjacentHTML('beforebegin', reportWarnHTML);
+  }
   const fmt = (n) => {
     const sym = AppState.currencySymbol || '₹';
     return sym + Math.abs(n).toLocaleString('en-IN', {maximumFractionDigits:0});
