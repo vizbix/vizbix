@@ -1294,7 +1294,7 @@ const allZeroCost = rows.every(r => !r.cost || r.cost === 0);
 if (allZeroCost) {
   setTimeout(() => showCostMissingModal(rows), 400);
 }
-
+}
 // ══════════════════════════════════════════
 //  ENHANCED REPORT RENDERING
 // ══════════════════════════════════════════
@@ -2756,5 +2756,6 @@ function showCostCsvResult() {
 
 </body>
 </html>
+
 
 
