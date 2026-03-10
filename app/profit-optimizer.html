@@ -1203,8 +1203,14 @@ function runAnalysis(data) {
     .sort((a,b) => b.rev - a.rev);
   const chartSlice   = chartData.slice(0, CHART_MAX);
   const chartLabels  = chartSlice.map(d => d.name.length > 14 ? d.name.slice(0,13)+'…' : d.name);
-  const chartRevD    = chartSlice.map(d => d.rev);
-  const chartProfD   = chartSlice.map(d => d.profit);
+  const chartRevD = chartSlice.map(d => d.rev);
+let chartProfD;
+
+if (AppState.analyticsMode === "revenue") {
+    chartProfD = new Array(chartRevD.length).fill(0);
+} else {
+    chartProfD = chartSlice.map(d => d.profit);
+}
   const extraCount   = chartData.length - CHART_MAX;
 
   // Show "showing top N" notice
@@ -1221,10 +1227,14 @@ function runAnalysis(data) {
     type: 'bar',
     data: {
       labels: chartLabels,
-      datasets: [
-        {label:'Revenue', data:chartRevD,  backgroundColor:'#e0e7ff', borderRadius:5},
-        {label:'Profit',  data:chartProfD, backgroundColor:'#5b5ef6', borderRadius:5}
-      ]
+      ddatasets: AppState.analyticsMode === "revenue"
+? [
+    {label:'Revenue', data:chartRevD, backgroundColor:'#5b5ef6', borderRadius:5}
+  ]
+: [
+    {label:'Revenue', data:chartRevD,  backgroundColor:'#e0e7ff', borderRadius:5},
+    {label:'Profit',  data:chartProfD, backgroundColor:'#5b5ef6', borderRadius:5}
+  ]
     },
     options: {
       responsive: true,
@@ -1476,6 +1486,9 @@ function renderEnhancedReport(data) {
   // Compute per-product stats
   let tRev = 0, tCost = 0, tProfit = 0, tQty = 0;
   const products = data.map(item => {
+  if (AppState.analyticsMode === "revenue") {
+      item.cost = 0;
+    }
     const sellP  = item.sell || item.sellPrice || 0;
     const costP  = item.cost || item.costPrice || 0;
     const q      = item.qty  || 0;
