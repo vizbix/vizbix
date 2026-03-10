@@ -2591,7 +2591,16 @@ document.addEventListener('DOMContentLoaded', ()=>{
   renderFeatureTable();
   // Restore saved product data from localStorage
   const restored = loadDataFromStorage();
-  if (restored) showToast('Your previous data has been restored ✓', 'info', 2500);
+  if (restored) {
+    showToast('Your previous data has been restored ✓', 'info', 2500);
+    // Auto-detect revenue mode if all costs are 0
+    const savedData = getFreshData();
+    const allZeroCost = savedData.length > 0 && savedData.every(p => !p.cost || p.cost === 0);
+    if (allZeroCost) {
+      AppState.analyticsMode = 'revenue';
+      window.revenueOnlyMode = true;
+    }
+  }
 });
 
 // ══════════════════════════════════════════
