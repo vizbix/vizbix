@@ -1286,8 +1286,13 @@ function confirmImport() {
   });
 
   closeImportModal();
-  showToast(`✅ ${rows.length} products imported successfully!`, 'success', 3500);
-  switchView('data', document.getElementById('nav-data'));
+showToast(`✅ ${rows.length} products imported successfully!`, 'success', 3500);
+switchView('data', document.getElementById('nav-data'));
+
+// Show cost modal if all costs are 0
+const allZeroCost = rows.every(r => !r.cost || r.cost === 0);
+if (allZeroCost) {
+  setTimeout(() => showCostMissingModal(rows), 400);
 }
 
 // ══════════════════════════════════════════
@@ -2751,4 +2756,5 @@ function showCostCsvResult() {
 
 </body>
 </html>
+
 
