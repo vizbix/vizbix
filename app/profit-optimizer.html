@@ -494,7 +494,7 @@
     <div id="view-report" class="app-view">
      <div style="max-width:1040px;margin:0 auto;width:100%;box-sizing:border-box;position:relative;">
 
-        <div id="reportRevenueLock" style="display:none;position:absolute;inset:0;z-index:50;background:rgba(255,255,255,0.92);backdrop-filter:blur(6px);border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;">
+        <div id="reportRevenueLock" style="display:none;position:absolute;inset:0;z-index:50;background:rgba(255,255,255,0.92);backdrop-filter:blur(6px);border-radius:16px;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;">
        <div style="font-size:48px;margin-bottom:16px;">🔒</div>
        <h3 style="font-size:20px;font-weight:700;color:var(--ink);margin:0 0 10px;">Profit Report Locked</h3>
        <p style="font-size:14px;color:var(--slate-300);max-width:320px;line-height:1.6;margin-bottom:24px;">You're in Revenue-Only Mode. Add cost prices to unlock the full profit report with margins, loss makers, and PDF export.</p>
@@ -976,7 +976,7 @@ function toggleAnalyticsMode() {
 }
 
 function updateModeBadge() {
-  const badge = document.getElementById('analyticsModebage');
+  const badge = document.getElementById('analyticsModebadge');
   const btn   = document.getElementById('toggleModeBtn');
   if (!badge || !btn) return;
 
