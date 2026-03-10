@@ -950,25 +950,41 @@ function processDataAndShowReport() {
 }
 
 function toggleAnalyticsMode() {
+
   if (AppState.analyticsMode === 'revenue') {
+
     AppState.analyticsMode = 'profit';
     window.revenueOnlyMode = false;
     showToast('Switched to Profit Mode', 'success');
+
   } else {
+
     AppState.analyticsMode = 'revenue';
     window.revenueOnlyMode = true;
     showToast('Switched to Revenue Mode', 'info');
+
   }
+
+  updateModeBadge();
+
   const data = getFreshData();
+
   if (data.length) {
+
     document.getElementById('dashboardSkeleton').style.display = 'block';
     document.getElementById('dashboardContent').style.opacity = '0.3';
+
     setTimeout(() => {
+
       runAnalysis(data);
+
       document.getElementById('dashboardSkeleton').style.display = 'none';
       document.getElementById('dashboardContent').style.opacity = '1';
+
     }, 300);
+
   }
+
 }
 
 function updateModeBadge() {
@@ -1025,6 +1041,19 @@ if (reportTitle) {
       ? "Revenue Intelligence Report"
       : "Detailed Profit Report";
 }
+
+document.getElementById("colCostPrice").style.display =
+AppState.analyticsMode === "revenue" ? "none" : "";
+
+document.getElementById("colTotalCost").style.display =
+AppState.analyticsMode === "revenue" ? "none" : "";
+
+document.getElementById("colGrossProfit").style.display =
+AppState.analyticsMode === "revenue" ? "none" : "";
+
+document.getElementById("colMargin").style.display =
+AppState.analyticsMode === "revenue" ? "none" : "";
+
   let tRev=0, tCost=0, tProfit=0, tItems=0;
   let labels=[], revD=[], profD=[], reportHTML='', pdfIns='';
   let top = {name:'–', profit:-Infinity};
@@ -1040,6 +1069,8 @@ if (AppState.analyticsMode === "revenue") {
   mNum = 0;
 } else {
   mNum = rev>0 ? (profit/rev)*100 : 0;
+
+  
 }
 
     tRev    += rev;
@@ -1727,19 +1758,6 @@ if (AppState.analyticsMode === "profit") {
   }
 
   // ── Margin horizontal bar chart ──────────
-  const margCtx = document.getElementById('reportMarginChart');
-  if (AppState.analyticsMode === "revenue") {
-  if (reportMarginChart) reportMarginChart.destroy();
-
-  const ctx = document.getElementById('reportMarginChart');
-  ctx.parentElement.innerHTML = `
-    <div style="display:flex;align-items:center;justify-content:center;height:100%;font-size:13px;color:var(--slate-300);text-align:center;">
-      Margin analysis disabled in Revenue Mode.<br>
-      Add product costs to unlock profit insights.
-    </div>
-  `;
-  return;
-}
   if (margCtx) {
     if (reportMarginChart) reportMarginChart.destroy();
     // Bubble chart: x=margin%, y=profit, r=revenue size
