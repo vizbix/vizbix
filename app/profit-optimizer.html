@@ -533,7 +533,7 @@
           </table>
         </div>
 
-        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;width:100%;" id="reportBottomGrid">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px;width:100%;" id="reportBottomGrid">cccccccccccccccccccccccc
           <div class="data-card" style="padding:20px;min-width:0;width:100%;box-sizing:border-box;">
             <h4 style="font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--slate-300);margin-bottom:4px;">Revenue Share by Product</h4>
             <p style="font-size:11.5px;color:var(--slate-300);margin-bottom:12px;">Which products drive your revenue</p>
@@ -1484,20 +1484,18 @@ function renderEnhancedReport(data) {
     if (reportPieChart) reportPieChart.destroy();
     // Limit pie to top 10 + "Others" bucket
     const PIE_MAX = 10;
-    const pieTop   = sorted.slice(0, PIE_MAX);
-    const pieRest  = sorted.slice(PIE_MAX);
-    const pieLabels = pieTop.map(p => p.name.length > 16 ? p.name.slice(0,15)+'…' : p.name);
-    const pieData   = pieTop.map(p => Math.max(0, p.rev));
-    const piePalette = ['#5b5ef6','#6ee7b7','#fbbf24','#f87171','#a78bfa','#34d399','#fb923c','#60a5fa','#e879f9','#38bdf8'];
-    if (pieRest.length > 0) {
-      const othersRev = pieRest.reduce((s,p) => s + Math.max(0,p.rev), 0);
-      pieLabels.push(`Others (${pieRest.length})`);
-      pieData.push(othersRev);
-      piePalette.push('#cbd5e1');
-    }
-    const showLegend = sorted.length <= 8;
+    const pieTop     = sorted.slice(0, PIE_MAX);
+    const totalPieRev = sorted.reduce((s,p) => s + Math.max(0, p.rev), 0);
+    const pieLabels  = pieTop.map(p => {
+      const pct = totalPieRev > 0 ? ((p.rev / totalPieRev) * 100).toFixed(1) : 0;
+      const name = p.name.length > 14 ? p.name.slice(0,13)+'…' : p.name;
+      return `${name} (${pct}%)`;
+    });
+    const pieData    = pieTop.map(p => Math.max(0, p.rev));
+    const piePalette = ['#5b5ef6','#f87171','#fbbf24','#34d399','#a78bfa','#fb923c','#60a5fa','#e879f9','#38bdf8','#6ee7b7'];
+
     reportPieChart = new Chart(pieCtx, {
-      type: 'doughnut',
+      type: 'pie',
       data: {
         labels: pieLabels,
         datasets: [{
@@ -1505,25 +1503,22 @@ function renderEnhancedReport(data) {
           backgroundColor: piePalette,
           borderWidth: 3,
           borderColor: 'white',
-          hoverOffset: 14,
-          borderRadius: 4,
+          hoverOffset: 16,
         }]
       },
       options: {
         responsive: true,
         maintainAspectRatio: false,
-        cutout: '68%',
         plugins: {
           legend: {
-            display: showLegend,
+            display: true,
             position: 'bottom',
             labels: {
               font: { size: 11, family: 'Inter', weight: '500' },
               color: '#64748b',
               boxWidth: 10,
               boxHeight: 10,
-              borderRadius: 3,
-              padding: 12,
+              padding: 10,
               usePointStyle: true,
               pointStyle: 'circle',
             }
@@ -1538,9 +1533,8 @@ function renderEnhancedReport(data) {
               label: ctx => {
                 const sym = AppState.currencySymbol || '₹';
                 const val = ctx.raw;
-                const total = ctx.dataset.data.reduce((a,b)=>a+b,0);
-                const pct = total > 0 ? ((val/total)*100).toFixed(1) : 0;
-                return ` ${ctx.label}: ${sym}${val.toLocaleString('en-IN',{maximumFractionDigits:0})} (${pct}%)`;
+                const pct = totalPieRev > 0 ? ((val / totalPieRev) * 100).toFixed(1) : 0;
+                return ` ${ctx.label.split(' (')[0]}: ${sym}${val.toLocaleString('en-IN',{maximumFractionDigits:0})} — ${pct}% of total revenue`;
               }
             }
           }
@@ -2860,4 +2854,3 @@ function showCostCsvResult() {
 
 </body>
 </html>
-
