@@ -345,16 +345,16 @@
         </div>
 
         <div id="dashboardContent" style="transition:opacity 0.3s;">
-          <div class="metrics-grid">
+          <div class="metrics-grid" id="dashMetricsGrid">
             <div class="metric-card">
               <h4>Total Revenue</h4>
               <div class="value" id="dash-revenue">—</div>
             </div>
-            <div class="metric-card highlight">
+            <div class="metric-card highlight" id="dash-profit-card">
               <h4>Total Net Profit</h4>
               <div class="value" id="dash-profit">—</div>
             </div>
-            <div class="metric-card">
+            <div class="metric-card" id="dash-margin-card">
               <h4>Avg Gross Margin</h4>
               <div class="value" id="dash-margin">—</div>
             </div>
@@ -657,7 +657,7 @@ const KEY   = "rzp_live_SCvIqUMzTNsXgq";
 // ══════════════════════════════════════════
 //  CENTRALISED APP STATE
 // ══════════════════════════════════════════
-const AppState = {
+cconst AppState = {
   currentData:       [],
   currentView:       'data',
   currentCurrency:   'INR',
@@ -666,6 +666,7 @@ const AppState = {
   isProUser:         null,
   userEmail:         null,
   proDaysLeft:       null,
+  analyticsMode:     'profit', // 'profit' or 'revenue'
 };
 
 // window.* proxies — keep auth.js / old callbacks working unchanged
@@ -1018,16 +1019,41 @@ function runAnalysis(data) {
   setText('dash-revenue',     fmt(tRev));
   setText('dash-top-product', top.name);
 
-  if (window.revenueOnlyMode) {
-    setText('dash-profit',  '—');
-    setText('dash-margin',  '—');
-    document.getElementById('dash-profit').closest('.metric-card').style.filter = 'blur(4px)';
-    document.getElementById('dash-margin').closest('.metric-card').style.filter = 'blur(4px)';
+  if (AppState.analyticsMode === 'revenue') {
+    // Revenue mode — swap profit/margin cards to units and avg price
+    const avgPrice = tItems > 0 ? fmt(tRev / tItems) : '—';
+
+    const profitCard = document.getElementById('dash-profit-card');
+    profitCard.classList.remove('highlight');
+    profitCard.style.background = '#f0fdf4';
+    profitCard.style.borderColor = '#bbf7d0';
+    profitCard.innerHTML = `
+      <h4 style="color:#059669;">Total Units Sold</h4>
+      <div class="value" style="color:#059669;">${tItems.toLocaleString()}</div>`;
+
+    const marginCard = document.getElementById('dash-margin-card');
+    marginCard.style.background = '#eff6ff';
+    marginCard.style.borderColor = '#bfdbfe';
+    marginCard.innerHTML = `
+      <h4 style="color:#3b82f6;">Avg Revenue / Unit</h4>
+      <div class="value" style="color:#3b82f6;">${avgPrice}</div>`;
+
   } else {
-    setText('dash-profit', fmt(tProfit));
-    setText('dash-margin', ovMargin.toFixed(1)+'%');
-    document.getElementById('dash-profit').closest('.metric-card').style.filter = 'none';
-    document.getElementById('dash-margin').closest('.metric-card').style.filter = 'none';
+    // Profit mode — normal cards
+    const profitCard = document.getElementById('dash-profit-card');
+    profitCard.classList.add('highlight');
+    profitCard.style.background = '';
+    profitCard.style.borderColor = '';
+    profitCard.innerHTML = `
+      <h4>Total Net Profit</h4>
+      <div class="value" id="dash-profit">${fmt(tProfit)}</div>`;
+
+    const marginCard = document.getElementById('dash-margin-card');
+    marginCard.style.background = '';
+    marginCard.style.borderColor = '';
+    marginCard.innerHTML = `
+      <h4>Avg Gross Margin</h4>
+      <div class="value" id="dash-margin">${ovMargin.toFixed(1)+'%'}</div>`;
   }
   document.getElementById('reportTableBody').innerHTML = reportHTML;
 
@@ -2571,10 +2597,10 @@ function applyCostOption() {
     });
     window.costEstimateMode = false;
     window.revenueOnlyMode = false;
+    AppState.analyticsMode = 'profit';
     showToast('Costs saved manually ✓', 'success');
 
   } else if (selectedCostOption === 'csv') {
-    // Match by name and fill costs
     data.forEach((p, i) => {
       const match = costCsvMatched.find(m =>
         m.name.toLowerCase().trim() === p.name.toLowerCase().trim() ||
@@ -2588,10 +2614,12 @@ function applyCostOption() {
     });
     window.costEstimateMode = false;
     window.revenueOnlyMode = false;
+    AppState.analyticsMode = 'profit';
     showToast('Costs matched from CSV ✓', 'success');
 
   } else if (selectedCostOption === 'revenue') {
     window.revenueOnlyMode = true;
+    AppState.analyticsMode = 'revenue';
     showToast('Revenue-Only Mode enabled', 'info');
   }
 
