@@ -23,6 +23,43 @@
       display: block;
       animation: vzFadeIn 0.22s ease;
     }
+/* ── Cost Missing Modal ── */
+.cost-modal-overlay {
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(8,9,13,0.6); backdrop-filter: blur(6px);
+  display: flex; align-items: center; justify-content: center;
+  animation: vzFadeIn 0.2s ease;
+}
+.cost-modal-box {
+  background: white; border-radius: 20px; width: 92%; max-width: 560px;
+  max-height: 88vh; overflow-y: auto;
+  box-shadow: 0 32px 80px rgba(8,9,13,0.22);
+  padding: 32px;
+}
+.cost-option-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 20px 0;
+}
+.cost-option-btn {
+  border: 2px solid var(--slate-100); border-radius: 14px; padding: 18px 14px;
+  background: white; cursor: pointer; text-align: left;
+  transition: all 0.18s; position: relative; overflow: hidden;
+}
+.cost-option-btn:hover { border-color: var(--indigo); background: var(--indigo-light); transform: translateY(-1px); box-shadow: 0 4px 16px rgba(91,94,246,0.12); }
+.cost-option-btn.selected { border-color: var(--indigo); background: var(--indigo-light); }
+.cost-option-icon { font-size: 26px; margin-bottom: 8px; display: block; }
+.cost-option-title { font-size: 13px; font-weight: 700; color: var(--ink); margin-bottom: 3px; }
+.cost-option-desc { font-size: 11.5px; color: var(--slate-300); line-height: 1.4; }
+.cost-panel { display: none; margin-top: 16px; }
+.cost-panel.active { display: block; animation: vzFadeIn 0.18s ease; }
+.cost-manual-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.cost-manual-table th { padding: 8px 10px; font-size: 10px; font-weight: 700; color: var(--slate-300); text-transform: uppercase; letter-spacing: 0.6px; border-bottom: 1.5px solid var(--slate-100); text-align: left; }
+.cost-manual-table td { padding: 6px 8px; border-bottom: 1px solid var(--slate-100); }
+.cost-manual-table input { width: 100%; padding: 6px 8px; border: 1.5px solid var(--slate-100); border-radius: 7px; font-size: 13px; outline: none; font-family: Inter, sans-serif; }
+.cost-manual-table input:focus { border-color: var(--indigo); }
+.margin-slider-wrap { background: var(--slate-50); border-radius: 12px; padding: 20px; margin-top: 8px; }
+.margin-big-num { font-size: 48px; font-weight: 700; color: var(--indigo); text-align: center; line-height: 1; margin-bottom: 4px; font-family: Inter, sans-serif; }
+.margin-preview-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--slate-100); font-size: 12.5px; }
+    
   </style>
 </head>
 <body>
@@ -644,7 +681,8 @@ window.currentMode = 'product';
 let myChart = null;
 let authVerified = false;
 let storeSyncing = false;
-
+let costModalShown = false;  
+  
 // ══════════════════════════════════════════
 //  TOAST
 // ══════════════════════════════════════════
@@ -2137,7 +2175,14 @@ if (AppState.userEmail) {
       showToast(`✅ Imported ${d.data.length} items! Loading dashboard...`, 'success', 3000);
       
       saveDataToStorage();
-      processDataAndShowReport();
+      // Check if all costs are 0 (store didn't provide them)
+      const allZeroCost = d.data.every(p => !p.cost || p.cost === 0);
+      if (allZeroCost) {
+        document.getElementById('storeModal').style.display = 'none';
+        setTimeout(() => showCostMissingModal(getFreshData()), 300);
+      } else {
+        processDataAndShowReport();
+      }
       
       setTimeout(() => alert("Import Successful!\n\nNote: Cost Price is set to 0.\nPlease update your costs to see profit."), 500);
     } else {
@@ -2240,12 +2285,17 @@ async function checkSavedStoreConnections() {
         showSyncBadge('done', syncData.lastSynced);
         // Go straight to dashboard — guard prevents re-entry
         if (!storeSyncing) {
-          storeSyncing = true;
-          setTimeout(() => {
-            processDataAndShowReport();
-            storeSyncing = false;
-          }, 300);
-        }
+  storeSyncing = true;
+  setTimeout(() => {
+    const allZero = syncData.data.every(p => !p.cost || p.cost === 0);
+    if (allZero) {
+      showCostMissingModal(getFreshData());
+    } else {
+      processDataAndShowReport();
+    }
+    storeSyncing = false;
+  }, 300);
+}
       } else {
         showSyncBadge('failed');
       }
@@ -2353,9 +2403,278 @@ document.addEventListener('DOMContentLoaded', ()=>{
   const restored = loadDataFromStorage();
   if (restored) showToast('Your previous data has been restored ✓', 'info', 2500);
 });
+
+// ══════════════════════════════════════════
+//  COST MISSING MODAL
+// ══════════════════════════════════════════
+let selectedCostOption = null;
+let costCsvMatched = []; // [{name, cost}]
+window.revenueOnlyMode = false;
+
+function showCostMissingModal(products) {
+  if (costModalShown) return;   // ← add
+  costModalShown = true;        // ← add
+  document.getElementById('costMissingCount').textContent = products.length;
+  document.getElementById('costMissingModal').style.display = 'flex';
+  // Pre-populate manual table
+  const tbody = document.getElementById('costManualBody');
+  tbody.innerHTML = products.map((p, i) => `
+    <tr>
+      <td style="font-weight:500;max-width:160px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${p.name}">${p.name}</td>
+      <td style="color:var(--slate-300);">${AppState.currencySymbol}${p.sell}</td>
+      <td><input type="number" placeholder="0" id="manualCost_${i}" min="0" step="1"
+        style="width:90px;" oninput="checkManualReady()"></td>
+    </tr>`).join('');
+  // Init margin preview
+  updateMarginPreview(40);
+}
+
+function closeCostModal() {
+  costModalShown = false;       // ← add
+  document.getElementById('costMissingModal').style.display = 'none';
+}
+
+function selectCostOption(opt) {
+  selectedCostOption = opt;
+  // Highlight selected button
+  ['csv','margin','manual','revenue'].forEach(o => {
+    document.getElementById('cost-opt-'+o).classList.toggle('selected', o === opt);
+  });
+  // Show correct panel
+  document.querySelectorAll('.cost-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('cost-panel-'+opt).classList.add('active');
+  // Enable apply button (except csv which needs file first)
+  const btn = document.getElementById('costApplyBtn');
+  btn.disabled = (opt === 'csv' && !costCsvMatched.length);
+  if (opt !== 'csv') btn.disabled = false;
+}
+
+function applyCostOption() {
+  const data = getFreshData();
+  if (!data.length) return;
+
+  if (selectedCostOption === 'margin') {
+    const margin = parseInt(document.getElementById('marginSlider').value);
+    data.forEach((p, i) => {
+      // cost = sell * (1 - margin/100)
+      const cost = parseFloat((p.sell * (1 - margin / 100)).toFixed(2));
+      const row = document.querySelectorAll('#items .data-row')[i];
+      if (row) row.querySelector('.input-cost').value = cost;
+    });
+    showToast(`Costs estimated at ${margin}% margin ✓`, 'success');
+
+  } else if (selectedCostOption === 'manual') {
+    data.forEach((p, i) => {
+      const input = document.getElementById('manualCost_'+i);
+      const cost = parseFloat(input?.value) || 0;
+      const row = document.querySelectorAll('#items .data-row')[i];
+      if (row) row.querySelector('.input-cost').value = cost;
+    });
+    showToast('Costs saved manually ✓', 'success');
+
+  } else if (selectedCostOption === 'csv') {
+    // Match by name and fill costs
+    data.forEach((p, i) => {
+      const match = costCsvMatched.find(m =>
+        m.name.toLowerCase().trim() === p.name.toLowerCase().trim() ||
+        p.name.toLowerCase().includes(m.name.toLowerCase()) ||
+        m.name.toLowerCase().includes(p.name.toLowerCase())
+      );
+      if (match) {
+        const row = document.querySelectorAll('#items .data-row')[i];
+        if (row) row.querySelector('.input-cost').value = match.cost;
+      }
+    });
+    showToast('Costs matched from CSV ✓', 'success');
+
+  } else if (selectedCostOption === 'revenue') {
+    window.revenueOnlyMode = true;
+    showToast('Revenue-Only Mode enabled', 'info');
+  }
+
+  closeCostModal();
+  saveDataToStorage();
+  processDataAndShowReport();
+}
+
+// ── Margin Slider Live Preview ──
+function updateMarginPreview(val) {
+  document.getElementById('marginBigNum').textContent = val + '%';
+  const data = getFreshData();
+  const preview = data.slice(0, 5);
+  const list = document.getElementById('marginPreviewList');
+  if (!preview.length) { list.innerHTML = '<div style="font-size:12px;color:var(--slate-300);text-align:center;">No products loaded yet</div>'; return; }
+  list.innerHTML = preview.map(p => {
+    const cost = (p.sell * (1 - val / 100)).toFixed(0);
+    return `<div class="margin-preview-row">
+      <span style="color:var(--ink);font-weight:500;">${p.name.length>22?p.name.slice(0,21)+'…':p.name}</span>
+      <span style="color:var(--slate-300);">₹${p.sell} sell → <strong style="color:var(--indigo);">₹${cost} cost</strong></span>
+    </div>`;
+  }).join('');
+  if (data.length > 5) list.innerHTML += `<div style="font-size:11px;color:var(--slate-300);text-align:center;padding-top:6px;">+${data.length-5} more products</div>`;
+}
+
+function checkManualReady() {
+  // Enable button once at least one cost is entered
+  const any = document.querySelector('#costManualBody input[type=number]');
+  if (any) document.getElementById('costApplyBtn').disabled = false;
+}
+
+// ── Cost CSV Upload ──
+function handleCostCsvDrop(e) {
+  e.preventDefault();
+  e.currentTarget.style.borderColor = 'var(--slate-200)';
+  const file = e.dataTransfer.files[0];
+  if (file) parseCostFile(file);
+}
+
+function handleCostCsvFile(input) {
+  const file = input.files[0];
+  if (file) parseCostFile(file);
+}
+
+function parseCostFile(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  const process = (rows) => {
+    // Try to detect name + cost columns
+    const headers = Object.keys(rows[0] || {});
+    const nameCol = headers.find(h => /name|product|item|title/i.test(h)) || headers[0];
+    const costCol = headers.find(h => /cost|cogs|purchase|buy|price/i.test(h)) || headers[1];
+    costCsvMatched = rows
+      .map(r => ({ name: String(r[nameCol]||'').trim(), cost: parseFloat(String(r[costCol]||'').replace(/[^0-9.]/g,''))||0 }))
+      .filter(r => r.name && r.cost > 0);
+    showCostCsvResult();
+  };
+  if (ext === 'csv') {
+    Papa.parse(file, { header:true, skipEmptyLines:true, complete: r => process(r.data) });
+  } else {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const wb = XLSX.read(e.target.result, {type:'array'});
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      process(XLSX.utils.sheet_to_json(ws, {defval:''}));
+    };
+    reader.readAsArrayBuffer(file);
+  }
+}
+
+function showCostCsvResult() {
+  const data = getFreshData();
+  const matched = data.filter(p => costCsvMatched.find(m =>
+    m.name.toLowerCase().trim() === p.name.toLowerCase().trim() ||
+    p.name.toLowerCase().includes(m.name.toLowerCase()) ||
+    m.name.toLowerCase().includes(p.name.toLowerCase())
+  ));
+  const div = document.getElementById('costCsvMatches');
+  div.innerHTML = `
+    <div style="background:${matched.length?'#d1fae5':'#fef3c7'};border:1px solid ${matched.length?'#a7f3d0':'#fde68a'};border-radius:9px;padding:12px 14px;font-size:13px;color:${matched.length?'#065f46':'#92400e'};">
+      ${matched.length
+        ? `✅ <strong>${matched.length} of ${data.length} products matched.</strong> Unmatched products will keep cost = 0.`
+        : `⚠️ No products matched. Check that your CSV has the correct product names.`}
+    </div>`;
+  if (matched.length) document.getElementById('costApplyBtn').disabled = false;
+}
+  
 </script>
 <script type="module" src="../assets/js/auth.js?v=4.4"></script>
 
+<!-- ══ COST MISSING MODAL ══ -->
+<div id="costMissingModal" style="display:none;" class="cost-modal-overlay">
+  <div class="cost-modal-box">
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;">
+      <div>
+        <div style="display:inline-flex;align-items:center;gap:7px;background:#fef3c7;border:1px solid #fde68a;border-radius:99px;padding:4px 12px;font-size:11px;font-weight:700;color:#92400e;margin-bottom:10px;">
+          ⚠️ Cost Data Missing
+        </div>
+        <h3 style="font-size:20px;font-weight:700;color:var(--ink);margin:0 0 6px;">How do you want to handle costs?</h3>
+        <p style="font-size:13px;color:var(--slate-300);margin:0;">Your store sync imported <strong id="costMissingCount">0</strong> products — but Shopify/WooCommerce doesn't share cost prices. Choose how to proceed:</p>
+      </div>
+      <button onclick="closeCostModal()" style="background:none;border:none;font-size:22px;color:var(--slate-300);cursor:pointer;margin-left:12px;flex-shrink:0;">×</button>
+    </div>
+
+    <!-- 4 Option Buttons -->
+    <div class="cost-option-grid">
+      <button class="cost-option-btn" onclick="selectCostOption('csv')" id="cost-opt-csv">
+        <span class="cost-option-icon">📂</span>
+        <div class="cost-option-title">Upload Cost CSV</div>
+        <div class="cost-option-desc">Upload a file with your purchase costs. We'll match by product name.</div>
+      </button>
+      <button class="cost-option-btn" onclick="selectCostOption('margin')" id="cost-opt-margin">
+        <span class="cost-option-icon">📊</span>
+        <div class="cost-option-title">Estimate Margin</div>
+        <div class="cost-option-desc">Set an estimated margin % and we'll calculate costs automatically.</div>
+      </button>
+      <button class="cost-option-btn" onclick="selectCostOption('manual')" id="cost-opt-manual">
+        <span class="cost-option-icon">✏️</span>
+        <div class="cost-option-title">Enter Manually</div>
+        <div class="cost-option-desc">Type in cost prices yourself for each product.</div>
+      </button>
+      <button class="cost-option-btn" onclick="selectCostOption('revenue')" id="cost-opt-revenue">
+        <span class="cost-option-icon">📈</span>
+        <div class="cost-option-title">Revenue-Only Mode</div>
+        <div class="cost-option-desc">Skip costs entirely. Analyze revenue, units & top products only.</div>
+      </button>
+    </div>
+
+    <!-- Panel: CSV Upload -->
+    <div class="cost-panel" id="cost-panel-csv">
+      <div style="border:2px dashed var(--slate-200);border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:all 0.2s;"
+        onclick="document.getElementById('costCsvInput').click()"
+        ondragover="event.preventDefault();this.style.borderColor='var(--indigo)'"
+        ondragleave="this.style.borderColor='var(--slate-200)'"
+        ondrop="handleCostCsvDrop(event)">
+        <div style="font-size:32px;margin-bottom:8px;">📂</div>
+        <div style="font-size:13px;font-weight:600;color:var(--ink);">Drop your cost CSV here or click to browse</div>
+        <div style="font-size:11.5px;color:var(--slate-300);margin-top:4px;">Needs columns: Product Name + Cost Price</div>
+      </div>
+      <input type="file" id="costCsvInput" accept=".csv,.xlsx,.xls" style="display:none;" onchange="handleCostCsvFile(this)">
+      <div id="costCsvMatches" style="margin-top:14px;"></div>
+    </div>
+
+    <!-- Panel: Margin Estimator -->
+    <div class="cost-panel" id="cost-panel-margin">
+      <div class="margin-slider-wrap">
+        <div style="font-size:12px;font-weight:600;color:var(--slate-300);text-align:center;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.6px;">Your Estimated Gross Margin</div>
+        <div class="margin-big-num" id="marginBigNum">40%</div>
+        <input type="range" min="1" max="90" value="40" id="marginSlider"
+          oninput="updateMarginPreview(this.value)"
+          style="width:100%;margin:12px 0;accent-color:var(--indigo);">
+        <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--slate-300);margin-bottom:14px;">
+          <span>1% margin</span><span>90% margin</span>
+        </div>
+        <div style="font-size:11px;font-weight:700;color:var(--slate-300);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;">Live Preview</div>
+        <div id="marginPreviewList"></div>
+      </div>
+    </div>
+
+    <!-- Panel: Manual Entry -->
+    <div class="cost-panel" id="cost-panel-manual">
+      <div style="max-height:280px;overflow-y:auto;border:1px solid var(--slate-100);border-radius:10px;">
+        <table class="cost-manual-table">
+          <thead><tr><th>Product</th><th>Sell Price</th><th>Cost Price (₹)</th></tr></thead>
+          <tbody id="costManualBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Panel: Revenue Only -->
+    <div class="cost-panel" id="cost-panel-revenue">
+      <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:18px;text-align:center;">
+        <div style="font-size:32px;margin-bottom:8px;">📈</div>
+        <div style="font-size:14px;font-weight:600;color:#1e40af;margin-bottom:6px;">Revenue-Only Mode Active</div>
+        <div style="font-size:12.5px;color:#3b82f6;line-height:1.5;">Your dashboard will show Revenue, Units Sold, and Top Products. Profit and Margin metrics will be hidden until you add cost data.</div>
+      </div>
+    </div>
+
+    <!-- Action Button -->
+    <div style="margin-top:18px;display:flex;gap:10px;">
+      <button class="btn btn-secondary" style="flex:1;" onclick="closeCostModal()">Skip for now</button>
+      <button class="btn btn-primary" id="costApplyBtn" style="flex:2;font-weight:700;" onclick="applyCostOption()" disabled>
+        Apply & Generate Dashboard →
+      </button>
+    </div>
+  </div>
+</div>
   
 <div class="modal-overlay-login" id="loginModal" style="display:none; position:fixed; inset:0; background:rgba(8,9,13,0.6); z-index:9999; backdrop-filter:blur(4px); align-items:center; justify-content:center;">
   <div class="login-box" style="background:white; padding:32px; border-radius:16px; width:90%; max-width:400px; position:relative; box-shadow:0 20px 60px rgba(0,0,0,0.2);">
@@ -2432,3 +2751,4 @@ document.addEventListener('DOMContentLoaded', ()=>{
 
 </body>
 </html>
+
