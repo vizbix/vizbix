@@ -372,7 +372,7 @@
 
           <div class="dash-grid">
             <div class="data-card chart-card" style="padding:16px;margin:0;width:100%;min-width:0;overflow:hidden;box-sizing:border-box;">
-              <h4 id="dashChartTitle" style="margin:0 0 12px;font-size:10.5px;font-weight:700;color:var(--slate-300);text-transform:uppercase;letter-spacing:0.9px;">Revenue vs Profit</h4>
+              <h4 style="margin:0 0 12px;font-size:10.5px;font-weight:700;color:var(--slate-300);text-transform:uppercase;letter-spacing:0.9px;">Revenue vs Profit</h4>
               <div class="chart-wrap" style="position:relative;height:240px;width:100%;max-width:100%;overflow:hidden;"><canvas id="profitChart"></canvas></div>
             </div>
 
@@ -492,7 +492,7 @@
     </div>
 
     <div id="view-report" class="app-view">
-     <div style="max-width:1040px;margin:0 auto;width:100%;box-sizing:border-box;">
+      <div style="max-width:1040px;margin:0 auto;width:100%;box-sizing:border-box;">
 
         <div class="page-header">
           <h2>Detailed Profit Report</h2>
@@ -500,14 +500,6 @@
             <button class="btn btn-secondary" style="font-size:13px;" onclick="switchView('data', document.getElementById('nav-data'))">← Edit Data</button>
             <button class="btn btn-primary"   style="font-size:13px;" onclick="exportExecutivePDF()">📥 Download PDF</button>
           </div>
-        </div>
-
-        <div id="reportRevenueLock" style="display:none;position:relative;z-index:50;background:rgba(255,255,255,0.92);backdrop-filter:blur(6px);border-radius:16px;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 40px;margin-bottom:14px;">
-          <div style="font-size:48px;margin-bottom:16px;">🔒</div>
-          <h3 style="font-size:20px;font-weight:700;color:var(--ink);margin:0 0 10px;">Profit Report Locked</h3>
-          <p style="font-size:14px;color:var(--slate-300);max-width:320px;line-height:1.6;margin-bottom:24px;">You're in Revenue-Only Mode. Add cost prices to unlock the full profit report with margins, loss makers, and PDF export.</p>
-          <button onclick="costModalShown=false;showCostMissingModal(getFreshData())" style="font-size:14px;font-weight:700;padding:12px 28px;border-radius:10px;border:none;background:var(--indigo);color:white;cursor:pointer;">💡 Add Costs to Unlock →</button>
-          <p style="font-size:12px;color:var(--slate-200);margin-top:12px;">Or switch back to Profit Mode from the Dashboard</p>
         </div>
 
         <div id="reportSummaryBar" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;"></div>
@@ -980,10 +972,6 @@ function updateModeBadge() {
   const btn   = document.getElementById('toggleModeBtn');
   if (!badge || !btn) return;
 
-  const reportLock = document.getElementById('reportRevenueLock');
-  const chartTitle = document.getElementById('dashChartTitle');
-  if (chartTitle) chartTitle.textContent = AppState.analyticsMode === 'revenue' ? 'Revenue by Product' : 'Revenue vs Profit';
-
   if (AppState.analyticsMode === 'revenue') {
     badge.style.display = 'inline-flex';
     badge.style.background = '#eff6ff';
@@ -994,25 +982,12 @@ function updateModeBadge() {
     btn.textContent = '🔓 Switch to Profit Mode';
     btn.style.borderColor = '#bfdbfe';
     btn.style.color = '#3b82f6';
-    if (reportLock) reportLock.style.display = 'flex';
   } else {
     badge.style.display = 'none';
     btn.style.display = 'block';
     btn.textContent = '📈 Revenue Mode';
     btn.style.borderColor = 'var(--slate-200)';
     btn.style.color = 'var(--slate-300)';
-    if (reportLock) reportLock.style.display = 'none';
-    // Restore hidden report sections
-    const summaryBar = document.getElementById('reportSummaryBar');
-    const bandsEl    = document.getElementById('reportBands');
-    const bottomGrid = document.getElementById('reportBottomGrid');
-    const searchWrap = document.getElementById('reportSearch')?.closest('div');
-    const tableWrap  = document.querySelector('#view-report [style*="overflow-x:auto"]');
-    if (summaryBar) summaryBar.style.display = '';
-    if (bandsEl)    bandsEl.style.display    = '';
-    if (bottomGrid) bottomGrid.style.display = '';
-    if (searchWrap) searchWrap.style.display = '';
-    if (tableWrap)  tableWrap.style.display  = '';
   }
 }
 
@@ -1246,14 +1221,10 @@ function runAnalysis(data) {
     type: 'bar',
     data: {
       labels: chartLabels,
-      datasets: AppState.analyticsMode === 'revenue'
-        ? [
-            {label:'Revenue', data:chartRevD, backgroundColor:'#3b82f6', borderRadius:5}
-          ]
-        : [
-            {label:'Revenue', data:chartRevD,  backgroundColor:'#e0e7ff', borderRadius:5},
-            {label:'Profit',  data:chartProfD, backgroundColor:'#5b5ef6', borderRadius:5}
-          ]
+      datasets: [
+        {label:'Revenue', data:chartRevD,  backgroundColor:'#e0e7ff', borderRadius:5},
+        {label:'Profit',  data:chartProfD, backgroundColor:'#5b5ef6', borderRadius:5}
+      ]
     },
     options: {
       responsive: true,
@@ -1489,29 +1460,6 @@ let reportMarginChart = null;
 
 function renderEnhancedReport(data) {
   if (!data || !data.length) return;
-
-  const summaryBar  = document.getElementById('reportSummaryBar');
-  const bandsEl     = document.getElementById('reportBands');
-  const bottomGrid  = document.getElementById('reportBottomGrid');
-  const searchWrap  = document.getElementById('reportSearch')?.closest('div');
-  const tableWrap   = document.querySelector('#view-report [style*="overflow-x:auto"]');
-
-  if (AppState.analyticsMode === 'revenue') {
-    if (summaryBar) summaryBar.style.display = 'none';
-    if (bandsEl)    bandsEl.style.display    = 'none';
-    if (bottomGrid) bottomGrid.style.display = 'none';
-    if (searchWrap) searchWrap.style.display = 'none';
-    if (tableWrap)  tableWrap.style.display  = 'none';
-    return;
-  }
-
-  // Restore all in profit mode
-  if (summaryBar) summaryBar.style.display = '';
-  if (bandsEl)    bandsEl.style.display    = '';
-  if (bottomGrid) bottomGrid.style.display = '';
-  if (searchWrap) searchWrap.style.display = '';
-  if (tableWrap)  tableWrap.style.display  = '';
-
   // ── Warning bar at top of report ──
   const existingWarn = document.getElementById('reportWarningBar');
   if (existingWarn) existingWarn.remove();
@@ -2641,21 +2589,9 @@ function showHelp(platform) {
 document.addEventListener('DOMContentLoaded', ()=>{
   restoreChatSession();
   renderFeatureTable();
+  // Restore saved product data from localStorage
   const restored = loadDataFromStorage();
-  if (restored) {
-    showToast('Your previous data has been restored ✓', 'info', 2500);
-    // Auto-detect revenue mode if all costs are 0
-    const savedData = getFreshData();
-    const allZeroCost = savedData.length > 0 && savedData.every(p => !p.cost || p.cost === 0);
-    if (allZeroCost) {
-      AppState.analyticsMode = 'revenue';
-      window.revenueOnlyMode = true;
-    }
-  }
-  
-  // ← ADD THIS LINE:
-  const lock = document.getElementById('reportRevenueLock');
-  if (lock) lock.style.display = 'none';
+  if (restored) showToast('Your previous data has been restored ✓', 'info', 2500);
 });
 
 // ══════════════════════════════════════════
