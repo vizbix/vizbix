@@ -1002,6 +1002,17 @@ function updateModeBadge() {
     btn.style.borderColor = 'var(--slate-200)';
     btn.style.color = 'var(--slate-300)';
     if (reportLock) reportLock.style.display = 'none';
+    // Restore hidden report sections
+    const summaryBar = document.getElementById('reportSummaryBar');
+    const bandsEl    = document.getElementById('reportBands');
+    const bottomGrid = document.getElementById('reportBottomGrid');
+    const searchWrap = document.getElementById('reportSearch')?.closest('div');
+    const tableWrap  = document.querySelector('#view-report [style*="overflow-x:auto"]');
+    if (summaryBar) summaryBar.style.display = '';
+    if (bandsEl)    bandsEl.style.display    = '';
+    if (bottomGrid) bottomGrid.style.display = '';
+    if (searchWrap) searchWrap.style.display = '';
+    if (tableWrap)  tableWrap.style.display  = '';
   }
 }
 
