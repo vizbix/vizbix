@@ -495,7 +495,7 @@
       <div style="max-width:1040px;margin:0 auto;width:100%;box-sizing:border-box;">
 
         <div class="page-header">
-          <h2>Detailed Profit Report</h2>
+          <h2 id="reportTitle">Detailed Profit Report</h2>
           <div style="display:flex;gap:9px;flex-wrap:wrap;">
             <button class="btn btn-secondary" style="font-size:13px;" onclick="switchView('data', document.getElementById('nav-data'))">← Edit Data</button>
             <button class="btn btn-primary"   style="font-size:13px;" onclick="exportExecutivePDF()">📥 Download PDF</button>
@@ -1014,6 +1014,13 @@ function getDataWarningHTML() {
 }
 
 function runAnalysis(data) {
+  const reportTitle = document.getElementById("reportTitle");
+if (reportTitle) {
+  reportTitle.innerText =
+    AppState.analyticsMode === "revenue"
+      ? "Revenue Intelligence Report"
+      : "Detailed Profit Report";
+}
   let tRev=0, tCost=0, tProfit=0, tItems=0;
   let labels=[], revD=[], profD=[], reportHTML='', pdfIns='';
   let top = {name:'–', profit:-Infinity};
@@ -1227,7 +1234,7 @@ if (AppState.analyticsMode === "revenue") {
     type: 'bar',
     data: {
       labels: chartLabels,
-      ddatasets: AppState.analyticsMode === "revenue"
+      datasets: AppState.analyticsMode === "revenue"
 ? [
     {label:'Revenue', data:chartRevD, backgroundColor:'#5b5ef6', borderRadius:5}
   ]
@@ -1258,6 +1265,13 @@ if (AppState.analyticsMode === "revenue") {
 
   showToast('Dashboard updated ✓', 'success');
   renderEnhancedReport(data);
+  if (AppState.analyticsMode === "revenue") {
+  const healthCircle = document.getElementById("health-circle");
+  const healthLabel = document.getElementById("health-label");
+
+  if (healthCircle) healthCircle.innerText = "—";
+  if (healthLabel) healthLabel.innerText = "Revenue Mode";
+}
 }
 
 // ══════════════════════════════════════════
@@ -1558,11 +1572,13 @@ function renderEnhancedReport(data) {
       <td style="color:var(--slate-300);font-size:12px;">${i+1}</td>
       <td style="font-weight:600;">${p.name}</td>
       <td>${fmt(p.sell)}</td>
-      <td>${fmt(p.cost)}</td>
-      <td style="color:var(--slate-300);">${p.qty.toLocaleString()}</td>
-      <td style="font-weight:500;">${fmt(p.rev)}</td>
-      <td>${fmt(p.costTotal)}</td>
-      <td style="font-weight:600;color:${p.profit<0?'var(--red)':'var(--green)'};">${p.profit<0?'-':''}${fmt(p.profit)}</td>
+      ${AppState.analyticsMode === "revenue" ? "" : `
+<td>${fmt(p.cost)}</td>
+<td>${fmt(p.costTotal)}</td>
+<td style="font-weight:600;color:${p.profit<0?'var(--red)':'var(--green)'};">
+  ${p.profit<0?'-':''}${fmt(p.profit)}
+</td>
+`}
       <td>
         <div style="display:flex;align-items:center;gap:6px;">
           <span style="font-weight:600;font-size:13px;color:${barC};min-width:38px;">${p.margin.toFixed(1)}%</span>
