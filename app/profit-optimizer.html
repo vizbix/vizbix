@@ -520,24 +520,20 @@
         <div style="overflow-x:auto;overflow-y:auto;max-height:520px;background:white;border:1px solid var(--slate-100);border-radius:14px;box-shadow:0 1px 3px rgba(8,9,13,0.04);margin-bottom:14px;">
           <table class="report-table" style="border:none;">
             <thead style="position:sticky;top:0;z-index:10;background:white;">
-<tr>
-<th>#</th>
-<th>Product Name</th>
-<th>Sell Price</th>
-
-<th id="colCostPrice">Cost Price</th>
-
-<th>Qty Sold</th>
-<th>Revenue</th>
-
-<th id="colTotalCost">Total Cost</th>
-<th id="colGrossProfit">Gross Profit</th>
-<th id="colMargin">Margin %</th>
-
-<th>Rev Share</th>
-<th>Status</th>
-</tr>
-</thead>
+                <tr>
+                <th>#</th>
+                <th>Product Name</th>
+                <th>Sell Price</th>
+                <th>Cost Price</th>
+                <th>Qty Sold</th>
+                <th>Revenue</th>
+                <th>Total Cost</th>
+                <th>Gross Profit</th>
+                <th>Margin %</th>
+                <th>Rev Share</th>
+                <th>Status</th>
+              </tr>
+            </thead>
             <tbody id="reportTableBody"></tbody>
             <tfoot id="reportTableFoot"></tfoot>
           </table>
@@ -950,41 +946,25 @@ function processDataAndShowReport() {
 }
 
 function toggleAnalyticsMode() {
-
   if (AppState.analyticsMode === 'revenue') {
-
     AppState.analyticsMode = 'profit';
     window.revenueOnlyMode = false;
     showToast('Switched to Profit Mode', 'success');
-
   } else {
-
     AppState.analyticsMode = 'revenue';
     window.revenueOnlyMode = true;
     showToast('Switched to Revenue Mode', 'info');
-
   }
-
-  updateModeBadge();
-
   const data = getFreshData();
-
   if (data.length) {
-
     document.getElementById('dashboardSkeleton').style.display = 'block';
     document.getElementById('dashboardContent').style.opacity = '0.3';
-
     setTimeout(() => {
-
       runAnalysis(data);
-
       document.getElementById('dashboardSkeleton').style.display = 'none';
       document.getElementById('dashboardContent').style.opacity = '1';
-
     }, 300);
-
   }
-
 }
 
 function updateModeBadge() {
@@ -1041,19 +1021,6 @@ if (reportTitle) {
       ? "Revenue Intelligence Report"
       : "Detailed Profit Report";
 }
-
-document.getElementById("colCostPrice").style.display =
-AppState.analyticsMode === "revenue" ? "none" : "";
-
-document.getElementById("colTotalCost").style.display =
-AppState.analyticsMode === "revenue" ? "none" : "";
-
-document.getElementById("colGrossProfit").style.display =
-AppState.analyticsMode === "revenue" ? "none" : "";
-
-document.getElementById("colMargin").style.display =
-AppState.analyticsMode === "revenue" ? "none" : "";
-
   let tRev=0, tCost=0, tProfit=0, tItems=0;
   let labels=[], revD=[], profD=[], reportHTML='', pdfIns='';
   let top = {name:'–', profit:-Infinity};
@@ -1063,15 +1030,7 @@ AppState.analyticsMode === "revenue" ? "none" : "";
     const rev    = item.sell * item.qty;
     const cost   = item.cost * item.qty;
     const profit = rev - cost;
-    let mNum;
-
-if (AppState.analyticsMode === "revenue") {
-  mNum = 0;
-} else {
-  mNum = rev>0 ? (profit/rev)*100 : 0;
-
-  
-}
+    const mNum   = rev>0 ? (profit/rev)*100 : 0;
 
     tRev    += rev;
     tCost   += cost;
@@ -1090,43 +1049,22 @@ if (AppState.analyticsMode === "revenue") {
       ? `<span class="status-pill status-healthy">Healthy</span>`
       : `<span class="status-pill status-leak">Leak</span>`;
 
-    if (AppState.analyticsMode === "revenue") {
-
-  reportHTML += `<tr>
-    <td style="font-weight:700;font-family:'Inter',sans-serif;">${item.name}</td>
-    <td>${fmt(rev)}</td>
-    <td>${item.qty}</td>
-    <td>${fmt(rev)}</td>
-    <td>—</td>
-    <td><span class="status-pill status-healthy">Revenue Mode</span></td>
-  </tr>`;
-
-} else {
-
-  reportHTML += `<tr>
-    <td style="font-weight:700;font-family:'Inter',sans-serif;">${item.name}</td>
-    <td>${fmt(rev)}</td>
-    <td>${fmt(cost)}</td>
-    <td style="font-weight:600;color:${profit<0?'var(--red)':'var(--ink)'};">${fmt(profit)}</td>
-    <td>
-      <div class="margin-bar">
-        <span class="margin-label">${mNum.toFixed(1)}%</span>
-        <div class="margin-bar-track"><div class="margin-bar-fill" style="width:${barW}%;background:${barC};"></div></div>
-      </div>
-    </td>
-    <td>${pill}</td>
-  </tr>`;
-
-}
+    reportHTML += `<tr>
+      <td style="font-weight:700;font-family:'Inter',sans-serif;">${item.name}</td>
+      <td>${fmt(rev)}</td>
+      <td>${fmt(cost)}</td>
+      <td style="font-weight:600;color:${profit<0?'var(--red)':'var(--ink)'};">${fmt(profit)}</td>
+      <td>
+        <div class="margin-bar">
+          <span class="margin-label">${mNum.toFixed(1)}%</span>
+          <div class="margin-bar-track"><div class="margin-bar-fill" style="width:${barW}%;background:${barC};"></div></div>
+        </div>
+      </td>
+      <td>${pill}</td>
+    </tr>`;
   });
 
-  let ovMargin;
-
-if (AppState.analyticsMode === "revenue") {
-  ovMargin = 0;
-} else {
-  ovMargin = tRev>0 ? (tProfit/tRev)*100 : 0;
-}
+  const ovMargin = tRev>0 ? (tProfit/tRev)*100 : 0;
 
   // Weighted health score
   let hs = 50;
@@ -1571,13 +1509,7 @@ function renderEnhancedReport(data) {
     const rev    = sellP * q;
     const costT  = costP * q;
     const profit = rev - costT;
-    let margin;
-
-    if (AppState.analyticsMode === "revenue") {
-  margin = 0;
-} else {
-  margin = rev > 0 ? (profit / rev) * 100 : 0;
-}
+    const margin = rev > 0 ? (profit / rev) * 100 : 0;
     tRev    += rev;
     tCost   += costT;
     tProfit += profit;
@@ -1607,13 +1539,10 @@ function renderEnhancedReport(data) {
   `).join('');
 
   // ── Performance Bands ────────────────────
-  let stars = [], average = [], leakers = [];
+  const stars   = sorted.filter(p => p.margin >= 30);
+  const average = sorted.filter(p => p.margin >= 0 && p.margin < 30);
+  const leakers = sorted.filter(p => p.margin < 0);
 
-if (AppState.analyticsMode === "profit") {
-  stars   = sorted.filter(p => p.margin >= 30);
-  average = sorted.filter(p => p.margin >= 0 && p.margin < 30);
-  leakers = sorted.filter(p => p.margin < 0);
-}
   const bands = document.getElementById('reportBands');
   if (bands) bands.innerHTML = [
     { label:'⭐ Star Products',  items: stars,   bg:'#d1fae5', border:'#a7f3d0', color:'#065f46' },
@@ -1640,25 +1569,16 @@ if (AppState.analyticsMode === "profit") {
         ? `<span class="status-pill" style="background:#fef3c7;color:#92400e;">Average</span>`
         : `<span class="status-pill status-leak">Loss</span>`;
     return `<tr style="${i % 2 === 0 ? '' : 'background:var(--slate-50);'}">
-  <td style="color:var(--slate-300);font-size:12px;">${i+1}</td>
-  <td style="font-weight:600;">${p.name}</td>
-  <td>${fmt(p.sell)}</td>
-
-  ${AppState.analyticsMode === "revenue" ? `
-    <td>—</td>
-    <td>${p.qty}</td>
-    <td>${fmt(p.rev)}</td>
-    <td>—</td>
-    <td>—</td>
-  ` : `
-    <td>${fmt(p.cost)}</td>
-    <td>${p.qty}</td>
-    <td>${fmt(p.rev)}</td>
-    <td>${fmt(p.costTotal)}</td>
-    <td style="font-weight:600;color:${p.profit<0?'var(--red)':'var(--green)'};">
-      ${p.profit<0?'-':''}${fmt(p.profit)}
-    </td>
-  `}
+      <td style="color:var(--slate-300);font-size:12px;">${i+1}</td>
+      <td style="font-weight:600;">${p.name}</td>
+      <td>${fmt(p.sell)}</td>
+      ${AppState.analyticsMode === "revenue" ? "" : `
+<td>${fmt(p.cost)}</td>
+<td>${fmt(p.costTotal)}</td>
+<td style="font-weight:600;color:${p.profit<0?'var(--red)':'var(--green)'};">
+  ${p.profit<0?'-':''}${fmt(p.profit)}
+</td>
+`}
       <td>
         <div style="display:flex;align-items:center;gap:6px;">
           <span style="font-weight:600;font-size:13px;color:${barC};min-width:38px;">${p.margin.toFixed(1)}%</span>
@@ -1758,6 +1678,7 @@ if (AppState.analyticsMode === "profit") {
   }
 
   // ── Margin horizontal bar chart ──────────
+  const margCtx = document.getElementById('reportMarginChart');
   if (margCtx) {
     if (reportMarginChart) reportMarginChart.destroy();
     // Bubble chart: x=margin%, y=profit, r=revenue size
