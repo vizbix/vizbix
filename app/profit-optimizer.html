@@ -492,15 +492,7 @@
     </div>
 
     <div id="view-report" class="app-view">
-     <div style="max-width:1040px;margin:0 auto;width:100%;box-sizing:border-box;position:relative;">
-
-        <div id="reportRevenueLock" style="display:none;position:absolute;inset:0;z-index:50;background:rgba(255,255,255,0.92);backdrop-filter:blur(6px);border-radius:16px;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;">
-       <div style="font-size:48px;margin-bottom:16px;">🔒</div>
-       <h3 style="font-size:20px;font-weight:700;color:var(--ink);margin:0 0 10px;">Profit Report Locked</h3>
-       <p style="font-size:14px;color:var(--slate-300);max-width:320px;line-height:1.6;margin-bottom:24px;">You're in Revenue-Only Mode. Add cost prices to unlock the full profit report with margins, loss makers, and PDF export.</p>
-       <button onclick="costModalShown=false;showCostMissingModal(getFreshData())" style="font-size:14px;font-weight:700;padding:12px 28px;border-radius:10px;border:none;background:var(--indigo);color:white;cursor:pointer;">💡 Add Costs to Unlock →</button>
-       <p style="font-size:12px;color:var(--slate-200);margin-top:12px;">Or switch back to Profit Mode from the Dashboard</p>
-        </div>
+     <div style="max-width:1040px;margin:0 auto;width:100%;box-sizing:border-box;">
 
         <div class="page-header">
           <h2>Detailed Profit Report</h2>
@@ -508,6 +500,14 @@
             <button class="btn btn-secondary" style="font-size:13px;" onclick="switchView('data', document.getElementById('nav-data'))">← Edit Data</button>
             <button class="btn btn-primary"   style="font-size:13px;" onclick="exportExecutivePDF()">📥 Download PDF</button>
           </div>
+        </div>
+
+        <div id="reportRevenueLock" style="display:none;position:relative;z-index:50;background:rgba(255,255,255,0.92);backdrop-filter:blur(6px);border-radius:16px;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:60px 40px;margin-bottom:14px;">
+          <div style="font-size:48px;margin-bottom:16px;">🔒</div>
+          <h3 style="font-size:20px;font-weight:700;color:var(--ink);margin:0 0 10px;">Profit Report Locked</h3>
+          <p style="font-size:14px;color:var(--slate-300);max-width:320px;line-height:1.6;margin-bottom:24px;">You're in Revenue-Only Mode. Add cost prices to unlock the full profit report with margins, loss makers, and PDF export.</p>
+          <button onclick="costModalShown=false;showCostMissingModal(getFreshData())" style="font-size:14px;font-weight:700;padding:12px 28px;border-radius:10px;border:none;background:var(--indigo);color:white;cursor:pointer;">💡 Add Costs to Unlock →</button>
+          <p style="font-size:12px;color:var(--slate-200);margin-top:12px;">Or switch back to Profit Mode from the Dashboard</p>
         </div>
 
         <div id="reportSummaryBar" style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px;"></div>
