@@ -327,11 +327,17 @@
       <div style="max-width:1040px;margin:0 auto;width:100%;box-sizing:border-box;">
 
         <div class="page-header">
-          <h2>Financial Dashboard</h2>
-          <div style="display:flex;align-items:center;gap:10px;background:white;padding:8px 16px;border-radius:10px;border:1px solid var(--slate-100);box-shadow:0 1px 3px rgba(8,9,13,0.04);">
-            <span style="font-size:10px;font-weight:600;color:var(--slate-300);text-transform:uppercase;letter-spacing:0.8px;">Health Score</span>
-            <div id="health-circle">–</div>
-            <div id="health-label" style="font-size:12px;font-weight:500;color:var(--slate-300);"></div>
+          <div style="display:flex;align-items:center;gap:12px;">
+            <h2>Financial Dashboard</h2>
+            <div id="analyticsModebadge" style="display:none;font-size:11px;font-weight:700;padding:4px 12px;border-radius:99px;"></div>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <button id="toggleModeBtn" onclick="toggleAnalyticsMode()" style="display:none;font-size:12px;font-weight:600;padding:7px 14px;border-radius:8px;border:1.5px solid var(--slate-200);background:white;color:var(--ink);cursor:pointer;transition:all 0.2s;font-family:Inter,sans-serif;"></button>
+            <div style="display:flex;align-items:center;gap:10px;background:white;padding:8px 16px;border-radius:10px;border:1px solid var(--slate-100);box-shadow:0 1px 3px rgba(8,9,13,0.04);">
+              <span style="font-size:10px;font-weight:600;color:var(--slate-300);text-transform:uppercase;letter-spacing:0.8px;">Health Score</span>
+              <div id="health-circle">–</div>
+              <div id="health-label" style="font-size:12px;font-weight:500;color:var(--slate-300);"></div>
+            </div>
           </div>
         </div>
 
@@ -939,6 +945,52 @@ function processDataAndShowReport() {
   }, 420);
 }
 
+function toggleAnalyticsMode() {
+  if (AppState.analyticsMode === 'revenue') {
+    AppState.analyticsMode = 'profit';
+    window.revenueOnlyMode = false;
+    showToast('Switched to Profit Mode', 'success');
+  } else {
+    AppState.analyticsMode = 'revenue';
+    window.revenueOnlyMode = true;
+    showToast('Switched to Revenue Mode', 'info');
+  }
+  const data = getFreshData();
+  if (data.length) {
+    document.getElementById('dashboardSkeleton').style.display = 'block';
+    document.getElementById('dashboardContent').style.opacity = '0.3';
+    setTimeout(() => {
+      runAnalysis(data);
+      document.getElementById('dashboardSkeleton').style.display = 'none';
+      document.getElementById('dashboardContent').style.opacity = '1';
+    }, 300);
+  }
+}
+
+function updateModeBadge() {
+  const badge = document.getElementById('analyticsModebage');
+  const btn   = document.getElementById('toggleModeBtn');
+  if (!badge || !btn) return;
+
+  if (AppState.analyticsMode === 'revenue') {
+    badge.style.display = 'inline-flex';
+    badge.style.background = '#eff6ff';
+    badge.style.color = '#3b82f6';
+    badge.style.border = '1px solid #bfdbfe';
+    badge.textContent = '📈 Revenue Mode';
+    btn.style.display = 'block';
+    btn.textContent = '🔓 Switch to Profit Mode';
+    btn.style.borderColor = '#bfdbfe';
+    btn.style.color = '#3b82f6';
+  } else {
+    badge.style.display = 'none';
+    btn.style.display = 'block';
+    btn.textContent = '📈 Revenue Mode';
+    btn.style.borderColor = 'var(--slate-200)';
+    btn.style.color = 'var(--slate-300)';
+  }
+}
+
 function getDataWarningHTML() {
   const data = getFreshData();
   const missingSell = data.filter(p => !p.sell || p.sell === 0);
@@ -1015,46 +1067,56 @@ function runAnalysis(data) {
   if(data.length>=3) hs+=12;
   hs = Math.max(0, Math.min(100, Math.round(hs)));
 
-  // Metric cards
+ // Metric cards
   setText('dash-revenue',     fmt(tRev));
   setText('dash-top-product', top.name);
 
   if (AppState.analyticsMode === 'revenue') {
-    // Revenue mode — swap profit/margin cards to units and avg price
     const avgPrice = tItems > 0 ? fmt(tRev / tItems) : '—';
 
     const profitCard = document.getElementById('dash-profit-card');
-    profitCard.classList.remove('highlight');
-    profitCard.style.background = '#f0fdf4';
-    profitCard.style.borderColor = '#bbf7d0';
-    profitCard.innerHTML = `
-      <h4 style="color:#059669;">Total Units Sold</h4>
-      <div class="value" style="color:#059669;">${tItems.toLocaleString()}</div>`;
+    if (profitCard) {
+      profitCard.classList.remove('highlight');
+      profitCard.style.background = '#f0fdf4';
+      profitCard.style.border = '1.5px solid #bbf7d0';
+      profitCard.innerHTML = `
+        <h4 style="color:#059669;">Total Units Sold</h4>
+        <div class="value" style="color:#059669;">${tItems.toLocaleString()}</div>`;
+    }
 
     const marginCard = document.getElementById('dash-margin-card');
-    marginCard.style.background = '#eff6ff';
-    marginCard.style.borderColor = '#bfdbfe';
-    marginCard.innerHTML = `
-      <h4 style="color:#3b82f6;">Avg Revenue / Unit</h4>
-      <div class="value" style="color:#3b82f6;">${avgPrice}</div>`;
+    if (marginCard) {
+      marginCard.style.background = '#eff6ff';
+      marginCard.style.border = '1.5px solid #bfdbfe';
+      marginCard.innerHTML = `
+        <h4 style="color:#3b82f6;">Avg Revenue / Unit</h4>
+        <div class="value" style="color:#3b82f6;">${avgPrice}</div>`;
+    }
 
   } else {
-    // Profit mode — normal cards
     const profitCard = document.getElementById('dash-profit-card');
-    profitCard.classList.add('highlight');
-    profitCard.style.background = '';
-    profitCard.style.borderColor = '';
-    profitCard.innerHTML = `
-      <h4>Total Net Profit</h4>
-      <div class="value" id="dash-profit">${fmt(tProfit)}</div>`;
+    if (profitCard) {
+      profitCard.classList.add('highlight');
+      profitCard.style.background = '';
+      profitCard.style.border = '';
+      profitCard.innerHTML = `
+        <h4>Total Net Profit</h4>
+        <div class="value" id="dash-profit">${fmt(tProfit)}</div>`;
+    }
 
     const marginCard = document.getElementById('dash-margin-card');
-    marginCard.style.background = '';
-    marginCard.style.borderColor = '';
-    marginCard.innerHTML = `
-      <h4>Avg Gross Margin</h4>
-      <div class="value" id="dash-margin">${ovMargin.toFixed(1)+'%'}</div>`;
+    if (marginCard) {
+      marginCard.style.background = '';
+      marginCard.style.border = '';
+      marginCard.innerHTML = `
+        <h4>Avg Gross Margin</h4>
+        <div class="value" id="dash-margin">${ovMargin.toFixed(1)+'%'}</div>`;
+    }
   }
+
+  // Update mode badge and toggle button
+  updateModeBadge();
+
   document.getElementById('reportTableBody').innerHTML = reportHTML;
 
   // Health badge
@@ -1067,28 +1129,45 @@ function runAnalysis(data) {
 
   // 3-point action plan
   let ins = '';
-  if(top.profit>0) {
-    ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'Inter',sans-serif;"><strong style="color:var(--ink);">1. Scale Winner:</strong> ${top.name} generated ${fmt(top.profit)}. Increase ad spend here.</div>`;
-    pdfIns += `<li style="margin-bottom:10px;"><strong>Scale Winner:</strong> ${top.name} is your most profitable product.</li>`;
-  } else {
-    ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'Inter',sans-serif;"><strong style="color:var(--ink);">1. Raise Prices:</strong> No profitable products. Raise prices or renegotiate costs immediately.</div>`;
-    pdfIns += `<li style="margin-bottom:10px;"><strong>Raise Prices:</strong> No profitable products detected.</li>`;
-  }
 
-  if(leaks.length>0) {
-    ins += `<div style="padding:11px 14px;background:var(--red-bg);border-radius:9px;border:1px solid #fecaca;color:var(--red);font-family:'Inter',sans-serif;"><strong>2. Stop Leaks:</strong> ${leaks.join(', ')} are losing money. Reprice or drop them.</div>`;
-    pdfIns += `<li style="margin-bottom:10px;color:#dc2626;"><strong>Fix Leaks:</strong> ${leaks.join(', ')} are losing money.</li>`;
-  } else {
-    ins += `<div style="padding:11px 14px;background:var(--green-bg);border-radius:9px;border:1px solid #a7f3d0;color:#065f46;font-family:'Inter',sans-serif;"><strong>2. Unit Economics Safe:</strong> Zero products losing money. Baseline is secure.</div>`;
-    pdfIns += `<li style="margin-bottom:10px;"><strong>Secure Economics:</strong> No products operating at a loss.</li>`;
-  }
+  if (AppState.analyticsMode === 'revenue') {
+    const topRevProduct = [...data].sort((a,b) => (b.sell*b.qty)-(a.sell*a.qty))[0];
+    const lowRevProduct = [...data].sort((a,b) => (a.sell*a.qty)-(b.sell*b.qty))[0];
+    const topRevShare   = tRev > 0 ? (((topRevProduct.sell*topRevProduct.qty)/tRev)*100).toFixed(1) : 0;
+    const avgUnits      = data.length > 0 ? Math.round(tItems / data.length) : 0;
 
-  if(ovMargin<20) {
-    ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'Inter',sans-serif;"><strong style="color:var(--ink);">3. Margin Warning:</strong> ${ovMargin.toFixed(1)}% is tight. Bundle items to raise AOV.</div>`;
-    pdfIns += `<li><strong>Improve Margin:</strong> ${ovMargin.toFixed(1)}% margin is tight.</li>`;
+    ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'Inter',sans-serif;"><strong style="color:var(--ink);">1. Top Revenue Driver:</strong> ${topRevProduct.name} generates ${topRevShare}% of your total revenue. Focus marketing here.</div>`;
+    ins += `<div style="padding:11px 14px;background:#fef3c7;border-radius:9px;border:1px solid #fde68a;font-family:'Inter',sans-serif;"><strong style="color:#92400e;">2. Low Performer:</strong> ${lowRevProduct.name} contributes the least revenue. Consider repricing or promoting it.</div>`;
+    ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'Inter',sans-serif;"><strong style="color:var(--ink);">3. Volume Opportunity:</strong> Avg ${avgUnits} units sold per product. Push your top products harder to grow total volume.</div>`;
+    ins += `<div style="padding:12px 16px;background:#f0fdf4;border-radius:9px;border:1px solid #bbf7d0;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:4px;">
+      <span style="font-size:12.5px;color:#065f46;">💡 Add cost prices to unlock Profit, Margin & Health Score</span>
+      <button onclick="costModalShown=false;showCostMissingModal(getFreshData())" style="font-size:12px;font-weight:600;padding:6px 12px;border-radius:7px;border:1px solid #059669;background:white;color:#059669;cursor:pointer;white-space:nowrap;">Add Costs →</button>
+    </div>`;
+
   } else {
-    ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'Inter',sans-serif;"><strong style="color:var(--ink);">3. Healthy Margin:</strong> ${ovMargin.toFixed(1)}% gives excellent cash flow for growth.</div>`;
-    pdfIns += `<li><strong>Healthy Margin:</strong> ${ovMargin.toFixed(1)}% gives flexibility to scale.</li>`;
+    if(top.profit>0) {
+      ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'Inter',sans-serif;"><strong style="color:var(--ink);">1. Scale Winner:</strong> ${top.name} generated ${fmt(top.profit)}. Increase ad spend here.</div>`;
+      pdfIns += `<li style="margin-bottom:10px;"><strong>Scale Winner:</strong> ${top.name} is your most profitable product.</li>`;
+    } else {
+      ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'Inter',sans-serif;"><strong style="color:var(--ink);">1. Raise Prices:</strong> No profitable products. Raise prices or renegotiate costs immediately.</div>`;
+      pdfIns += `<li style="margin-bottom:10px;"><strong>Raise Prices:</strong> No profitable products detected.</li>`;
+    }
+
+    if(leaks.length>0) {
+      ins += `<div style="padding:11px 14px;background:var(--red-bg);border-radius:9px;border:1px solid #fecaca;color:var(--red);font-family:'Inter',sans-serif;"><strong>2. Stop Leaks:</strong> ${leaks.join(', ')} are losing money. Reprice or drop them.</div>`;
+      pdfIns += `<li style="margin-bottom:10px;color:#dc2626;"><strong>Fix Leaks:</strong> ${leaks.join(', ')} are losing money.</li>`;
+    } else {
+      ins += `<div style="padding:11px 14px;background:var(--green-bg);border-radius:9px;border:1px solid #a7f3d0;color:#065f46;font-family:'Inter',sans-serif;"><strong>2. Unit Economics Safe:</strong> Zero products losing money. Baseline is secure.</div>`;
+      pdfIns += `<li style="margin-bottom:10px;"><strong>Secure Economics:</strong> No products operating at a loss.</li>`;
+    }
+
+    if(ovMargin<20) {
+      ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'Inter',sans-serif;"><strong style="color:var(--ink);">3. Margin Warning:</strong> ${ovMargin.toFixed(1)}% is tight. Bundle items to raise AOV.</div>`;
+      pdfIns += `<li><strong>Improve Margin:</strong> ${ovMargin.toFixed(1)}% margin is tight.</li>`;
+    } else {
+      ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'Inter',sans-serif;"><strong style="color:var(--ink);">3. Healthy Margin:</strong> ${ovMargin.toFixed(1)}% gives excellent cash flow for growth.</div>`;
+      pdfIns += `<li><strong>Healthy Margin:</strong> ${ovMargin.toFixed(1)}% gives flexibility to scale.</li>`;
+    }
   }
 
   document.getElementById('auto-insights-list').innerHTML = ins;
