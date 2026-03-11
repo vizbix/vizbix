@@ -1058,6 +1058,7 @@
   </div>
 </div>
 
+<script type="module" src="../assets/js/auth.js"></script>
 <script src="../assets/js/drawer.js?v=9.3"></script>
 
 <script>
@@ -2933,17 +2934,8 @@ function showHelp(platform) {
 }
 
 document.addEventListener('DOMContentLoaded', ()=>{
-  // 1. Check for an existing login session from the home page
-  // Note: Replace 'userEmail' with whatever localStorage key your homepage actually uses
-  const savedEmail = localStorage.getItem('userEmail'); 
-  if (savedEmail) {
-    window.userEmail = savedEmail; // This auto-triggers your auth flow and unlocks the app
-  }
-
-  // 2. Existing initialization code
   restoreChatSession();
   renderFeatureTable();
-  
   // Restore saved product data from localStorage
   const restored = loadDataFromStorage();
   if (restored) showToast('Your previous data has been restored ✓', 'info', 2500);
