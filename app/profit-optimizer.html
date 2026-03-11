@@ -495,7 +495,7 @@
       <div style="max-width:1040px;margin:0 auto;width:100%;box-sizing:border-box;">
 
         <div class="page-header">
-          <h2 id="reportTitle">Detailed Profit Report</h2>
+          <h2>Detailed Profit Report</h2>
           <div style="display:flex;gap:9px;flex-wrap:wrap;">
             <button class="btn btn-secondary" style="font-size:13px;" onclick="switchView('data', document.getElementById('nav-data'))">← Edit Data</button>
             <button class="btn btn-primary"   style="font-size:13px;" onclick="exportExecutivePDF()">📥 Download PDF</button>
@@ -1014,13 +1014,6 @@ function getDataWarningHTML() {
 }
 
 function runAnalysis(data) {
-  const reportTitle = document.getElementById("reportTitle");
-if (reportTitle) {
-  reportTitle.innerText =
-    AppState.analyticsMode === "revenue"
-      ? "Revenue Intelligence Report"
-      : "Detailed Profit Report";
-}
   let tRev=0, tCost=0, tProfit=0, tItems=0;
   let labels=[], revD=[], profD=[], reportHTML='', pdfIns='';
   let top = {name:'–', profit:-Infinity};
@@ -1126,18 +1119,6 @@ if (reportTitle) {
 
   document.getElementById('reportTableBody').innerHTML = reportHTML;
 
-  // Toggle report columns for revenue mode
-const cols = [
-  "th:nth-child(4), td:nth-child(4)",
-  "th:nth-child(7), td:nth-child(7)",
-  "th:nth-child(8), td:nth-child(8)",
-  "th:nth-child(9), td:nth-child(9)",
-  "#reportTableFoot td:nth-child(3)",
-  "#reportTableFoot td:nth-child(4)",
-  "#reportTableFoot td:nth-child(5)",
-  "#reportTableFoot td:nth-child(6)"
-];
-
   // Health badge
   const hc = document.getElementById('health-circle');
   const hl = document.getElementById('health-label');
@@ -1222,14 +1203,8 @@ const cols = [
     .sort((a,b) => b.rev - a.rev);
   const chartSlice   = chartData.slice(0, CHART_MAX);
   const chartLabels  = chartSlice.map(d => d.name.length > 14 ? d.name.slice(0,13)+'…' : d.name);
-  const chartRevD = chartSlice.map(d => d.rev);
-let chartProfD;
-
-if (AppState.analyticsMode === "revenue") {
-    chartProfD = new Array(chartRevD.length).fill(0);
-} else {
-    chartProfD = chartSlice.map(d => d.profit);
-}
+  const chartRevD    = chartSlice.map(d => d.rev);
+  const chartProfD   = chartSlice.map(d => d.profit);
   const extraCount   = chartData.length - CHART_MAX;
 
   // Show "showing top N" notice
@@ -1242,28 +1217,70 @@ if (AppState.analyticsMode === "revenue") {
   }
   chartNote.textContent = extraCount > 0 ? `Top ${CHART_MAX} of ${data.length} products by revenue` : '';
 
+  // Change the Chart Initialization block in runAnalysis:
+  const isRevMode = AppState.analyticsMode === 'revenue';
+  
+  // Update the chart title based on the mode
+  const chartTitle = document.querySelector('.chart-card h4');
+  if (chartTitle) chartTitle.innerText = isRevMode ? 'Top Products by Revenue' : 'Revenue vs Profit';
+
   myChart = new Chart(ctx, {
     type: 'bar',
     data: {
       labels: chartLabels,
-      datasets: AppState.analyticsMode === "revenue"
-? [
-    {label:'Revenue', data:chartRevD, backgroundColor:'#5b5ef6', borderRadius:5}
-  ]
-: [
-    {label:'Revenue', data:chartRevD,  backgroundColor:'#e0e7ff', borderRadius:5},
-    {label:'Profit',  data:chartProfD, backgroundColor:'#5b5ef6', borderRadius:5}
-  ]
+      datasets: isRevMode ? [
+        // Match the Purple from the image
+        {label:'Revenue', data:chartRevD,  backgroundColor:'#5b5ef6', borderRadius:4}
+      ] : [
+        // Match the Purple and Green from the image
+        {label:'Revenue', data:chartRevD,  backgroundColor:'#5b5ef6', borderRadius:4},
+        {label:'Profit',  data:chartProfD, backgroundColor:'#22c55e', borderRadius:4}
+      ]
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       plugins: {
-        legend: { position:'top', labels:{ font:{weight:'600',size:11,family:'Inter'}, color:'#94a3b8', boxWidth:12, padding:12 } }
+        // Hide the legend to match the screenshot
+        legend: { display: false },
+        tooltip: {
+          titleFont: { family: 'Inter', size: 13 },
+          bodyFont: { family: 'Inter', size: 12 },
+          padding: 10,
+          cornerRadius: 8
+        }
       },
       scales: {
-        x:{ grid:{display:false}, ticks:{color:'#94a3b8', font:{weight:'500',size:10,family:'Inter'}, maxRotation:40, autoSkip:false} },
-        y:{ beginAtZero:true, grid:{color:'#f4f7ff'}, ticks:{color:'#94a3b8', font:{size:10,family:'Inter'}} }
+        x: { 
+          grid: { display: false }, 
+          ticks: { 
+            color: '#64748b', 
+            font: { weight: '500', size: 11, family: 'Inter' }, 
+            maxRotation: 0, // Keeps text flat like the screenshot (auto-truncates if needed)
+            autoSkip: false 
+          } 
+        },
+        y: { 
+          beginAtZero: true, 
+          border: { display: false }, // Removes the solid vertical axis line
+          grid: { 
+            color: '#f1f5f9', 
+            tickLength: 0, 
+            borderDash: [5, 5] // Creates the dashed lines seen in the image
+          }, 
+          ticks: { 
+            color: '#94a3b8', 
+            font: { size: 11, family: 'Inter' },
+            padding: 10,
+            // Formats numbers to 9k, 18k, 27k to match the screenshot perfectly
+            callback: function(value) {
+              const sym = AppState.currencySymbol || '₹';
+              if (value >= 1000) return sym + (value / 1000) + 'k';
+              if (value === 0) return sym + '0';
+              return sym + value;
+            }
+          } 
+        }
       }
     }
   });
@@ -1277,13 +1294,6 @@ if (AppState.analyticsMode === "revenue") {
 
   showToast('Dashboard updated ✓', 'success');
   renderEnhancedReport(data);
-  if (AppState.analyticsMode === "revenue") {
-  const healthCircle = document.getElementById("health-circle");
-  const healthLabel = document.getElementById("health-label");
-
-  if (healthCircle) healthCircle.innerText = "—";
-  if (healthLabel) healthLabel.innerText = "Revenue Mode";
-}
 }
 
 // ══════════════════════════════════════════
@@ -1496,7 +1506,10 @@ let reportMarginChart = null;
 
 function renderEnhancedReport(data) {
   if (!data || !data.length) return;
-  // ── Warning bar at top of report ──
+  
+  // 1. Check if Revenue Mode is active
+  const isRevMode = AppState.analyticsMode === 'revenue';
+
   const existingWarn = document.getElementById('reportWarningBar');
   if (existingWarn) existingWarn.remove();
   const reportWarnHTML = getDataWarningHTML()?.replace('id="dataWarningBar"', 'id="reportWarningBar"');
@@ -1509,12 +1522,8 @@ function renderEnhancedReport(data) {
     return sym + Math.abs(n).toLocaleString('en-IN', {maximumFractionDigits:0});
   };
 
-  // Compute per-product stats
   let tRev = 0, tCost = 0, tProfit = 0, tQty = 0;
   const products = data.map(item => {
-  if (AppState.analyticsMode === "revenue") {
-      item.cost = 0;
-    }
     const sellP  = item.sell || item.sellPrice || 0;
     const costP  = item.cost || item.costPrice || 0;
     const q      = item.qty  || 0;
@@ -1530,47 +1539,75 @@ function renderEnhancedReport(data) {
   });
 
   const ovMargin = tRev > 0 ? (tProfit / tRev) * 100 : 0;
-
-  // Sort by revenue desc for display
   const sorted = [...products].sort((a, b) => b.profit - a.profit);
 
-  // ── Summary Bar ──────────────────────────
-  const sb = document.getElementById('reportSummaryBar');
-  if (sb) sb.innerHTML = [
-    { l:'Total Revenue',  v: fmt(tRev),                c:'var(--indigo)' },
-    { l:'Net Profit',     v: fmt(tProfit),             c: tProfit >= 0 ? 'var(--green)' : 'var(--red)' },
+  // ── Summary Bar (Hide Profit/Margin in Rev Mode) ──
+  const summaryItems = isRevMode ? [
+    { l:'Total Revenue',  v: fmt(tRev),                  c:'var(--indigo)' },
+    { l:'Units Sold',     v: tQty.toLocaleString(),      c:'#8b5cf6' },
+    { l:'Products',       v: data.length,                c:'var(--ink)' },
+    { l:'Avg Price/Unit', v: tQty > 0 ? fmt(tRev / tQty) : '—', c:'var(--ink)' },
+  ] : [
+    { l:'Total Revenue',  v: fmt(tRev),                  c:'var(--indigo)' },
+    { l:'Net Profit',     v: fmt(tProfit),               c: tProfit >= 0 ? 'var(--green)' : 'var(--red)' },
     { l:'Avg Margin',     v: ovMargin.toFixed(1) + '%',c: ovMargin >= 25 ? 'var(--green)' : ovMargin >= 10 ? 'var(--amber)' : 'var(--red)' },
-    { l:'Units Sold',     v: tQty.toLocaleString(),    c:'#8b5cf6' },
-    { l:'Products',       v: data.length,              c:'var(--ink)' },
+    { l:'Units Sold',     v: tQty.toLocaleString(),      c:'#8b5cf6' },
+    { l:'Products',       v: data.length,                c:'var(--ink)' },
     { l:'Profit / Unit',  v: tQty > 0 ? fmt(tProfit / tQty) : '—', c:'var(--ink)' },
-  ].map(s => `
+  ];
+
+  const sb = document.getElementById('reportSummaryBar');
+  if (sb) sb.innerHTML = summaryItems.map(s => `
     <div style="background:white;border:1px solid var(--slate-100);border-radius:10px;padding:10px 14px;min-width:100px;flex:1;">
       <span style="font-size:10px;font-weight:700;color:var(--slate-300);text-transform:uppercase;letter-spacing:0.7px;display:block;margin-bottom:3px;">${s.l}</span>
       <span style="font-size:17px;font-weight:600;color:${s.c};">${s.v}</span>
     </div>
   `).join('');
 
-  // ── Performance Bands ────────────────────
-  const stars   = sorted.filter(p => p.margin >= 30);
-  const average = sorted.filter(p => p.margin >= 0 && p.margin < 30);
-  const leakers = sorted.filter(p => p.margin < 0);
+  // ── Performance Bands (Hide entirely in Rev Mode) ──
+  const bandsContainer = document.getElementById('reportBands');
+  if (isRevMode) {
+    if (bandsContainer) bandsContainer.style.display = 'none';
+  } else {
+    if (bandsContainer) bandsContainer.style.display = 'grid';
+    const stars   = sorted.filter(p => p.margin >= 30);
+    const average = sorted.filter(p => p.margin >= 0 && p.margin < 30);
+    const leakers = sorted.filter(p => p.margin < 0);
 
-  const bands = document.getElementById('reportBands');
-  if (bands) bands.innerHTML = [
-    { label:'⭐ Star Products',  items: stars,   bg:'#d1fae5', border:'#a7f3d0', color:'#065f46' },
-    { label:'📊 Average Margin', items: average, bg:'#fef3c7', border:'#fde68a', color:'#92400e' },
-    { label:'🔴 Loss Makers',    items: leakers, bg:'#fee2e2', border:'#fecaca', color:'#991b1b' },
-  ].map(band => `
-    <div style="background:${band.bg};border:1px solid ${band.border};border-radius:12px;padding:14px;">
-      <div style="font-size:11px;font-weight:700;color:${band.color};text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;">${band.label} (${band.items.length})</div>
-      ${band.items.length
-        ? band.items.map(p => `<div style="font-size:13px;color:${band.color};margin-bottom:3px;font-weight:500;">• ${p.name} <span style="opacity:0.7;">${p.margin.toFixed(1)}%</span></div>`).join('')
-        : `<div style="font-size:12.5px;color:${band.color};opacity:0.6;">None</div>`
-      }
-    </div>
-  `).join('');
+    if (bandsContainer) bandsContainer.innerHTML = [
+      { label:'⭐ Star Products',  items: stars,   bg:'#d1fae5', border:'#a7f3d0', color:'#065f46' },
+      { label:'📊 Average Margin', items: average, bg:'#fef3c7', border:'#fde68a', color:'#92400e' },
+      { label:'🔴 Loss Makers',    items: leakers, bg:'#fee2e2', border:'#fecaca', color:'#991b1b' },
+    ].map(band => `
+      <div style="background:${band.bg};border:1px solid ${band.border};border-radius:12px;padding:14px;">
+        <div style="font-size:11px;font-weight:700;color:${band.color};text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;">${band.label} (${band.items.length})</div>
+        ${band.items.length
+          ? band.items.map(p => `<div style="font-size:13px;color:${band.color};margin-bottom:3px;font-weight:500;">• ${p.name} <span style="opacity:0.7;">${p.margin.toFixed(1)}%</span></div>`).join('')
+          : `<div style="font-size:12.5px;color:${band.color};opacity:0.6;">None</div>`
+        }
+      </div>
+    `).join('');
+  }
 
-  // ── Main Table ───────────────────────────
+  // ── Main Table Header (Dynamic) ──
+  const thead = document.querySelector('.report-table thead');
+  if (thead) {
+    thead.innerHTML = `<tr style="text-align:left;">
+      <th style="padding:10px;font-size:11px;color:var(--slate-300);">#</th>
+      <th style="padding:10px;font-size:11px;color:var(--slate-300);">Product Name</th>
+      <th style="padding:10px;font-size:11px;color:var(--slate-300);">Sell Price</th>
+      ${isRevMode ? '' : '<th style="padding:10px;font-size:11px;color:var(--slate-300);">Cost Price</th>'}
+      <th style="padding:10px;font-size:11px;color:var(--slate-300);">Qty Sold</th>
+      <th style="padding:10px;font-size:11px;color:var(--slate-300);">Revenue</th>
+      ${isRevMode ? '' : '<th style="padding:10px;font-size:11px;color:var(--slate-300);">Total Cost</th>'}
+      ${isRevMode ? '' : '<th style="padding:10px;font-size:11px;color:var(--slate-300);">Gross Profit</th>'}
+      ${isRevMode ? '' : '<th style="padding:10px;font-size:11px;color:var(--slate-300);">Margin %</th>'}
+      <th style="padding:10px;font-size:11px;color:var(--slate-300);">Rev Share</th>
+      ${isRevMode ? '' : '<th style="padding:10px;font-size:11px;color:var(--slate-300);">Status</th>'}
+    </tr>`;
+  }
+
+  // ── Main Table Body ──
   const tbody = document.getElementById('reportTableBody');
   if (tbody) tbody.innerHTML = sorted.map((p, i) => {
     const barW = tRev > 0 ? Math.round((p.rev / tRev) * 100) : 0;
@@ -1580,26 +1617,25 @@ function renderEnhancedReport(data) {
       : p.margin >= 0
         ? `<span class="status-pill" style="background:#fef3c7;color:#92400e;">Average</span>`
         : `<span class="status-pill status-leak">Loss</span>`;
+        
     return `<tr style="${i % 2 === 0 ? '' : 'background:var(--slate-50);'}">
-      <td style="color:var(--slate-300);font-size:12px;">${i+1}</td>
-      <td style="font-weight:600;">${p.name}</td>
-      <td>${fmt(p.sell)}</td>
-      ${AppState.analyticsMode === "revenue" ? "" : `
-<td>${fmt(p.cost)}</td>
-<td>${fmt(p.costTotal)}</td>
-<td style="font-weight:600;color:${p.profit<0?'var(--red)':'var(--green)'};">
-  ${p.profit<0?'-':''}${fmt(p.profit)}
-</td>
-`}
-      <td>
+      <td style="color:var(--slate-300);font-size:12px;padding:8px;">${i+1}</td>
+      <td style="font-weight:600;padding:8px;">${p.name}</td>
+      <td style="padding:8px;">${fmt(p.sell)}</td>
+      ${isRevMode ? '' : `<td style="padding:8px;">${fmt(p.cost)}</td>`}
+      <td style="color:var(--slate-300);padding:8px;">${p.qty.toLocaleString()}</td>
+      <td style="font-weight:500;padding:8px;">${fmt(p.rev)}</td>
+      ${isRevMode ? '' : `<td style="padding:8px;">${fmt(p.costTotal)}</td>`}
+      ${isRevMode ? '' : `<td style="font-weight:600;padding:8px;color:${p.profit<0?'var(--red)':'var(--green)'};">${p.profit<0?'-':''}${fmt(p.profit)}</td>`}
+      ${isRevMode ? '' : `<td style="padding:8px;">
         <div style="display:flex;align-items:center;gap:6px;">
           <span style="font-weight:600;font-size:13px;color:${barC};min-width:38px;">${p.margin.toFixed(1)}%</span>
           <div style="flex:1;background:var(--slate-100);border-radius:99px;height:5px;min-width:36px;">
             <div style="width:${Math.max(0,Math.min(100,p.margin)).toFixed(0)}%;background:${barC};height:5px;border-radius:99px;"></div>
           </div>
         </div>
-      </td>
-      <td>
+      </td>`}
+      <td style="padding:8px;">
         <div style="display:flex;align-items:center;gap:5px;">
           <span style="font-size:12px;color:var(--slate-300);min-width:28px;">${barW}%</span>
           <div style="flex:1;background:var(--slate-100);border-radius:99px;height:5px;min-width:36px;">
@@ -1607,87 +1643,49 @@ function renderEnhancedReport(data) {
           </div>
         </div>
       </td>
-      <td>${pill}</td>
+      ${isRevMode ? '' : `<td style="padding:8px;">${pill}</td>`}
     </tr>`;
   }).join('');
 
-  // Totals footer
+  // ── Main Table Footer ──
   const tfoot = document.getElementById('reportTableFoot');
-  if (tfoot) tfoot.innerHTML = `<tr style="background:#0d0f18;color:white;font-weight:600;">
-    <td colspan="5" style="padding:11px 16px;font-size:12px;color:white;">TOTALS</td>
-    <td style="padding:11px 16px;color:white;">${fmt(tRev)}</td>
-    <td style="padding:11px 16px;color:white;">${fmt(tCost)}</td>
-    <td style="padding:11px 16px;color:${tProfit>=0?'#6ee7b7':'#fca5a5'};">${tProfit<0?'-':''}${fmt(tProfit)}</td>
-    <td style="padding:11px 16px;color:white;">${ovMargin.toFixed(1)}%</td>
-    <td style="padding:11px 16px;color:white;">100%</td>
-    <td style="padding:11px 16px;color:white;"></td>
-  </tr>`;
+  if (tfoot) {
+    if (isRevMode) {
+      tfoot.innerHTML = `<tr style="background:#0d0f18;color:white;font-weight:600;">
+        <td colspan="4" style="padding:11px 16px;font-size:12px;color:white;">TOTALS</td>
+        <td style="padding:11px 16px;color:white;">${fmt(tRev)}</td>
+        <td style="padding:11px 16px;color:white;">100%</td>
+      </tr>`;
+    } else {
+      tfoot.innerHTML = `<tr style="background:#0d0f18;color:white;font-weight:600;">
+        <td colspan="5" style="padding:11px 16px;font-size:12px;color:white;">TOTALS</td>
+        <td style="padding:11px 16px;color:white;">${fmt(tRev)}</td>
+        <td style="padding:11px 16px;color:white;">${fmt(tCost)}</td>
+        <td style="padding:11px 16px;color:${tProfit>=0?'#6ee7b7':'#fca5a5'};">${tProfit<0?'-':''}${fmt(tProfit)}</td>
+        <td style="padding:11px 16px;color:white;">${ovMargin.toFixed(1)}%</td>
+        <td style="padding:11px 16px;color:white;">100%</td>
+        <td style="padding:11px 16px;color:white;"></td>
+      </tr>`;
+    }
+  }
 
-  // ── Pie chart ───────────────────────────
+  // ── Charts & Grids ──
+  const bottomGrid = document.getElementById('reportBottomGrid');
+  if (bottomGrid) {
+    const marginChartCard = bottomGrid.children[1];
+    if (isRevMode) {
+      marginChartCard.style.display = 'none'; // Hide margin bubble chart
+      bottomGrid.style.gridTemplateColumns = '1fr'; // Make pie chart full width
+    } else {
+      marginChartCard.style.display = 'block';
+      bottomGrid.style.gridTemplateColumns = '1fr 1fr';
+    }
+  }
+
+  // ... (Leave the rest of the existing Pie Chart and Margin Chart logic untouched below this point)
   const palette = ['#5b5ef6','#6ee7b7','#fbbf24','#f87171','#a78bfa','#34d399','#fb923c','#60a5fa'];
   const pieCtx  = document.getElementById('reportPieChart');
-  if (pieCtx) {
-    if (reportPieChart) reportPieChart.destroy();
-    // Limit pie to top 10 + "Others" bucket
-    const PIE_MAX = 10;
-    const pieTop     = sorted.slice(0, PIE_MAX);
-    const totalPieRev = sorted.reduce((s,p) => s + Math.max(0, p.rev), 0);
-    const pieLabels  = pieTop.map(p => {
-      const pct = totalPieRev > 0 ? ((p.rev / totalPieRev) * 100).toFixed(1) : 0;
-      const name = p.name.length > 14 ? p.name.slice(0,13)+'…' : p.name;
-      return `${name} (${pct}%)`;
-    });
-    const pieData    = pieTop.map(p => Math.max(0, p.rev));
-    const piePalette = ['#1e3a5f','#2563eb','#3b82f6','#60a5fa','#93c5fd','#475569','#64748b','#94a3b8','#cbd5e1','#f59e0b'];
-
-    reportPieChart = new Chart(pieCtx, {
-      type: 'pie',
-      data: {
-        labels: pieLabels,
-        datasets: [{
-          data: pieData,
-          backgroundColor: piePalette,
-          borderWidth: 4,
-          borderColor: 'white',
-          hoverOffset: 18,
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: true,
-            position: 'bottom',
-            labels: {
-              font: { size: 11, family: 'Inter', weight: '500' },
-              color: '#64748b',
-              boxWidth: 10,
-              boxHeight: 10,
-              padding: 10,
-              usePointStyle: true,
-              pointStyle: 'circle',
-            }
-          },
-          tooltip: {
-            backgroundColor: 'rgba(8,9,13,0.85)',
-            titleFont: { size: 12, family: 'Inter', weight: '600' },
-            bodyFont: { size: 12, family: 'Inter' },
-            padding: 10,
-            cornerRadius: 8,
-            callbacks: {
-              label: ctx => {
-                const sym = AppState.currencySymbol || '₹';
-                const val = ctx.raw;
-                const pct = totalPieRev > 0 ? ((val / totalPieRev) * 100).toFixed(1) : 0;
-                return ` ${ctx.label.split(' (')[0]}: ${sym}${val.toLocaleString('en-IN',{maximumFractionDigits:0})} — ${pct}% of total revenue`;
-              }
-            }
-          }
-        }
-      }
-    });
-  }
+  // ... Keep everything else exactly as is ...
 
   // ── Margin horizontal bar chart ──────────
   const margCtx = document.getElementById('reportMarginChart');
@@ -1858,6 +1856,9 @@ function exportExecutivePDF() {
   const data = AppState.currentData;
   if (!data || !data.length) { showToast('Generate a dashboard first.', 'error'); return; }
 
+  // 1. Check if Revenue Mode is active
+  const isRevMode = AppState.analyticsMode === 'revenue';
+
   const sym = AppState.currencySymbol || '₹';
   const fmt = n => sym + Math.abs(n).toLocaleString('en-IN', {maximumFractionDigits:0});
 
@@ -1872,49 +1873,56 @@ function exportExecutivePDF() {
   const ovMargin = tRev>0?(tProfit/tRev)*100:0;
   const top = products[0];
 
-  // Build chart image from live canvas
   const chartImg = document.getElementById('profitChart')?.toDataURL('image/png') || '';
 
+  // ── Filter Table Rows ──
   const tableRows = products.map((p,i) => {
-    const barW = Math.max(0,Math.min(100,p.margin)).toFixed(0);
     const barC = p.margin>=30?'#059669':p.margin>=0?'#d97706':'#dc2626';
     const status = p.margin>=30?'Star':p.margin>=0?'Average':'Loss';
     return `<tr style="${i%2===0?'':'background:#f8fafc'}">
       <td style="padding:8px 10px;font-size:12px;color:#94a3b8;">${i+1}</td>
       <td style="padding:8px 10px;font-weight:600;font-size:13px;">${p.name}</td>
       <td style="padding:8px 10px;font-size:12px;">${fmt(p.sell)}</td>
-      <td style="padding:8px 10px;font-size:12px;">${fmt(p.cost)}</td>
+      ${isRevMode ? '' : `<td style="padding:8px 10px;font-size:12px;">${fmt(p.cost)}</td>`}
       <td style="padding:8px 10px;font-size:12px;color:#94a3b8;">${p.qty.toLocaleString()}</td>
       <td style="padding:8px 10px;font-size:12px;">${fmt(p.rev)}</td>
-      <td style="padding:8px 10px;font-weight:600;font-size:12px;color:${p.profit<0?'#dc2626':'#059669'};">${p.profit<0?'-':''}${fmt(p.profit)}</td>
-      <td style="padding:8px 10px;font-size:12px;color:${barC};">${p.margin.toFixed(1)}%</td>
-      <td style="padding:8px 10px;font-size:11px;font-weight:600;color:${barC};">${status}</td>
+      ${isRevMode ? '' : `<td style="padding:8px 10px;font-weight:600;font-size:12px;color:${p.profit<0?'#dc2626':'#059669'};">${p.profit<0?'-':''}${fmt(p.profit)}</td>`}
+      ${isRevMode ? '' : `<td style="padding:8px 10px;font-size:12px;color:${barC};">${p.margin.toFixed(1)}%</td>`}
+      ${isRevMode ? '' : `<td style="padding:8px 10px;font-size:11px;font-weight:600;color:${barC};">${status}</td>`}
     </tr>`;
   }).join('');
+
+  // ── Filter Top Metrics ──
+  const topMetrics = isRevMode ? [
+    {l:'Total Revenue',  v:fmt(tRev),                  c:'#5b5ef6'},
+    {l:'Units Sold',     v:tQty.toLocaleString(),      c:'#8b5cf6'},
+    {l:'Products',       v:data.length,                c:'#0f172a'},
+    {l:'Avg Price',      v:tQty > 0 ? fmt(tRev / tQty) : '—', c:'#0f172a'},
+  ] : [
+    {l:'Total Revenue',  v:fmt(tRev),                  c:'#5b5ef6'},
+    {l:'Net Profit',     v:fmt(tProfit),               c:tProfit>=0?'#059669':'#dc2626'},
+    {l:'Avg Margin',     v:ovMargin.toFixed(1)+'%',    c:ovMargin>=25?'#059669':ovMargin>=10?'#d97706':'#dc2626'},
+    {l:'Units Sold',     v:tQty.toLocaleString(),      c:'#8b5cf6'},
+  ];
 
   const html = `<div style="font-family:Inter,sans-serif;padding:32px;color:#08090d;background:white;width:1000px;">
     <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:28px;">
       <div>
-        <div style="font-size:22px;font-weight:700;color:#08090d;margin-bottom:4px;">Vizbix Profit Report</div>
+        <div style="font-size:22px;font-weight:700;color:#08090d;margin-bottom:4px;">Vizbix ${isRevMode ? 'Revenue' : 'Profit'} Report</div>
         <div style="font-size:12px;color:#94a3b8;">Generated ${new Date().toLocaleDateString('en-IN',{day:'numeric',month:'long',year:'numeric'})}</div>
       </div>
       <div style="background:#5b5ef6;color:white;padding:8px 18px;border-radius:99px;font-size:13px;font-weight:600;">Vizbix Pro</div>
     </div>
 
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:24px;">
-      ${[
-        {l:'Total Revenue',  v:fmt(tRev),                c:'#5b5ef6'},
-        {l:'Net Profit',     v:fmt(tProfit),             c:tProfit>=0?'#059669':'#dc2626'},
-        {l:'Avg Margin',     v:ovMargin.toFixed(1)+'%',  c:ovMargin>=25?'#059669':ovMargin>=10?'#d97706':'#dc2626'},
-        {l:'Units Sold',     v:tQty.toLocaleString(),    c:'#8b5cf6'},
-      ].map(s=>`<div style="border:1px solid #e8edf5;border-radius:12px;padding:14px;">
+      ${topMetrics.map(s=>`<div style="border:1px solid #e8edf5;border-radius:12px;padding:14px;">
         <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.6px;margin-bottom:6px;">${s.l}</div>
         <div style="font-size:20px;font-weight:700;color:${s.c};">${s.v}</div>
       </div>`).join('')}
     </div>
 
     ${chartImg ? `<div style="margin-bottom:24px;border:1px solid #e8edf5;border-radius:12px;padding:16px;">
-      <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:10px;">Revenue vs Profit (Top Products)</div>
+      <div style="font-size:10px;font-weight:700;color:#94a3b8;text-transform:uppercase;letter-spacing:0.7px;margin-bottom:10px;">${isRevMode ? 'Top Products by Revenue' : 'Revenue vs Profit (Top Products)'}</div>
       <img src="${chartImg}" style="width:100%;height:200px;object-fit:contain;" />
     </div>` : ''}
 
@@ -1924,28 +1932,35 @@ function exportExecutivePDF() {
           <th style="padding:10px;font-size:11px;text-align:left;">#</th>
           <th style="padding:10px;font-size:11px;text-align:left;">Product</th>
           <th style="padding:10px;font-size:11px;text-align:left;">Sell</th>
-          <th style="padding:10px;font-size:11px;text-align:left;">Cost</th>
+          ${isRevMode ? '' : '<th style="padding:10px;font-size:11px;text-align:left;">Cost</th>'}
           <th style="padding:10px;font-size:11px;text-align:left;">Qty</th>
           <th style="padding:10px;font-size:11px;text-align:left;">Revenue</th>
-          <th style="padding:10px;font-size:11px;text-align:left;">Profit</th>
-          <th style="padding:10px;font-size:11px;text-align:left;">Margin</th>
-          <th style="padding:10px;font-size:11px;text-align:left;">Status</th>
+          ${isRevMode ? '' : '<th style="padding:10px;font-size:11px;text-align:left;">Profit</th>'}
+          ${isRevMode ? '' : '<th style="padding:10px;font-size:11px;text-align:left;">Margin</th>'}
+          ${isRevMode ? '' : '<th style="padding:10px;font-size:11px;text-align:left;">Status</th>'}
         </tr>
       </thead>
       <tbody>${tableRows}</tbody>
       <tfoot>
-        <tr style="background:#0d0f18;color:white;font-weight:600;">
-          <td colspan="5" style="padding:10px;font-size:12px;">TOTALS</td>
-          <td style="padding:10px;font-size:12px;">${fmt(tRev)}</td>
-          <td style="padding:10px;font-size:12px;color:${tProfit>=0?'#6ee7b7':'#fca5a5'};">${tProfit<0?'-':''}${fmt(tProfit)}</td>
-          <td style="padding:10px;font-size:12px;">${ovMargin.toFixed(1)}%</td>
-          <td></td>
-        </tr>
+        ${isRevMode ? `
+          <tr style="background:#0d0f18;color:white;font-weight:600;">
+            <td colspan="4" style="padding:10px;font-size:12px;">TOTALS</td>
+            <td style="padding:10px;font-size:12px;">${fmt(tRev)}</td>
+          </tr>
+        ` : `
+          <tr style="background:#0d0f18;color:white;font-weight:600;">
+            <td colspan="5" style="padding:10px;font-size:12px;">TOTALS</td>
+            <td style="padding:10px;font-size:12px;">${fmt(tRev)}</td>
+            <td style="padding:10px;font-size:12px;color:${tProfit>=0?'#6ee7b7':'#fca5a5'};">${tProfit<0?'-':''}${fmt(tProfit)}</td>
+            <td style="padding:10px;font-size:12px;">${ovMargin.toFixed(1)}%</td>
+            <td></td>
+          </tr>
+        `}
       </tfoot>
     </table>
 
     <div style="font-size:10px;color:#94a3b8;text-align:center;border-top:1px solid #e8edf5;padding-top:12px;">
-      Generated by Vizbix Profit Optimizer Pro · vizbix.com
+      Generated by Vizbix Optimizer Pro · vizbix.com
     </div>
   </div>`;
 
@@ -2632,16 +2647,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   renderFeatureTable();
   // Restore saved product data from localStorage
   const restored = loadDataFromStorage();
-  if (restored) {
-    showToast('Your previous data has been restored ✓', 'info', 2500);
-    // Auto-detect revenue mode if all costs are 0
-    const savedData = getFreshData();
-    const allZeroCost = savedData.length > 0 && savedData.every(p => !p.cost || p.cost === 0);
-    if (allZeroCost) {
-      AppState.analyticsMode = 'revenue';
-      window.revenueOnlyMode = true;
-    }
-  }
+  if (restored) showToast('Your previous data has been restored ✓', 'info', 2500);
 });
 
 // ══════════════════════════════════════════
