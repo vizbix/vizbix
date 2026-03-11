@@ -222,7 +222,6 @@
   #reportBottomGrid { grid-template-columns: 1fr !important; }
   #reportSummaryBar > div { min-width: 40% !important; flex: 1 1 auto !important; }
   
-  /* Data Input Panel */
   /* Data Input Panel (Mobile Card Layout) */
   .data-table-headers, .di-header-row { display: none !important; } 
   
@@ -463,18 +462,12 @@
   <main class="app-main" id="mainContainer">
 
     <div class="mobile-app-bar">
-      <div class="mobile-brand">
-        <span class="brand-dot"></span>
-        <span class="brand-text">Vizbix</span>
-      </div>
-      <div class="mobile-actions">
-        <button class="btn btn-secondary mobile-login-btn" id="headerLoginBtn" onclick="document.getElementById('loginModal').style.display='flex'">Log in</button>
-        <button class="hamburger-btn" onclick="toggleAppDrawer()">
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-            <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
-          </svg>
-        </button>
-      </div>
+      <button onclick="toggleAppDrawer()">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+        </svg>
+      </button>
+      <div class="page-title" id="mobilePageTitle">Data Input</div>
     </div>
 
     <div id="view-data" class="app-view active">
