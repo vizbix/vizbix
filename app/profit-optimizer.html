@@ -374,6 +374,44 @@
     </div>
   </div>
 
+  <div id="mergeCostModal" style="display:none;position:fixed;inset:0;z-index:200;background:rgba(8,9,13,0.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
+    <div style="background:white;border-radius:18px;padding:28px;width:92%;max-width:540px;max-height:90vh;overflow-y:auto;box-shadow:0 24px 64px rgba(8,9,13,0.18);">
+      
+      <div id="mergeStep1">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+          <h3 style="font-size:17px;font-weight:600;color:var(--ink);">Update Costs via CSV</h3>
+          <button onclick="closeMergeCostModal()" style="background:none;border:none;cursor:pointer;font-size:22px;color:var(--slate-300);line-height:1;">×</button>
+        </div>
+        <p style="font-size:13px;color:var(--slate-300);margin-top:-10px;margin-bottom:16px;">This will update the cost price of your existing products without overwriting sales data.</p>
+        <div id="mergeDropZone" style="border:2px dashed var(--slate-200);background:#f0fdf4;border-radius:14px;padding:36px 24px;text-align:center;cursor:pointer;transition:all 0.2s;"
+          onclick="document.getElementById('mergeFileInput').click()"
+          ondragover="event.preventDefault();this.style.borderColor='#059669';this.style.background='#d1fae5'"
+          ondragleave="this.style.borderColor='var(--slate-200)';this.style.background='#f0fdf4'"
+          ondrop="handleMergeDrop(event)">
+          <div style="font-size:36px;margin-bottom:10px;">💸</div>
+          <div style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:6px;">Drop your Cost CSV here or click to browse</div>
+          <div style="font-size:12px;color:var(--slate-300);">Needs a "Product Name/SKU" column and a "Cost" column</div>
+        </div>
+        <input type="file" id="mergeFileInput" accept=".csv,.xlsx,.xls" style="display:none;" onchange="handleMergeFile(this)">
+      </div>
+
+      <div id="mergeStep2" style="display:none;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px;">
+          <h3 style="font-size:17px;font-weight:600;color:var(--ink);">Map Cost Columns</h3>
+          <button onclick="closeMergeCostModal()" style="background:none;border:none;cursor:pointer;font-size:22px;color:var(--slate-300);line-height:1;">×</button>
+        </div>
+        <p style="font-size:13px;color:var(--slate-300);margin-bottom:16px;" id="mergeFileInfo"></p>
+
+        <div style="display:grid;gap:14px;margin-bottom:24px;" id="mergeMappingGrid"></div>
+
+        <div style="display:flex;gap:9px;">
+          <button class="btn btn-secondary" style="flex:1;" onclick="document.getElementById('mergeStep2').style.display='none';document.getElementById('mergeStep1').style.display='block';">← Back</button>
+          <button class="btn btn-primary" style="flex:2;background:#059669;border-color:#059669;" onclick="confirmMergeCost()">Merge Costs →</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
   <div id="proLockOverlay" class="pro-lock-overlay pro-lock-hidden">
     <div class="pro-lock-card">
       <button class="pro-lock-close" onclick="closePaywall()">×</button>
@@ -474,14 +512,18 @@
       <div style="max-width:100%; padding:0 24px; margin:0 auto; width:100%; box-sizing:border-box;">
         
         <div class="page-header" style="margin-bottom: 20px;">
-          <div style="display:flex; justify-content: space-between; align-items: center; width: 100%;">
-            <h2>📋 Product Data</h2>
-            <div style="display:flex;align-items:center;gap:8px;">
-              <button class="btn btn-secondary" style="font-size:12px;padding:6px 12px;border-radius:8px;display:flex;align-items:center;gap:5px;" onclick="triggerImport()">
+          <div style="display:flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 12px;">
+            <h2 style="margin: 0; white-space: nowrap;">📋 Product Data</h2>
+            <div style="display:flex; align-items:center; gap:8px; flex-wrap: wrap;">
+              <button class="btn btn-secondary" style="font-size:12px;padding:6px 12px;border-radius:8px;display:flex;align-items:center;gap:5px; white-space: nowrap;" onclick="triggerImport()">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                Import CSV / Excel
+                Import Sales Data
               </button>
-              <a class="demo-link" onclick="loadDemoData()" style="cursor:pointer; color:var(--indigo); font-size:13px; font-weight:600;">↗ Load Demo</a>
+              <button class="btn btn-secondary" style="font-size:12px;padding:6px 12px;border-radius:8px;display:flex;align-items:center;gap:5px; white-space: nowrap; background: #f0fdf4; border-color: #bbf7d0; color: #059669;" onclick="triggerMergeCost()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 22v-6h6"/></svg>
+                Update Costs (CSV)
+              </button>
+              <a class="demo-link" onclick="loadDemoData()" style="cursor:pointer; color:var(--indigo); font-size:13px; font-weight:600; white-space: nowrap;">↗ Load Demo</a>
             </div>
           </div>
         </div>
@@ -3348,6 +3390,168 @@ function confirmImport() {
     setTimeout(() => processDataAndShowReport(), 400);
   }
 }
+// ══════════════════════════════════════════
+//  MERGE COSTS FROM CSV LOGIC
+// ══════════════════════════════════════════
+let mergeRawData = [];
+let mergeHeaders = [];
+let mergeMapping = {};
+
+function triggerMergeCost() {
+  const data = getFreshData();
+  if (!data.length) return showToast('Please add products or import sales data first.', 'error');
+  document.getElementById('mergeCostModal').style.display = 'flex';
+  document.getElementById('mergeStep1').style.display = '';
+  document.getElementById('mergeStep2').style.display = 'none';
+}
+
+function closeMergeCostModal() {
+  document.getElementById('mergeCostModal').style.display = 'none';
+  document.getElementById('mergeFileInput').value = '';
+}
+
+function handleMergeDrop(e) {
+  e.preventDefault();
+  e.currentTarget.style.borderColor = 'var(--slate-200)';
+  e.currentTarget.style.background = '#f0fdf4';
+  const file = e.dataTransfer.files[0];
+  if (file) processMergeFile(file);
+}
+
+function handleMergeFile(input) {
+  const file = input.files[0];
+  if (file) processMergeFile(file);
+  input.value = ''; // Reset input
+}
+
+function processMergeFile(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  
+  if (ext === 'csv') {
+    Papa.parse(file, {
+      header: true, skipEmptyLines: true,
+      complete: function(r) {
+        const headers = r.meta.fields || (r.data.length > 0 ? Object.keys(r.data[0]) : []);
+        setupMergeMapping(r.data, headers, file.name);
+      },
+      error: function() { showToast('Error reading CSV file.', 'error'); }
+    });
+  } else if (['xlsx','xls'].includes(ext)) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const wb = XLSX.read(e.target.result, {type:'array'});
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const data = XLSX.utils.sheet_to_json(ws, {defval:''});
+        const headers = data.length ? Object.keys(data[0]) : [];
+        setupMergeMapping(data, headers, file.name);
+      } catch (err) { showToast('Error reading Excel file.', 'error'); }
+    };
+    reader.onerror = () => showToast('File read failed.', 'error');
+    reader.readAsArrayBuffer(file);
+  } else {
+    showToast('Please upload a CSV or Excel file.', 'error');
+  }
+}
+
+function setupMergeMapping(data, headers, filename) {
+  if (!data || !data.length) {
+    showToast('File is empty.', 'error');
+    return;
+  }
+
+  mergeRawData = data;
+  mergeHeaders = headers || [];
+
+  // Auto-detect columns
+  mergeMapping = {
+    name: detectColumn(mergeHeaders, 'name'),
+    costPrice: detectColumn(mergeHeaders, 'costPrice')
+  };
+
+  document.getElementById('mergeStep1').style.display = 'none';
+  document.getElementById('mergeStep2').style.display = '';
+  document.getElementById('mergeFileInfo').textContent = `${filename} · ${data.length} rows found`;
+
+  const fieldLabels = { name: 'Match by (Name/SKU)', costPrice: 'Cost Price' };
+  const grid = document.getElementById('mergeMappingGrid');
+  
+  grid.innerHTML = Object.entries(fieldLabels).map(([key, label]) => `
+    <div style="display:flex;align-items:center;gap:10px;">
+      <label style="font-size:12.5px;font-weight:600;color:var(--ink);width:140px;flex-shrink:0;">${label}</label>
+      <select id="mergeMap_${key}" onchange="mergeMapping['${key}']=this.value; this.style.borderColor=this.value?'var(--indigo)':'var(--slate-200)';"
+        style="flex:1;padding:8px 12px;border-radius:8px;border:1.5px solid ${mergeMapping[key]?'var(--indigo)':'var(--slate-200)'};font-size:13px;background:white;outline:none;">
+        <option value="">— select column —</option>
+        ${mergeHeaders.map(h=>`<option value="${h}" ${mergeMapping[key]===h?'selected':''}>${h}</option>`).join('')}
+      </select>
+    </div>
+  `).join('');
+}
+
+function confirmMergeCost() {
+  const { name: idCol, costPrice: costCol } = mergeMapping;
+  if (!idCol || !costCol) {
+    showToast('Please map both Name/SKU and Cost columns.', 'error');
+    return;
+  }
+
+  const currentRows = document.querySelectorAll('#items .data-row');
+  let matchCount = 0;
+
+  // Pre-process merge data for faster/easier matching
+  const costLookup = {};
+  mergeRawData.forEach(row => {
+    const idVal = String(row[idCol] || '').toLowerCase().trim();
+    const costVal = parseFloat(String(row[costCol] || '').replace(/[^0-9.]/g, ''));
+    if (idVal && !isNaN(costVal)) {
+      costLookup[idVal] = costVal;
+    }
+  });
+
+  currentRows.forEach(row => {
+    const nameInput = row.querySelector('.input-name');
+    const costInput = row.querySelector('.input-cost');
+    const productName = (nameInput.value || '').toLowerCase().trim();
+
+    // Try exact match first
+    if (costLookup[productName] !== undefined) {
+      costInput.value = costLookup[productName];
+      matchCount++;
+      highlightMerge(costInput);
+    } else {
+      // Try partial match (e.g. if CSV has "SKU-123" and Vizbix name is "Blue Shirt SKU-123")
+      const partialKey = Object.keys(costLookup).find(k => productName.includes(k) || k.includes(productName));
+      if (partialKey) {
+        costInput.value = costLookup[partialKey];
+        matchCount++;
+        highlightMerge(costInput);
+      }
+    }
+  });
+
+  closeMergeCostModal();
+  saveDataToStorage();
+
+  if (matchCount > 0) {
+    showToast(`✅ Updated costs for ${matchCount} products!`, 'success', 4000);
+    // If they already generated the dashboard, update it instantly
+    if (AppState.currentView === 'dashboard') {
+      setTimeout(() => processDataAndShowReport(), 300);
+    }
+  } else {
+    showToast('⚠️ No products matched. Check your column mapping.', 'error', 5000);
+  }
+}
+
+function highlightMerge(inputEl) {
+  inputEl.style.transition = 'background-color 0.3s';
+  inputEl.style.backgroundColor = '#d1fae5';
+  inputEl.style.color = '#059669';
+  setTimeout(() => {
+    inputEl.style.backgroundColor = 'transparent';
+    inputEl.style.color = 'var(--ink)';
+  }, 1500);
+}
 </script>
 
 <div id="costMissingModal" style="display:none;" class="cost-modal-overlay">
@@ -3516,4 +3720,3 @@ function confirmImport() {
 
 </body>
 </html>
-
