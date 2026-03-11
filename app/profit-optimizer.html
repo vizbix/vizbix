@@ -463,6 +463,12 @@
         <span class="nav-pro-badge">PRO</span>
       </a>
 
+      <a class="nav-item" onclick="switchView('compare', this); renderCompareView();">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+        <span class="nav-item-text">Growth Compare</span>
+        <span class="nav-pro-badge">PRO</span>
+      </a>
+
       <a class="nav-item" onclick="switchView('ai', this)">
         <span style="background:white;color:#08090d;padding:2px 5px;border-radius:4px;font-size:11px;font-weight:600;line-height:1;flex-shrink:0;font-family:'Inter',sans-serif;">Ai</span>
         <span class="nav-item-text">Strategy</span>
@@ -1017,6 +1023,20 @@
       </div>
     </div>
 
+    <div id="view-compare" class="app-view">
+      <div style="max-width:100%; padding:0 24px; margin:0 auto; width:100%; box-sizing:border-box;">
+        <div class="page-header" style="margin-bottom:20px;">
+          <div>
+            <h2>📈 Growth Compare</h2>
+            <p style="color:var(--slate-300); font-size:13px; margin-top:4px;">Comparing your current data against your latest Cloud Save.</p>
+          </div>
+        </div>
+        <div id="compareViewContent" style="background:white; border:1px solid var(--slate-100); border-radius:16px; padding:24px; box-shadow:0 1px 3px rgba(8,9,13,0.02);">
+          <div style="text-align:center; padding:40px; color:var(--slate-300);">Loading comparison engine...</div>
+        </div>
+      </div>
+    </div>
+
     <div id="view-settings" class="app-view">
       <div class="data-card" style="max-width:580px;margin:0 auto;">
         <h2 style="margin-bottom:22px;font-size:20px;">Account Settings</h2>
@@ -1264,7 +1284,7 @@ function toggleAppDrawer() {
   document.getElementById('mobileAppOverlay').classList.toggle('active');
 }
 
-const PRO_VIEWS = ['ai','report','history','simulator'];
+const PRO_VIEWS = ['ai','report','history','simulator','compare'];
 
 function switchView(viewId, element, bypass=false) {
   AppState.currentView = viewId;
@@ -1504,6 +1524,66 @@ function runAnalysis(data) {
   if(tProfit>0) hs+=10;
   if(data.length>=3) hs+=12;
   hs = Math.max(0, Math.min(100, Math.round(hs)));
+  // ── NEW: TREND COMPARISON ENGINE (80% RULE) ──
+  let trendHTML = { rev: '', prof: '', marg: '' };
+
+  if (AppState.latestCloudSave && AppState.latestCloudSave.length > 0) {
+    const prev = AppState.latestCloudSave;
+    let matchedCount = 0;
+    let cRev = 0, cCost = 0, cProf = 0;
+    let pRev = 0, pCost = 0, pProf = 0;
+
+    // Map previous data for quick lookup
+    const prevMap = {};
+    prev.forEach(p => {
+      const n = (p.name || p.n || '').toLowerCase().trim();
+      prevMap[n] = { sell: p.sell || p.v1 || 0, cost: p.cost || p.v2 || 0, qty: p.qty || p.v3 || 0 };
+    });
+
+    // Cross-reference current data
+    data.forEach(item => {
+      const n = item.name.toLowerCase().trim();
+      if (prevMap[n]) {
+        matchedCount++;
+        // Current subset math
+        const r = item.sell * item.qty;
+        const c = item.cost * item.qty;
+        cRev += r; cCost += c; cProf += (r - c);
+
+        // Previous subset math
+        const pOld = prevMap[n];
+        const prOld = pOld.sell * pOld.qty;
+        const pcOld = pOld.cost * pOld.qty;
+        pRev += prOld; pCost += pcOld; pProf += (prOld - pcOld);
+      }
+    });
+
+    const matchRatio = data.length > 0 ? (matchedCount / data.length) : 0;
+
+    // Apply the 80% Threshold Rule
+    if (matchRatio >= 0.8 && matchedCount > 0) {
+      const calcPct = (oldV, newV) => oldV !== 0 ? ((newV - oldV) / Math.abs(oldV)) * 100 : 0;
+      
+      const revPct = calcPct(pRev, cRev);
+      const profPct = calcPct(pProf, cProf);
+      const curMarg = cRev > 0 ? (cProf / cRev) * 100 : 0;
+      const prevMarg = pRev > 0 ? (pProf / pRev) * 100 : 0;
+      const margDiff = curMarg - prevMarg;
+
+      const formatTrend = (val, isPts = false) => {
+        if (Math.abs(val) < 0.1) return `<span class="metric-trend" style="color:var(--slate-300)">→ Flat</span>`;
+        const sign = val > 0 ? '↗ +' : '↘ ';
+        const color = val > 0 ? '#059669' : '#dc2626';
+        return `<span style="color:${color}">${sign}${Math.abs(val).toFixed(1)}${isPts ? ' pts' : '%'}</span>`;
+      };
+
+      trendHTML.rev = formatTrend(revPct);
+      trendHTML.prof = formatTrend(profPct);
+      trendHTML.marg = formatTrend(margDiff, true);
+    } else {
+      console.log(`Trend skipped: Only ${Math.round(matchRatio*100)}% match. Requires 80%.`);
+    }
+  }
 
   // --- HEALTH SCORE BADGE ---
   const hc = document.getElementById('health-circle');
@@ -1523,12 +1603,20 @@ function runAnalysis(data) {
       // Card 1: Revenue (Always the same)
       kpiCards[0].querySelector('.metric-value-new').innerText = fmt(tRev);
       
-      // NEW LOGIC: Calculate Avg Revenue per Unit
+      // Calculate Avg Revenue per Unit as fallback
       const avgRevPerUnit = tItems > 0 ? (tRev / tItems) : 0;
+      const fallbackText = tItems > 0 ? 'Avg ' + fmt(avgRevPerUnit) + '/unit' : '';
+      
       const revTrendEl = document.getElementById('dash-revenue-trend');
       if (revTrendEl) {
-          revTrendEl.innerText = tItems > 0 ? 'Avg ' + fmt(avgRevPerUnit) + '/unit' : '';
-          revTrendEl.style.color = '#059669'; // Keep it green
+          // If we have history data, show the % growth. Otherwise, show the fallback text.
+          revTrendEl.innerHTML = trendHTML.rev || fallbackText;
+          
+          // Only force the color to green if we are using the fallback text. 
+          // If using the trendHTML, the color is handled by the math engine (red for loss, green for gain).
+          if (!trendHTML.rev) {
+             revTrendEl.style.color = '#059669'; 
+          }
       }
 
       if (isRevMode) {
@@ -1559,16 +1647,16 @@ function runAnalysis(data) {
           kpiCards[1].querySelector('.metric-icon-wrap').style.cssText = 'background:#d1fae5; color:#059669;';
           kpiCards[1].querySelector('.metric-label-new').innerText = 'Total Net Profit';
           kpiCards[1].querySelector('.metric-value-new').innerText = fmt(tProfit);
-          kpiCards[1].querySelector('.metric-trend').innerText = tProfit >= 0 ? '↗ Healthy' : '↘ Loss';
-          kpiCards[1].querySelector('.metric-trend').className = tProfit >= 0 ? 'metric-trend trend-up' : 'metric-trend trend-down';
+          // Injection point for new Profit trend:
+          kpiCards[1].querySelector('.metric-trend').innerHTML = trendHTML.prof || (tProfit >= 0 ? '↗ Healthy' : '↘ Loss');
 
           // Card 3: Margin
           kpiCards[2].querySelector('.metric-icon-wrap').innerText = '%';
           kpiCards[2].querySelector('.metric-icon-wrap').style.cssText = 'background:#fef3c7; color:#d97706;';
           kpiCards[2].querySelector('.metric-label-new').innerText = 'Average Margin';
           kpiCards[2].querySelector('.metric-value-new').innerText = ovMargin.toFixed(0) + '%';
-          kpiCards[2].querySelector('.metric-trend').innerText = ovMargin >= 15 ? '↗ Good' : '↘ Low';
-          kpiCards[2].querySelector('.metric-trend').className = ovMargin >= 15 ? 'metric-trend trend-up' : 'metric-trend trend-down';
+          // Injection point for new Margin trend:
+          kpiCards[2].querySelector('.metric-trend').innerHTML = trendHTML.marg || (ovMargin >= 15 ? '↗ Good' : '↘ Low');
 
           // Card 4: Top Product (Profit)
           kpiCards[3].querySelector('.metric-value-new').innerText = top.name;
@@ -2457,6 +2545,17 @@ window.verify = async function(email) {
         AppState.proDaysLeft = diff>0 ? Math.ceil(diff/(1000*60*60*24))+' Days Left' : 'Expired';
         if(diff<=0) window.isProUser = false;
       }
+      // ── NEW: Silently fetch the baseline history for comparisons ──
+      try {
+        const histRes = await fetch(workerURL+'/history?email='+e);
+        const histData = await histRes.json();
+        if(histData && histData.length > 0) {
+          // Sort by date descending to get the absolute newest save
+          histData.sort((a,b) => new Date(b.date) - new Date(a.date));
+          AppState.latestCloudSave = histData[0].data; 
+        }
+      } catch(err) { console.warn("Failed to load baseline history."); }
+      
     } else { window.isProUser = false; }
     onAuthChange();
   } catch(e){}
@@ -3552,6 +3651,87 @@ function highlightMerge(inputEl) {
     inputEl.style.color = 'var(--ink)';
   }, 1500);
 }
+
+// ══════════════════════════════════════════
+//  GROWTH COMPARE VIEW RENDERER (DYNAMIC)
+// ══════════════════════════════════════════
+window.renderCompareView = function() {
+  const container = document.getElementById('compareViewContent');
+  if (!AppState.isProUser) {
+    container.innerHTML = `<div style="text-align:center;padding:40px;"><p style="color:var(--slate-300);">Growth Compare is a Pro feature.</p><button class="btn btn-primary" onclick="handleUpgradeClick()">Upgrade to Pro</button></div>`;
+    return;
+  }
+  if (!AppState.latestCloudSave || !AppState.latestCloudSave.length) {
+    container.innerHTML = `<div style="text-align:center;padding:40px;color:var(--slate-300);">No Cloud Save found. Save your current dashboard to start tracking growth!</div>`;
+    return;
+  }
+  
+  const currentData = getFreshData();
+  if (!currentData.length) {
+    container.innerHTML = `<div style="text-align:center;padding:40px;color:var(--slate-300);">Please enter data in the Data Input section first.</div>`;
+    return;
+  }
+
+  // ── NEW: Check Mode ──
+  const isRevMode = AppState.analyticsMode === 'revenue';
+  const metricLabel = isRevMode ? 'Revenue' : 'Profit';
+
+  // Map previous data
+  const prevMap = {};
+  AppState.latestCloudSave.forEach(p => {
+    const n = (p.name || p.n || '').toLowerCase().trim();
+    const s = p.sell || p.v1 || 0;
+    const c = p.cost || p.v2 || 0;
+    const q = p.qty || p.v3 || 0;
+    
+    // Dynamically store either old revenue or old profit
+    prevMap[n] = { 
+      oldVal: isRevMode ? (s * q) : ((s - c) * q) 
+    };
+  });
+
+  let tableRows = '';
+  currentData.forEach(item => {
+    const n = item.name.toLowerCase().trim();
+    if (prevMap[n]) {
+      // Dynamically calculate current revenue or current profit
+      const curVal = isRevMode ? (item.sell * item.qty) : ((item.sell - item.cost) * item.qty);
+      const oldVal = prevMap[n].oldVal;
+      
+      const diff = curVal - oldVal;
+      const diffColor = diff > 0 ? '#059669' : diff < 0 ? '#dc2626' : 'var(--slate-300)';
+      const diffStr = diff > 0 ? '+'+fmt(diff) : diff < 0 ? '-'+fmt(Math.abs(diff)) : 'Flat';
+
+      tableRows += `
+        <tr style="border-bottom:1px solid var(--slate-50);">
+          <td style="padding:12px; font-weight:600; color:var(--ink);">${item.name}</td>
+          <td style="padding:12px; color:var(--slate-300);">${fmt(oldVal)}</td>
+          <td style="padding:12px; font-weight:600;">${fmt(curVal)}</td>
+          <td style="padding:12px; font-weight:700; color:${diffColor};">${diffStr}</td>
+        </tr>`;
+    }
+  });
+
+  if (!tableRows) {
+    container.innerHTML = `<div style="text-align:center;padding:40px;color:var(--slate-300);">Could not match current products with your last save. Make sure product names match!</div>`;
+    return;
+  }
+
+  container.innerHTML = `
+    <table style="width:100%; border-collapse:collapse; text-align:left; font-size:13.5px;">
+      <thead>
+        <tr style="background:#f8fafc; color:var(--slate-300); font-size:11px; text-transform:uppercase; letter-spacing:0.5px;">
+          <th style="padding:12px; border-radius:8px 0 0 8px;">Product</th>
+          <th style="padding:12px;">Last Save ${metricLabel}</th>
+          <th style="padding:12px;">Current ${metricLabel}</th>
+          <th style="padding:12px; border-radius:0 8px 8px 0;">Growth</th>
+        </tr>
+      </thead>
+      <tbody>${tableRows}</tbody>
+    </table>
+  `;
+};
+
 </script>
 
 <div id="costMissingModal" style="display:none;" class="cost-modal-overlay">
