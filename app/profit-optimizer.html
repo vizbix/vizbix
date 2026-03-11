@@ -59,7 +59,261 @@
 .margin-slider-wrap { background: var(--slate-50); border-radius: 12px; padding: 20px; margin-top: 8px; }
 .margin-big-num { font-size: 48px; font-weight: 700; color: var(--indigo); text-align: center; line-height: 1; margin-bottom: 4px; font-family: Inter, sans-serif; }
 .margin-preview-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid var(--slate-100); font-size: 12.5px; }
-    
+  
+/* --- NEW DATA INPUT STYLES --- */
+.data-input-container { background: white; border: 1px solid var(--slate-100); border-radius: 16px; box-shadow: 0 1px 3px rgba(8,9,13,0.02); overflow: hidden; margin-top: 20px;}
+.di-header-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 40px; gap: 16px; padding: 16px 24px; border-bottom: 1px solid var(--slate-100); background: #f8fafc; font-size: 11px; font-weight: 600; color: var(--slate-300); text-transform: uppercase; letter-spacing: 0.5px; }
+.di-items { display: flex; flex-direction: column; }
+.di-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 40px; gap: 16px; padding: 12px 24px; border-bottom: 1px solid var(--slate-50); align-items: center; transition: background 0.2s; }
+.di-row:hover { background: #f8fafc; }
+.di-row:last-child { border-bottom: none; }
+.di-input { border: none; background: transparent; font-size: 13.5px; color: var(--ink); outline: none; width: 100%; font-family: 'Inter', sans-serif; font-weight: 500; }
+.di-input::placeholder { color: var(--slate-200); font-weight: 400;}
+.di-delete-btn { background: none; border: none; color: var(--slate-300); cursor: pointer; font-size: 16px; display: flex; align-items: center; justify-content: center; transition: color 0.2s; padding: 4px;}
+.di-delete-btn:hover { color: var(--red); }
+
+.di-footer-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 24px; background: white; border-top: 1px solid var(--slate-100); }
+.btn-add-product { background: white; border: 1px solid var(--slate-200); padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; color: var(--ink); cursor: pointer; display: flex; align-items: center; gap: 8px; transition: all 0.2s; }
+.btn-add-product:hover { background: #f8fafc; border-color: var(--slate-300); }
+.btn-reset-data { background: none; border: none; font-size: 13px; font-weight: 500; color: var(--slate-300); cursor: pointer; display: flex; align-items: center; gap: 6px; transition: color 0.2s; }
+.btn-reset-data:hover { color: var(--red); }
+
+.main-action-bar { display: flex; justify-content: space-between; align-items: center; margin-top: 24px; }
+.shortcut-hint { font-size: 13px; color: var(--slate-300); display: flex; align-items: center; gap: 6px; }
+.kbd-new { background: white; border: 1px solid var(--slate-200); border-radius: 4px; padding: 2px 6px; font-size: 11px; font-weight: 600; color: var(--slate-300); font-family: monospace; }
+.action-btns-right { display: flex; gap: 12px; }
+
+/* --- NEW INTEGRATION STYLES --- */
+.integrations-container { max-width: 1040px; margin: 0 auto; width: 100%; box-sizing: border-box; padding: 0 24px; }
+.int-header { margin-bottom: 32px; }
+.int-header h2 { font-size: 24px; font-weight: 700; color: var(--ink); margin-bottom: 8px; }
+.int-header p { font-size: 14px; color: var(--slate-300); margin: 0; }
+
+.int-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 24px; }
+
+.int-card { background: white; border: 1px solid var(--slate-100); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; box-shadow: 0 1px 3px rgba(8,9,13,0.02); }
+.int-card-header { display: flex; align-items: center; gap: 12px; margin-bottom: 24px; }
+.int-icon-box { width: 40px; height: 40px; border-radius: 8px; background: #f8fafc; border: 1px solid var(--slate-100); display: flex; align-items: center; justify-content: center; }
+.int-icon-box img { width: 20px; height: 20px; object-fit: contain; }
+.int-icon-box svg { width: 20px; height: 20px; stroke: var(--slate-300); }
+.int-title { font-size: 16px; font-weight: 600; color: var(--ink); display: flex; align-items: center; gap: 8px; }
+.int-badge { background: #f1f5f9; color: var(--slate-300); font-size: 10px; font-weight: 700; padding: 4px 8px; border-radius: 99px; letter-spacing: 0.5px; }
+
+.int-desc { font-size: 13.5px; color: var(--slate-300); line-height: 1.5; flex-grow: 1; margin-bottom: 24px; }
+
+.int-btn { width: 100%; padding: 12px; border-radius: 10px; font-size: 13.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; transition: all 0.2s; border: none; }
+.int-btn-connect { background: #5b5ef6; color: white; }
+.int-btn-connect:hover { background: #4f46e5; }
+.int-btn-connected { background: #f0fdf4; color: #059669; border: 1px solid #bbf7d0; }
+.int-btn-disabled { background: #f8fafc; color: var(--slate-200); cursor: not-allowed; }
+
+.int-security-notice { text-align: center; margin-top: 40px; font-size: 13px; color: var(--slate-300); display: flex; align-items: center; justify-content: center; gap: 8px; border-top: 1px solid var(--slate-100); padding-top: 24px; }
+
+/* --- NEW DASHBOARD STYLES --- */
+.dash-metrics-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-bottom: 24px; }
+.metric-card-new { background: white; border: 1px solid var(--slate-100); border-radius: 16px; padding: 14px 16px; box-shadow: 0 1px 3px rgba(8,9,13,0.02); }
+.metric-header-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+.metric-icon-wrap { width: 32px; height: 32px; border-radius: 10px; background: #eff6ff; color: #5b5ef6; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; }
+.metric-trend { font-size: 12px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+.trend-up { color: #059669; }
+.trend-down { color: #dc2626; }
+.metric-value-new { font-size: 22px; font-weight: 700; color: var(--ink); font-family: 'Inter', sans-serif; margin-bottom: 2px; }
+.metric-label-new { font-size: 13px; color: var(--slate-300); }
+
+.warning-banner { background: #fefce8; border: 1px solid #fef08a; border-radius: 12px; padding: 16px 20px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.warning-banner-left { display: flex; align-items: flex-start; gap: 14px; }
+.warning-icon { width: 28px; height: 28px; background: #fde047; color: #854d0e; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: bold; flex-shrink: 0; }
+.warning-title { font-size: 15px; font-weight: 600; color: #854d0e; margin-bottom: 4px; }
+.warning-desc { font-size: 13px; color: #a16207; }
+.warning-btn { background: white; border: 1px solid #fde047; color: #854d0e; padding: 8px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer; transition: all 0.2s; }
+.warning-btn:hover { background: #fef08a; }
+
+.dash-main-split { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; margin-bottom: 32px; }
+.dash-panel { background: white; border: 1px solid var(--slate-100); border-radius: 16px; padding: 24px; box-shadow: 0 1px 3px rgba(8,9,13,0.02); }
+.dash-panel-title { font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 20px; }
+
+.top-product-list { display: flex; flex-direction: column; gap: 18px; }
+.tp-item { display: flex; align-items: center; gap: 12px; }
+.tp-rank { width: 28px; height: 28px; background: #eff6ff; color: #5b5ef6; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; flex-shrink: 0; }
+.tp-details { flex: 1; min-width: 0; }
+.tp-name { font-size: 13px; font-weight: 600; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-bottom: 4px; }
+.tp-stats { font-size: 11px; color: var(--slate-300); }
+.tp-profit-text { color: #059669; font-weight: 500; }
+.tp-visuals { display: flex; align-items: center; gap: 12px; width: 80px; justify-content: flex-end; }
+.tp-bar-bg { width: 44px; height: 6px; background: var(--slate-100); border-radius: 99px; overflow: hidden; }
+.tp-bar-fill { height: 100%; border-radius: 99px; }
+.tp-margin-text { font-size: 12px; color: var(--slate-300); font-weight: 500; width: 32px; text-align: right; }
+
+.dash-section-title { font-size: 18px; font-weight: 600; color: var(--ink); margin-bottom: 16px; }
+.insights-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 32px; }
+.insight-card { background: white; border: 1px solid var(--slate-100); border-radius: 16px; padding: 20px; display: flex; flex-direction: column; }
+.insight-header { display: flex; align-items: center; gap: 12px; margin-bottom: 14px; }
+.insight-icon { width: 36px; height: 36px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 18px; }
+.ic-success { background: #d1fae5; color: #059669; }
+.ic-danger { background: #fee2e2; color: #dc2626; }
+.ic-info { background: #eff6ff; color: #5b5ef6; }
+.insight-title { font-size: 14px; font-weight: 600; color: var(--ink); }
+.insight-desc { font-size: 13px; color: var(--slate-300); line-height: 1.5; flex: 1; margin-bottom: 20px; }
+.insight-action { font-size: 13px; font-weight: 600; color: #5b5ef6; text-decoration: none; cursor: pointer; display: flex; align-items: center; gap: 6px; }
+
+.quick-actions-panel { background: white; border: 1px solid var(--slate-100); border-radius: 16px; padding: 24px; display: flex; flex-direction: column; gap: 16px;}
+.qa-buttons { display: flex; gap: 12px; }
+.qa-btn { padding: 10px 20px; border-radius: 10px; font-size: 13.5px; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 8px; border: 1.5px solid transparent; transition: all 0.2s; }
+.qa-btn-primary { background: #5b5ef6; color: white; }
+.qa-btn-primary:hover { background: #4f46e5; }
+.qa-btn-secondary { background: white; color: var(--ink); border-color: var(--slate-200); }
+.qa-btn-secondary:hover { border-color: var(--slate-300); background: #f8fafc; }
+
+/* --- NEW SIMULATOR STYLES --- */
+.sim-layout { display: grid; grid-template-columns: 350px 1fr; gap: 24px; align-items: start; }
+.sim-panel { background: white; border: 1px solid var(--slate-100); border-radius: 16px; padding: 24px; box-shadow: 0 1px 3px rgba(8,9,13,0.02); }
+.sim-panel-title { font-size: 16px; font-weight: 600; color: var(--ink); margin-bottom: 20px; }
+
+/* Left Column */
+.sim-form-group { margin-bottom: 24px; }
+.sim-label { display: flex; justify-content: space-between; font-size: 13px; font-weight: 600; color: var(--ink); margin-bottom: 8px; }
+.sim-select { width: 100%; padding: 10px 12px; border: 1px solid var(--slate-200); border-radius: 8px; font-size: 14px; color: var(--ink); outline: none; background: white; font-family: 'Inter', sans-serif; cursor: pointer; }
+.sim-range-wrap { position: relative; padding-bottom: 18px; }
+.sim-range { width: 100%; accent-color: #5b5ef6; cursor: pointer; }
+.sim-range-labels { display: flex; justify-content: space-between; position: absolute; bottom: 0; width: 100%; font-size: 11px; color: var(--slate-300); }
+
+/* Right Column */
+.sim-kpi-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; margin-bottom: 16px; }
+.sim-kpi-card { background: white; border: 1px solid var(--slate-100); border-radius: 16px; padding: 20px; box-shadow: 0 1px 3px rgba(8,9,13,0.02); display: flex; flex-direction: column; justify-content: center;}
+.sim-kpi-title { font-size: 13px; color: var(--slate-300); margin-bottom: 8px; }
+.sim-kpi-val { font-size: 24px; font-weight: 700; color: var(--ink); }
+.sim-kpi-val.blue { color: #5b5ef6; }
+.sim-kpi-delta { font-size: 13px; font-weight: 600; display: flex; align-items: center; gap: 4px; }
+.sim-kpi-subtext { font-size: 12px; color: #059669; margin-top: 4px; }
+
+.sim-insight-card { margin-bottom: 16px; }
+.sim-insight-header { display: flex; align-items: center; gap: 8px; font-size: 15px; font-weight: 600; color: var(--ink); margin-bottom: 12px; }
+.sim-insight-text { font-size: 13.5px; color: var(--slate-300); line-height: 1.5; }
+
+.sim-details-row { display: flex; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--slate-100); font-size: 13.5px; }
+.sim-details-row:last-child { border-bottom: none; padding-bottom: 0; }
+.sim-details-label { color: var(--slate-300); }
+.sim-details-val { font-weight: 600; color: var(--ink); }
+.sim-details-group { margin-bottom: 16px; }
+.sim-details-group:last-child { margin-bottom: 0; }
+
+/* ══════════════════════════════════════════
+   MOBILE RESPONSIVE LAYOUT (SMARTPHONES & TABLETS)
+   ══════════════════════════════════════════ */
+@media (max-width: 900px) {
+  /* Dashboard Grids */
+  .dash-metrics-grid { grid-template-columns: 1fr 1fr !important; } /* 2 columns on tablet */
+  .dash-main-split { grid-template-columns: 1fr !important; } /* Stacks chart and top products */
+  .insights-grid { grid-template-columns: 1fr !important; }
+  
+  /* Quick Actions */
+  .qa-buttons { flex-direction: column; width: 100%; }
+  .qa-btn { width: 100%; justify-content: center; }
+
+  /* Integrations */
+  .int-grid { grid-template-columns: 1fr !important; }
+
+  /* Profit Lab Simulator */
+  .sim-layout { grid-template-columns: 1fr !important; }
+  .sim-kpi-grid { grid-template-columns: 1fr !important; }
+
+  /* Detailed Report (Overriding inline styles) */
+  #reportBands { grid-template-columns: 1fr !important; }
+  #reportBottomGrid { grid-template-columns: 1fr !important; }
+  #reportSummaryBar > div { min-width: 40% !important; flex: 1 1 auto !important; }
+  
+  /* Data Input Panel */
+  /* Data Input Panel (Mobile Card Layout) */
+  .data-table-headers, .di-header-row { display: none !important; } 
+  
+  .data-card, .data-input-container { 
+    background: transparent !important; 
+    border: none !important; 
+    box-shadow: none !important; 
+    padding: 0 !important; 
+    margin-top: 10px !important;
+    overflow: visible !important;
+  }
+
+  .data-row, .di-row {
+    display: grid !important;
+    grid-template-columns: 1fr 1fr !important;
+    background: white !important;
+    border-radius: 12px !important;
+    padding: 16px !important;
+    gap: 12px !important;
+    margin-bottom: 16px !important;
+    border: 1px solid var(--slate-100) !important;
+    box-shadow: 0 2px 8px rgba(8,9,13,0.03) !important;
+    min-width: 0 !important; 
+  }
+
+  .data-row input, .di-row input {
+    background: #f8fafc !important; 
+    border: 1px solid transparent !important;
+    border-radius: 8px !important;
+    padding: 12px 14px !important;
+    font-size: 15px !important;
+    font-weight: 600 !important;
+    color: var(--ink) !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+  }
+  .data-row input:focus, .di-row input:focus {
+    background: white !important;
+    border-color: var(--indigo) !important;
+  }
+
+  .data-row input:nth-child(1), .di-row input:nth-child(1) { grid-column: span 2 !important; }
+  .data-row input:nth-child(2), .di-row input:nth-child(2) { grid-column: 1 / 2 !important; }
+  .data-row input:nth-child(3), .di-row input:nth-child(3) { grid-column: 2 / 3 !important; }
+  .data-row input:nth-child(4), .di-row input:nth-child(4) { grid-column: 1 / 2 !important; }
+  
+  .delete-btn, .di-delete-btn {
+    grid-column: 2 / 3 !important;
+    justify-self: center !important;
+    align-self: center !important;
+    background: transparent !important;
+    width: auto !important;
+    height: auto !important;
+    padding: 8px !important;
+  }
+  .delete-btn svg, .di-delete-btn svg { width: 24px; height: 24px; stroke: var(--slate-400); }
+  .delete-btn:hover svg, .di-delete-btn:hover svg { stroke: var(--red); }
+
+  .di-footer-row, .action-buttons-wrap {
+    flex-direction: column !important;
+    gap: 12px !important;
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+    margin-top: 20px !important;
+  }
+  .btn-add-product, .add-row-btn, .btn-reset-data {
+    width: 100% !important;
+    justify-content: center !important;
+    padding: 14px !important;
+    border-radius: 10px !important;
+    font-size: 14px !important;
+  }
+  .main-action-bar { display: flex; flex-direction: column; gap: 12px; margin-top: 24px; }
+  .action-btns-right { display: flex; flex-direction: column; width: 100%; gap: 12px; }
+  .action-btns-right button { width: 100%; justify-content: center; padding: 14px; }
+  .shortcut-hint { display: none !important; }
+
+  /* Modals */
+  .cost-option-grid { grid-template-columns: 1fr !important; }
+  .cost-modal-box { padding: 20px !important; width: 95% !important; }
+  
+  /* Fix header alignment on mobile */
+  .page-header > div { flex-wrap: wrap; justify-content: flex-start; }
+}
+
+/* Extra small phones */
+@media (max-width: 480px) {
+  .dash-metrics-grid { grid-template-columns: 1fr !important; } /* 1 column for KPIs on tiny screens */
+}
+
   </style>
 </head>
 <body>
@@ -209,122 +463,173 @@
   <main class="app-main" id="mainContainer">
 
     <div class="mobile-app-bar">
-      <button onclick="toggleAppDrawer()">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
-        </svg>
-      </button>
-      <div class="page-title" id="mobilePageTitle">Data Input</div>
+      <div class="mobile-brand">
+        <span class="brand-dot"></span>
+        <span class="brand-text">Vizbix</span>
+      </div>
+      <div class="mobile-actions">
+        <button class="btn btn-secondary mobile-login-btn" id="headerLoginBtn" onclick="document.getElementById('loginModal').style.display='flex'">Log in</button>
+        <button class="hamburger-btn" onclick="toggleAppDrawer()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/>
+          </svg>
+        </button>
+      </div>
     </div>
 
     <div id="view-data" class="app-view active">
-      <div class="data-card">
-        <div class="card-header">
-          <div class="card-title">📋 Product Data</div>
-          <div style="display:flex;align-items:center;gap:8px;">
-            <button class="btn btn-secondary" style="font-size:12px;padding:6px 12px;border-radius:8px;display:flex;align-items:center;gap:5px;" onclick="triggerImport()">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-              Import CSV / Excel
-            </button>
-            <a class="demo-link" onclick="loadDemoData()">↗ Load Demo</a>
+      <div style="max-width:100%; padding:0 24px; margin:0 auto; width:100%; box-sizing:border-box;">
+        
+        <div class="page-header" style="margin-bottom: 20px;">
+          <div style="display:flex; justify-content: space-between; align-items: center; width: 100%;">
+            <h2>📋 Product Data</h2>
+            <div style="display:flex;align-items:center;gap:8px;">
+              <button class="btn btn-secondary" style="font-size:12px;padding:6px 12px;border-radius:8px;display:flex;align-items:center;gap:5px;" onclick="triggerImport()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                Import CSV / Excel
+              </button>
+              <a class="demo-link" onclick="loadDemoData()" style="cursor:pointer; color:var(--indigo); font-size:13px; font-weight:600;">↗ Load Demo</a>
+            </div>
           </div>
         </div>
         <input type="file" id="importFileInput" accept=".csv,.xlsx,.xls" style="display:none;" onchange="handleImportFile(this)">
 
-        <div class="data-table-headers">
-          <div>Product Name</div>
-          <div id="hdr-sell">Sell Price (₹)</div>
-          <div id="hdr-cost">Cost Price (₹)</div>
-          <div>Qty Sold</div>
-          <div></div>
-        </div>
+        <div class="data-input-container">
+          <div class="di-header-row">
+            <div>Product Name</div>
+            <div id="hdr-sell">Sell Price (₹)</div>
+            <div id="hdr-cost">Cost Price (₹)</div>
+            <div>Qty Sold</div>
+            <div></div>
+          </div>
 
-        <div id="items">
-          <div class="data-row">
-            <input type="text"   placeholder="e.g. Wireless Earbuds" class="input-name" value="Wireless Earbuds">
-            <input type="number" placeholder="0"             class="input-sell" value="2500">
-            <input type="number" placeholder="0"             class="input-cost" value="1200">
-            <input type="number" placeholder="0"             class="input-qty"  value="140">
-            <button class="delete-btn" onclick="removeRow(this)" title="Remove">×</button>
+          <div id="items" class="di-items">
+            <div class="di-row data-row">
+              <input type="text"   placeholder="e.g. Wireless Earbuds" class="di-input input-name" value="Wireless Earbuds">
+              <input type="number" placeholder="0"             class="di-input input-sell" value="2500">
+              <input type="number" placeholder="0"             class="di-input input-cost" value="1200">
+              <input type="number" placeholder="0"             class="di-input input-qty"  value="140">
+              <button class="di-delete-btn delete-btn" onclick="removeRow(this)" title="Remove">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+              </button>
+            </div>
+          </div>
+
+          <div class="di-footer-row">
+            <button class="btn-add-product" onclick="addNewRow()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              Add Product
+            </button>
+            <button class="btn-reset-data" onclick="confirmResetData()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><polyline points="3 3 3 8 8 8"></polyline></svg>
+              Reset All Data
+            </button>
           </div>
         </div>
 
-        <button class="add-row-btn" onclick="addNewRow()">+ Add Product</button>
-        <button class="add-row-btn" onclick="confirmResetData()" style="background:none;border:1.5px solid var(--slate-200);color:var(--red);margin-top:4px;font-size:12.5px;">🗑 Reset All Data</button>
-
-        <div class="action-buttons-wrap">
-          <button class="btn btn-primary"
-            style="flex:1;padding:14px 20px;font-size:15px;font-weight:700;border-radius:11px;"
-            onclick="processDataAndShowReport()">
-            Generate Dashboard →
-          </button>
-          <button id="saveCloudBtn" class="btn btn-secondary"
-            style="padding:14px 18px;border-radius:11px;"
-            onclick="window.saveToCloud();">
-            💾 Save
-          </button>
+        <div class="main-action-bar">
+          <div class="shortcut-hint">
+            <span class="kbd-new">Ctrl</span> + <span class="kbd-new">Enter</span> to generate dashboard
+          </div>
+          <div class="action-btns-right">
+            <button id="saveCloudBtn" class="qa-btn qa-btn-secondary" onclick="window.saveToCloud();">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.5 19H9a7 7 0 1 1 6.71-9h1.79a4.5 4.5 0 1 1 0 9Z"></path></svg>
+              Save to Cloud
+            </button>
+            <button class="qa-btn qa-btn-primary" onclick="processDataAndShowReport()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              Generate Dashboard
+            </button>
+          </div>
         </div>
 
-        <p style="text-align:center;color:var(--slate-300);font-size:12px;margin-top:12px;font-family:'Inter',sans-serif;">
-          <span class="kbd">Ctrl+Enter</span> to generate &nbsp;·&nbsp; <span class="kbd">Tab</span> from last field to add row
-        </p>
       </div>
     </div>
 
     <div id="view-integrations" class="app-view">
-      <div style="max-width:900px; margin:0 auto;">
-        <div class="page-header">
-          <h2>Data Integrations</h2>
+      <div class="integrations-container">
+        
+        <div class="int-header">
+          <h2>Integrations</h2>
+          <p>Connect your ecommerce platforms to automatically import product data.</p>
         </div>
 
-        <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap:16px;">
-  
-  <div class="data-card" style="padding:24px; text-align:center;">
-    <img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/woocommerce.svg" style="height:32px; margin-bottom:12px; filter: invert(34%) sepia(87%) saturate(2253%) hue-rotate(242deg) brightness(97%) contrast(92%);" alt="WooCommerce">
-    <h3 style="font-size:16px; font-weight:700; color:var(--ink);">WooCommerce</h3>
-    <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Sync products and sales history instantly.</p>
-    <div id="woo-card-status">
-       <button class="btn btn-primary" style="width:100%; background:#7c3aed; border-color:#7c3aed;" onclick="openStoreModal('woo')">Connect Store</button>
-    </div>
-  </div>
-
-  <div class="data-card" style="padding:24px; text-align:center;">
-    <img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/shopify.svg" style="height:32px; margin-bottom:12px; filter: invert(41%) sepia(98%) saturate(1209%) hue-rotate(124deg) brightness(95%) contrast(101%);" alt="Shopify">
-    <h3 style="font-size:16px; font-weight:700; color:var(--ink);">Shopify</h3>
-    <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Sync live inventory and pricing data.</p>
-    <div id="shopify-card-status">
-       <button class="btn btn-primary" style="width:100%; background:#059669; border-color:#059669;" onclick="openStoreModal('shopify')">Connect Store</button>
-    </div>
-  </div>
-
-  <div class="data-card" style="padding:24px; text-align:center;">
-    <div style="font-size:32px; margin-bottom:12px;">📊</div>
-    <h3 style="font-size:16px; font-weight:700; color:var(--ink);">CSV / Excel</h3>
-    <p style="font-size:13px; color:var(--slate-300); margin-bottom:20px;">Upload data from any other platform or POS.</p>
-    <button class="btn btn-secondary" style="width:100%;" onclick="triggerImport()">Upload File</button>
-  </div>
-
-    <div class="data-card" style="padding:24px; text-align:center; position:relative; border-style: dashed; background: var(--slate-50); opacity: 0.8;">
-    <div style="position:absolute; top:12px; right:12px; background:#e0f2fe; color:#0369a1; font-size:10px; font-weight:800; padding:2px 8px; border-radius:4px; text-transform:uppercase; letter-spacing: 0.5px;">Soon</div>
-    <img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/razorpay.svg" style="height:28px; margin: 4px 0 12px; filter: grayscale(1); opacity: 0.4;" alt="Razorpay">
-    <h3 style="font-size:16px; font-weight:700; color:var(--slate-300);">Razorpay</h3>
-    <p style="font-size:12px; color:var(--slate-200); margin-bottom:20px;">Connect gateway for verified, bank-matched revenue.</p>
-    <button class="btn btn-secondary" disabled style="width:100%; cursor:not-allowed; border-color: var(--slate-100); color: var(--slate-200);">Notify Me</button>
-  </div>
+        <div class="int-grid">
           
-</div>
+          <div class="int-card">
+            <div class="int-card-header">
+              <div class="int-icon-box">
+                <img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/woocommerce.svg" style="filter: invert(34%) sepia(87%) saturate(2253%) hue-rotate(242deg) brightness(97%) contrast(92%);" alt="WooCommerce">
+              </div>
+              <div class="int-title">WooCommerce</div>
+            </div>
+            <div class="int-desc">Connect your WooCommerce store to import products and sales data automatically.</div>
+            <div id="woo-card-status">
+              <button class="int-btn" style="background: #7c3aed; color: white;" onclick="openStoreModal('woo')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 8-4-4-4 4"/><path d="M15 4v16"/><path d="m5 16 4 4 4-4"/><path d="M9 20V4"/></svg>
+                Connect
+              </button>
+            </div>
+          </div>
 
-<div style="margin-top:40px; text-align:center; padding:20px; border-top:1px solid var(--slate-100);">
-  <p style="font-size:12px; color:var(--slate-300); display:flex; align-items:center; justify-content:center; gap:8px;">
-    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" style="color:#059669;"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
-    Vizbix uses official Read-Only APIs. Your credentials are encrypted and never shared.
-  </p>
-</div>
-</div>
-</div>
+          <div class="int-card">
+            <div class="int-card-header">
+              <div class="int-icon-box">
+                <img src="https://raw.githubusercontent.com/simple-icons/simple-icons/develop/icons/shopify.svg" style="filter: invert(41%) sepia(98%) saturate(1209%) hue-rotate(124deg) brightness(95%) contrast(101%);" alt="Shopify">
+              </div>
+              <div class="int-title">Shopify</div>
+            </div>
+            <div class="int-desc">Sync your Shopify store products, orders, and inventory in real-time.</div>
+            <div id="shopify-card-status">
+              <button class="int-btn" style="background: #059669; color: white;" onclick="openStoreModal('shopify')">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 8-4-4-4 4"/><path d="M15 4v16"/><path d="m5 16 4 4 4-4"/><path d="M9 20V4"/></svg>
+                Connect
+              </button>
+            </div>
+          </div>
+
+          <div class="int-card">
+            <div class="int-card-header">
+              <div class="int-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg>
+              </div>
+              <div class="int-title">CSV Upload</div>
+            </div>
+            <div class="int-desc">Import product data from CSV or Excel files exported from any platform.</div>
+            <button class="int-btn int-btn-connect" onclick="triggerImport()">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 8-4-4-4 4"/><path d="M15 4v16"/><path d="m5 16 4 4 4-4"/><path d="M9 20V4"/></svg>
+              Upload
+            </button>
+          </div>
+
+          <div class="int-card" style="opacity: 0.7;">
+            <div class="int-card-header">
+              <div class="int-icon-box">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="5" width="20" height="14" rx="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+              </div>
+              <div class="int-title">
+                Razorpay <span class="int-badge">Coming Soon</span>
+              </div>
+            </div>
+            <div class="int-desc">Import payment and transaction data from Razorpay dashboard.</div>
+            <button class="int-btn int-btn-disabled" disabled>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 8-4-4-4 4"/><path d="M15 4v16"/><path d="m5 16 4 4 4-4"/><path d="M9 20V4"/></svg>
+              Connect
+            </button>
+          </div>
+
+        </div>
+
+        <div class="int-security-notice">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect><path d="M7 11V7a5 5 0 0 1 10 0v4"></path></svg>
+          Vizbix uses official Read-Only APIs. Your credentials are encrypted and never shared.
+        </div>
+
+      </div>
+    </div>
 
     <div id="view-dashboard" class="app-view">
-      <div style="max-width:1040px;margin:0 auto;width:100%;box-sizing:border-box;">
+      <div style="max-width:100%; padding:0 24px; margin:0 auto; width:100%; box-sizing:border-box;">
 
         <div class="page-header">
           <div style="display:flex;align-items:center;gap:12px;">
@@ -351,97 +656,207 @@
         </div>
 
         <div id="dashboardContent" style="transition:opacity 0.3s;">
-          <div class="metrics-grid" id="dashMetricsGrid">
-            <div class="metric-card">
-              <h4>Total Revenue</h4>
-              <div class="value" id="dash-revenue">—</div>
+          <div class="dash-metrics-grid">
+            <div class="metric-card-new">
+              <div class="metric-header-row">
+                <div class="metric-icon-wrap" style="background:#eff6ff; color:#5b5ef6;">₹</div>
+                <div class="metric-trend trend-up" id="dash-revenue-trend"></div>
+              </div>
+              <div class="metric-value-new" id="dash-revenue">—</div>
+              <div class="metric-label-new">Total Revenue</div>
             </div>
-            <div class="metric-card highlight" id="dash-profit-card">
-              <h4>Total Net Profit</h4>
-              <div class="value" id="dash-profit">—</div>
+            
+            <div class="metric-card-new">
+              <div class="metric-header-row">
+                <div class="metric-icon-wrap" style="background:#eff6ff; color:#5b5ef6;">₹</div>
+                <div class="metric-trend trend-up">↗ +8.5%</div>
+              </div>
+              <div class="metric-value-new" id="dash-profit">—</div>
+              <div class="metric-label-new">Total Net Profit</div>
             </div>
-            <div class="metric-card" id="dash-margin-card">
-              <h4>Avg Gross Margin</h4>
-              <div class="value" id="dash-margin">—</div>
+
+            <div class="metric-card-new">
+              <div class="metric-header-row">
+                <div class="metric-icon-wrap" style="background:#eff6ff; color:#5b5ef6;">%</div>
+                <div class="metric-trend trend-down">↘ -2.1%</div>
+              </div>
+              <div class="metric-value-new" id="dash-margin">—</div>
+              <div class="metric-label-new">Average Margin</div>
             </div>
-            <div class="metric-card">
-              <h4>Top Product</h4>
-              <div class="value" id="dash-top-product" style="font-size:18px;line-height:1.3;margin-top:6px;">—</div>
+
+            <div class="metric-card-new">
+              <div class="metric-header-row">
+                <div class="metric-icon-wrap" style="background:#eff6ff; color:#5b5ef6;">📦</div>
+                <div class="metric-trend trend-up" id="dash-top-trend">↗ ₹0 profit</div>
+              </div>
+              <div class="metric-value-new" id="dash-top-product" style="font-size:20px; margin-top:4px;">—</div>
+              <div class="metric-label-new">Top Product</div>
             </div>
           </div>
 
-          <div class="dash-grid">
-            <div class="data-card chart-card" style="padding:16px;margin:0;width:100%;min-width:0;overflow:hidden;box-sizing:border-box;">
-              <h4 style="margin:0 0 12px;font-size:10.5px;font-weight:700;color:var(--slate-300);text-transform:uppercase;letter-spacing:0.9px;">Revenue vs Profit</h4>
-              <div class="chart-wrap" style="position:relative;height:240px;width:100%;max-width:100%;overflow:hidden;"><canvas id="profitChart"></canvas></div>
+          <div class="warning-banner" id="dashWarningBanner" style="display:none;">
+            <div class="warning-banner-left">
+              <div class="warning-icon">⚠</div>
+              <div>
+                <div class="warning-title">Profit Health Issues Detected</div>
+                <div class="warning-desc" id="warningDescText">Products are losing money or margins are too low.</div>
+              </div>
             </div>
+            <button class="warning-btn" onclick="switchView('report', document.querySelectorAll('.nav-item')[5])">Fix Issues</button>
+          </div>
 
-            <div class="data-card" style="padding:16px;margin:0;background:var(--slate-50);min-width:0;overflow:hidden;box-sizing:border-box;">
-              <h4 style="margin:0 0 14px;font-size:14px;font-weight:600;color:var(--ink);display:flex;align-items:center;gap:8px;">⚡ 3-Point Action Plan</h4>
-              <div id="auto-insights-list" style="font-size:13px;line-height:1.6;display:flex;flex-direction:column;gap:10px;word-break:break-word;">
-                <p style="color:var(--slate-300);font-size:14px;">Generate a report to see your action plan.</p>
+          <div class="dash-main-split">
+            <div class="dash-panel">
+              <div class="dash-panel-title">Revenue vs Profit</div>
+              <div class="chart-wrap" style="position:relative;height:280px;width:100%;">
+                <canvas id="profitChart"></canvas>
               </div>
-              <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--slate-100);">
-                <button class="btn btn-secondary" style="font-size:13px;width:100%;border-radius:9px;"
-                  onclick="switchView('ai', document.querySelectorAll('.nav-item')[3])">
-                  ✨ Get AI Deep Analysis →
-                </button>
-              </div>
+            </div>
+            
+            <div class="dash-panel">
+              <div class="dash-panel-title">Top Products</div>
+              <div class="top-product-list" id="dashTopProductsList"></div>
+            </div>
+          </div>
+
+          <div class="dash-section-title">Insights</div>
+          <div class="insights-grid" id="dashInsightsGrid"></div>
+
+          <div class="quick-actions-panel">
+            <div class="dash-section-title" style="margin-bottom: 0;">Quick Actions</div>
+            <div class="qa-buttons">
+              <button class="qa-btn qa-btn-primary" onclick="switchView('ai', document.querySelectorAll('.nav-item')[4])">
+                ✨ Run AI Analysis
+              </button>
+              <button class="qa-btn qa-btn-secondary" onclick="switchView('simulator', document.querySelectorAll('.nav-item')[3]); initSimulator();">
+                🧪 Open Profit Lab
+              </button>
+              <button class="qa-btn qa-btn-secondary" onclick="exportExecutivePDF()">
+                📥 Export Report
+              </button>
             </div>
           </div>
         </div>
+
       </div>
     </div>
 
     <div id="view-simulator" class="app-view">
-      <div style="max-width:880px;margin:0 auto;width:100%;box-sizing:border-box;">
+      <div style="max-width:100%; padding:0 24px; margin:0 auto; width:100%; box-sizing:border-box;">
         <div class="page-header">
+          <h2>🧪 Profit Lab</h2>
+        </div>
+
+        <div class="sim-layout">
+          <div class="sim-panel">
+            <div class="sim-panel-title">Simulation Controls</div>
+            
+            <div class="sim-form-group">
+              <div class="sim-label">Select Product</div>
+              <select id="sim-product-select" class="sim-select" onchange="runSimulation()">
+                </select>
+            </div>
+
+            <div class="sim-form-group">
+              <div class="sim-label"><span>Price Change</span><span id="val-price">0%</span></div>
+              <div class="sim-range-wrap">
+                <input type="range" min="-50" max="50" value="0" id="slide-price" class="sim-range" oninput="runSimulation()">
+                <div class="sim-range-labels"><span>-50%</span><span>0%</span><span>+50%</span></div>
+              </div>
+            </div>
+
+            <div class="sim-form-group">
+              <div class="sim-label"><span>Volume Change</span><span id="val-vol">0%</span></div>
+              <div class="sim-range-wrap">
+                <input type="range" min="-50" max="50" value="0" id="slide-vol" class="sim-range" oninput="runSimulation()">
+                <div class="sim-range-labels"><span>-50%</span><span>0%</span><span>+50%</span></div>
+              </div>
+            </div>
+
+            <div class="sim-form-group">
+              <div class="sim-label"><span>Cost Change</span><span id="val-cost">0%</span></div>
+              <div class="sim-range-wrap">
+                <input type="range" min="-50" max="50" value="0" id="slide-cost" class="sim-range" oninput="runSimulation()">
+                <div class="sim-range-labels"><span>-50%</span><span>0%</span><span>+50%</span></div>
+              </div>
+            </div>
+
+            <button class="btn btn-secondary" style="width: 100%; justify-content: center; padding: 12px; border-radius: 8px; font-weight: 600;" onclick="resetSimulation()">
+              ↺ Reset Simulation
+            </button>
+          </div>
+
           <div>
-            <h2>🧪 Profit Lab</h2>
-            <p style="font-size:13px;margin-top:3px;font-family:'Inter',sans-serif;">Drag sliders to simulate scenarios in real time.</p>
+            <div class="sim-kpi-grid">
+              <div class="sim-kpi-card">
+                <div class="sim-kpi-title">Current Profit</div>
+                <div class="sim-kpi-val" id="sim-current">—</div>
+              </div>
+              <div class="sim-kpi-card">
+                <div class="sim-kpi-title">Projected Profit</div>
+                <div class="sim-kpi-val blue" id="sim-projected">—</div>
+              </div>
+              <div class="sim-kpi-card" id="sim-delta-card" style="background: #f0fdf4; border-color: #bbf7d0;">
+                <div class="sim-kpi-title">Profit Delta</div>
+                <div class="sim-kpi-val" style="color: #059669;" id="sim-delta">↗ +₹0</div>
+                <div class="sim-kpi-subtext" id="sim-delta-pct">+0% change</div>
+              </div>
+            </div>
+
+            <div class="sim-panel sim-insight-card">
+              <div class="sim-insight-header">
+                <span style="color: #5b5ef6; font-size: 18px;">✨</span> Simulation Insight
+              </div>
+              <div class="sim-insight-text" id="sim-insight">
+                Adjust the sliders to simulate different scenarios and see how they affect your profit.
+              </div>
+            </div>
+
+            <div class="sim-panel sim-details-card">
+              <div class="sim-panel-title" style="margin-bottom: 16px;">Scenario Details</div>
+              
+              <div class="sim-details-group">
+                <div class="sim-details-row">
+                  <span class="sim-details-label">Original Price</span>
+                  <span class="sim-details-val" id="det-orig-price">—</span>
+                </div>
+                <div class="sim-details-row">
+                  <span class="sim-details-label">New Price</span>
+                  <span class="sim-details-val" id="det-new-price">—</span>
+                </div>
+              </div>
+
+              <div class="sim-details-group">
+                <div class="sim-details-row">
+                  <span class="sim-details-label">Original Cost</span>
+                  <span class="sim-details-val" id="det-orig-cost">—</span>
+                </div>
+                <div class="sim-details-row">
+                  <span class="sim-details-label">New Cost</span>
+                  <span class="sim-details-val" id="det-new-cost">—</span>
+                </div>
+              </div>
+
+              <div class="sim-details-group">
+                <div class="sim-details-row">
+                  <span class="sim-details-label">Original Volume</span>
+                  <span class="sim-details-val" id="det-orig-vol">—</span>
+                </div>
+                <div class="sim-details-row">
+                  <span class="sim-details-label">New Volume</span>
+                  <span class="sim-details-val" id="det-new-vol">—</span>
+                </div>
+              </div>
+
+            </div>
           </div>
         </div>
 
-        <div class="sim-controls">
-          <div class="slider-group">
-            <div class="slider-label-row"><span>Price Change</span><span class="slider-val" id="val-price">0%</span></div>
-            <input type="range" min="-50" max="50" value="0" id="slide-price" oninput="runSimulation()">
-          </div>
-          <div class="slider-group">
-            <div class="slider-label-row"><span>Volume Change</span><span class="slider-val" id="val-vol">0%</span></div>
-            <input type="range" min="-50" max="50" value="0" id="slide-vol" oninput="runSimulation()">
-          </div>
-          <div class="slider-group">
-            <div class="slider-label-row"><span>Cost Change</span><span class="slider-val" id="val-cost">0%</span></div>
-            <input type="range" min="-50" max="50" value="0" id="slide-cost" oninput="runSimulation()">
-          </div>
-          <div style="text-align:center;margin-top:6px;">
-            <button class="btn btn-secondary" style="font-size:12px;padding:7px 16px;border-radius:8px;" onclick="resetSimulation()">↺ Reset All</button>
-          </div>
-        </div>
-
-        <div class="sim-results">
-          <div class="sim-card">
-            <h4>Current Profit</h4>
-            <div class="big-num" id="sim-current">—</div>
-          </div>
-          <div class="sim-card active">
-            <h4>Simulated Profit</h4>
-            <div class="big-num" id="sim-projected">—</div>
-            <div class="sim-delta" id="sim-delta">—</div>
-          </div>
-        </div>
-
-        <div class="data-card" style="margin-top:14px;text-align:center;background:#f0fdf4;border-color:#bbf7d0;">
-          <p id="sim-insight" style="font-weight:700;color:#166534;font-size:14px;line-height:1.6;font-family:'Inter',sans-serif;">
-            Adjust the sliders to see how small changes impact your bottom line.
-          </p>
-        </div>
       </div>
     </div>
 
     <div id="view-ai" class="app-view">
-      <div style="max-width:840px;margin:0 auto;width:100%;box-sizing:border-box;">
+      <div style="max-width:100%; padding:0 24px; margin:0 auto; width:100%; box-sizing:border-box;">
 
         <div class="page-header">
           <h2 style="display:flex;align-items:center;gap:12px;">
@@ -492,7 +907,7 @@
     </div>
 
     <div id="view-report" class="app-view">
-      <div style="max-width:1040px;margin:0 auto;width:100%;box-sizing:border-box;">
+      <div style="max-width:100%; padding:0 24px; margin:0 auto; width:100%; box-sizing:border-box;">
 
         <div class="page-header">
           <h2>Detailed Profit Report</h2>
@@ -870,13 +1285,15 @@ function fmt(n) {
 function addNewRow(name='',sell='',cost='',qty='') {
   const c = document.getElementById('items');
   const row = document.createElement('div');
-  row.className = 'data-row';
+  row.className = 'di-row data-row';
   row.innerHTML = `
-    <input type="text"   placeholder="Product name" class="input-name" value="${name}">
-    <input type="number" placeholder="0"             class="input-sell" value="${sell}">
-    <input type="number" placeholder="0"             class="input-cost" value="${cost}">
-    <input type="number" placeholder="0"             class="input-qty"  value="${qty}">
-    <button class="delete-btn" onclick="removeRow(this)" title="Remove">×</button>`;
+    <input type="text"   placeholder="Product name" class="di-input input-name" value="${name}">
+    <input type="number" placeholder="0"             class="di-input input-sell" value="${sell}">
+    <input type="number" placeholder="0"             class="di-input input-cost" value="${cost}">
+    <input type="number" placeholder="0"             class="di-input input-qty"  value="${qty}">
+    <button class="di-delete-btn delete-btn" onclick="removeRow(this)" title="Remove">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+    </button>`;
 
   // Tab on last qty field → new row
   row.querySelector('.input-qty').addEventListener('keydown', e=>{
@@ -1019,6 +1436,9 @@ function runAnalysis(data) {
   let top = {name:'–', profit:-Infinity};
   let leaks = [];
 
+  // Determine which mode we are in
+  const isRevMode = AppState.analyticsMode === 'revenue';
+
   data.forEach(item=>{
     const rev    = item.sell * item.qty;
     const cost   = item.cost * item.qty;
@@ -1035,31 +1455,13 @@ function runAnalysis(data) {
 
     labels.push(item.name); revD.push(rev); profD.push(profit);
 
-    // Margin bar color
-    const barC = mNum>=30?'#10b981':mNum>=10?'#f59e0b':'#ef4444';
-    const barW = Math.max(0, Math.min(100, mNum));
-    const pill = profit>0
-      ? `<span class="status-pill status-healthy">Healthy</span>`
-      : `<span class="status-pill status-leak">Leak</span>`;
-
-    reportHTML += `<tr>
-      <td style="font-weight:700;font-family:'Inter',sans-serif;">${item.name}</td>
-      <td>${fmt(rev)}</td>
-      <td>${fmt(cost)}</td>
-      <td style="font-weight:600;color:${profit<0?'var(--red)':'var(--ink)'};">${fmt(profit)}</td>
-      <td>
-        <div class="margin-bar">
-          <span class="margin-label">${mNum.toFixed(1)}%</span>
-          <div class="margin-bar-track"><div class="margin-bar-fill" style="width:${barW}%;background:${barC};"></div></div>
-        </div>
-      </td>
-      <td>${pill}</td>
-    </tr>`;
+    // PDF Insights Builder
+    if(profit<0) pdfIns += `<li style="margin-bottom:10px;color:#dc2626;"><strong>Fix Leak:</strong> ${item.name} is losing money.</li>`;
   });
 
   const ovMargin = tRev>0 ? (tProfit/tRev)*100 : 0;
 
-  // Weighted health score
+  // Weighted health score (Profit Mode Only)
   let hs = 50;
   if(ovMargin>=40) hs+=28; else if(ovMargin>=25) hs+=18; else if(ovMargin>=10) hs+=8; else if(ovMargin<0) hs-=20;
   hs -= Math.min(leaks.length*14, 28);
@@ -1067,161 +1469,283 @@ function runAnalysis(data) {
   if(data.length>=3) hs+=12;
   hs = Math.max(0, Math.min(100, Math.round(hs)));
 
- // Metric cards
-  setText('dash-revenue',     fmt(tRev));
-  setText('dash-top-product', top.name);
-
-  if (AppState.analyticsMode === 'revenue') {
-    const avgPrice = tItems > 0 ? fmt(tRev / tItems) : '—';
-
-    const profitCard = document.getElementById('dash-profit-card');
-    if (profitCard) {
-      profitCard.classList.remove('highlight');
-      profitCard.style.background = '#f0fdf4';
-      profitCard.style.border = '1.5px solid #bbf7d0';
-      profitCard.innerHTML = `
-        <h4 style="color:#059669;">Total Units Sold</h4>
-        <div class="value" style="color:#059669;">${tItems.toLocaleString()}</div>`;
-    }
-
-    const marginCard = document.getElementById('dash-margin-card');
-    if (marginCard) {
-      marginCard.style.background = '#eff6ff';
-      marginCard.style.border = '1.5px solid #bfdbfe';
-      marginCard.innerHTML = `
-        <h4 style="color:#3b82f6;">Avg Revenue / Unit</h4>
-        <div class="value" style="color:#3b82f6;">${avgPrice}</div>`;
-    }
-
-  } else {
-    const profitCard = document.getElementById('dash-profit-card');
-    if (profitCard) {
-      profitCard.classList.add('highlight');
-      profitCard.style.background = '';
-      profitCard.style.border = '';
-      profitCard.innerHTML = `
-        <h4>Total Net Profit</h4>
-        <div class="value" id="dash-profit">${fmt(tProfit)}</div>`;
-    }
-
-    const marginCard = document.getElementById('dash-margin-card');
-    if (marginCard) {
-      marginCard.style.background = '';
-      marginCard.style.border = '';
-      marginCard.innerHTML = `
-        <h4>Avg Gross Margin</h4>
-        <div class="value" id="dash-margin">${ovMargin.toFixed(1)+'%'}</div>`;
-    }
-  }
-
-  // Update mode badge and toggle button
-  updateModeBadge();
-
-  document.getElementById('reportTableBody').innerHTML = reportHTML;
-
-  // Health badge
+  // --- HEALTH SCORE BADGE ---
   const hc = document.getElementById('health-circle');
   const hl = document.getElementById('health-label');
-  hc.innerText = hs+'%';
-  if(hs>=75) { hc.style.background='var(--green-bg)'; hc.style.color='#059669'; if(hl) hl.innerText='Strong'; }
-  else if(hs>=50) { hc.style.background='var(--amber-bg)'; hc.style.color='#d97706'; if(hl) hl.innerText='Fair'; }
-  else { hc.style.background='var(--red-bg)'; hc.style.color='var(--red)'; if(hl) hl.innerText='At Risk'; }
-
-  // 3-point action plan
-  let ins = '';
-
-  if (AppState.analyticsMode === 'revenue') {
-    const topRevProduct = [...data].sort((a,b) => (b.sell*b.qty)-(a.sell*a.qty))[0];
-    const lowRevProduct = [...data].sort((a,b) => (a.sell*a.qty)-(b.sell*b.qty))[0];
-    const topRevShare   = tRev > 0 ? (((topRevProduct.sell*topRevProduct.qty)/tRev)*100).toFixed(1) : 0;
-    const avgUnits      = data.length > 0 ? Math.round(tItems / data.length) : 0;
-
-    ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'Inter',sans-serif;"><strong style="color:var(--ink);">1. Top Revenue Driver:</strong> ${topRevProduct.name} generates ${topRevShare}% of your total revenue. Focus marketing here.</div>`;
-    ins += `<div style="padding:11px 14px;background:#fef3c7;border-radius:9px;border:1px solid #fde68a;font-family:'Inter',sans-serif;"><strong style="color:#92400e;">2. Low Performer:</strong> ${lowRevProduct.name} contributes the least revenue. Consider repricing or promoting it.</div>`;
-    ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'Inter',sans-serif;"><strong style="color:var(--ink);">3. Volume Opportunity:</strong> Avg ${avgUnits} units sold per product. Push your top products harder to grow total volume.</div>`;
-    ins += `<div style="padding:12px 16px;background:#f0fdf4;border-radius:9px;border:1px solid #bbf7d0;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:4px;">
-      <span style="font-size:12.5px;color:#065f46;">💡 Add cost prices to unlock Profit, Margin & Health Score</span>
-      <button onclick="costModalShown=false;showCostMissingModal(getFreshData())" style="font-size:12px;font-weight:600;padding:6px 12px;border-radius:7px;border:1px solid #059669;background:white;color:#059669;cursor:pointer;white-space:nowrap;">Add Costs →</button>
-    </div>`;
-
+  if(hc) hc.innerText = isRevMode ? '—' : hs+'%';
+  if(isRevMode) {
+      if(hc){hc.style.background='#f1f5f9'; hc.style.color='#64748b';} if(hl) hl.innerText='Revenue Mode';
   } else {
-    if(top.profit>0) {
-      ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'Inter',sans-serif;"><strong style="color:var(--ink);">1. Scale Winner:</strong> ${top.name} generated ${fmt(top.profit)}. Increase ad spend here.</div>`;
-      pdfIns += `<li style="margin-bottom:10px;"><strong>Scale Winner:</strong> ${top.name} is your most profitable product.</li>`;
-    } else {
-      ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'Inter',sans-serif;"><strong style="color:var(--ink);">1. Raise Prices:</strong> No profitable products. Raise prices or renegotiate costs immediately.</div>`;
-      pdfIns += `<li style="margin-bottom:10px;"><strong>Raise Prices:</strong> No profitable products detected.</li>`;
-    }
-
-    if(leaks.length>0) {
-      ins += `<div style="padding:11px 14px;background:var(--red-bg);border-radius:9px;border:1px solid #fecaca;color:var(--red);font-family:'Inter',sans-serif;"><strong>2. Stop Leaks:</strong> ${leaks.join(', ')} are losing money. Reprice or drop them.</div>`;
-      pdfIns += `<li style="margin-bottom:10px;color:#dc2626;"><strong>Fix Leaks:</strong> ${leaks.join(', ')} are losing money.</li>`;
-    } else {
-      ins += `<div style="padding:11px 14px;background:var(--green-bg);border-radius:9px;border:1px solid #a7f3d0;color:#065f46;font-family:'Inter',sans-serif;"><strong>2. Unit Economics Safe:</strong> Zero products losing money. Baseline is secure.</div>`;
-      pdfIns += `<li style="margin-bottom:10px;"><strong>Secure Economics:</strong> No products operating at a loss.</li>`;
-    }
-
-    if(ovMargin<20) {
-      ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'Inter',sans-serif;"><strong style="color:var(--ink);">3. Margin Warning:</strong> ${ovMargin.toFixed(1)}% is tight. Bundle items to raise AOV.</div>`;
-      pdfIns += `<li><strong>Improve Margin:</strong> ${ovMargin.toFixed(1)}% margin is tight.</li>`;
-    } else {
-      ins += `<div style="padding:11px 14px;background:white;border-radius:9px;border:1px solid var(--slate-100);font-family:'Inter',sans-serif;"><strong style="color:var(--ink);">3. Healthy Margin:</strong> ${ovMargin.toFixed(1)}% gives excellent cash flow for growth.</div>`;
-      pdfIns += `<li><strong>Healthy Margin:</strong> ${ovMargin.toFixed(1)}% gives flexibility to scale.</li>`;
-    }
+      if(hs>=75) { if(hc){hc.style.background='var(--green-bg)'; hc.style.color='#059669';} if(hl) hl.innerText='Strong'; }
+      else if(hs>=50) { if(hc){hc.style.background='var(--amber-bg)'; hc.style.color='#d97706';} if(hl) hl.innerText='Fair'; }
+      else { if(hc){hc.style.background='var(--red-bg)'; hc.style.color='var(--red)';} if(hl) hl.innerText='At Risk'; }
   }
 
-  document.getElementById('auto-insights-list').innerHTML = ins;
-  document.getElementById('pdf-insight-list').innerHTML   = pdfIns;
+  // --- DYNAMIC KPI CARDS ---
+  const kpiCards = document.querySelectorAll('.metric-card-new');
+  if (kpiCards.length >= 4) {
+      // Card 1: Revenue (Always the same)
+      kpiCards[0].querySelector('.metric-value-new').innerText = fmt(tRev);
+      
+      // NEW LOGIC: Calculate Avg Revenue per Unit
+      const avgRevPerUnit = tItems > 0 ? (tRev / tItems) : 0;
+      const revTrendEl = document.getElementById('dash-revenue-trend');
+      if (revTrendEl) {
+          revTrendEl.innerText = tItems > 0 ? 'Avg ' + fmt(avgRevPerUnit) + '/unit' : '';
+          revTrendEl.style.color = '#059669'; // Keep it green
+      }
 
-  // Report summary bar
-  const sb = document.getElementById('reportSummaryBar');
-  if(sb) sb.innerHTML = [
-    {l:'Revenue',    v:fmt(tRev),              c:'var(--indigo)'},
-    {l:'Net Profit', v:fmt(tProfit),           c:tProfit>=0?'var(--green)':'var(--red)'},
-    {l:'Margin',     v:ovMargin.toFixed(1)+'%',c:ovMargin>=20?'var(--green)':'var(--amber)'},
-    {l:'Units Sold', v:tItems.toLocaleString(),c:'#8b5cf6'},
-  ].map(s=>`<div style="background:white;border:1px solid var(--slate-100);border-radius:10px;padding:9px 14px;min-width:105px;">
-    <span style="font-size:10px;font-weight:700;color:var(--slate-300);text-transform:uppercase;letter-spacing:0.7px;font-family:'Inter',sans-serif;display:block;margin-bottom:3px;">${s.l}</span>
-    <span style="font-size:17px;font-weight:600;color:${s.c};font-family:'Inter',sans-serif;letter-spacing:-0.01em;">${s.v}</span>
-  </div>`).join('');
+      if (isRevMode) {
+          const topRevProd = [...data].sort((a,b) => (b.sell*b.qty) - (a.sell*a.qty))[0];
 
-  // PDF fields
-  setText('pdf-rev',       fmt(tRev));
-  setText('pdf-cost',      fmt(tCost));
-  setText('pdf-profit',    fmt(tProfit));
+          // Card 2: Units Sold
+          kpiCards[1].querySelector('.metric-icon-wrap').innerText = '📦';
+          kpiCards[1].querySelector('.metric-icon-wrap').style.cssText = 'background:#f3e8ff; color:#9333ea;';
+          kpiCards[1].querySelector('.metric-label-new').innerText = 'Total Units Sold';
+          kpiCards[1].querySelector('.metric-value-new').innerText = tItems.toLocaleString();
+          kpiCards[1].querySelector('.metric-trend').innerText = '';
+
+          // Card 3: Avg Price
+          kpiCards[2].querySelector('.metric-icon-wrap').innerText = '₹';
+          kpiCards[2].querySelector('.metric-icon-wrap').style.cssText = 'background:#e0f2fe; color:#2563eb;';
+          kpiCards[2].querySelector('.metric-label-new').innerText = 'Avg Price / Unit';
+          kpiCards[2].querySelector('.metric-value-new').innerText = tItems > 0 ? fmt(tRev/tItems) : '—';
+          kpiCards[2].querySelector('.metric-trend').innerText = '';
+
+          // Card 4: Top Product (Revenue)
+          kpiCards[3].querySelector('.metric-value-new').innerText = topRevProd ? topRevProd.name : '—';
+          kpiCards[3].querySelector('.metric-trend').innerText = topRevProd ? '↗ ' + fmt(topRevProd.sell*topRevProd.qty) + ' rev' : '';
+          kpiCards[3].querySelector('.metric-trend').className = 'metric-trend trend-up';
+          kpiCards[3].querySelector('.metric-icon-wrap').innerText = '⭐';
+      } else {
+          // Card 2: Net Profit
+          kpiCards[1].querySelector('.metric-icon-wrap').innerText = '₹';
+          kpiCards[1].querySelector('.metric-icon-wrap').style.cssText = 'background:#d1fae5; color:#059669;';
+          kpiCards[1].querySelector('.metric-label-new').innerText = 'Total Net Profit';
+          kpiCards[1].querySelector('.metric-value-new').innerText = fmt(tProfit);
+          kpiCards[1].querySelector('.metric-trend').innerText = tProfit >= 0 ? '↗ Healthy' : '↘ Loss';
+          kpiCards[1].querySelector('.metric-trend').className = tProfit >= 0 ? 'metric-trend trend-up' : 'metric-trend trend-down';
+
+          // Card 3: Margin
+          kpiCards[2].querySelector('.metric-icon-wrap').innerText = '%';
+          kpiCards[2].querySelector('.metric-icon-wrap').style.cssText = 'background:#fef3c7; color:#d97706;';
+          kpiCards[2].querySelector('.metric-label-new').innerText = 'Average Margin';
+          kpiCards[2].querySelector('.metric-value-new').innerText = ovMargin.toFixed(0) + '%';
+          kpiCards[2].querySelector('.metric-trend').innerText = ovMargin >= 15 ? '↗ Good' : '↘ Low';
+          kpiCards[2].querySelector('.metric-trend').className = ovMargin >= 15 ? 'metric-trend trend-up' : 'metric-trend trend-down';
+
+          // Card 4: Top Product (Profit)
+          kpiCards[3].querySelector('.metric-value-new').innerText = top.name;
+          kpiCards[3].querySelector('.metric-trend').innerText = '↗ ' + fmt(top.profit) + ' profit';
+          kpiCards[3].querySelector('.metric-trend').className = 'metric-trend trend-up';
+          kpiCards[3].querySelector('.metric-icon-wrap').innerText = '📦';
+      }
+  }
+
+  // --- PDF EXPORT SYNC ---
+  setText('pdf-rev',        fmt(tRev));
+  setText('pdf-cost',       fmt(tCost));
+  setText('pdf-profit',     fmt(tProfit));
   setText('pdf-units-sold', tItems);
-  setText('pdf-margin',    ovMargin.toFixed(1)+'%');
-  setText('pdf-top-prod',  top.name);
+  setText('pdf-margin',     ovMargin.toFixed(1)+'%');
+  setText('pdf-top-prod',   top.name);
+  document.getElementById('pdf-insight-list').innerHTML = pdfIns || `<li><strong>Healthy:</strong> No major leaks detected.</li>`;
 
-  // Chart
-  const ctx = document.getElementById('profitChart').getContext('2d');
+  // --- WARNING BANNER LOGIC ---
+  const banner = document.getElementById('dashWarningBanner');
+  const warningText = document.getElementById('warningDescText');
+  const warningTitle = document.querySelector('.warning-title');
+  
+  if (banner && warningText && warningTitle) {
+      if (isRevMode) {
+          const lowestRevProd = [...data].sort((a,b) => (a.sell*a.qty) - (b.sell*b.qty))[0];
+          if (lowestRevProd && data.length > 1) {
+              banner.style.display = 'flex';
+              warningTitle.innerText = "Low Revenue Alert";
+              warningText.innerText = `${lowestRevProd.name} is your lowest selling product at just ${fmt(lowestRevProd.sell*lowestRevProd.qty)} revenue.`;
+          } else {
+              banner.style.display = 'none';
+          }
+      } else {
+          if (leaks.length > 0 || ovMargin < 15) {
+              banner.style.display = 'flex';
+              warningTitle.innerText = "Profit Health Issues Detected";
+              let issues = [];
+              if (leaks.length > 0) issues.push(`${leaks.length} products are losing money`);
+              if (ovMargin < 15) issues.push(`Average margin below 15%`);
+              warningText.innerText = issues.join(' • ');
+          } else {
+              banner.style.display = 'none';
+          }
+      }
+  }
+
+  // --- TOP PRODUCTS LIST LOGIC ---
+  const topListContainer = document.getElementById('dashTopProductsList');
+  if(topListContainer) {
+      if (isRevMode) {
+          // Sort by Revenue
+          const revList = [...data].map(p => {
+              const rev = p.sell * p.qty;
+              return {...p, rev};
+          }).sort((a,b) => b.rev - a.rev).slice(0, 5);
+
+          topListContainer.innerHTML = revList.map((p, i) => {
+              let barWidth = tRev > 0 ? (p.rev / tRev) * 100 : 0;
+              return `
+              <div class="tp-item">
+                <div class="tp-rank">${i + 1}</div>
+                <div class="tp-details">
+                  <div class="tp-name">${p.name}</div>
+                  <div class="tp-stats"><span class="tp-profit-text" style="color:#5b5ef6">${fmt(p.rev)} revenue</span> • ${p.qty.toLocaleString()} units</div>
+                </div>
+                <div class="tp-visuals">
+                  <div class="tp-bar-bg"><div class="tp-bar-fill" style="width:${barWidth}%; background:#5b5ef6;"></div></div>
+                  <div class="tp-margin-text" style="color:#5b5ef6;">${barWidth.toFixed(0)}%</div>
+                </div>
+              </div>`;
+          }).join('');
+      } else {
+          // Sort by Profit
+          const profList = [...data].map(p => {
+              const rev = p.sell * p.qty;
+              const profit = rev - (p.cost * p.qty);
+              const margin = rev > 0 ? (profit / rev) * 100 : 0;
+              return {...p, rev, profit, margin};
+          }).sort((a,b) => b.profit - a.profit).slice(0, 5);
+
+          topListContainer.innerHTML = profList.map((p, i) => {
+              let color = '#22c55e';
+              if(p.margin < 30) color = '#f59e0b';
+              if(p.margin < 15) color = '#ef4444';
+              let barWidth = Math.max(0, Math.min(100, p.margin));
+              return `
+              <div class="tp-item">
+                <div class="tp-rank">${i + 1}</div>
+                <div class="tp-details">
+                  <div class="tp-name">${p.name}</div>
+                  <div class="tp-stats">${fmt(p.rev)} • <span class="tp-profit-text" style="color:${color}">${fmt(p.profit)} profit</span></div>
+                </div>
+                <div class="tp-visuals">
+                  <div class="tp-bar-bg"><div class="tp-bar-fill" style="width:${barWidth}%; background:${color};"></div></div>
+                  <div class="tp-margin-text">${p.margin.toFixed(0)}%</div>
+                </div>
+              </div>`;
+          }).join('');
+      }
+  }
+
+  // --- INSIGHTS CARDS LOGIC ---
+  let insightsHTML = '';
+  
+  if (isRevMode) {
+      const topRevProd = [...data].sort((a,b) => (b.sell*b.qty) - (a.sell*a.qty))[0];
+      const lowRevProd = [...data].sort((a,b) => (a.sell*a.qty) - (b.sell*b.qty))[0];
+      const avgUnits = data.length > 0 ? Math.round(tItems / data.length) : 0;
+      
+      if (topRevProd) {
+          const topRevShare = tRev > 0 ? (((topRevProd.sell*topRevProd.qty)/tRev)*100).toFixed(1) : 0;
+          insightsHTML += `
+          <div class="insight-card">
+            <div class="insight-header">
+              <div class="insight-icon ic-success" style="background:#eff6ff; color:#5b5ef6;">🏆</div>
+              <div class="insight-title">Top Revenue Driver</div>
+            </div>
+            <div class="insight-desc">${topRevProd.name} generates ${topRevShare}% of your total revenue. Focus marketing here.</div>
+            <a class="insight-action" onclick="switchView('report', document.querySelectorAll('.nav-item')[5])">↗ View Report</a>
+          </div>`;
+      }
+      if (lowRevProd && data.length > 1) {
+          insightsHTML += `
+          <div class="insight-card">
+            <div class="insight-header">
+              <div class="insight-icon ic-danger" style="background:#fef3c7; color:#d97706;">⚠</div>
+              <div class="insight-title">Low Performer</div>
+            </div>
+            <div class="insight-desc">${lowRevProd.name} contributes the least revenue. Consider promoting it.</div>
+            <a class="insight-action" onclick="switchView('data', document.querySelectorAll('.nav-item')[0])">✏️ Edit Data</a>
+          </div>`;
+      }
+      insightsHTML += `
+      <div class="insight-card">
+        <div class="insight-header">
+          <div class="insight-icon ic-info" style="background:#d1fae5; color:#059669;">📦</div>
+          <div class="insight-title">Volume Opportunity</div>
+        </div>
+        <div class="insight-desc">You average ${avgUnits} units sold per product. Push top products to grow total volume.</div>
+        <a class="insight-action" onclick="costModalShown=false;showCostMissingModal(getFreshData())">💡 Add Costs for Profit Data</a>
+      </div>`;
+
+  } else {
+      if (top.profit > 0) {
+          const topData = [...data].map(p => ({name: p.name, profit: (p.sell-p.cost)*p.qty, margin: (((p.sell-p.cost)/p.sell)*100)||0})).sort((a,b)=>b.profit-a.profit)[0];
+          insightsHTML += `
+          <div class="insight-card">
+            <div class="insight-header">
+              <div class="insight-icon ic-success">🏆</div>
+              <div class="insight-title">Top Product</div>
+            </div>
+            <div class="insight-desc">${topData.name} generated ${fmt(topData.profit)} profit with a ${topData.margin.toFixed(0)}% margin.</div>
+            <a class="insight-action" onclick="switchView('report', document.querySelectorAll('.nav-item')[5])">↗ Open Report</a>
+          </div>`;
+      }
+      if (leaks.length > 0) {
+          const worst = [...data].map(p => ({name: p.name, profit: (p.sell*p.qty) - (p.cost*p.qty)})).sort((a,b) => a.profit - b.profit)[0];
+          insightsHTML += `
+          <div class="insight-card">
+            <div class="insight-header">
+              <div class="insight-icon ic-danger">⚠</div>
+              <div class="insight-title">Profit Leak</div>
+            </div>
+            <div class="insight-desc">${worst.name} lost ${fmt(Math.abs(worst.profit))} this month. Consider price adjustment.</div>
+            <a class="insight-action" onclick="switchView('simulator', document.querySelectorAll('.nav-item')[3]); initSimulator();">🧪 Run Simulation</a>
+          </div>`;
+      } else {
+          insightsHTML += `
+          <div class="insight-card">
+            <div class="insight-header">
+              <div class="insight-icon ic-success">🛡️</div>
+              <div class="insight-title">Healthy Roster</div>
+            </div>
+            <div class="insight-desc">Zero products are losing money. Your baseline economics are secure.</div>
+            <a class="insight-action" onclick="switchView('report', document.querySelectorAll('.nav-item')[5])">📊 View Full Report</a>
+          </div>`;
+      }
+      const profList = [...data].map(p => ({name: p.name, profit: (p.sell*p.qty) - (p.cost*p.qty)})).sort((a,b) => b.profit - a.profit);
+      const secondBest = profList.length > 1 ? profList[1] : profList[0];
+      if(secondBest && secondBest.profit > 0) {
+          const potentialGain = secondBest.profit * 0.08;
+          insightsHTML += `
+          <div class="insight-card">
+            <div class="insight-header">
+              <div class="insight-icon ic-info">📈</div>
+              <div class="insight-title">Optimization Opportunity</div>
+            </div>
+            <div class="insight-desc">Increasing ${secondBest.name} price by 8% could add ${fmt(potentialGain)} profit.</div>
+            <a class="insight-action" onclick="switchView('ai', document.querySelectorAll('.nav-item')[4])">✨ Ask AI</a>
+          </div>`;
+      }
+  }
+
+  const ig = document.getElementById('dashInsightsGrid');
+  if(ig) ig.innerHTML = insightsHTML;
+
+  updateModeBadge();
+
+  // --- CHART LOGIC ---
+  const ctx = document.getElementById('profitChart')?.getContext('2d');
+  if(!ctx) return; 
+
   if(myChart) myChart.destroy();
-  // Limit chart to top 12 products by revenue to stay readable
-  const CHART_MAX = 12;
-  const chartData = data
-    .map(d => ({ name: d.name, rev: d.sell*d.qty, profit: (d.sell-d.cost)*d.qty }))
-    .sort((a,b) => b.rev - a.rev);
+  const CHART_MAX = 6;
+  const chartData = data.map(d => ({ name: d.name, rev: d.sell*d.qty, profit: (d.sell-d.cost)*d.qty })).sort((a,b) => b.rev - a.rev);
   const chartSlice   = chartData.slice(0, CHART_MAX);
   const chartLabels  = chartSlice.map(d => d.name.length > 14 ? d.name.slice(0,13)+'…' : d.name);
   const chartRevD    = chartSlice.map(d => d.rev);
   const chartProfD   = chartSlice.map(d => d.profit);
-  const extraCount   = chartData.length - CHART_MAX;
 
-  // Show "showing top N" notice
-  let chartNote = document.getElementById('chartTopNote');
-  if (!chartNote) {
-    chartNote = document.createElement('div');
-    chartNote.id = 'chartTopNote';
-    chartNote.style.cssText = 'font-size:11px;color:var(--slate-300);text-align:right;margin-bottom:4px;';
-    ctx.canvas.parentNode.insertBefore(chartNote, ctx.canvas);
-  }
-  chartNote.textContent = extraCount > 0 ? `Top ${CHART_MAX} of ${data.length} products by revenue` : '';
-
-  // Change the Chart Initialization block in runAnalysis:
-  const isRevMode = AppState.analyticsMode === 'revenue';
-  
-  // Update the chart title based on the mode
-  const chartTitle = document.querySelector('.chart-card h4');
+  // Update the chart title dynamically
+  const chartTitle = document.querySelector('.dash-panel-title');
   if (chartTitle) chartTitle.innerText = isRevMode ? 'Top Products by Revenue' : 'Revenue vs Profit';
 
   myChart = new Chart(ctx, {
@@ -1229,285 +1753,44 @@ function runAnalysis(data) {
     data: {
       labels: chartLabels,
       datasets: isRevMode ? [
-        // Match the Purple from the image
-        {label:'Revenue', data:chartRevD,  backgroundColor:'#5b5ef6', borderRadius:4}
+        {label:'Revenue', data:chartRevD, backgroundColor:'#5b5ef6', borderRadius:4}
       ] : [
-        // Match the Purple and Green from the image
-        {label:'Revenue', data:chartRevD,  backgroundColor:'#5b5ef6', borderRadius:4},
+        {label:'Revenue', data:chartRevD, backgroundColor:'#5b5ef6', borderRadius:4},
         {label:'Profit',  data:chartProfD, backgroundColor:'#22c55e', borderRadius:4}
       ]
     },
     options: {
-      responsive: true,
-      maintainAspectRatio: false,
-      plugins: {
-        // Hide the legend to match the screenshot
-        legend: { display: false },
-        tooltip: {
-          titleFont: { family: 'Inter', size: 13 },
-          bodyFont: { family: 'Inter', size: 12 },
-          padding: 10,
-          cornerRadius: 8
-        }
-      },
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
       scales: {
-        x: { 
-          grid: { display: false }, 
-          ticks: { 
-            color: '#64748b', 
-            font: { weight: '500', size: 11, family: 'Inter' }, 
-            maxRotation: 0, // Keeps text flat like the screenshot (auto-truncates if needed)
-            autoSkip: false 
-          } 
-        },
-        y: { 
-          beginAtZero: true, 
-          border: { display: false }, // Removes the solid vertical axis line
-          grid: { 
-            color: '#f1f5f9', 
-            tickLength: 0, 
-            borderDash: [5, 5] // Creates the dashed lines seen in the image
-          }, 
-          ticks: { 
-            color: '#94a3b8', 
-            font: { size: 11, family: 'Inter' },
-            padding: 10,
-            // Formats numbers to 9k, 18k, 27k to match the screenshot perfectly
-            callback: function(value) {
+        x: { grid: { display: false }, ticks: { color: '#64748b', font: { size: 11, family: 'Inter' } } },
+        y: {
+          beginAtZero: true, border: { display: false }, grid: { color: '#f1f5f9', borderDash: [5, 5] },
+          ticks: { color: '#94a3b8', font: { size: 11, family: 'Inter' },
+            callback: function(v) {
               const sym = AppState.currencySymbol || '₹';
-              if (value >= 1000) return sym + (value / 1000) + 'k';
-              if (value === 0) return sym + '0';
-              return sym + value;
+              if (v >= 1000) return sym + (v / 1000) + 'k';
+              return sym + v;
             }
-          } 
+          }
         }
       }
     }
   });
 
-  // ── Warning bar at bottom of dashboard ──
   document.getElementById('dataWarningBar')?.remove();
   const warnHTML = getDataWarningHTML();
-  if (warnHTML) {
-    document.getElementById('dashboardContent').insertAdjacentHTML('beforeend', warnHTML);
-  }
+  if (warnHTML) document.getElementById('dashboardContent').insertAdjacentHTML('beforeend', warnHTML);
 
   showToast('Dashboard updated ✓', 'success');
   renderEnhancedReport(data);
 }
-
-// ══════════════════════════════════════════
-//  CSV / EXCEL SMART IMPORT
-// ══════════════════════════════════════════
-
-let importRawData = [];  // parsed rows (array of objects)
-let importHeaders = [];  // column names from file
-let importMapping = {};  // { vizbixField: columnName }
-
-const FIELD_ALIASES = {
-  name:     ['name','product','item','title','description','product name','item name','sku','product title','goods','service'],
-  sellPrice:['sell','selling','price','sale price','mrp','sp','sell price','selling price','unit price','rate','amount','revenue per unit','sale'],
-  costPrice:['cost','cogs','purchase','buy price','cost price','buying price','unit cost','purchase price','cp','landed cost','expense'],
-  qty:      ['qty','quantity','units','sold','sales','volume','units sold','qty sold','pieces','count','no of units','no. of units','pcs']
-};
-
-function triggerImport() {
-  document.getElementById('importModal').style.display = 'flex';
-  showImportStep1();
-}
-
-function closeImportModal() {
-  document.getElementById('importModal').style.display = 'none';
-  document.getElementById('importFileInput').value = '';
-}
-
-function showImportStep1() {
-  document.getElementById('importStep1').style.display = '';
-  document.getElementById('importStep2').style.display = 'none';
-}
-
-function handleImportDrop(e) {
-  e.preventDefault();
-  e.currentTarget.style.borderColor = 'var(--slate-200)';
-  e.currentTarget.style.background = '';
-  const file = e.dataTransfer.files[0];
-  if (file) processImportFile(file);
-}
-
-function handleImportFile(input) {
-  const file = input.files[0];
-  if (file) processImportFile(file);
-}
-
-function processImportFile(file) {
-  const ext = file.name.split('.').pop().toLowerCase();
-  if (ext === 'csv') {
-    Papa.parse(file, {
-      header: true, skipEmptyLines: true,
-      complete: (r) => setupImportMapping(r.data, r.meta.fields, file.name)
-    });
-  } else if (['xlsx','xls'].includes(ext)) {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const wb = XLSX.read(e.target.result, {type:'array'});
-      const ws = wb.Sheets[wb.SheetNames[0]];
-      const data = XLSX.utils.sheet_to_json(ws, {defval:''});
-      const headers = data.length ? Object.keys(data[0]) : [];
-      setupImportMapping(data, headers, file.name);
-    };
-    reader.readAsArrayBuffer(file);
-  } else {
-    showToast('Please upload a CSV or Excel file.', 'error');
-  }
-}
-
-function detectColumn(headers, fieldKey) {
-  const aliases = FIELD_ALIASES[fieldKey];
-  const lower = headers.map(h => h.toLowerCase().trim());
-  // Exact match first
-  for (const alias of aliases) {
-    const idx = lower.indexOf(alias);
-    if (idx !== -1) return headers[idx];
-  }
-  // Partial match
-  for (const alias of aliases) {
-    const idx = lower.findIndex(h => h.includes(alias) || alias.includes(h));
-    if (idx !== -1) return headers[idx];
-  }
-  return '';
-}
-
-function setupImportMapping(data, headers, filename) {
-  importRawData = data;
-  importHeaders = headers;
-
-  // Auto-detect
-  importMapping = {
-    name:      detectColumn(headers, 'name'),
-    sellPrice: detectColumn(headers, 'sellPrice'),
-    costPrice: detectColumn(headers, 'costPrice'),
-    qty:       detectColumn(headers, 'qty'),
-  };
-
-  const matched = Object.values(importMapping).filter(Boolean).length;
-  const confidence = matched === 4 ? 'high' : matched >= 2 ? 'medium' : 'low';
-
-  // Show step 2
-  document.getElementById('importStep1').style.display = 'none';
-  document.getElementById('importStep2').style.display = '';
-  document.getElementById('importFileInfo').textContent = `${filename} · ${data.length} rows · ${headers.length} columns detected`;
-
-  // Confidence banner
-  const banner = document.getElementById('importConfidenceBanner');
-  if (confidence === 'high') {
-    banner.style.cssText = 'background:#d1fae5;border:1px solid #a7f3d0;color:#065f46;padding:10px 14px;border-radius:9px;margin-bottom:16px;font-size:13px;';
-    banner.innerHTML = '✅ <strong>All 4 columns detected automatically.</strong> Review below and confirm.';
-  } else if (confidence === 'medium') {
-    banner.style.cssText = 'background:#fef3c7;border:1px solid #fde68a;color:#92400e;padding:10px 14px;border-radius:9px;margin-bottom:16px;font-size:13px;';
-    banner.innerHTML = `⚠️ <strong>${matched} of 4 columns detected.</strong> Please map the missing ones below.`;
-  } else {
-    banner.style.cssText = 'background:#fee2e2;border:1px solid #fecaca;color:#991b1b;padding:10px 14px;border-radius:9px;margin-bottom:16px;font-size:13px;';
-    banner.innerHTML = '❌ <strong>Could not auto-detect columns.</strong> Please select them manually below.';
-  }
-
-  // Mapping dropdowns
-  const fieldLabels = { name:'Product Name', sellPrice:'Sell Price', costPrice:'Cost Price', qty:'Qty Sold' };
-  const grid = document.getElementById('importMappingGrid');
-  grid.innerHTML = Object.entries(fieldLabels).map(([key, label]) => `
-    <div style="display:flex;align-items:center;gap:10px;">
-      <label style="font-size:12.5px;font-weight:600;color:var(--ink);width:100px;flex-shrink:0;">${label}</label>
-      <select id="mapSelect_${key}" onchange="importMapping['${key}']=this.value;updateImportPreview()"
-        style="flex:1;padding:8px 12px;border-radius:8px;border:1.5px solid ${importMapping[key]?'var(--indigo)':'var(--slate-200)'};font-size:13px;background:${importMapping[key]?'var(--indigo-light)':'white'};outline:none;">
-        <option value="">— not mapped —</option>
-        ${headers.map(h=>`<option value="${h}" ${importMapping[key]===h?'selected':''}>${h}</option>`).join('')}
-      </select>
-    </div>
-  `).join('');
-
-  updateImportPreview();
-}
-
-function updateImportPreview() {
-  // Re-read mapping from selects
-  ['name','sellPrice','costPrice','qty'].forEach(k => {
-    const sel = document.getElementById('mapSelect_'+k);
-    if (sel) {
-      importMapping[k] = sel.value;
-      sel.style.borderColor = sel.value ? 'var(--indigo)' : 'var(--slate-200)';
-      sel.style.background  = sel.value ? 'var(--indigo-light)' : 'white';
-    }
-  });
-
-  const preview = importRawData.slice(0, 3);
-  const mapped  = Object.values(importMapping).filter(Boolean);
-  const tbl     = document.getElementById('importPreviewTable');
-
-  if (!mapped.length) { tbl.innerHTML = '<tr><td style="padding:10px;color:var(--slate-300);text-align:center;">Map at least one column to preview</td></tr>'; return; }
-
-  const cols = Object.entries(importMapping).filter(([,v])=>v);
-  const labels = { name:'Name', sellPrice:'Sell ₹', costPrice:'Cost ₹', qty:'Qty' };
-
-  tbl.innerHTML = `
-    <thead><tr style="background:var(--slate-50);">${cols.map(([k])=>`<th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--slate-300);text-align:left;text-transform:uppercase;letter-spacing:0.5px;">${labels[k]}</th>`).join('')}</tr></thead>
-    <tbody>${preview.map(row=>`<tr style="border-top:1px solid var(--slate-100);">${cols.map(([,col])=>`<td style="padding:8px 12px;font-size:12.5px;color:var(--ink);">${row[col]??'—'}</td>`).join('')}</tr>`).join('')}</tbody>
-  `;
-
-  // Update confirm button
-  const validRows = importRawData.filter(r => importMapping.name && r[importMapping.name]).length;
-  document.getElementById('importRowCount').textContent = validRows;
-}
-
-function confirmImport() {
-  const { name, sellPrice, costPrice, qty } = importMapping;
-  if (!name) { showToast('Please map the Product Name column.', 'error'); return; }
-
-  const rows = importRawData
-    .filter(r => r[name] && String(r[name]).trim())
-    .map(r => ({
-      name:      String(r[name]).trim(),
-      sell:      parseFloat(String(r[sellPrice]??'').replace(/[^0-9.]/g,'')) || 0,
-      cost:      parseFloat(String(r[costPrice]??'').replace(/[^0-9.]/g,'')) || 0,
-      qty:       parseInt(String(r[qty]??'').replace(/[^0-9]/g,''))           || 0,
-    }));
-
-  if (!rows.length) { showToast('No valid rows found.', 'error'); return; }
-
-  // Clear existing rows and populate
-  document.getElementById('items').innerHTML = '';
-  rows.forEach(r => {
-    const div = document.createElement('div');
-    div.className = 'data-row';
-    div.innerHTML = `
-      <input type="text"   class="input-name" value="${r.name.replace(/"/g,'&quot;')}">
-      <input type="number" class="input-sell" value="${r.sell}">
-      <input type="number" class="input-cost" value="${r.cost}">
-      <input type="number" class="input-qty"  value="${r.qty}">
-      <button class="delete-btn" onclick="removeRow(this)" title="Remove">×</button>
-    `;
-    document.getElementById('items').appendChild(div);
-  });
-
-  closeImportModal();
-showToast(`✅ ${rows.length} products imported successfully!`, 'success', 3500);
-switchView('data', document.getElementById('nav-data'));
-
-// Show cost modal if all costs are 0
-const allZeroCost = rows.every(r => !r.cost || r.cost === 0);
-if (allZeroCost) {
-  setTimeout(() => showCostMissingModal(rows), 400);
-}
-}
-// ══════════════════════════════════════════
-//  ENHANCED REPORT RENDERING
-// ══════════════════════════════════════════
 
 let reportPieChart   = null;
 let reportMarginChart = null;
 
 function renderEnhancedReport(data) {
   if (!data || !data.length) return;
-  
-  // 1. Check if Revenue Mode is active
   const isRevMode = AppState.analyticsMode === 'revenue';
 
   const existingWarn = document.getElementById('reportWarningBar');
@@ -1541,7 +1824,7 @@ function renderEnhancedReport(data) {
   const ovMargin = tRev > 0 ? (tProfit / tRev) * 100 : 0;
   const sorted = [...products].sort((a, b) => b.profit - a.profit);
 
-  // ── Summary Bar (Hide Profit/Margin in Rev Mode) ──
+  // ── Summary Bar ──
   const summaryItems = isRevMode ? [
     { l:'Total Revenue',  v: fmt(tRev),                  c:'var(--indigo)' },
     { l:'Units Sold',     v: tQty.toLocaleString(),      c:'#8b5cf6' },
@@ -1564,7 +1847,7 @@ function renderEnhancedReport(data) {
     </div>
   `).join('');
 
-  // ── Performance Bands (Hide entirely in Rev Mode) ──
+  // ── Performance Bands ──
   const bandsContainer = document.getElementById('reportBands');
   if (isRevMode) {
     if (bandsContainer) bandsContainer.style.display = 'none';
@@ -1579,17 +1862,23 @@ function renderEnhancedReport(data) {
       { label:'📊 Average Margin', items: average, bg:'#fef3c7', border:'#fde68a', color:'#92400e' },
       { label:'🔴 Loss Makers',    items: leakers, bg:'#fee2e2', border:'#fecaca', color:'#991b1b' },
     ].map(band => `
-      <div style="background:${band.bg};border:1px solid ${band.border};border-radius:12px;padding:14px;">
-        <div style="font-size:11px;font-weight:700;color:${band.color};text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;">${band.label} (${band.items.length})</div>
-        ${band.items.length
-          ? band.items.map(p => `<div style="font-size:13px;color:${band.color};margin-bottom:3px;font-weight:500;">• ${p.name} <span style="opacity:0.7;">${p.margin.toFixed(1)}%</span></div>`).join('')
-          : `<div style="font-size:12.5px;color:${band.color};opacity:0.6;">None</div>`
-        }
+      <div style="background:${band.bg};border:1px solid ${band.border};border-radius:12px;padding:14px; display:flex; flex-direction:column; max-height:240px;">
+        <div style="font-size:11px;font-weight:700;color:${band.color};text-transform:uppercase;letter-spacing:0.6px;margin-bottom:10px;flex-shrink:0;">${band.label} (${band.items.length})</div>
+        <div style="overflow-y:auto; flex-grow:1; padding-right:4px;">
+          ${band.items.length
+            ? band.items.map(p => `
+                <div style="font-size:13px;color:${band.color};margin-bottom:6px;font-weight:500;display:flex;justify-content:space-between;gap:8px;">
+                  <span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${p.name}</span>
+                  <span style="opacity:0.8;flex-shrink:0;">${p.margin.toFixed(1)}%</span>
+                </div>
+              `).join('')
+            : `<div style="font-size:12.5px;color:${band.color};opacity:0.6;">None</div>`
+          }
+        </div>
       </div>
     `).join('');
   }
-
-  // ── Main Table Header (Dynamic) ──
+  // ── Main Table Header ──
   const thead = document.querySelector('.report-table thead');
   if (thead) {
     thead.innerHTML = `<tr style="text-align:left;">
@@ -1674,63 +1963,57 @@ function renderEnhancedReport(data) {
   if (bottomGrid) {
     const marginChartCard = bottomGrid.children[1];
     if (isRevMode) {
-      marginChartCard.style.display = 'none'; // Hide margin bubble chart
-      bottomGrid.style.gridTemplateColumns = '1fr'; // Make pie chart full width
+      marginChartCard.style.display = 'none';
+      bottomGrid.style.gridTemplateColumns = '1fr'; 
     } else {
       marginChartCard.style.display = 'block';
       bottomGrid.style.gridTemplateColumns = '1fr 1fr';
     }
   }
 
-  // ... (Leave the rest of the existing Pie Chart and Margin Chart logic untouched below this point)
+  // ── Pie Chart ──────────
   const palette = ['#5b5ef6','#6ee7b7','#fbbf24','#f87171','#a78bfa','#34d399','#fb923c','#60a5fa'];
-  const pieCtx  = document.getElementById('reportPieChart');
-  // ... Keep everything else exactly as is ...
+  const pieCtx = document.getElementById('reportPieChart');
+  if (pieCtx) {
+    if (reportPieChart) reportPieChart.destroy();
+    const top5 = sorted.slice(0, 5);
+    const otherRev = sorted.slice(5).reduce((sum, p) => sum + p.rev, 0);
+    const pieLabels = top5.map(p => p.name);
+    const pieData = top5.map(p => p.rev);
+    if (otherRev > 0) { pieLabels.push('Other'); pieData.push(otherRev); }
 
-  // ── Margin horizontal bar chart ──────────
+    reportPieChart = new Chart(pieCtx, {
+      type: 'doughnut',
+      data: { labels: pieLabels, datasets: [{ data: pieData, backgroundColor: palette, borderWidth: 0 }] },
+      options: {
+        responsive: true, maintainAspectRatio: false, cutout: '70%',
+        plugins: {
+          legend: { position: 'right', labels: { usePointStyle: true, boxWidth: 8, font: { family: 'Inter', size: 11 }, color: '#64748b' } },
+          tooltip: { callbacks: { label: ctx => ' ' + (AppState.currencySymbol || '₹') + ctx.raw.toLocaleString() } }
+        }
+      }
+    });
+  }
+
+  // ── Margin Bubble Chart ──────────
   const margCtx = document.getElementById('reportMarginChart');
   if (margCtx) {
     if (reportMarginChart) reportMarginChart.destroy();
-    // Bubble chart: x=margin%, y=profit, r=revenue size
-    // Show top 15 by revenue — better readability
     const BUBBLE_MAX = 15;
     const bubbleSrc  = sorted.slice(0, BUBBLE_MAX);
     const maxRev     = Math.max(...bubbleSrc.map(p => p.rev), 1);
-    const bubbleData = bubbleSrc.map(p => ({
-      x: parseFloat(p.margin.toFixed(1)),
-      y: p.profit,
-      r: Math.max(6, Math.round((p.rev / maxRev) * 22)),
-    }));
-    const bubbleColors = bubbleSrc.map(p =>
-      p.margin >= 30 ? 'rgba(110,231,183,0.8)' :
-      p.margin >= 0  ? 'rgba(251,191,36,0.8)'  :
-                       'rgba(248,113,113,0.8)'
-    );
-    const bubbleBorders = bubbleSrc.map(p =>
-      p.margin >= 30 ? '#059669' : p.margin >= 0 ? '#d97706' : '#dc2626'
-    );
+    const bubbleData = bubbleSrc.map(p => ({ x: parseFloat(p.margin.toFixed(1)), y: p.profit, r: Math.max(6, Math.round((p.rev / maxRev) * 22)) }));
+    const bubbleColors = bubbleSrc.map(p => p.margin >= 30 ? 'rgba(110,231,183,0.8)' : p.margin >= 0  ? 'rgba(251,191,36,0.8)'  : 'rgba(248,113,113,0.8)');
+    const bubbleBorders = bubbleSrc.map(p => p.margin >= 30 ? '#059669' : p.margin >= 0 ? '#d97706' : '#dc2626');
     reportMarginChart = new Chart(margCtx, {
       type: 'bubble',
-      data: {
-        datasets: [{
-          label: 'Products',
-          data: bubbleData,
-          backgroundColor: bubbleColors,
-          borderColor: bubbleBorders,
-          borderWidth: 2,
-        }]
-      },
+      data: { datasets: [{ label: 'Products', data: bubbleData, backgroundColor: bubbleColors, borderColor: bubbleBorders, borderWidth: 2 }] },
       options: {
-        responsive: true,
-        maintainAspectRatio: false,
+        responsive: true, maintainAspectRatio: false,
         plugins: {
           legend: { display: false },
           tooltip: {
-            backgroundColor: 'rgba(8,9,13,0.85)',
-            titleFont: { size: 12, family: 'Inter', weight: '600' },
-            bodyFont: { size: 12, family: 'Inter' },
-            padding: 10,
-            cornerRadius: 8,
+            backgroundColor: 'rgba(8,9,13,0.85)', titleFont: { size: 12, family: 'Inter', weight: '600' }, bodyFont: { size: 12, family: 'Inter' }, padding: 10, cornerRadius: 8,
             callbacks: {
               label: ctx => {
                 const p = bubbleSrc[ctx.dataIndex];
@@ -1742,32 +2025,13 @@ function renderEnhancedReport(data) {
           }
         },
         scales: {
-          x: {
-            title: { display:true, text:'Margin %', color:'#94a3b8', font:{ size:11, family:'Inter', weight:'600' } },
-            grid: { color:'#f1f5f9', lineWidth: 1 },
-            border: { dash: [4, 4] },
-            ticks: { color:'#94a3b8', font:{ size:10, family:'Inter' }, callback: v => v+'%' }
-          },
-          y: {
-            title: { display:true, text:'Gross Profit', color:'#94a3b8', font:{ size:11, family:'Inter', weight:'600' } },
-            grid: { color:'#f1f5f9', lineWidth: 1 },
-            border: { dash: [4, 4] },
-            ticks: {
-              color:'#94a3b8', font:{ size:10, family:'Inter' },
-              callback: v => {
-                const sym = AppState.currencySymbol || '₹';
-                if (Math.abs(v) >= 100000) return sym+(v/100000).toFixed(1)+'L';
-                if (Math.abs(v) >= 1000)   return sym+(v/1000).toFixed(0)+'k';
-                return sym+v;
-              }
-            }
-          }
+          x: { title: { display:true, text:'Margin %', color:'#94a3b8', font:{ size:11, family:'Inter', weight:'600' } }, grid: { color:'#f1f5f9', lineWidth: 1 }, border: { dash: [4, 4] }, ticks: { color:'#94a3b8', font:{ size:10, family:'Inter' }, callback: v => v+'%' } },
+          y: { title: { display:true, text:'Gross Profit', color:'#94a3b8', font:{ size:11, family:'Inter', weight:'600' } }, grid: { color:'#f1f5f9', lineWidth: 1 }, border: { dash: [4, 4] }, ticks: { color:'#94a3b8', font:{ size:10, family:'Inter' }, callback: v => { const sym = AppState.currencySymbol || '₹'; if (Math.abs(v) >= 100000) return sym+(v/100000).toFixed(1)+'L'; if (Math.abs(v) >= 1000)   return sym+(v/1000).toFixed(0)+'k'; return sym+v; } } }
         }
       }
     });
   }
 }
-
 
 // ── Report search/filter ──────────────────
 function filterReportTable(query) {
@@ -1784,7 +2048,6 @@ function filterReportTable(query) {
   if (cnt) cnt.textContent = q ? `${visible} of ${rows.length} products` : '';
 }
 
-
 // ══════════════════════════════════════════
 //  SIMULATOR
 // ══════════════════════════════════════════
@@ -1793,6 +2056,11 @@ function initSimulator() {
     getFreshData();
     if(!AppState.currentData.length) { showToast('Enter data in Data Input first.','error'); return; }
   }
+  
+  // Populate the dropdown with products
+  const select = document.getElementById('sim-product-select');
+  select.innerHTML = AppState.currentData.map((p, i) => `<option value="${i}">${p.name}</option>`).join('');
+  
   resetSimulation();
 }
 
@@ -1805,6 +2073,11 @@ function resetSimulation() {
 }
 
 function runSimulation() {
+  const select = document.getElementById('sim-product-select');
+  if(!select || !AppState.currentData.length) return;
+  const pIdx = select.value;
+  const prod = AppState.currentData[pIdx];
+
   const pV = parseInt(document.getElementById('slide-price').value);
   const vV = parseInt(document.getElementById('slide-vol').value);
   const cV = parseInt(document.getElementById('slide-cost').value);
@@ -1813,35 +2086,64 @@ function runSimulation() {
   setText('val-vol',   (vV>0?'+':'')+vV+'%');
   setText('val-cost',  (cV>0?'+':'')+cV+'%');
 
-  const pM=1+(pV/100), vM=1+(vV/100), cM=1+(cV/100);
-  let cur=0, sim=0;
-  AppState.currentData.forEach(i=>{
-    cur += (i.sell*i.qty)-(i.cost*i.qty);
-    sim += (i.sell*pM*i.qty*vM)-(i.cost*cM*i.qty*vM);
-  });
+  const pM = 1 + (pV/100);
+  const vM = 1 + (vV/100);
+  const cM = 1 + (cV/100);
 
-  setText('sim-current',   fmt(cur));
-  setText('sim-projected', fmt(sim));
+  // Single product current metrics
+  const origPrice = prod.sell;
+  const origCost = prod.cost;
+  const origVol = prod.qty;
+  const curProfit = (origPrice * origVol) - (origCost * origVol);
+
+  // Simulated metrics
+  const newPrice = origPrice * pM;
+  const newCost = origCost * cM;
+  const newVol = Math.round(origVol * vM); // round to whole units
+  const simProfit = (newPrice * newVol) - (newCost * newVol);
+
+  setText('sim-current',   fmt(curProfit));
+  setText('sim-projected', fmt(simProfit));
+
+  // Populate details table
+  setText('det-orig-price', fmt(origPrice));
+  setText('det-new-price', fmt(newPrice));
+  setText('det-orig-cost', fmt(origCost));
+  setText('det-new-cost', fmt(newCost));
+  setText('det-orig-vol', origVol.toLocaleString() + ' units');
+  setText('det-new-vol', newVol.toLocaleString() + ' units');
 
   const dEl = document.getElementById('sim-delta');
+  const dPctEl = document.getElementById('sim-delta-pct');
+  const cardEl = document.getElementById('sim-delta-card');
   const iEl = document.getElementById('sim-insight');
-  const diff = sim-cur;
-  const pct  = cur>0 ? ((diff/cur)*100).toFixed(1) : 0;
+  
+  const diff = simProfit - curProfit;
+  const pct  = curProfit > 0 ? ((diff/curProfit)*100).toFixed(1) : 0;
 
   if(diff>=0) {
-    dEl.innerText = '▲ '+fmt(diff)+' ('+pct+'%)';
-    dEl.className = 'sim-delta delta-pos';
-    iEl.style.cssText = 'font-weight:700;font-size:14px;color:#064e3b;background:#d1fae5;border:1px solid #34d399;padding:14px;border-radius:9px;line-height:1.6;font-family:"DM Sans",sans-serif;';
-    if(pV>0&&vV>0&&cV<0)        iEl.innerHTML=`<strong>🦄 Unicorn Strategy:</strong> You raised value, scaled volume, and cut waste. Perfect efficiency.`;
-    else if(pV>0&&vV<0)         iEl.innerHTML=`<strong>💎 Luxury Pivot:</strong> Selling fewer units but making more. Repositioned as Premium.`;
-    else if(pV<0&&vV>0)         iEl.innerHTML=`<strong>🔥 Mass Market:</strong> Lower price triggered huge demand. Winning on volume.`;
+    dEl.innerText = '↗ +' + fmt(diff);
+    dEl.style.color = '#059669';
+    dPctEl.innerText = '+' + pct + '% change';
+    dPctEl.style.color = '#059669';
+    cardEl.style.background = '#f0fdf4';
+    cardEl.style.borderColor = '#bbf7d0';
+    
+    if(pV===0&&vV===0&&cV===0) iEl.innerHTML = `Adjust the sliders to simulate different scenarios and see how they affect your profit.`;
+    else if(pV>0&&vV>0&&cV<0)  iEl.innerHTML=`<strong>🦄 Unicorn Strategy:</strong> You raised value, scaled volume, and cut waste. Perfect efficiency.`;
+    else if(pV>0&&vV<0)        iEl.innerHTML=`<strong>💎 Luxury Pivot:</strong> Selling fewer units but making more. Repositioned as Premium.`;
+    else if(pV<0&&vV>0)        iEl.innerHTML=`<strong>🔥 Mass Market:</strong> Lower price triggered huge demand. Winning on volume.`;
     else if(cV<0&&pV===0&&vV===0) iEl.innerHTML=`<strong>✂️ Lean Ops:</strong> Every rupee saved flows 100% to the bottom line.`;
-    else if(pV>0&&vV>=0)        iEl.innerHTML=`<strong>📈 Pricing Power:</strong> Brand is strong enough that customers accepted the price hike.`;
-    else                        iEl.innerHTML=`<strong>✅ Strategic Win:</strong> Extra <strong>${fmt(diff)}</strong> in pure profit.`;
+    else if(pV>0&&vV>=0)       iEl.innerHTML=`<strong>📈 Pricing Power:</strong> Brand is strong enough that customers accepted the price hike.`;
+    else                       iEl.innerHTML=`<strong>✅ Strategic Win:</strong> Extra <strong>${fmt(diff)}</strong> in pure profit.`;
   } else {
-    dEl.innerText = '▼ '+fmt(Math.abs(diff));
-    dEl.className = 'sim-delta delta-neg';
-    iEl.style.cssText = 'font-weight:700;font-size:14px;color:#7f1d1d;background:var(--red-bg);border:1px solid #f87171;padding:14px;border-radius:9px;line-height:1.6;font-family:"DM Sans",sans-serif;';
+    dEl.innerText = '↘ -' + fmt(Math.abs(diff));
+    dEl.style.color = '#dc2626';
+    dPctEl.innerText = pct + '% change';
+    dPctEl.style.color = '#dc2626';
+    cardEl.style.background = '#fef2f2';
+    cardEl.style.borderColor = '#fecaca';
+
     if(pV<0&&vV>0)   iEl.innerHTML=`<strong>⚠️ Discount Trap:</strong> Volume didn't cover the price cut.`;
     else if(pV>0&&vV<0) iEl.innerHTML=`<strong>📉 Price Shock:</strong> Market rejected the increase. Lost too many customers.`;
     else if(vV>0&&cV>0) iEl.innerHTML=`<strong>💸 Growing Broke:</strong> Costs rising faster than revenue.`;
@@ -1856,9 +2158,7 @@ function exportExecutivePDF() {
   const data = AppState.currentData;
   if (!data || !data.length) { showToast('Generate a dashboard first.', 'error'); return; }
 
-  // 1. Check if Revenue Mode is active
   const isRevMode = AppState.analyticsMode === 'revenue';
-
   const sym = AppState.currencySymbol || '₹';
   const fmt = n => sym + Math.abs(n).toLocaleString('en-IN', {maximumFractionDigits:0});
 
@@ -1875,7 +2175,6 @@ function exportExecutivePDF() {
 
   const chartImg = document.getElementById('profitChart')?.toDataURL('image/png') || '';
 
-  // ── Filter Table Rows ──
   const tableRows = products.map((p,i) => {
     const barC = p.margin>=30?'#059669':p.margin>=0?'#d97706':'#dc2626';
     const status = p.margin>=30?'Star':p.margin>=0?'Average':'Loss';
@@ -1892,7 +2191,6 @@ function exportExecutivePDF() {
     </tr>`;
   }).join('');
 
-  // ── Filter Top Metrics ──
   const topMetrics = isRevMode ? [
     {l:'Total Revenue',  v:fmt(tRev),                  c:'#5b5ef6'},
     {l:'Units Sold',     v:tQty.toLocaleString(),      c:'#8b5cf6'},
@@ -2332,8 +2630,6 @@ function doResetData() {
   showToast('Data cleared.', 'info');
 }
 
-
-
 // ── Auto-save on any input change ───────────
 document.addEventListener('input', e => {
   if (e.target.closest('#items')) saveDataToStorage();
@@ -2389,22 +2685,21 @@ async function runStoreImport(platform) {
   btn.disabled = true;
 
   try {
-    
     // Save credentials to KV first
-if (AppState.userEmail) {
-  await fetch(workerURL + '/woo/save-creds', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({
-      email: AppState.userEmail,
-      platform,
-      storeUrl: payload.storeUrl,
-      key: payload.key || null,
-      secret: payload.secret || null,
-      token: payload.token || null,
-    })
-  });
-}
+    if (AppState.userEmail) {
+      await fetch(workerURL + '/woo/save-creds', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          email: AppState.userEmail,
+          platform,
+          storeUrl: payload.storeUrl,
+          key: payload.key || null,
+          secret: payload.secret || null,
+          token: payload.token || null,
+        })
+      });
+    }
 
     const res = await fetch(workerURL + '/fetch-store', {
       method: 'POST',
@@ -2453,15 +2748,13 @@ function updateIntegrationCard(platform, storeUrl, lastSynced) {
     : 'Never';
   el.innerHTML = `
     <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-      <span style="background:#d1fae5;color:#065f46;padding:3px 10px;border-radius:99px;font-size:11px;font-weight:700;">✓ Connected</span>
+      <span style="color:#059669; font-size:12px; font-weight:600;">✓ Connected</span>
       <span style="font-size:12px;color:var(--slate-300);">${domain}</span>
     </div>
-    <div style="font-size:11px;color:var(--slate-300);margin-bottom:10px;">Last synced: ${syncTime}</div>
+    <div style="font-size:11.5px;color:var(--slate-300);margin-bottom:14px;">Last synced: ${syncTime}</div>
     <div style="display:flex;gap:8px;">
-      <button class="btn btn-primary" style="flex:1;font-size:12px;padding:8px;"
-        onclick="manualRefresh()">↻ Sync Now</button>
-      <button class="btn btn-secondary" style="font-size:12px;padding:8px;"
-        onclick="disconnectStore('${platform}')">Disconnect</button>
+      <button class="int-btn int-btn-connected" style="flex:1; padding: 10px;" onclick="manualRefresh()">↻ Sync</button>
+      <button class="int-btn" style="flex:1; padding: 10px; background: white; border: 1px solid var(--slate-200); color: var(--slate-300);" onclick="disconnectStore('${platform}')">Disconnect</button>
     </div>`;
 }
 
@@ -2531,17 +2824,17 @@ async function checkSavedStoreConnections() {
         showSyncBadge('done', syncData.lastSynced);
         // Go straight to dashboard — guard prevents re-entry
         if (!storeSyncing) {
-  storeSyncing = true;
-  setTimeout(() => {
-    const allZero = syncData.data.every(p => !p.cost || p.cost === 0);
-    if (allZero) {
-      showCostMissingModal(getFreshData());
-    } else {
-      processDataAndShowReport();
-    }
-    storeSyncing = false;
-  }, 300);
-}
+          storeSyncing = true;
+          setTimeout(() => {
+            const allZero = syncData.data.every(p => !p.cost || p.cost === 0);
+            if (allZero) {
+              showCostMissingModal(getFreshData());
+            } else {
+              processDataAndShowReport();
+            }
+            storeSyncing = false;
+          }, 300);
+        }
       } else {
         showSyncBadge('failed');
       }
@@ -2601,7 +2894,11 @@ async function disconnectStore(platform) {
     const cardId = platform === 'woo' ? 'woo-card-status' : 'shopify-card-status';
     const el = document.getElementById(cardId);
     const color = platform === 'woo' ? '#7c3aed' : '#059669';
-    if (el) el.innerHTML = `<button class="btn btn-primary" style="width:100%;background:${color};border-color:${color};" onclick="openStoreModal('${platform}')">Connect Store</button>`;
+    if (el) el.innerHTML = `
+      <button class="int-btn int-btn-connect" onclick="openStoreModal('${platform}')">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m19 8-4-4-4 4"/><path d="M15 4v16"/><path d="m5 16 4 4 4-4"/><path d="M9 20V4"/></svg>
+        Connect
+      </button>`;
     // Remove sync badge
     document.getElementById('syncStatusBadge')?.remove();
     showToast('Store disconnected.', 'info');
@@ -2841,10 +3138,224 @@ function showCostCsvResult() {
   if (matched.length) document.getElementById('costApplyBtn').disabled = false;
 }
   
-</script>
-<script type="module" src="../assets/js/auth.js?v=4.4"></script>
+// ══════════════════════════════════════════
+//  CSV / EXCEL SMART IMPORT (FIXED)
+// ══════════════════════════════════════════
 
-<!-- ══ COST MISSING MODAL ══ -->
+let importRawData = [];  // parsed rows (array of objects)
+let importHeaders = [];  // column names from file
+let importMapping = {};  // { vizbixField: columnName }
+
+const FIELD_ALIASES = {
+  name:     ['name','product','item','title','description','product name','item name','sku','product title','goods','service'],
+  sellPrice:['sell','selling','price','sale price','mrp','sp','sell price','selling price','unit price','rate','amount','revenue per unit','sale'],
+  costPrice:['cost','cogs','purchase','buy price','cost price','buying price','unit cost','purchase price','cp','landed cost','expense'],
+  qty:      ['qty','quantity','units','sold','sales','volume','units sold','qty sold','pieces','count','no of units','no. of units','pcs']
+};
+
+function triggerImport() {
+  document.getElementById('importModal').style.display = 'flex';
+  showImportStep1();
+}
+
+function closeImportModal() {
+  document.getElementById('importModal').style.display = 'none';
+  document.getElementById('importFileInput').value = '';
+}
+
+function showImportStep1() {
+  document.getElementById('importStep1').style.display = '';
+  document.getElementById('importStep2').style.display = 'none';
+}
+
+function handleImportDrop(e) {
+  e.preventDefault();
+  e.currentTarget.style.borderColor = 'var(--slate-200)';
+  e.currentTarget.style.background = '';
+  const file = e.dataTransfer.files[0];
+  if (file) processImportFile(file);
+}
+
+function handleImportFile(input) {
+  const file = input.files[0];
+  if (file) processImportFile(file);
+  input.value = ''; // Reset input so same file can be uploaded again if needed
+}
+
+function processImportFile(file) {
+  const ext = file.name.split('.').pop().toLowerCase();
+  
+  if (ext === 'csv') {
+    Papa.parse(file, {
+      header: true, 
+      skipEmptyLines: true,
+      complete: function(r) {
+        const headers = r.meta.fields || (r.data.length > 0 ? Object.keys(r.data[0]) : []);
+        setupImportMapping(r.data, headers, file.name);
+      },
+      error: function() {
+        showToast('Error reading CSV file. Please check the format.', 'error');
+      }
+    });
+  } else if (['xlsx','xls'].includes(ext)) {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      try {
+        const wb = XLSX.read(e.target.result, {type:'array'});
+        const ws = wb.Sheets[wb.SheetNames[0]];
+        const data = XLSX.utils.sheet_to_json(ws, {defval:''});
+        const headers = data.length ? Object.keys(data[0]) : [];
+        setupImportMapping(data, headers, file.name);
+      } catch (err) {
+        showToast('Error reading Excel file. Ensure it is a valid spreadsheet.', 'error');
+      }
+    };
+    reader.onerror = () => showToast('File read failed.', 'error');
+    reader.readAsArrayBuffer(file);
+  } else {
+    showToast('Please upload a CSV or Excel file.', 'error');
+  }
+}
+
+function detectColumn(headers, fieldKey) {
+  if (!headers || !headers.length) return '';
+  const aliases = FIELD_ALIASES[fieldKey];
+  const lower = headers.map(h => (h || '').toString().toLowerCase().trim());
+  
+  for (const alias of aliases) {
+    const idx = lower.indexOf(alias);
+    if (idx !== -1) return headers[idx];
+  }
+  for (const alias of aliases) {
+    const idx = lower.findIndex(h => h.includes(alias) || alias.includes(h));
+    if (idx !== -1) return headers[idx];
+  }
+  return '';
+}
+
+function setupImportMapping(data, headers, filename) {
+  if (!data || !data.length) {
+    showToast('File is empty or contains no valid data.', 'error');
+    closeImportModal();
+    return;
+  }
+
+  importRawData = data;
+  importHeaders = headers || [];
+
+  importMapping = {
+    name:      detectColumn(importHeaders, 'name'),
+    sellPrice: detectColumn(importHeaders, 'sellPrice'),
+    costPrice: detectColumn(importHeaders, 'costPrice'),
+    qty:       detectColumn(importHeaders, 'qty'),
+  };
+
+  const matched = Object.values(importMapping).filter(Boolean).length;
+  const confidence = matched === 4 ? 'high' : matched >= 2 ? 'medium' : 'low';
+
+  document.getElementById('importStep1').style.display = 'none';
+  document.getElementById('importStep2').style.display = '';
+  document.getElementById('importFileInfo').textContent = `${filename} · ${data.length} rows · ${importHeaders.length} columns detected`;
+
+  const banner = document.getElementById('importConfidenceBanner');
+  if (confidence === 'high') {
+    banner.style.cssText = 'background:#d1fae5;border:1px solid #a7f3d0;color:#065f46;padding:10px 14px;border-radius:9px;margin-bottom:16px;font-size:13px;';
+    banner.innerHTML = '✅ <strong>All 4 columns detected automatically.</strong> Review below and confirm.';
+  } else if (confidence === 'medium') {
+    banner.style.cssText = 'background:#fef3c7;border:1px solid #fde68a;color:#92400e;padding:10px 14px;border-radius:9px;margin-bottom:16px;font-size:13px;';
+    banner.innerHTML = `⚠️ <strong>${matched} of 4 columns detected.</strong> Please map the missing ones below.`;
+  } else {
+    banner.style.cssText = 'background:#fee2e2;border:1px solid #fecaca;color:#991b1b;padding:10px 14px;border-radius:9px;margin-bottom:16px;font-size:13px;';
+    banner.innerHTML = '❌ <strong>Could not auto-detect columns.</strong> Please select them manually below.';
+  }
+
+  const fieldLabels = { name:'Product Name', sellPrice:'Sell Price', costPrice:'Cost Price', qty:'Qty Sold' };
+  const grid = document.getElementById('importMappingGrid');
+  grid.innerHTML = Object.entries(fieldLabels).map(([key, label]) => `
+    <div style="display:flex;align-items:center;gap:10px;">
+      <label style="font-size:12.5px;font-weight:600;color:var(--ink);width:100px;flex-shrink:0;">${label}</label>
+      <select id="mapSelect_${key}" onchange="importMapping['${key}']=this.value;updateImportPreview()"
+        style="flex:1;padding:8px 12px;border-radius:8px;border:1.5px solid ${importMapping[key]?'var(--indigo)':'var(--slate-200)'};font-size:13px;background:${importMapping[key]?'var(--indigo-light)':'white'};outline:none;">
+        <option value="">— not mapped —</option>
+        ${importHeaders.map(h=>`<option value="${h}" ${importMapping[key]===h?'selected':''}>${h}</option>`).join('')}
+      </select>
+    </div>
+  `).join('');
+
+  updateImportPreview();
+}
+
+function updateImportPreview() {
+  ['name','sellPrice','costPrice','qty'].forEach(k => {
+    const sel = document.getElementById('mapSelect_'+k);
+    if (sel) {
+      importMapping[k] = sel.value;
+      sel.style.borderColor = sel.value ? 'var(--indigo)' : 'var(--slate-200)';
+      sel.style.background  = sel.value ? 'var(--indigo-light)' : 'white';
+    }
+  });
+
+  const preview = importRawData.slice(0, 3);
+  const mapped  = Object.values(importMapping).filter(Boolean);
+  const tbl     = document.getElementById('importPreviewTable');
+
+  if (!mapped.length) { tbl.innerHTML = '<tr><td style="padding:10px;color:var(--slate-300);text-align:center;">Map at least one column to preview</td></tr>'; return; }
+
+  const cols = Object.entries(importMapping).filter(([,v])=>v);
+  const labels = { name:'Name', sellPrice:'Sell ₹', costPrice:'Cost ₹', qty:'Qty' };
+
+  tbl.innerHTML = `
+    <thead><tr style="background:var(--slate-50);">${cols.map(([k])=>`<th style="padding:8px 12px;font-size:11px;font-weight:600;color:var(--slate-300);text-align:left;text-transform:uppercase;letter-spacing:0.5px;">${labels[k]}</th>`).join('')}</tr></thead>
+    <tbody>${preview.map(row=>`<tr style="border-top:1px solid var(--slate-100);">${cols.map(([,col])=>`<td style="padding:8px 12px;font-size:12.5px;color:var(--ink);">${row[col]??'—'}</td>`).join('')}</tr>`).join('')}</tbody>
+  `;
+
+  const validRows = importRawData.filter(r => importMapping.name && r[importMapping.name]).length;
+  document.getElementById('importRowCount').textContent = validRows;
+}
+
+function confirmImport() {
+  const { name, sellPrice, costPrice, qty } = importMapping;
+  if (!name) { showToast('Please map the Product Name column.', 'error'); return; }
+
+  const rows = importRawData
+    .filter(r => r[name] !== undefined && r[name] !== null && String(r[name]).trim() !== '')
+    .map(r => ({
+      name:      String(r[name]).trim(),
+      sell:      parseFloat(String(r[sellPrice]??'').replace(/[^0-9.]/g,'')) || 0,
+      cost:      parseFloat(String(r[costPrice]??'').replace(/[^0-9.]/g,'')) || 0,
+      qty:       parseInt(String(r[qty]??'').replace(/[^0-9]/g,''))          || 0,
+    }));
+
+  if (!rows.length) { showToast('No valid rows found in file.', 'error'); return; }
+
+  document.getElementById('items').innerHTML = '';
+  rows.forEach(r => {
+    const div = document.createElement('div');
+    div.className = 'data-row';
+    div.innerHTML = `
+      <input type="text"   class="input-name" value="${r.name.replace(/"/g,'&quot;')}">
+      <input type="number" class="input-sell" value="${r.sell}">
+      <input type="number" class="input-cost" value="${r.cost}">
+      <input type="number" class="input-qty"  value="${r.qty}">
+      <button class="delete-btn" onclick="removeRow(this)" title="Remove">×</button>
+    `;
+    document.getElementById('items').appendChild(div);
+  });
+
+  closeImportModal();
+  showToast(`✅ ${rows.length} products imported successfully!`, 'success', 3500);
+  switchView('data', document.getElementById('nav-data'));
+
+  // Automatically process dashboard after import
+  const allZeroCost = rows.every(r => !r.cost || r.cost === 0);
+  if (allZeroCost) {
+    setTimeout(() => showCostMissingModal(rows), 400);
+  } else {
+    setTimeout(() => processDataAndShowReport(), 400);
+  }
+}
+</script>
+
 <div id="costMissingModal" style="display:none;" class="cost-modal-overlay">
   <div class="cost-modal-box">
     <div style="display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:6px;">
@@ -2858,7 +3369,6 @@ function showCostCsvResult() {
       <button onclick="closeCostModal()" style="background:none;border:none;font-size:22px;color:var(--slate-300);cursor:pointer;margin-left:12px;flex-shrink:0;">×</button>
     </div>
 
-    <!-- 4 Option Buttons -->
     <div class="cost-option-grid">
       <button class="cost-option-btn" onclick="selectCostOption('csv')" id="cost-opt-csv">
         <span class="cost-option-icon">📂</span>
@@ -2882,7 +3392,6 @@ function showCostCsvResult() {
       </button>
     </div>
 
-    <!-- Panel: CSV Upload -->
     <div class="cost-panel" id="cost-panel-csv">
       <div style="border:2px dashed var(--slate-200);border-radius:12px;padding:28px;text-align:center;cursor:pointer;transition:all 0.2s;"
         onclick="document.getElementById('costCsvInput').click()"
@@ -2897,7 +3406,6 @@ function showCostCsvResult() {
       <div id="costCsvMatches" style="margin-top:14px;"></div>
     </div>
 
-    <!-- Panel: Margin Estimator -->
     <div class="cost-panel" id="cost-panel-margin">
       <div class="margin-slider-wrap">
         <div style="font-size:12px;font-weight:600;color:var(--slate-300);text-align:center;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.6px;">Your Estimated Gross Margin</div>
@@ -2913,7 +3421,6 @@ function showCostCsvResult() {
       </div>
     </div>
 
-    <!-- Panel: Manual Entry -->
     <div class="cost-panel" id="cost-panel-manual">
       <div style="max-height:280px;overflow-y:auto;border:1px solid var(--slate-100);border-radius:10px;">
         <table class="cost-manual-table">
@@ -2923,7 +3430,6 @@ function showCostCsvResult() {
       </div>
     </div>
 
-    <!-- Panel: Revenue Only -->
     <div class="cost-panel" id="cost-panel-revenue">
       <div style="background:#eff6ff;border:1px solid #bfdbfe;border-radius:12px;padding:18px;text-align:center;">
         <div style="font-size:32px;margin-bottom:8px;">📈</div>
@@ -2932,7 +3438,6 @@ function showCostCsvResult() {
       </div>
     </div>
 
-    <!-- Action Button -->
     <div style="margin-top:18px;display:flex;gap:10px;">
       <button class="btn btn-secondary" style="flex:1;" onclick="closeCostModal()">Skip for now</button>
       <button class="btn btn-primary" id="costApplyBtn" style="flex:2;font-weight:700;" onclick="applyCostOption()" disabled>
