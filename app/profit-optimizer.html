@@ -3653,7 +3653,7 @@ function highlightMerge(inputEl) {
 }
 
 // ══════════════════════════════════════════
-//  GROWTH COMPARE VIEW RENDERER (DYNAMIC)
+//  GROWTH COMPARE VIEW RENDERER (DYNAMIC + ENHANCED)
 // ══════════════════════════════════════════
 window.renderCompareView = function() {
   const container = document.getElementById('compareViewContent');
@@ -3672,7 +3672,6 @@ window.renderCompareView = function() {
     return;
   }
 
-  // ── NEW: Check Mode ──
   const isRevMode = AppState.analyticsMode === 'revenue';
   const metricLabel = isRevMode ? 'Revenue' : 'Profit';
 
@@ -3683,48 +3682,97 @@ window.renderCompareView = function() {
     const s = p.sell || p.v1 || 0;
     const c = p.cost || p.v2 || 0;
     const q = p.qty || p.v3 || 0;
-    
-    // Dynamically store either old revenue or old profit
-    prevMap[n] = { 
-      oldVal: isRevMode ? (s * q) : ((s - c) * q) 
-    };
+    prevMap[n] = { oldVal: isRevMode ? (s * q) : ((s - c) * q) };
   });
 
-  let tableRows = '';
+  let comparisonData = [];
+  let totalOld = 0;
+  let totalNew = 0;
+
   currentData.forEach(item => {
     const n = item.name.toLowerCase().trim();
     if (prevMap[n]) {
-      // Dynamically calculate current revenue or current profit
       const curVal = isRevMode ? (item.sell * item.qty) : ((item.sell - item.cost) * item.qty);
       const oldVal = prevMap[n].oldVal;
-      
       const diff = curVal - oldVal;
-      const diffColor = diff > 0 ? '#059669' : diff < 0 ? '#dc2626' : 'var(--slate-300)';
-      const diffStr = diff > 0 ? '+'+fmt(diff) : diff < 0 ? '-'+fmt(Math.abs(diff)) : 'Flat';
+      
+      // Calculate Percentage
+      let pct = 0;
+      if (oldVal !== 0) {
+        pct = (diff / Math.abs(oldVal)) * 100;
+      } else if (curVal > 0) {
+        pct = 100; // Went from 0 to something
+      }
 
-      tableRows += `
-        <tr style="border-bottom:1px solid var(--slate-50);">
-          <td style="padding:12px; font-weight:600; color:var(--ink);">${item.name}</td>
-          <td style="padding:12px; color:var(--slate-300);">${fmt(oldVal)}</td>
-          <td style="padding:12px; font-weight:600;">${fmt(curVal)}</td>
-          <td style="padding:12px; font-weight:700; color:${diffColor};">${diffStr}</td>
-        </tr>`;
+      totalOld += oldVal;
+      totalNew += curVal;
+
+      comparisonData.push({ name: item.name, oldVal, curVal, diff, pct });
     }
   });
 
-  if (!tableRows) {
+  if (!comparisonData.length) {
     container.innerHTML = `<div style="text-align:center;padding:40px;color:var(--slate-300);">Could not match current products with your last save. Make sure product names match!</div>`;
     return;
   }
 
+  // Sort by biggest growth first
+  comparisonData.sort((a, b) => b.diff - a.diff);
+
+  // Generate Table Rows
+  let tableRows = comparisonData.map(item => {
+    const diffColor = item.diff > 0 ? '#059669' : item.diff < 0 ? '#dc2626' : 'var(--slate-300)';
+    const diffStr = item.diff > 0 ? '+'+fmt(item.diff) : item.diff < 0 ? '-'+fmt(Math.abs(item.diff)) : 'Flat';
+    
+    // Format percentage badge
+    let pctBadge = '';
+    if (Math.abs(item.pct) > 0.1) {
+        const pctColor = item.pct > 0 ? '#d1fae5' : '#fee2e2';
+        const txtColor = item.pct > 0 ? '#065f46' : '#991b1b';
+        const arrow = item.pct > 0 ? '↑' : '↓';
+        pctBadge = `<span style="background:${pctColor}; color:${txtColor}; font-size:10.5px; padding:2px 6px; border-radius:4px; margin-left:8px; font-weight:600;">${arrow} ${Math.abs(item.pct).toFixed(1)}%</span>`;
+    }
+
+    return `
+      <tr style="border-bottom:1px solid var(--slate-50);">
+        <td style="padding:14px 12px; font-weight:600; color:var(--ink);">${item.name}</td>
+        <td style="padding:14px 12px; color:var(--slate-300);">${fmt(item.oldVal)}</td>
+        <td style="padding:14px 12px; font-weight:600;">${fmt(item.curVal)}</td>
+        <td style="padding:14px 12px; font-weight:700; color:${diffColor}; display:flex; align-items:center;">
+            ${diffStr} ${pctBadge}
+        </td>
+      </tr>`;
+  }).join('');
+
+  // Generate Total Summary Math
+  const totalDiff = totalNew - totalOld;
+  const totalColor = totalDiff > 0 ? '#059669' : totalDiff < 0 ? '#dc2626' : 'var(--slate-300)';
+  const totalBg = totalDiff > 0 ? '#f0fdf4' : totalDiff < 0 ? '#fef2f2' : '#f8fafc';
+  const totalBorder = totalDiff > 0 ? '#bbf7d0' : totalDiff < 0 ? '#fecaca' : '#e2e8f0';
+  const totalStr = totalDiff > 0 ? '+'+fmt(totalDiff) : totalDiff < 0 ? '-'+fmt(Math.abs(totalDiff)) : 'Flat';
+  
+  let totalPct = totalOld !== 0 ? ((totalDiff / Math.abs(totalOld)) * 100).toFixed(1) : 0;
+  const totalArrow = totalDiff > 0 ? '↗' : totalDiff < 0 ? '↘' : '→';
+
+  // Final Render
   container.innerHTML = `
+    <div style="background:${totalBg}; border:1px solid ${totalBorder}; border-radius:12px; padding:16px 20px; display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+        <div>
+            <div style="font-size:12px; font-weight:700; color:var(--slate-300); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Total Matched ${metricLabel} Growth</div>
+            <div style="color:var(--slate-300); font-size:13.5px;">Compared to your last save, your overlapping products have shifted by <strong style="color:${totalColor};">${totalStr}</strong>.</div>
+        </div>
+        <div style="text-align:right;">
+            <div style="font-size:24px; font-weight:800; color:${totalColor}; font-family:Inter, sans-serif;">${totalArrow} ${Math.abs(totalPct)}%</div>
+        </div>
+    </div>
+
     <table style="width:100%; border-collapse:collapse; text-align:left; font-size:13.5px;">
       <thead>
         <tr style="background:#f8fafc; color:var(--slate-300); font-size:11px; text-transform:uppercase; letter-spacing:0.5px;">
           <th style="padding:12px; border-radius:8px 0 0 8px;">Product</th>
           <th style="padding:12px;">Last Save ${metricLabel}</th>
           <th style="padding:12px;">Current ${metricLabel}</th>
-          <th style="padding:12px; border-radius:0 8px 8px 0;">Growth</th>
+          <th style="padding:12px; border-radius:0 8px 8px 0;">Growth Impact</th>
         </tr>
       </thead>
       <tbody>${tableRows}</tbody>
