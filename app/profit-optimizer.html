@@ -1284,17 +1284,19 @@ function toggleAppDrawer() {
   document.getElementById('mobileAppOverlay').classList.toggle('active');
 }
 
-const PRO_VIEWS = ['ai','report','history','simulator','compare'];
+// Note: 'report' has been REMOVED from this list so free users can click it!
+const PRO_VIEWS = ['ai','history','simulator','compare'];
 
 function switchView(viewId, element, bypass=false) {
-  AppState.currentView = viewId;
-
-  if (PRO_VIEWS.includes(viewId) && AppState.isProUser===false && !bypass) {
+  // If it's a Pro feature and they are free, SHOW PAYWALL AND STOP!
+  if (PRO_VIEWS.includes(viewId) && AppState.isProUser !== true && !bypass) {
     document.getElementById('proLockOverlay').classList.remove('pro-lock-hidden');
-  } else {
-    document.getElementById('proLockOverlay').classList.add('pro-lock-hidden');
-    document.querySelectorAll('.app-view').forEach(v=>v.style.filter='none');
+    return; // This line fixes the bug: It stops Profit Lab from showing in the background
   }
+
+  AppState.currentView = viewId;
+  document.getElementById('proLockOverlay').classList.add('pro-lock-hidden');
+  document.querySelectorAll('.app-view').forEach(v=>v.style.filter='none');
 
   document.querySelectorAll('.app-view').forEach(v=>v.classList.remove('active'));
   document.getElementById('view-'+viewId).classList.add('active');
@@ -1312,11 +1314,6 @@ function switchView(viewId, element, bypass=false) {
     sb.classList.remove('mobile-open');
     document.getElementById('mobileAppOverlay').classList.remove('active');
   }
-}
-
-function closePaywall() {
-  document.getElementById('proLockOverlay').classList.add('pro-lock-hidden');
-  switchView('data', document.getElementById('nav-data'), true);
 }
 
 // ══════════════════════════════════════════
@@ -1948,6 +1945,16 @@ function renderEnhancedReport(data) {
   const ovMargin = tRev > 0 ? (tProfit / tRev) * 100 : 0;
   const sorted = [...products].sort((a, b) => b.profit - a.profit);
 
+  // ── PLG SMART TEASER LOGIC ──
+  const isFreeUser = AppState.isProUser !== true;
+  const FREE_LIMIT = 5;
+  const displayProducts = isFreeUser ? sorted.slice(0, FREE_LIMIT) : sorted;
+  
+  let hiddenLossCount = 0;
+  if (isFreeUser && sorted.length > FREE_LIMIT) {
+      hiddenLossCount = sorted.slice(FREE_LIMIT).filter(p => p.profit < 0).length;
+  }
+
   // ── Summary Bar ──
   const summaryItems = isRevMode ? [
     { l:'Total Revenue',  v: fmt(tRev),                  c:'var(--indigo)' },
@@ -1977,9 +1984,10 @@ function renderEnhancedReport(data) {
     if (bandsContainer) bandsContainer.style.display = 'none';
   } else {
     if (bandsContainer) bandsContainer.style.display = 'grid';
-    const stars   = sorted.filter(p => p.margin >= 30);
-    const average = sorted.filter(p => p.margin >= 0 && p.margin < 30);
-    const leakers = sorted.filter(p => p.margin < 0);
+    // Use displayProducts so free users don't see full lists in the bands
+    const stars    = displayProducts.filter(p => p.margin >= 30);
+    const average  = displayProducts.filter(p => p.margin >= 0 && p.margin < 30);
+    const leakers  = displayProducts.filter(p => p.margin < 0);
 
     if (bandsContainer) bandsContainer.innerHTML = [
       { label:'⭐ Star Products',  items: stars,   bg:'#d1fae5', border:'#a7f3d0', color:'#065f46' },
@@ -2002,6 +2010,7 @@ function renderEnhancedReport(data) {
       </div>
     `).join('');
   }
+  
   // ── Main Table Header ──
   const thead = document.querySelector('.report-table thead');
   if (thead) {
@@ -2021,8 +2030,7 @@ function renderEnhancedReport(data) {
   }
 
   // ── Main Table Body ──
-  const tbody = document.getElementById('reportTableBody');
-  if (tbody) tbody.innerHTML = sorted.map((p, i) => {
+  let tableHTML = displayProducts.map((p, i) => {
     const barW = tRev > 0 ? Math.round((p.rev / tRev) * 100) : 0;
     const barC = p.margin >= 30 ? 'var(--green)' : p.margin >= 0 ? 'var(--amber)' : 'var(--red)';
     const pill = p.margin >= 30
@@ -2059,6 +2067,30 @@ function renderEnhancedReport(data) {
       ${isRevMode ? '' : `<td style="padding:8px;">${pill}</td>`}
     </tr>`;
   }).join('');
+
+  // ── APPEND SMART TEASER IF FREE USER ──
+  if (isFreeUser && sorted.length > FREE_LIMIT) {
+      const hiddenCount = sorted.length - FREE_LIMIT;
+      const colspan = isRevMode ? 6 : 9;
+      
+      let teaserMsg = `🔒 You have ${hiddenCount} more products hidden. Upgrade to Pro to see them.`;
+      if (hiddenLossCount > 0 && !isRevMode) {
+          teaserMsg = `🚨 You have ${hiddenLossCount} hidden products losing money! Upgrade to Pro to reveal which ones.`;
+      }
+
+      tableHTML += `
+        <tr style="background:#f8fafc; cursor:pointer; transition:all 0.2s;" onclick="handleUpgradeClick()" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">
+          <td colspan="${colspan}" style="padding:32px 10px; text-align:center; border-top:2px dashed #cbd5e1;">
+            <div style="font-size:24px; margin-bottom:8px;">🔒</div>
+            <div style="font-size:15px; font-weight:700; color:var(--indigo); margin-bottom:4px;">${teaserMsg}</div>
+            <div style="font-size:13px; color:var(--slate-400); font-weight:500;">Click here to unlock your full catalog, export PDF reports, and access Profit Lab.</div>
+          </td>
+        </tr>
+      `;
+  }
+
+  const tbody = document.getElementById('reportTableBody');
+  if (tbody) tbody.innerHTML = tableHTML;
 
   // ── Main Table Footer ──
   const tfoot = document.getElementById('reportTableFoot');
@@ -2279,6 +2311,10 @@ function runSimulation() {
 //  PDF EXPORT
 // ══════════════════════════════════════════
 function exportExecutivePDF() {
+  if (AppState.isProUser !== true) {
+    document.getElementById('proLockOverlay').classList.remove('pro-lock-hidden');
+    return; 
+  }
   const data = AppState.currentData;
   if (!data || !data.length) { showToast('Generate a dashboard first.', 'error'); return; }
 
