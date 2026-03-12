@@ -3653,7 +3653,7 @@ function highlightMerge(inputEl) {
 }
 
 // ══════════════════════════════════════════
-//  GROWTH COMPARE VIEW RENDERER (DYNAMIC + ENHANCED)
+//  GROWTH COMPARE VIEW RENDERER (DYNAMIC + ENHANCED + MISSING/NEW)
 // ══════════════════════════════════════════
 window.renderCompareView = function() {
   const container = document.getElementById('compareViewContent');
@@ -3675,39 +3675,56 @@ window.renderCompareView = function() {
   const isRevMode = AppState.analyticsMode === 'revenue';
   const metricLabel = isRevMode ? 'Revenue' : 'Profit';
 
-  // Map previous data
+  // 1. Map previous data & track what gets matched
   const prevMap = {};
   AppState.latestCloudSave.forEach(p => {
     const n = (p.name || p.n || '').toLowerCase().trim();
     const s = p.sell || p.v1 || 0;
     const c = p.cost || p.v2 || 0;
     const q = p.qty || p.v3 || 0;
-    prevMap[n] = { oldVal: isRevMode ? (s * q) : ((s - c) * q) };
+    prevMap[n] = { 
+      name: p.name || p.n, // Keep original casing for display
+      oldVal: isRevMode ? (s * q) : ((s - c) * q),
+      matched: false 
+    };
   });
 
   let comparisonData = [];
   let totalOld = 0;
   let totalNew = 0;
+  let newProducts = []; // Items in current, but not in old
 
+  // 2. Loop through current data
   currentData.forEach(item => {
     const n = item.name.toLowerCase().trim();
+    const curVal = isRevMode ? (item.sell * item.qty) : ((item.sell - item.cost) * item.qty);
+
     if (prevMap[n]) {
-      const curVal = isRevMode ? (item.sell * item.qty) : ((item.sell - item.cost) * item.qty);
+      // It's a match!
+      prevMap[n].matched = true;
       const oldVal = prevMap[n].oldVal;
       const diff = curVal - oldVal;
       
-      // Calculate Percentage
       let pct = 0;
-      if (oldVal !== 0) {
-        pct = (diff / Math.abs(oldVal)) * 100;
-      } else if (curVal > 0) {
-        pct = 100; // Went from 0 to something
-      }
+      if (oldVal !== 0) pct = (diff / Math.abs(oldVal)) * 100;
+      else if (curVal > 0) pct = 100;
 
       totalOld += oldVal;
       totalNew += curVal;
-
       comparisonData.push({ name: item.name, oldVal, curVal, diff, pct });
+    } else {
+      // It's a new product!
+      if (curVal > 0) { // Only list it if it actually generated revenue/profit
+         newProducts.push({ name: item.name, val: curVal });
+      }
+    }
+  });
+
+  // 3. Find missing products (in old, but never matched)
+  let missingProducts = [];
+  Object.values(prevMap).forEach(oldItem => {
+    if (!oldItem.matched && oldItem.oldVal !== 0) {
+      missingProducts.push({ name: oldItem.name, val: oldItem.oldVal });
     }
   });
 
@@ -3716,15 +3733,14 @@ window.renderCompareView = function() {
     return;
   }
 
-  // Sort by biggest growth first
+  // 4. Sort main table
   comparisonData.sort((a, b) => b.diff - a.diff);
 
-  // Generate Table Rows
+  // 5. Generate Table Rows
   let tableRows = comparisonData.map(item => {
     const diffColor = item.diff > 0 ? '#059669' : item.diff < 0 ? '#dc2626' : 'var(--slate-300)';
     const diffStr = item.diff > 0 ? '+'+fmt(item.diff) : item.diff < 0 ? '-'+fmt(Math.abs(item.diff)) : 'Flat';
     
-    // Format percentage badge
     let pctBadge = '';
     if (Math.abs(item.pct) > 0.1) {
         const pctColor = item.pct > 0 ? '#d1fae5' : '#fee2e2';
@@ -3744,19 +3760,50 @@ window.renderCompareView = function() {
       </tr>`;
   }).join('');
 
-  // Generate Total Summary Math
+  // 6. Generate Total Summary Math
   const totalDiff = totalNew - totalOld;
   const totalColor = totalDiff > 0 ? '#059669' : totalDiff < 0 ? '#dc2626' : 'var(--slate-300)';
   const totalBg = totalDiff > 0 ? '#f0fdf4' : totalDiff < 0 ? '#fef2f2' : '#f8fafc';
   const totalBorder = totalDiff > 0 ? '#bbf7d0' : totalDiff < 0 ? '#fecaca' : '#e2e8f0';
   const totalStr = totalDiff > 0 ? '+'+fmt(totalDiff) : totalDiff < 0 ? '-'+fmt(Math.abs(totalDiff)) : 'Flat';
-  
   let totalPct = totalOld !== 0 ? ((totalDiff / Math.abs(totalOld)) * 100).toFixed(1) : 0;
   const totalArrow = totalDiff > 0 ? '↗' : totalDiff < 0 ? '↘' : '→';
 
-  // Final Render
+  // 7. Generate Missing / New HTML
+  let auditHTML = '';
+  if (newProducts.length > 0 || missingProducts.length > 0) {
+      auditHTML = `<div style="display:flex; gap:20px; margin-top:32px; border-top:1px solid var(--slate-100); padding-top:24px; flex-wrap:wrap;">`;
+      
+      if (newProducts.length > 0) {
+          newProducts.sort((a,b) => b.val - a.val);
+          auditHTML += `
+          <div style="flex:1; min-width:250px; background:#f8fafc; border:1px solid var(--slate-100); border-radius:12px; padding:16px;">
+            <div style="font-size:12px; font-weight:700; color:var(--ink); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; display:flex; align-items:center; gap:6px;"><span>✨</span> New This Period</div>
+            <div style="font-size:12px; color:var(--slate-300); margin-bottom:12px;">Added to current data.</div>
+            <ul style="list-style:none; padding:0; margin:0; font-size:13px;">
+              ${newProducts.map(p => `<li style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px dashed var(--slate-200); padding-bottom:4px;"><span>${p.name}</span> <strong style="color:#059669;">+${fmt(p.val)}</strong></li>`).join('')}
+            </ul>
+          </div>`;
+      }
+
+      if (missingProducts.length > 0) {
+          missingProducts.sort((a,b) => Math.abs(b.val) - Math.abs(a.val));
+          auditHTML += `
+          <div style="flex:1; min-width:250px; background:#fef2f2; border:1px solid #fecaca; border-radius:12px; padding:16px;">
+            <div style="font-size:12px; font-weight:700; color:#991b1b; text-transform:uppercase; letter-spacing:0.5px; margin-bottom:12px; display:flex; align-items:center; gap:6px;"><span>👻</span> Missing This Period</div>
+            <div style="font-size:12px; color:#b91c1c; margin-bottom:12px; opacity:0.8;">Was in previous save, missing now.</div>
+            <ul style="list-style:none; padding:0; margin:0; font-size:13px; color:#991b1b;">
+              ${missingProducts.map(p => `<li style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px dashed #fca5a5; padding-bottom:4px;"><span>${p.name}</span> <strong>${p.val > 0 ? '-' : ''}${fmt(p.val)}</strong></li>`).join('')}
+            </ul>
+          </div>`;
+      }
+      
+      auditHTML += `</div>`;
+  }
+
+  // 8. Final Render
   container.innerHTML = `
-    <div style="background:${totalBg}; border:1px solid ${totalBorder}; border-radius:12px; padding:16px 20px; display:flex; justify-content:space-between; align-items:center; margin-bottom:24px;">
+    <div style="background:${totalBg}; border:1px solid ${totalBorder}; border-radius:12px; padding:16px 20px; display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:10px;">
         <div>
             <div style="font-size:12px; font-weight:700; color:var(--slate-300); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Total Matched ${metricLabel} Growth</div>
             <div style="color:var(--slate-300); font-size:13.5px;">Compared to your last save, your overlapping products have shifted by <strong style="color:${totalColor};">${totalStr}</strong>.</div>
@@ -3766,17 +3813,21 @@ window.renderCompareView = function() {
         </div>
     </div>
 
-    <table style="width:100%; border-collapse:collapse; text-align:left; font-size:13.5px;">
-      <thead>
-        <tr style="background:#f8fafc; color:var(--slate-300); font-size:11px; text-transform:uppercase; letter-spacing:0.5px;">
-          <th style="padding:12px; border-radius:8px 0 0 8px;">Product</th>
-          <th style="padding:12px;">Last Save ${metricLabel}</th>
-          <th style="padding:12px;">Current ${metricLabel}</th>
-          <th style="padding:12px; border-radius:0 8px 8px 0;">Growth Impact</th>
-        </tr>
-      </thead>
-      <tbody>${tableRows}</tbody>
-    </table>
+    <div style="overflow-x:auto;">
+        <table style="width:100%; border-collapse:collapse; text-align:left; font-size:13.5px; min-width:500px;">
+          <thead>
+            <tr style="background:#f8fafc; color:var(--slate-300); font-size:11px; text-transform:uppercase; letter-spacing:0.5px;">
+              <th style="padding:12px; border-radius:8px 0 0 8px;">Product</th>
+              <th style="padding:12px;">Last Save ${metricLabel}</th>
+              <th style="padding:12px;">Current ${metricLabel}</th>
+              <th style="padding:12px; border-radius:0 8px 8px 0;">Growth Impact</th>
+            </tr>
+          </thead>
+          <tbody>${tableRows}</tbody>
+        </table>
+    </div>
+
+    ${auditHTML}
   `;
 };
 
