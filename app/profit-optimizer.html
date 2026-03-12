@@ -527,10 +527,14 @@
                 Import Sales Data
               </button>
               <button class="btn btn-secondary" style="font-size:12px;padding:6px 12px;border-radius:8px;display:flex;align-items:center;gap:5px; white-space: nowrap; background: #f0fdf4; border-color: #bbf7d0; color: #059669;" onclick="triggerMergeCost()">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 22v-6h6"/></svg>
-                Update Costs (CSV)
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21 2v6h-6"/><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 22v-6h6"/></svg>
+                Update Costs (CSV)
+              </button>
+              <button class="btn btn-secondary" style="font-size:12px;padding:6px 12px;border-radius:8px;display:flex;align-items:center;gap:5px; white-space: nowrap;" onclick="openQuickEstimate()">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+                Estimate Margin
               </button>
-              <a class="demo-link" onclick="loadDemoData()" style="cursor:pointer; color:var(--indigo); font-size:13px; font-weight:600; white-space: nowrap;">↗ Load Demo</a>
+              <a class="demo-link" onclick="loadDemoData()" style="cursor:pointer; color:var(--indigo); font-size:13px; font-weight:600; white-space: nowrap;">↗ Load Demo</a>
             </div>
           </div>
         </div>
@@ -3775,17 +3779,67 @@ function confirmMergeCost() {
 }
 
 function highlightMerge(inputEl) {
-  inputEl.style.transition = 'background-color 0.3s';
-  inputEl.style.backgroundColor = '#d1fae5';
-  inputEl.style.color = '#059669';
-  setTimeout(() => {
-    inputEl.style.backgroundColor = 'transparent';
-    inputEl.style.color = 'var(--ink)';
-  }, 1500);
+  inputEl.style.transition = 'background-color 0.3s';
+  inputEl.style.backgroundColor = '#d1fae5';
+  inputEl.style.color = '#059669';
+  setTimeout(() => {
+    inputEl.style.backgroundColor = 'transparent';
+    inputEl.style.color = 'var(--ink)';
+  }, 1500);
 }
 
 // ══════════════════════════════════════════
-//  GROWTH COMPARE VIEW RENDERER (DYNAMIC + ENHANCED + MISSING/NEW)
+//  QUICK ESTIMATE LOGIC
+// ══════════════════════════════════════════
+function openQuickEstimate() {
+  const data = getFreshData();
+  if(!data.length) return showToast('Please add products first.', 'error');
+  document.getElementById('quickEstimateModal').style.display = 'flex';
+  updateQuickMarginPreview(document.getElementById('quickMarginSlider').value);
+}
+
+function updateQuickMarginPreview(val) {
+  document.getElementById('quickMarginBigNum').textContent = val + '%';
+  const data = getFreshData();
+  const preview = data.slice(0, 4); // Show top 4
+  const list = document.getElementById('quickMarginPreviewList');
+  list.innerHTML = preview.map(p => {
+    const cost = (p.sell * (1 - val / 100)).toFixed(0);
+    return `<div class="margin-preview-row">
+      <span style="color:var(--ink);font-weight:500;">${p.name.length>22?p.name.slice(0,21)+'…':p.name}</span>
+      <span style="color:var(--slate-300);">₹${p.sell} sell → <strong style="color:var(--indigo);">₹${cost} cost</strong></span>
+    </div>`;
+  }).join('');
+  if (data.length > 4) list.innerHTML += `<div style="font-size:11px;color:var(--slate-300);text-align:center;padding-top:6px;">+${data.length-4} more products</div>`;
+}
+
+function applyQuickEstimate() {
+  const margin = parseInt(document.getElementById('quickMarginSlider').value);
+  const data = getFreshData();
+  
+  data.forEach((p, i) => {
+    if(p.sell > 0) {
+        const cost = parseFloat((p.sell * (1 - margin / 100)).toFixed(2));
+        const row = document.querySelectorAll('#items .data-row')[i];
+        if (row) {
+            const costInput = row.querySelector('.input-cost');
+            costInput.value = cost;
+            highlightMerge(costInput); // Reuse your nice green flash effect!
+        }
+    }
+  });
+  
+  window.costEstimateMode = true;
+  window.costEstimateMargin = margin;
+  window.revenueOnlyMode = false; // Turn off revenue mode if they were in it
+  
+  document.getElementById('quickEstimateModal').style.display = 'none';
+  saveDataToStorage();
+  showToast(`Costs updated based on ${margin}% margin ✓`, 'success');
+}
+
+// ══════════════════════════════════════════
+//  GROWTH COMPARE VIEW RENDERER (DYNAMIC + ENHANCED + MISSING/NEW)
 // ══════════════════════════════════════════
 window.renderCompareView = function() {
   const container = document.getElementById('compareViewContent');
@@ -4121,11 +4175,35 @@ window.renderCompareView = function() {
 </div>
 
 <div id="helpModal" style="display:none; position:fixed; inset:0; background:rgba(255,255,255,0.98); z-index:10000; align-items:center; justify-content:center;">
-  <div style="background:white; width:90%; max-width:500px; padding:32px; border-radius:16px; border:1px solid #e2e8f0; box-shadow:0 20px 60px rgba(0,0,0,0.1); position:relative;">
-    <button onclick="document.getElementById('helpModal').style.display='none'" style="position:absolute; top:20px; right:20px; background:none; border:none; font-size:24px; color:#94a3b8; cursor:pointer;">✕</button>
-    <h3 id="helpTitle" style="font-size:20px; font-weight:700; color:var(--ink); margin-bottom:16px;"></h3>
-    <div id="helpContent" style="font-size:14px; line-height:1.6; color:#475569;"></div>
-    <button onclick="document.getElementById('helpModal').style.display='none'" class="btn btn-secondary" style="width:100%; margin-top:24px;">Got it, back to setup</button>
+  <div style="background:white; width:90%; max-width:500px; padding:32px; border-radius:16px; border:1px solid #e2e8f0; box-shadow:0 20px 60px rgba(0,0,0,0.1); position:relative;">
+    <button onclick="document.getElementById('helpModal').style.display='none'" style="position:absolute; top:20px; right:20px; background:none; border:none; font-size:24px; color:#94a3b8; cursor:pointer;">✕</button>
+    <h3 id="helpTitle" style="font-size:20px; font-weight:700; color:var(--ink); margin-bottom:16px;"></h3>
+    <div id="helpContent" style="font-size:14px; line-height:1.6; color:#475569;"></div>
+    <button onclick="document.getElementById('helpModal').style.display='none'" class="btn btn-secondary" style="width:100%; margin-top:24px;">Got it, back to setup</button>
+  </div>
+</div>
+
+<div id="quickEstimateModal" style="display:none;position:fixed;inset:0;z-index:300;background:rgba(8,9,13,0.55);backdrop-filter:blur(4px);align-items:center;justify-content:center;">
+  <div style="background:white;border-radius:18px;padding:28px;width:92%;max-width:440px;box-shadow:0 24px 64px rgba(8,9,13,0.18);position:relative;">
+    <button onclick="document.getElementById('quickEstimateModal').style.display='none'" style="position:absolute;top:16px;right:16px;background:none;border:none;font-size:22px;color:var(--slate-300);cursor:pointer;line-height:1;">×</button>
+    <h3 style="font-size:18px;font-weight:700;color:var(--ink);margin:0 0 8px;">📊 Quick Estimate Costs</h3>
+    <p style="font-size:13px;color:var(--slate-300);margin:0 0 20px;">Missing cost data? Set your average gross margin and we will calculate estimated costs for all products automatically.</p>
+    
+    <div class="margin-slider-wrap">
+      <div style="font-size:12px;font-weight:600;color:var(--slate-300);text-align:center;margin-bottom:4px;text-transform:uppercase;letter-spacing:0.6px;">Estimated Gross Margin</div>
+      <div class="margin-big-num" id="quickMarginBigNum">40%</div>
+      <input type="range" min="1" max="90" value="40" id="quickMarginSlider" oninput="updateQuickMarginPreview(this.value)" style="width:100%;margin:12px 0;accent-color:var(--indigo);">
+      <div style="display:flex;justify-content:space-between;font-size:10px;color:var(--slate-300);margin-bottom:14px;">
+        <span>1%</span><span>90%</span>
+      </div>
+      <div style="font-size:11px;font-weight:700;color:var(--slate-300);text-transform:uppercase;letter-spacing:0.6px;margin-bottom:8px;">Live Preview</div>
+      <div id="quickMarginPreviewList"></div>
+    </div>
+    
+    <div style="display:flex;gap:10px;margin-top:20px;">
+      <button class="btn btn-secondary" style="flex:1;" onclick="document.getElementById('quickEstimateModal').style.display='none'">Cancel</button>
+      <button class="btn btn-primary" style="flex:2;" onclick="applyQuickEstimate()">Apply to All →</button>
+    </div>
   </div>
 </div>
 
