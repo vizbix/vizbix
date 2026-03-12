@@ -2917,18 +2917,30 @@ async function runStoreImport(platform) {
     const d = await res.json();
 
     if (d.ok) {
-      document.getElementById('items').innerHTML = ''; // Clear old data
-      d.data.forEach(p => addNewRow(p.name, p.sell, 0, p.qty)); // Cost is 0
-      
       document.getElementById('storeModal').style.display = 'none';
       updateIntegrationCard(platform, payload.storeUrl, Date.now());
+      
+      // ── NEW: BEAUTIFUL EMPTY STATE LOGIC ──
+      if (!d.data || d.data.length === 0) {
+        document.getElementById('items').innerHTML = `
+          <div style="text-align:center; padding:48px 20px; background:#f8fafc; border:2px dashed #cbd5e1; border-radius:12px; margin-top:10px;">
+            <div style="font-size:40px; margin-bottom:12px;">🛍️</div>
+            <h3 style="font-size:16px; font-weight:700; color:var(--ink); margin-bottom:8px;">Store Connected Successfully!</h3>
+            <p style="font-size:13.5px; color:var(--slate-400); max-width:320px; margin:0 auto;">We didn't find any products or sales data yet. Once you add items to your store, click sync again to generate your dashboard.</p>
+          </div>`;
+        showToast('Store connected! Waiting for data...', 'info', 4000);
+        return; // Stop here, don't generate the dashboard yet
+      }
+
+      // Normal Data Logic
+      document.getElementById('items').innerHTML = ''; // Clear old data
+      d.data.forEach(p => addNewRow(p.name, p.sell, 0, p.qty)); // Cost is 0
       showToast(`✅ Imported ${d.data.length} items! Loading dashboard...`, 'success', 3000);
       
       saveDataToStorage();
-      // Check if all costs are 0 (store didn't provide them)
+      
       const allZeroCost = d.data.every(p => !p.cost || p.cost === 0);
       if (allZeroCost) {
-        document.getElementById('storeModal').style.display = 'none';
         setTimeout(() => showCostMissingModal(getFreshData()), 300);
       } else {
         processDataAndShowReport();
@@ -3125,6 +3137,9 @@ function showHelp(platform) {
   if (platform === 'woo') {
     title.innerText = "How to get WooCommerce Keys";
     content.innerHTML = `
+      <div style="background:#f8fafc; border-radius:12px; height:180px; display:flex; align-items:center; justify-content:center; margin-bottom:20px; border:1px solid #e2e8f0; overflow:hidden;">
+         <div style="color:#94a3b8; font-size:12px; font-weight:600;">[ Replace this div with an &lt;img&gt; tag of your WooCommerce GIF ]</div>
+      </div>
       <ol style="padding-left:20px; margin:0;">
         <li style="margin-bottom:10px;">Log in to your <strong>WordPress Admin</strong>.</li>
         <li style="margin-bottom:10px;">Go to <strong>WooCommerce > Settings</strong>.</li>
@@ -3136,6 +3151,9 @@ function showHelp(platform) {
   } else {
     title.innerText = "How to get Shopify Token";
     content.innerHTML = `
+      <div style="background:#f0fdf4; border-radius:12px; height:180px; display:flex; align-items:center; justify-content:center; margin-bottom:20px; border:1px solid #bbf7d0; overflow:hidden;">
+         <div style="color:#059669; font-size:12px; font-weight:600;">[ Replace this div with an &lt;img&gt; tag of your Shopify GIF ]</div>
+      </div>
       <ol style="padding-left:20px; margin:0;">
         <li style="margin-bottom:10px;">Log in to <strong>Shopify Admin</strong> > <strong>Settings</strong>.</li>
         <li style="margin-bottom:10px;">Go to <strong>Apps and sales channels</strong> > <strong>Develop apps</strong>.</li>
