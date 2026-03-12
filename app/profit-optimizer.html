@@ -2979,7 +2979,7 @@ async function runStoreImport(platform) {
 
       // Normal Data Logic
       document.getElementById('items').innerHTML = ''; // Clear old data
-      d.data.forEach(p => addNewRow(p.name, p.sell, 0, p.qty)); // Cost is 0
+      d.data.forEach(p => addNewRow(p.name, p.sell, 0, p.qty, p.rto || 0)); // ADDED RTO
       showToast(`✅ Imported ${d.data.length} items! Loading dashboard...`, 'success', 3000);
       
       saveDataToStorage();
@@ -3084,7 +3084,7 @@ async function checkSavedStoreConnections() {
 
       if (syncData.ok && syncData.data.length) {
         document.getElementById('items').innerHTML = '';
-        syncData.data.forEach(p => addNewRow(p.name, p.sell, 0, p.qty));
+        syncData.data.forEach(p => addNewRow(p.name, p.sell, 0, p.qty, p.rto || 0));
         saveDataToStorage();
         showSyncBadge('done', syncData.lastSynced);
         // Go straight to dashboard — guard prevents re-entry
