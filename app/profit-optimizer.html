@@ -2497,10 +2497,13 @@ window.startAIAnalysis = async function() {
   document.getElementById('chatHistory').innerHTML = `<div class="chat-msg msg-ai" id="loadingAi">Analyzing your numbers… ⏳</div>`;
   AppState.chatConversation = [];
 
-  await window.executeAIRequest(
-    `Analyze my catalog. Identify my hero product, spot any profit leaks, and give me a clear 3-step action plan to increase my net margin. Use ${AppState.currencySymbol}.`,
-    data
-  );
+  // ── NEW: Dynamically change the question based on the mode ──
+  const isRevMode = AppState.analyticsMode === 'revenue';
+  const initialPrompt = isRevMode 
+    ? `Analyze my catalog. Identify my hero product, spot underperforming items, and give me a clear 3-step action plan to increase my total revenue. Use ${AppState.currencySymbol}.`
+    : `Analyze my catalog. Identify my hero product, spot any profit leaks, and give me a clear 3-step action plan to increase my net margin. Use ${AppState.currencySymbol}.`;
+
+  await window.executeAIRequest(initialPrompt, data);
 };
 
 window.sendChatMessage = async function() {
@@ -4069,4 +4072,3 @@ window.renderCompareView = function() {
 
 </body>
 </html>
-
