@@ -2059,7 +2059,7 @@ function renderEnhancedReport(data) {
     
     // Inject the Teaser row in the middle
     if (item === 'TEASER') {
-        const colspan = isRevMode ? 6 : 9;
+        const colspan = isRevMode ? 6 : 11;
         let teaserMsg = `🔒 You have ${hiddenCount} more products hidden. Upgrade to Pro to see them.`;
         if (hiddenLossCount > 0 && !isRevMode) {
             teaserMsg = `🚨 You have ${hiddenLossCount} hidden products losing money! Upgrade to Pro to reveal which ones.`;
@@ -4069,3 +4069,4 @@ window.renderCompareView = function() {
 
 </body>
 </html>
+
