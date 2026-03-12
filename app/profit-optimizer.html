@@ -1950,15 +1950,9 @@ function renderEnhancedReport(data) {
   const ovMargin = tRev > 0 ? (tProfit / tRev) * 100 : 0;
   const sorted = [...products].sort((a, b) => b.profit - a.profit);
 
-  // ── PLG SMART TEASER LOGIC ──
   const isFreeUser = AppState.isProUser !== true;
-  const FREE_LIMIT = 5;
-  const displayProducts = isFreeUser ? sorted.slice(0, FREE_LIMIT) : sorted;
-  
-  let hiddenLossCount = 0;
-  if (isFreeUser && sorted.length > FREE_LIMIT) {
-      hiddenLossCount = sorted.slice(FREE_LIMIT).filter(p => p.profit < 0).length;
-  }
+  // Free users only get stats for the top 5 in the summary bands
+  const displayProducts = isFreeUser ? sorted.slice(0, 5) : sorted;
 
   // ── Summary Bar ──
   const summaryItems = isRevMode ? [
@@ -1989,7 +1983,6 @@ function renderEnhancedReport(data) {
     if (bandsContainer) bandsContainer.style.display = 'none';
   } else {
     if (bandsContainer) bandsContainer.style.display = 'grid';
-    // Use displayProducts so free users don't see full lists in the bands
     const stars    = displayProducts.filter(p => p.margin >= 30);
     const average  = displayProducts.filter(p => p.margin >= 0 && p.margin < 30);
     const leakers  = displayProducts.filter(p => p.margin < 0);
@@ -2015,7 +2008,7 @@ function renderEnhancedReport(data) {
       </div>
     `).join('');
   }
-  
+
   // ── Main Table Header ──
   const thead = document.querySelector('.report-table thead');
   if (thead) {
@@ -2034,17 +2027,62 @@ function renderEnhancedReport(data) {
     </tr>`;
   }
 
-  // ── Main Table Body (WITH BLURRED TEASER UI) ──
-  let tableHTML = sorted.map((p, i) => {
-    // 1. Determine if this specific row should be hidden/blurred
-    const isHidden = isFreeUser && i >= FREE_LIMIT;
+  // ── SMART BLUR SPLIT LOGIC ──
+  let renderList = [];
+  let hiddenCount = 0;
+  let hiddenLossCount = 0;
+
+  if (!isFreeUser || sorted.length <= 5) {
+      // Pro user (or free user with <= 5 items): Render everything normally
+      renderList = sorted.map((p, i) => ({ ...p, originalIndex: i, isBlurred: false }));
+  } else {
+      // Free user with > 5 items: Split the table
+      const topVisible = sorted.slice(0, 5).map((p, i) => ({ ...p, originalIndex: i, isBlurred: false }));
+      
+      // Get the absolute worst 4 items to blur at the bottom
+      const blurCount = Math.min(4, sorted.length - 5);
+      const bottomBlurred = sorted.slice(-blurCount).map((p, i) => ({ ...p, originalIndex: sorted.length - blurCount + i, isBlurred: true }));
+      
+      // Calculate what is fully hidden in the middle gap
+      const middleHidden = sorted.slice(5, sorted.length - blurCount);
+      hiddenCount = middleHidden.length;
+      
+      // Count total losing products (middle gap + bottom blurred)
+      hiddenLossCount = middleHidden.filter(p => p.profit < 0).length + bottomBlurred.filter(p => p.profit < 0).length;
+      
+      // Stitch it together: Top 5 -> Teaser Row -> Bottom 4 Blurred
+      renderList = [...topVisible, 'TEASER', ...bottomBlurred];
+  }
+
+  // ── Main Table Body ──
+  let tableHTML = renderList.map((item, loopIndex) => {
     
-    // 2. Setup the CSS blur effect (keeps colors visible, hides text)
-    const blurFx = isHidden ? 'filter: blur(5px); opacity: 0.85; user-select: none;' : '';
-    
-    // 3. Make the hidden rows clickable to trigger the paywall
-    const rowCursor = isHidden ? 'cursor: pointer;' : '';
-    const rowClick = isHidden ? 'onclick="handleUpgradeClick()"' : '';
+    // Inject the Teaser row in the middle
+    if (item === 'TEASER') {
+        const colspan = isRevMode ? 6 : 9;
+        let teaserMsg = `🔒 You have ${hiddenCount} more products hidden. Upgrade to Pro to see them.`;
+        if (hiddenLossCount > 0 && !isRevMode) {
+            teaserMsg = `🚨 You have ${hiddenLossCount} hidden products losing money! Upgrade to Pro to reveal which ones.`;
+        }
+        return `
+          <tr style="background:#f8fafc; cursor:pointer; transition:all 0.2s; box-shadow: 0 -10px 20px rgba(255,255,255,0.9) relative; z-index:2;" onclick="handleUpgradeClick()" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">
+            <td colspan="${colspan}" style="padding:28px 10px; text-align:center; border-top:1px solid #cbd5e1; border-bottom:1px solid #cbd5e1;">
+              <div style="font-size:24px; margin-bottom:8px;">🔒</div>
+              <div style="font-size:15px; font-weight:700; color:${(!isRevMode && hiddenLossCount > 0) ? '#dc2626' : 'var(--indigo)'}; margin-bottom:4px;">${teaserMsg}</div>
+              <div style="font-size:13px; color:var(--slate-400); font-weight:500;">Click here to unlock your full catalog and stop the bleeding.</div>
+            </td>
+          </tr>
+        `;
+    }
+
+    // Render a standard or blurred row
+    const p = item;
+    const i = p.originalIndex;
+    const isBlurred = p.isBlurred;
+
+    const blurFx = isBlurred ? 'filter: blur(5px); opacity: 0.85; user-select: none;' : '';
+    const rowCursor = isBlurred ? 'cursor: pointer;' : '';
+    const rowClick = isBlurred ? 'onclick="handleUpgradeClick()"' : '';
 
     const barW = tRev > 0 ? Math.round((p.rev / tRev) * 100) : 0;
     const barC = p.margin >= 30 ? 'var(--green)' : p.margin >= 0 ? 'var(--amber)' : 'var(--red)';
@@ -2054,7 +2092,7 @@ function renderEnhancedReport(data) {
         ? `<span class="status-pill" style="background:#fef3c7;color:#92400e;">Average</span>`
         : `<span class="status-pill status-leak">Loss</span>`;
         
-    return `<tr style="${i % 2 === 0 ? '' : 'background:var(--slate-50);'} ${rowCursor}" ${rowClick} title="${isHidden ? 'Upgrade to Pro to reveal this product' : ''}">
+    return `<tr style="${i % 2 === 0 ? '' : 'background:var(--slate-50);'} ${rowCursor}" ${rowClick} title="${isBlurred ? 'Upgrade to Pro to reveal this product' : ''}">
       <td style="color:var(--slate-300);font-size:12px;padding:8px; ${blurFx}">${i+1}</td>
       <td style="font-weight:600;padding:8px; ${blurFx}">${p.name}</td>
       <td style="padding:8px; ${blurFx}">${fmt(p.sell)}</td>
@@ -2084,27 +2122,6 @@ function renderEnhancedReport(data) {
       ${isRevMode ? '' : `<td style="padding:8px; ${blurFx}">${pill}</td>`}
     </tr>`;
   }).join('');
-
-  // ── APPEND CALL TO ACTION OVERLAY ──
-  if (isFreeUser && sorted.length > FREE_LIMIT) {
-      const hiddenCount = sorted.length - FREE_LIMIT;
-      const colspan = isRevMode ? 6 : 9;
-      
-      let teaserMsg = `🔒 You have ${hiddenCount} more products hidden. Upgrade to Pro to see them.`;
-      if (hiddenLossCount > 0 && !isRevMode) {
-          teaserMsg = `🚨 You have ${hiddenLossCount} hidden products losing money! Upgrade to Pro to reveal which ones.`;
-      }
-
-      tableHTML += `
-        <tr style="background:#f8fafc; cursor:pointer; transition:all 0.2s; box-shadow: 0 -10px 20px rgba(255,255,255,0.9) relative; z-index:2;" onclick="handleUpgradeClick()" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">
-          <td colspan="${colspan}" style="padding:32px 10px; text-align:center; border-top:1px solid #cbd5e1;">
-            <div style="font-size:24px; margin-bottom:8px;">🔒</div>
-            <div style="font-size:15px; font-weight:700; color:${hiddenLossCount > 0 ? '#dc2626' : 'var(--indigo)'}; margin-bottom:4px;">${teaserMsg}</div>
-            <div style="font-size:13px; color:var(--slate-400); font-weight:500;">Click anywhere on the blurred rows to unlock your full catalog and export PDF reports.</div>
-          </td>
-        </tr>
-      `;
-  }
 
   const tbody = document.getElementById('reportTableBody');
   if (tbody) tbody.innerHTML = tableHTML;
