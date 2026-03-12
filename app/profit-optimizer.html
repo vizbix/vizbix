@@ -2977,18 +2977,39 @@ async function runStoreImport(platform) {
         return; // Stop here, don't generate the dashboard yet
       }
 
+      // ── PRESERVE EXISTING COSTS ──
+      const existingData = getFreshData();
+      const costMap = {};
+      existingData.forEach(item => {
+          if (item.name && item.cost > 0) {
+              costMap[item.name.toLowerCase().trim()] = item.cost;
+          }
+      });
+
       // Normal Data Logic
       document.getElementById('items').innerHTML = ''; // Clear old data
-      d.data.forEach(p => addNewRow(p.name, p.sell, 0, p.qty, p.rto || 0)); // ADDED RTO
-      showToast(`✅ Imported ${d.data.length} items! Loading dashboard...`, 'success', 3000);
+      d.data.forEach(p => {
+          const existingCost = costMap[p.name.toLowerCase().trim()] || 0;
+          addNewRow(p.name, p.sell, existingCost, p.qty, p.rto || 0);
+      });
       
+      showToast(`✅ Imported ${d.data.length} items! Loading dashboard...`, 'success', 3000);
       saveDataToStorage();
       
-      const allZeroCost = d.data.every(p => !p.cost || p.cost === 0);
+      const freshData = getFreshData();
+      const allZeroCost = freshData.every(p => !p.cost || p.cost === 0);
+      
       if (allZeroCost) {
-        setTimeout(() => showCostMissingModal(getFreshData()), 300);
-      } else {
-        processDataAndShowReport();
+          // Force Revenue Mode so they don't see 100% false margins
+          AppState.analyticsMode = 'revenue';
+          window.revenueOnlyMode = true;
+      }
+      
+      // ALWAYS generate dashboard so we don't get stuck on a skeleton screen
+      processDataAndShowReport();
+      
+      if (allZeroCost) {
+          setTimeout(() => showCostMissingModal(freshData), 600);
       }
       
     } else {
@@ -3083,22 +3104,43 @@ async function checkSavedStoreConnections() {
       const syncData = await syncRes.json();
 
       if (syncData.ok && syncData.data.length) {
+        // ── PRESERVE EXISTING COSTS ON REFRESH ──
+        const existingData = getFreshData();
+        const costMap = {};
+        existingData.forEach(item => {
+            if (item.name && item.cost > 0) {
+                costMap[item.name.toLowerCase().trim()] = item.cost;
+            }
+        });
+
         document.getElementById('items').innerHTML = '';
-        syncData.data.forEach(p => addNewRow(p.name, p.sell, 0, p.qty, p.rto || 0));
+        syncData.data.forEach(p => {
+            const existingCost = costMap[p.name.toLowerCase().trim()] || 0;
+            addNewRow(p.name, p.sell, existingCost, p.qty, p.rto || 0);
+        });
+        
         saveDataToStorage();
         showSyncBadge('done', syncData.lastSynced);
-        // Go straight to dashboard — guard prevents re-entry
+        
         if (!storeSyncing) {
           storeSyncing = true;
-          setTimeout(() => {
-            const allZero = syncData.data.every(p => !p.cost || p.cost === 0);
-            if (allZero) {
-              showCostMissingModal(getFreshData());
-            } else {
-              processDataAndShowReport();
-            }
-            storeSyncing = false;
-          }, 300);
+          
+          const freshData = getFreshData();
+          const allZeroCost = freshData.every(p => !p.cost || p.cost === 0);
+          
+          if (allZeroCost) {
+              AppState.analyticsMode = 'revenue';
+              window.revenueOnlyMode = true;
+          }
+          
+          // ALWAYS generate dashboard so we don't get stuck on the skeleton screen
+          processDataAndShowReport();
+          
+          if (allZeroCost) {
+              setTimeout(() => showCostMissingModal(freshData), 600);
+          }
+          
+          storeSyncing = false;
         }
       } else {
         showSyncBadge('failed');
@@ -3130,9 +3172,31 @@ async function manualRefresh() {
       const syncData = await syncRes.json();
 
       if (syncData.ok && syncData.data.length) {
+        // ── PRESERVE EXISTING COSTS ON MANUAL REFRESH ──
+        const existingData = getFreshData();
+        const costMap = {};
+        existingData.forEach(item => {
+            if (item.name && item.cost > 0) {
+                costMap[item.name.toLowerCase().trim()] = item.cost;
+            }
+        });
+
         document.getElementById('items').innerHTML = '';
-        syncData.data.forEach(p => addNewRow(p.name, p.sell, 0, p.qty));
+        syncData.data.forEach(p => {
+            const existingCost = costMap[p.name.toLowerCase().trim()] || 0;
+            addNewRow(p.name, p.sell, existingCost, p.qty, p.rto || 0);
+        });
+        
         saveDataToStorage();
+        
+        // Safely force Revenue Mode if costs are missing
+        const freshData = getFreshData();
+        const allZeroCost = freshData.every(p => !p.cost || p.cost === 0);
+        if (allZeroCost) {
+            AppState.analyticsMode = 'revenue';
+            window.revenueOnlyMode = true;
+        }
+        
         processDataAndShowReport();
         showSyncBadge('done', syncData.lastSynced);
         updateIntegrationCard(platform, d.storeUrl, syncData.lastSynced);
