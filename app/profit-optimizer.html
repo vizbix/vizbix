@@ -1336,13 +1336,33 @@ function closePaywall() {
 // ══════════════════════════════════════════
 //  CURRENCY
 // ══════════════════════════════════════════
-function updateCurrency() {
+function updateCurrency(silent = false) {
+  const sel = document.getElementById('currencySelect');
+  AppState.currentCurrency = sel.value;
+  AppState.currencySymbol  = sel.options[sel.selectedIndex].text.split(' ')[0];
+  setText('hdr-sell', `Sell Price (${AppState.currencySymbol})`);
+  setText('hdr-cost', `Cost Price (${AppState.currencySymbol})`);
+  
+  // Re-render everything instantly if data exists
+  if (AppState.currentData && AppState.currentData.length > 0) {
+      runAnalysis(AppState.currentData);
+      if (typeof initSimulator === 'function') initSimulator();
+  }
+  if(!silent) showToast(`Currency updated to ${AppState.currentCurrency}`, 'success');
+}
+
+function autoDetectStoreCurrency(code) {
+  if (!code) return;
   const sel = document.getElementById('currencySelect');
-  AppState.currentCurrency = sel.value;
-  AppState.currencySymbol  = sel.options[sel.selectedIndex].text.split(' ')[0];
-  setText('hdr-sell', `Sell Price (${AppState.currencySymbol})`);
-  setText('hdr-cost', `Cost Price (${AppState.currencySymbol})`);
-  showToast(`Currency set to ${AppState.currentCurrency}`, 'success');
+  for (let i = 0; i < sel.options.length; i++) {
+    if (sel.options[i].value.toUpperCase() === code.toUpperCase()) {
+      if (sel.selectedIndex !== i) {
+          sel.selectedIndex = i;
+          updateCurrency(true); // silent update
+      }
+      break;
+    }
+  }
 }
 
 function fmt(n) {
@@ -2962,6 +2982,8 @@ async function runStoreImport(platform) {
     const d = await res.json();
 
     if (d.ok) {
+    if (d.currency) autoDetectStoreCurrency(d.currency); // Auto-switch to USD/EUR
+      
       document.getElementById('storeModal').style.display = 'none';
       updateIntegrationCard(platform, payload.storeUrl, Date.now());
       
@@ -3104,6 +3126,7 @@ async function checkSavedStoreConnections() {
       const syncData = await syncRes.json();
 
       if (syncData.ok && syncData.data.length) {
+        if (syncData.currency) autoDetectStoreCurrency(syncData.currency);
         // ── PRESERVE EXISTING COSTS ON REFRESH ──
         const existingData = getFreshData();
         const costMap = {};
@@ -3172,6 +3195,7 @@ async function manualRefresh() {
       const syncData = await syncRes.json();
 
       if (syncData.ok && syncData.data.length) {
+        if (syncData.currency) autoDetectStoreCurrency(syncData.currency);
         // ── PRESERVE EXISTING COSTS ON MANUAL REFRESH ──
         const existingData = getFreshData();
         const costMap = {};
