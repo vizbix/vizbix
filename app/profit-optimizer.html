@@ -2034,8 +2034,18 @@ function renderEnhancedReport(data) {
     </tr>`;
   }
 
-  // ── Main Table Body ──
-  let tableHTML = displayProducts.map((p, i) => {
+  // ── Main Table Body (WITH BLURRED TEASER UI) ──
+  let tableHTML = sorted.map((p, i) => {
+    // 1. Determine if this specific row should be hidden/blurred
+    const isHidden = isFreeUser && i >= FREE_LIMIT;
+    
+    // 2. Setup the CSS blur effect (keeps colors visible, hides text)
+    const blurFx = isHidden ? 'filter: blur(5px); opacity: 0.85; user-select: none;' : '';
+    
+    // 3. Make the hidden rows clickable to trigger the paywall
+    const rowCursor = isHidden ? 'cursor: pointer;' : '';
+    const rowClick = isHidden ? 'onclick="handleUpgradeClick()"' : '';
+
     const barW = tRev > 0 ? Math.round((p.rev / tRev) * 100) : 0;
     const barC = p.margin >= 30 ? 'var(--green)' : p.margin >= 0 ? 'var(--amber)' : 'var(--red)';
     const pill = p.margin >= 30
@@ -2044,16 +2054,18 @@ function renderEnhancedReport(data) {
         ? `<span class="status-pill" style="background:#fef3c7;color:#92400e;">Average</span>`
         : `<span class="status-pill status-leak">Loss</span>`;
         
-    return `<tr style="${i % 2 === 0 ? '' : 'background:var(--slate-50);'}">
-      <td style="color:var(--slate-300);font-size:12px;padding:8px;">${i+1}</td>
-      <td style="font-weight:600;padding:8px;">${p.name}</td>
-      <td style="padding:8px;">${fmt(p.sell)}</td>
-      ${isRevMode ? '' : `<td style="padding:8px;">${fmt(p.cost)}</td>`}
-      <td style="color:var(--slate-300);padding:8px;">${p.qty.toLocaleString()}</td>
-      <td style="font-weight:500;padding:8px;">${fmt(p.rev)}</td>
-      ${isRevMode ? '' : `<td style="padding:8px;">${fmt(p.costTotal)}</td>`}
-      ${isRevMode ? '' : `<td style="font-weight:600;padding:8px;color:${p.profit<0?'var(--red)':'var(--green)'};">${p.profit<0?'-':''}${fmt(p.profit)}</td>`}
-      ${isRevMode ? '' : `<td style="padding:8px;">
+    return `<tr style="${i % 2 === 0 ? '' : 'background:var(--slate-50);'} ${rowCursor}" ${rowClick} title="${isHidden ? 'Upgrade to Pro to reveal this product' : ''}">
+      <td style="color:var(--slate-300);font-size:12px;padding:8px; ${blurFx}">${i+1}</td>
+      <td style="font-weight:600;padding:8px; ${blurFx}">${p.name}</td>
+      <td style="padding:8px; ${blurFx}">${fmt(p.sell)}</td>
+      ${isRevMode ? '' : `<td style="padding:8px; ${blurFx}">${fmt(p.cost)}</td>`}
+      <td style="color:var(--slate-300);padding:8px; ${blurFx}">${p.qty.toLocaleString()}</td>
+      <td style="font-weight:500;padding:8px; ${blurFx}">${fmt(p.rev)}</td>
+      ${isRevMode ? '' : `<td style="padding:8px; ${blurFx}">${fmt(p.costTotal)}</td>`}
+      
+      ${isRevMode ? '' : `<td style="font-weight:700;padding:8px;color:${p.profit<0?'var(--red)':'var(--green)'}; ${blurFx}">${p.profit<0?'-':''}${fmt(p.profit)}</td>`}
+      
+      ${isRevMode ? '' : `<td style="padding:8px; ${blurFx}">
         <div style="display:flex;align-items:center;gap:6px;">
           <span style="font-weight:600;font-size:13px;color:${barC};min-width:38px;">${p.margin.toFixed(1)}%</span>
           <div style="flex:1;background:var(--slate-100);border-radius:99px;height:5px;min-width:36px;">
@@ -2061,7 +2073,7 @@ function renderEnhancedReport(data) {
           </div>
         </div>
       </td>`}
-      <td style="padding:8px;">
+      <td style="padding:8px; ${blurFx}">
         <div style="display:flex;align-items:center;gap:5px;">
           <span style="font-size:12px;color:var(--slate-300);min-width:28px;">${barW}%</span>
           <div style="flex:1;background:var(--slate-100);border-radius:99px;height:5px;min-width:36px;">
@@ -2069,11 +2081,11 @@ function renderEnhancedReport(data) {
           </div>
         </div>
       </td>
-      ${isRevMode ? '' : `<td style="padding:8px;">${pill}</td>`}
+      ${isRevMode ? '' : `<td style="padding:8px; ${blurFx}">${pill}</td>`}
     </tr>`;
   }).join('');
 
-  // ── APPEND SMART TEASER IF FREE USER ──
+  // ── APPEND CALL TO ACTION OVERLAY ──
   if (isFreeUser && sorted.length > FREE_LIMIT) {
       const hiddenCount = sorted.length - FREE_LIMIT;
       const colspan = isRevMode ? 6 : 9;
@@ -2084,11 +2096,11 @@ function renderEnhancedReport(data) {
       }
 
       tableHTML += `
-        <tr style="background:#f8fafc; cursor:pointer; transition:all 0.2s;" onclick="handleUpgradeClick()" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">
-          <td colspan="${colspan}" style="padding:32px 10px; text-align:center; border-top:2px dashed #cbd5e1;">
+        <tr style="background:#f8fafc; cursor:pointer; transition:all 0.2s; box-shadow: 0 -10px 20px rgba(255,255,255,0.9) relative; z-index:2;" onclick="handleUpgradeClick()" onmouseover="this.style.background='#f1f5f9'" onmouseout="this.style.background='#f8fafc'">
+          <td colspan="${colspan}" style="padding:32px 10px; text-align:center; border-top:1px solid #cbd5e1;">
             <div style="font-size:24px; margin-bottom:8px;">🔒</div>
-            <div style="font-size:15px; font-weight:700; color:var(--indigo); margin-bottom:4px;">${teaserMsg}</div>
-            <div style="font-size:13px; color:var(--slate-400); font-weight:500;">Click here to unlock your full catalog, export PDF reports, and access Profit Lab.</div>
+            <div style="font-size:15px; font-weight:700; color:${hiddenLossCount > 0 ? '#dc2626' : 'var(--indigo)'}; margin-bottom:4px;">${teaserMsg}</div>
+            <div style="font-size:13px; color:var(--slate-400); font-weight:500;">Click anywhere on the blurred rows to unlock your full catalog and export PDF reports.</div>
           </td>
         </tr>
       `;
