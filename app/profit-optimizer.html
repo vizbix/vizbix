@@ -62,9 +62,9 @@
   
 /* --- NEW DATA INPUT STYLES --- */
 .data-input-container { background: white; border: 1px solid var(--slate-100); border-radius: 16px; box-shadow: 0 1px 3px rgba(8,9,13,0.02); overflow: hidden; margin-top: 20px;}
-.di-header-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 40px; gap: 16px; padding: 16px 24px; border-bottom: 1px solid var(--slate-100); background: #f8fafc; font-size: 11px; font-weight: 600; color: var(--slate-300); text-transform: uppercase; letter-spacing: 0.5px; }
+.di-header-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 40px; gap: 16px; padding: 16px 24px; border-bottom: 1px solid var(--slate-100); background: #f8fafc; font-size: 11px; font-weight: 600; color: var(--slate-300); text-transform: uppercase; letter-spacing: 0.5px; }
 .di-items { display: flex; flex-direction: column; }
-.di-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 40px; gap: 16px; padding: 12px 24px; border-bottom: 1px solid var(--slate-50); align-items: center; transition: background 0.2s; }
+.di-row { display: grid; grid-template-columns: 2fr 1fr 1fr 1fr 1fr 40px; gap: 16px; padding: 12px 24px; border-bottom: 1px solid var(--slate-50); align-items: center; transition: background 0.2s; }
 .di-row:hover { background: #f8fafc; }
 .di-row:last-child { border-bottom: none; }
 .di-input { border: none; background: transparent; font-size: 13.5px; color: var(--ink); outline: none; width: 100%; font-family: 'Inter', sans-serif; font-weight: 500; }
@@ -267,9 +267,10 @@
   .data-row input:nth-child(2), .di-row input:nth-child(2) { grid-column: 1 / 2 !important; }
   .data-row input:nth-child(3), .di-row input:nth-child(3) { grid-column: 2 / 3 !important; }
   .data-row input:nth-child(4), .di-row input:nth-child(4) { grid-column: 1 / 2 !important; }
+  .data-row input:nth-child(5), .di-row input:nth-child(5) { grid-column: 2 / 3 !important; }
   
   .delete-btn, .di-delete-btn {
-    grid-column: 2 / 3 !important;
+    grid-column: span 2 !important;
     justify-self: center !important;
     align-self: center !important;
     background: transparent !important;
@@ -541,6 +542,7 @@
             <div id="hdr-sell">Sell Price (₹)</div>
             <div id="hdr-cost">Cost Price (₹)</div>
             <div>Qty Sold</div>
+            <div>RTO Qty</div>
             <div></div>
           </div>
 
@@ -550,9 +552,8 @@
               <input type="number" placeholder="0"             class="di-input input-sell" value="2500">
               <input type="number" placeholder="0"             class="di-input input-cost" value="1200">
               <input type="number" placeholder="0"             class="di-input input-qty"  value="140">
+              <input type="number" placeholder="0"             class="di-input input-rto"  value="10">
               <button class="di-delete-btn delete-btn" onclick="removeRow(this)" title="Remove">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
-              </button>
             </div>
           </div>
 
@@ -678,6 +679,12 @@
             <div id="analyticsModebadge" style="display:none;font-size:11px;font-weight:700;padding:4px 12px;border-radius:99px;"></div>
           </div>
           <div style="display:flex;align-items:center;gap:10px;">
+            <div style="display:flex;align-items:center;gap:8px;background:white;padding:6px 12px;border-radius:8px;border:1px solid var(--slate-100);">
+              <input type="checkbox" id="applyFixedCost" onchange="processDataAndShowReport()" style="cursor:pointer; accent-color:#5b5ef6;">
+              <label for="applyFixedCost" style="font-size:12px;font-weight:600;color:var(--slate-300);cursor:pointer;">Apply Fixed Cost:</label>
+              <input type="number" id="fixedCostInput" placeholder="0" oninput="if(document.getElementById('applyFixedCost').checked) processDataAndShowReport()" style="width:70px;border:none;outline:none;font-size:13px;font-weight:600;color:var(--ink);background:transparent;">
+            </div>
+
             <button id="toggleModeBtn" onclick="toggleAnalyticsMode()" style="display:none;font-size:12px;font-weight:600;padding:7px 14px;border-radius:8px;border:1.5px solid var(--slate-200);background:white;color:var(--ink);cursor:pointer;transition:all 0.2s;font-family:Inter,sans-serif;"></button>
             <div style="display:flex;align-items:center;gap:10px;background:white;padding:8px 16px;border-radius:10px;border:1px solid var(--slate-100);box-shadow:0 1px 3px rgba(8,9,13,0.04);">
               <span style="font-size:10px;font-weight:600;color:var(--slate-300);text-transform:uppercase;letter-spacing:0.8px;">Health Score</span>
@@ -1270,7 +1277,8 @@ function getFreshData() {
     const s = parseFloat(row.querySelector('.input-sell')?.value)||0;
     const c = parseFloat(row.querySelector('.input-cost')?.value)||0;
     const q = parseFloat(row.querySelector('.input-qty')?.value) ||0;
-    if(n||s||c||q) data.push({name:n||'Unnamed',sell:s,cost:c,qty:q});
+    const rto = parseFloat(row.querySelector('.input-rto')?.value) ||0;
+    if(n||s||c||q) data.push({name:n||'Unnamed',sell:s,cost:c,qty:q,rto:rto});
   });
   AppState.currentData = data;
   return data;
@@ -1340,7 +1348,7 @@ function fmt(n) {
 // ══════════════════════════════════════════
 //  DATA INPUT HELPERS
 // ══════════════════════════════════════════
-function addNewRow(name='',sell='',cost='',qty='') {
+function addNewRow(name='',sell='',cost='',qty='', rto='') {
   const c = document.getElementById('items');
   const row = document.createElement('div');
   row.className = 'di-row data-row';
@@ -1349,12 +1357,13 @@ function addNewRow(name='',sell='',cost='',qty='') {
     <input type="number" placeholder="0"             class="di-input input-sell" value="${sell}">
     <input type="number" placeholder="0"             class="di-input input-cost" value="${cost}">
     <input type="number" placeholder="0"             class="di-input input-qty"  value="${qty}">
+    <input type="number" placeholder="0"             class="di-input input-rto"  value="${rto}">
     <button class="di-delete-btn delete-btn" onclick="removeRow(this)" title="Remove">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
     </button>`;
 
-  // Tab on last qty field → new row
-  row.querySelector('.input-qty').addEventListener('keydown', e=>{
+  // Tab on last rto field → new row
+  row.querySelector('.input-rto').addEventListener('keydown', e=>{
     if(e.key==='Tab' && !e.shiftKey) {
       const rows = document.querySelectorAll('#items .data-row');
       if(row === rows[rows.length-1]) {
@@ -1497,16 +1506,26 @@ function runAnalysis(data) {
   // Determine which mode we are in
   const isRevMode = AppState.analyticsMode === 'revenue';
 
+  let fixedCostValue = 0;
+  const applyFixedCb = document.getElementById('applyFixedCost');
+  const fixedInput = document.getElementById('fixedCostInput');
+  if(applyFixedCb && applyFixedCb.checked && fixedInput) {
+    fixedCostValue = parseFloat(fixedInput.value) || 0;
+  }
+
   data.forEach(item=>{
-    const rev    = item.sell * item.qty;
-    const cost   = item.cost * item.qty;
+    const rtoQty = item.rto || 0;
+    const netQty = Math.max(0, item.qty - rtoQty); // Net Successful Qty
+    
+    const rev    = item.sell * netQty;
+    const cost   = item.cost * netQty;
     const profit = rev - cost;
     const mNum   = rev>0 ? (profit/rev)*100 : 0;
 
     tRev    += rev;
     tCost   += cost;
     tProfit += profit;
-    tItems  += item.qty;
+    tItems  += netQty;
 
     if(profit>top.profit && item.qty>0) top = {name:item.name, profit};
     if(profit<0) leaks.push(item.name);
@@ -1517,6 +1536,7 @@ function runAnalysis(data) {
     if(profit<0) pdfIns += `<li style="margin-bottom:10px;color:#dc2626;"><strong>Fix Leak:</strong> ${item.name} is losing money.</li>`;
   });
 
+  tProfit -= fixedCostValue; // Deduct fixed cost
   const ovMargin = tRev>0 ? (tProfit/tRev)*100 : 0;
 
   // Weighted health score (Profit Mode Only)
@@ -1932,10 +1952,19 @@ function renderEnhancedReport(data) {
   };
 
   let tRev = 0, tCost = 0, tProfit = 0, tQty = 0;
+  
+  let fixedCostValue = 0;
+  const applyFixedCb = document.getElementById('applyFixedCost');
+  const fixedInput = document.getElementById('fixedCostInput');
+  if(applyFixedCb && applyFixedCb.checked && fixedInput) {
+    fixedCostValue = parseFloat(fixedInput.value) || 0;
+  }
+
   const products = data.map(item => {
     const sellP  = item.sell || item.sellPrice || 0;
     const costP  = item.cost || item.costPrice || 0;
-    const q      = item.qty  || 0;
+    const rto    = item.rto || 0;
+    const q      = Math.max(0, (item.qty || 0) - rto); // Net Qty
     const rev    = sellP * q;
     const costT  = costP * q;
     const profit = rev - costT;
@@ -1947,6 +1976,7 @@ function renderEnhancedReport(data) {
     return { ...item, sell: sellP, cost: costP, qty: q, rev, costTotal: costT, profit, margin };
   });
 
+  tProfit -= fixedCostValue; // Deduct fixed cost
   const ovMargin = tRev > 0 ? (tProfit / tRev) * 100 : 0;
   const sorted = [...products].sort((a, b) => b.profit - a.profit);
 
@@ -2357,13 +2387,24 @@ function exportExecutivePDF() {
   const fmt = n => sym + Math.abs(n).toLocaleString('en-IN', {maximumFractionDigits:0});
 
   let tRev=0, tCost=0, tProfit=0, tQty=0;
+
+  let fixedCostValue = 0;
+  const applyFixedCb = document.getElementById('applyFixedCost');
+  const fixedInput = document.getElementById('fixedCostInput');
+  if(applyFixedCb && applyFixedCb.checked && fixedInput) {
+    fixedCostValue = parseFloat(fixedInput.value) || 0;
+  }
+
   const products = data.map(item => {
-    const s = item.sell||item.sellPrice||0, c=item.cost||item.costPrice||0, q=item.qty||0;
+    const s = item.sell||item.sellPrice||0, c=item.cost||item.costPrice||0;
+    const rto = item.rto||0;
+    const q = Math.max(0, (item.qty||0) - rto); // Net Qty
     const rev=s*q, cost=c*q, profit=rev-cost, margin=rev>0?(profit/rev)*100:0;
     tRev+=rev; tCost+=cost; tProfit+=profit; tQty+=q;
     return {name:item.name,sell:s,cost:c,qty:q,rev,cost_t:cost,profit,margin};
   }).sort((a,b)=>b.rev-a.rev);
 
+  tProfit -= fixedCostValue;
   const ovMargin = tRev>0?(tProfit/tRev)*100:0;
   const top = products[0];
 
