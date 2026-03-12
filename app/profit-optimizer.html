@@ -1284,14 +1284,14 @@ function toggleAppDrawer() {
   document.getElementById('mobileAppOverlay').classList.toggle('active');
 }
 
-// Note: 'report' has been REMOVED from this list so free users can click it!
-const PRO_VIEWS = ['ai','history','simulator','compare'];
+// NOTE: 'report' is explicitly removed from this list so free users can view it!
+const PRO_VIEWS = ['ai', 'history', 'simulator', 'compare'];
 
 function switchView(viewId, element, bypass=false) {
-  // If it's a Pro feature and they are free, SHOW PAYWALL AND STOP!
+  // If it is a locked feature and user is free, SHOW PAYWALL AND STOP.
   if (PRO_VIEWS.includes(viewId) && AppState.isProUser !== true && !bypass) {
     document.getElementById('proLockOverlay').classList.remove('pro-lock-hidden');
-    return; // This line fixes the bug: It stops Profit Lab from showing in the background
+    return; // This early return is crucial so the view behind the paywall doesn't change
   }
 
   AppState.currentView = viewId;
@@ -1314,6 +1314,11 @@ function switchView(viewId, element, bypass=false) {
     sb.classList.remove('mobile-open');
     document.getElementById('mobileAppOverlay').classList.remove('active');
   }
+}
+
+function closePaywall() {
+  // Simply hides the paywall so the user can continue what they were doing
+  document.getElementById('proLockOverlay').classList.add('pro-lock-hidden');
 }
 
 // ══════════════════════════════════════════
