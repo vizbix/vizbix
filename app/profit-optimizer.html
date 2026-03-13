@@ -4166,7 +4166,7 @@ window.addEventListener('beforeunload', function (e) {
 });
 
 // ══════════════════════════════════════════
-//  EXCEL EXPORT (PRO FEATURE)
+//  EXCEL EXPORT (PRO DASHBOARD VERSION)
 // ══════════════════════════════════════════
 function exportToExcel() {
   if (AppState.isProUser !== true) {
@@ -4191,8 +4191,8 @@ function exportToExcel() {
     fixedCostValue = parseFloat(fixedInput.value) || 0;
   }
 
-  // 1. Build the row data
-  const exportRows = data.map((item, index) => {
+  // ─── 1. BUILD RAW DATA SHEET ───
+  const rawDataRows = data.map((item, index) => {
     const s = item.sell || item.sellPrice || 0;
     const c = item.cost || item.costPrice || 0;
     const rto = item.rto || 0;
@@ -4205,94 +4205,85 @@ function exportToExcel() {
 
     tRev += rev; tCost += costT; tProfit += profit; tQty += q;
 
-    // Different columns based on the mode
     if (isRevMode) {
-      return {
-        "S.No": index + 1,
-        "Product Name": item.name,
-        "Sell Price": s,
-        "Net Qty Sold": q,
-        "RTO (Returns)": rto,
-        "Total Revenue": rev
-      };
+      return { "S.No": index + 1, "Product Name": item.name, "Sell Price": s, "Net Qty Sold": q, "RTO (Returns)": rto, "Total Revenue": rev };
     } else {
-      return {
-        "S.No": index + 1,
-        "Product Name": item.name,
-        "Sell Price": s,
-        "Cost Price": c,
-        "Net Qty Sold": q,
-        "RTO (Returns)": rto,
-        "Total Revenue": rev,
-        "Total Cost": costT,
-        "Gross Profit": profit,
-        "Margin %": parseFloat(margin.toFixed(1))
-      };
+      return { "S.No": index + 1, "Product Name": item.name, "Sell Price": s, "Cost Price": c, "Net Qty Sold": q, "RTO (Returns)": rto, "Total Revenue": rev, "Total Cost": costT, "Gross Profit": profit, "Margin %": parseFloat(margin.toFixed(1)) };
     }
   });
 
-  // Calculate Final Totals
   const grossProfit = tProfit;
   tProfit -= fixedCostValue; // Net Profit
   const ovMargin = tRev > 0 ? (tProfit / tRev) * 100 : 0;
 
-  // 2. Add an empty spacer row
-  exportRows.push({});
+  rawDataRows.push({}); // Spacer
 
-  // 3. Add Totals Row
   if (isRevMode) {
-    exportRows.push({
-      "S.No": "TOTALS",
-      "Net Qty Sold": tQty,
-      "Total Revenue": tRev
-    });
+    rawDataRows.push({ "S.No": "TOTALS", "Net Qty Sold": tQty, "Total Revenue": tRev });
   } else {
-    exportRows.push({
-      "S.No": "TOTALS",
-      "Net Qty Sold": tQty,
-      "Total Revenue": tRev,
-      "Total Cost": tCost,
-      "Gross Profit": grossProfit,
-      "Margin %": parseFloat((tRev > 0 ? (grossProfit/tRev)*100 : 0).toFixed(1))
-    });
-    
-    // If they have fixed costs applied, show the breakdown at the bottom
+    rawDataRows.push({ "S.No": "TOTALS", "Net Qty Sold": tQty, "Total Revenue": tRev, "Total Cost": tCost, "Gross Profit": grossProfit, "Margin %": parseFloat((tRev > 0 ? (grossProfit/tRev)*100 : 0).toFixed(1)) });
     if (fixedCostValue > 0) {
-        exportRows.push({
-          "S.No": "FIXED COSTS",
-          "Gross Profit": -fixedCostValue
-        });
-        exportRows.push({
-          "S.No": "NET PROFIT",
-          "Gross Profit": tProfit,
-          "Margin %": parseFloat(ovMargin.toFixed(1))
-        });
+        rawDataRows.push({ "S.No": "FIXED COSTS", "Gross Profit": -fixedCostValue });
+        rawDataRows.push({ "S.No": "NET PROFIT", "Gross Profit": tProfit, "Margin %": parseFloat(ovMargin.toFixed(1)) });
     }
   }
 
-  // 4. Convert to Excel Workbook using SheetJS
+  // ─── 2. BUILD VISUAL DASHBOARD SHEET ───
+  const dashboardRows = [];
+  const sym = AppState.currencySymbol || '₹';
+
+  // Title
+  dashboardRows.push({ "A": `Vizbix Executive Dashboard - ${new Date().toLocaleDateString('en-IN')}`, "B": "", "C": "" });
+  dashboardRows.push({});
+
+  // KPI Section
+  dashboardRows.push({ "A": "KEY PERFORMANCE INDICATORS", "B": "", "C": "" });
+  dashboardRows.push({ "A": "Total Revenue", "B": `${sym}${tRev.toLocaleString()}`, "C": "" });
+  if (!isRevMode) {
+    dashboardRows.push({ "A": "Gross Profit", "B": `${sym}${grossProfit.toLocaleString()}`, "C": "" });
+    if (fixedCostValue > 0) dashboardRows.push({ "A": "Fixed Costs", "B": `-${sym}${fixedCostValue.toLocaleString()}`, "C": "" });
+    dashboardRows.push({ "A": "Net Profit", "B": `${sym}${tProfit.toLocaleString()}`, "C": "" });
+    dashboardRows.push({ "A": "Average Margin", "B": `${ovMargin.toFixed(1)}%`, "C": "" });
+  }
+  dashboardRows.push({ "A": "Total Units Sold", "B": tQty.toLocaleString(), "C": "" });
+  dashboardRows.push({});
+
+  // In-Cell Bar Chart Section (Top 5 Products)
+  dashboardRows.push({ "A": `TOP 5 PRODUCTS (By ${isRevMode ? 'Revenue' : 'Profit'})`, "B": "", "C": "" });
+  
+  // Sort data for the chart
+  const sortedData = [...data].map(item => {
+    const q = Math.max(0, (item.qty || 0) - (item.rto || 0));
+    const rev = (item.sell || 0) * q;
+    const profit = rev - ((item.cost || 0) * q);
+    return { name: item.name, rev, profit, metric: isRevMode ? rev : profit };
+  }).sort((a,b) => b.metric - a.metric).slice(0, 5);
+
+  const maxMetric = Math.max(...sortedData.map(d => d.metric), 1);
+
+  // Generate ASCII Data Bars
+  sortedData.forEach(item => {
+    const fillCount = Math.round((item.metric / maxMetric) * 20); // Max 20 blocks wide
+    const bar = '█'.repeat(Math.max(1, fillCount)) + '░'.repeat(20 - fillCount);
+    const valString = `${sym}${item.metric.toLocaleString()}`;
+    dashboardRows.push({ "A": item.name, "B": bar, "C": valString });
+  });
+
+  // ─── 3. GENERATE EXCEL FILE ───
   showToast('Preparing Excel file...', 'info', 1500);
   setTimeout(() => {
       try {
-          const ws = XLSX.utils.json_to_sheet(exportRows);
-          
-          // Auto-size columns slightly for better readability
-          const colWidths = [
-              { wch: 10 }, // S.No
-              { wch: 30 }, // Name
-              { wch: 12 }, // Sell
-              { wch: 12 }, // Cost (if exists)
-              { wch: 12 }, // Qty
-              { wch: 12 }, // RTO
-              { wch: 15 }, // Rev
-              { wch: 15 }, // Cost Total
-              { wch: 15 }, // Profit
-              { wch: 10 }  // Margin
-          ];
-          ws['!cols'] = colWidths;
-
           const wb = XLSX.utils.book_new();
-          XLSX.utils.book_append_sheet(wb, ws, isRevMode ? "Revenue Report" : "Profit Report");
+
+          // Add Dashboard Sheet
+          const wsDash = XLSX.utils.json_to_sheet(dashboardRows, { skipHeader: true });
+          wsDash['!cols'] = [{ wch: 35 }, { wch: 25 }, { wch: 15 }]; // Size columns for the bar chart
+          XLSX.utils.book_append_sheet(wb, wsDash, "Dashboard");
+
+          // Add Raw Data Sheet
+          const wsData = XLSX.utils.json_to_sheet(rawDataRows);
+          wsData['!cols'] = [{ wch: 10 }, { wch: 30 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 12 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 10 }];
+          XLSX.utils.book_append_sheet(wb, wsData, "Raw Data");
 
           // Trigger download
           const dateStr = new Date().toISOString().split('T')[0];
