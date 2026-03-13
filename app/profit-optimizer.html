@@ -2396,7 +2396,7 @@ function runSimulation() {
 }
 
 // ══════════════════════════════════════════
-//  PDF EXPORT (MULTI-PAGE VERSION)
+//  PDF EXPORT (PERFECT PAGE SPLIT VERSION)
 // ══════════════════════════════════════════
 function exportExecutivePDF() {
   if (AppState.isProUser !== true) {
@@ -2476,8 +2476,9 @@ function exportExecutivePDF() {
   ];
 
   // The actual HTML layout of the PDF
+  // Notice: padding is removed from the main wrapper, we let the PDF engine handle margins!
   const htmlString = `
-  <div style="font-family: Arial, sans-serif; padding:40px; color:#0f172a; background:white; width:1040px; margin:0 auto;">
+  <div style="font-family: Arial, sans-serif; color:#0f172a; background:white; width:1040px; margin:0 auto;">
     
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px; border-bottom:2px solid #f1f5f9; padding-bottom:20px;">
       <div>
@@ -2503,7 +2504,7 @@ function exportExecutivePDF() {
       <img src="${chartImg}" style="max-width:100%; height:auto; max-height:450px; object-fit:contain;" />
     </div>` : ''}
 
-    <div style="page-break-before: always; margin-top: 50px;"></div>
+    <div class="html2pdf__page-break"></div>
 
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid #f1f5f9; padding-bottom:16px;">
       <h2 style="font-size:20px; font-weight:800; color:#0f172a; margin:0;">Detailed Product Analysis</h2>
@@ -2551,14 +2552,15 @@ function exportExecutivePDF() {
 
   showToast('Generating PDF…', 'info', 2000);
   
-  // Configuration for html2pdf (with pagebreak mode enabled)
+  // Configuration for html2pdf
+  // Added a clean 0.4 inch margin that applies to EVERY page automatically
   const opt = {
-    margin:       0.2, 
+    margin:       0.4, 
     filename:     `Vizbix_Report_${new Date().toISOString().split('T')[0]}.pdf`,
     image:        { type: 'jpeg', quality: 1.0 },
     html2canvas:  { scale: 2, useCORS: true, logging: false },
     jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' },
-    pagebreak:    { mode: ['css', 'legacy'] } // This tells the engine to respect our page-break style!
+    pagebreak:    { mode: ['css', 'class'] } // Tells it to look for our 'html2pdf__page-break' class
   };
 
   // Process HTML String directly
