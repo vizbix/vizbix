@@ -3048,22 +3048,36 @@ async function runStoreImport(platform) {
 // ── Update integration card to connected state ──
 function updateIntegrationCard(platform, storeUrl, lastSynced) {
   const cardId = platform === 'woo' ? 'woo-card-status' : 'shopify-card-status';
+  const otherCardId = platform === 'woo' ? 'shopify-card-status' : 'woo-card-status';
+  
   const el = document.getElementById(cardId);
-  if (!el) return;
+  const otherEl = document.getElementById(otherCardId);
+  
   const domain = storeUrl.replace(/https?:\/\//, '').replace(/\/$/, '');
-  const syncTime = lastSynced
-    ? new Date(lastSynced).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' })
-    : 'Never';
-  el.innerHTML = `
-    <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
-      <span style="color:#059669; font-size:12px; font-weight:600;">✓ Connected</span>
-      <span style="font-size:12px;color:var(--slate-300);">${domain}</span>
-    </div>
-    <div style="font-size:11.5px;color:var(--slate-300);margin-bottom:14px;">Last synced: ${syncTime}</div>
-    <div style="display:flex;gap:8px;">
-      <button class="int-btn int-btn-connected" style="flex:1; padding: 10px;" onclick="manualRefresh()">↻ Sync</button>
-      <button class="int-btn" style="flex:1; padding: 10px; background: white; border: 1px solid var(--slate-200); color: var(--slate-300);" onclick="disconnectStore('${platform}')">Disconnect</button>
-    </div>`;
+  const syncTime = lastSynced ? new Date(lastSynced).toLocaleTimeString('en-IN', { hour:'2-digit', minute:'2-digit' }) : 'Never';
+  
+  // Set the connected card
+  if (el) {
+      el.innerHTML = `
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:6px;">
+          <span style="color:#059669; font-size:12px; font-weight:600;">✓ Connected</span>
+          <span style="font-size:12px;color:var(--slate-300);">${domain}</span>
+        </div>
+        <div style="font-size:11.5px;color:var(--slate-300);margin-bottom:14px;">Last synced: ${syncTime}</div>
+        <div style="display:flex;gap:8px;">
+          <button class="int-btn int-btn-connected" style="flex:1; padding: 10px;" onclick="manualRefresh()">↻ Sync</button>
+          <button class="int-btn" style="flex:1; padding: 10px; background: white; border: 1px solid var(--slate-200); color: var(--slate-300);" onclick="disconnectStore('${platform}')">Disconnect</button>
+        </div>`;
+  }
+
+  // Disable the OTHER card
+  if (otherEl) {
+      const otherName = platform === 'woo' ? 'WooCommerce' : 'Shopify';
+      otherEl.innerHTML = `
+        <button class="int-btn int-btn-disabled" style="cursor:not-allowed;" disabled>
+          ⚠ Disconnect ${platform === 'woo' ? 'Woo' : 'Shopify'} First
+        </button>`;
+  }
 }
 
 // ── Sync badge on dashboard header ──
@@ -4104,6 +4118,16 @@ window.renderCompareView = function() {
     ${auditHTML}
   `;
 };
+
+// Warn user if they try to close the tab with unsaved data
+window.addEventListener('beforeunload', function (e) {
+  const data = getFreshData();
+  // Only warn if they have data and aren't in the middle of a sync
+  if (data.length > 0 && !storeSyncing) {
+      e.preventDefault();
+      e.returnValue = '';
+  }
+});
 
 </script>
 
