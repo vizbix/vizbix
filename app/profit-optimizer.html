@@ -2396,7 +2396,7 @@ function runSimulation() {
 }
 
 // ══════════════════════════════════════════
-//  PDF EXPORT (BULLETPROOF VERSION)
+//  PDF EXPORT (MULTI-PAGE VERSION)
 // ══════════════════════════════════════════
 function exportExecutivePDF() {
   if (AppState.isProUser !== true) {
@@ -2489,7 +2489,7 @@ function exportExecutivePDF() {
       </div>
     </div>
 
-    <div style="display:flex; gap:20px; margin-bottom:30px;">
+    <div style="display:flex; gap:20px; margin-bottom:40px;">
       ${topMetrics.map(s=>`
       <div style="flex:1; border:1px solid #e2e8f0; border-radius:10px; padding:18px; background:#f8fafc;">
         <div style="font-size:11px; font-weight:bold; color:#64748b; text-transform:uppercase; letter-spacing:1px; margin-bottom:8px;">${s.l}</div>
@@ -2498,10 +2498,16 @@ function exportExecutivePDF() {
     </div>
 
     ${chartImg ? `
-    <div style="margin-bottom:30px; border:1px solid #e2e8f0; border-radius:10px; padding:24px;">
-      <div style="font-size:12px; font-weight:bold; color:#64748b; text-transform:uppercase; letter-spacing:1px; margin-bottom:16px;">${isRevMode ? 'Top Products by Revenue' : 'Revenue vs Profit (Top Products)'}</div>
-      <img src="${chartImg}" style="width:100%; max-height:260px; object-fit:contain;" />
+    <div style="margin-bottom:30px; border:1px solid #e2e8f0; border-radius:10px; padding:24px; text-align:center;">
+      <div style="font-size:12px; font-weight:bold; color:#64748b; text-transform:uppercase; letter-spacing:1px; margin-bottom:24px; text-align:left;">${isRevMode ? 'Top Products by Revenue' : 'Revenue vs Profit (Top Products)'}</div>
+      <img src="${chartImg}" style="max-width:100%; height:auto; max-height:450px; object-fit:contain;" />
     </div>` : ''}
+
+    <div style="page-break-before: always; margin-top: 50px;"></div>
+
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; border-bottom:2px solid #f1f5f9; padding-bottom:16px;">
+      <h2 style="font-size:20px; font-weight:800; color:#0f172a; margin:0;">Detailed Product Analysis</h2>
+    </div>
 
     <div style="border:1px solid #e2e8f0; border-radius:10px; overflow:hidden;">
         <table style="width:100%; border-collapse:collapse; text-align:left;">
@@ -2545,16 +2551,17 @@ function exportExecutivePDF() {
 
   showToast('Generating PDF…', 'info', 2000);
   
-  // Configuration for html2pdf
+  // Configuration for html2pdf (with pagebreak mode enabled)
   const opt = {
     margin:       0.2, 
     filename:     `Vizbix_Report_${new Date().toISOString().split('T')[0]}.pdf`,
     image:        { type: 'jpeg', quality: 1.0 },
     html2canvas:  { scale: 2, useCORS: true, logging: false },
-    jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' }
+    jsPDF:        { unit: 'in', format: 'a4', orientation: 'landscape' },
+    pagebreak:    { mode: ['css', 'legacy'] } // This tells the engine to respect our page-break style!
   };
 
-  // Process HTML String directly (never fails via clipping)
+  // Process HTML String directly
   setTimeout(() => {
     html2pdf().set(opt).from(htmlString).save()
       .then(() => {
