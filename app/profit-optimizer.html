@@ -965,7 +965,8 @@
           <h2>Detailed Profit Report</h2>
           <div style="display:flex;gap:9px;flex-wrap:wrap;">
             <button class="btn btn-secondary" style="font-size:13px;" onclick="switchView('data', document.getElementById('nav-data'))">← Edit Data</button>
-            <button class="btn btn-primary"   style="font-size:13px;" onclick="exportExecutivePDF()">📥 Download PDF</button>
+            <button class="btn btn-primary" style="font-size:13px; background:#059669; border-color:#059669;" onclick="exportToExcel()">📊 Export Excel</button>
+            <button class="btn btn-primary" style="font-size:13px;" onclick="exportExecutivePDF()">📥 Download PDF</button>
           </div>
         </div>
 
@@ -4163,6 +4164,147 @@ window.addEventListener('beforeunload', function (e) {
       e.returnValue = '';
   }
 });
+
+// ══════════════════════════════════════════
+//  EXCEL EXPORT (PRO FEATURE)
+// ══════════════════════════════════════════
+function exportToExcel() {
+  if (AppState.isProUser !== true) {
+    document.getElementById('proLockOverlay').classList.remove('pro-lock-hidden');
+    return; 
+  }
+
+  const data = AppState.currentData;
+  if (!data || !data.length) { 
+      showToast('Generate a dashboard first.', 'error'); 
+      return; 
+  }
+
+  const isRevMode = AppState.analyticsMode === 'revenue';
+  let tRev=0, tCost=0, tProfit=0, tQty=0;
+
+  // Check for Fixed Costs
+  let fixedCostValue = 0;
+  const applyFixedCb = document.getElementById('applyFixedCost');
+  const fixedInput = document.getElementById('fixedCostInput');
+  if(applyFixedCb && applyFixedCb.checked && fixedInput) {
+    fixedCostValue = parseFloat(fixedInput.value) || 0;
+  }
+
+  // 1. Build the row data
+  const exportRows = data.map((item, index) => {
+    const s = item.sell || item.sellPrice || 0;
+    const c = item.cost || item.costPrice || 0;
+    const rto = item.rto || 0;
+    const q = Math.max(0, (item.qty || 0) - rto); // Net Qty
+    
+    const rev = s * q;
+    const costT = c * q;
+    const profit = rev - costT;
+    const margin = rev > 0 ? (profit / rev) * 100 : 0;
+
+    tRev += rev; tCost += costT; tProfit += profit; tQty += q;
+
+    // Different columns based on the mode
+    if (isRevMode) {
+      return {
+        "S.No": index + 1,
+        "Product Name": item.name,
+        "Sell Price": s,
+        "Net Qty Sold": q,
+        "RTO (Returns)": rto,
+        "Total Revenue": rev
+      };
+    } else {
+      return {
+        "S.No": index + 1,
+        "Product Name": item.name,
+        "Sell Price": s,
+        "Cost Price": c,
+        "Net Qty Sold": q,
+        "RTO (Returns)": rto,
+        "Total Revenue": rev,
+        "Total Cost": costT,
+        "Gross Profit": profit,
+        "Margin %": parseFloat(margin.toFixed(1))
+      };
+    }
+  });
+
+  // Calculate Final Totals
+  const grossProfit = tProfit;
+  tProfit -= fixedCostValue; // Net Profit
+  const ovMargin = tRev > 0 ? (tProfit / tRev) * 100 : 0;
+
+  // 2. Add an empty spacer row
+  exportRows.push({});
+
+  // 3. Add Totals Row
+  if (isRevMode) {
+    exportRows.push({
+      "S.No": "TOTALS",
+      "Net Qty Sold": tQty,
+      "Total Revenue": tRev
+    });
+  } else {
+    exportRows.push({
+      "S.No": "TOTALS",
+      "Net Qty Sold": tQty,
+      "Total Revenue": tRev,
+      "Total Cost": tCost,
+      "Gross Profit": grossProfit,
+      "Margin %": parseFloat((tRev > 0 ? (grossProfit/tRev)*100 : 0).toFixed(1))
+    });
+    
+    // If they have fixed costs applied, show the breakdown at the bottom
+    if (fixedCostValue > 0) {
+        exportRows.push({
+          "S.No": "FIXED COSTS",
+          "Gross Profit": -fixedCostValue
+        });
+        exportRows.push({
+          "S.No": "NET PROFIT",
+          "Gross Profit": tProfit,
+          "Margin %": parseFloat(ovMargin.toFixed(1))
+        });
+    }
+  }
+
+  // 4. Convert to Excel Workbook using SheetJS
+  showToast('Preparing Excel file...', 'info', 1500);
+  setTimeout(() => {
+      try {
+          const ws = XLSX.utils.json_to_sheet(exportRows);
+          
+          // Auto-size columns slightly for better readability
+          const colWidths = [
+              { wch: 10 }, // S.No
+              { wch: 30 }, // Name
+              { wch: 12 }, // Sell
+              { wch: 12 }, // Cost (if exists)
+              { wch: 12 }, // Qty
+              { wch: 12 }, // RTO
+              { wch: 15 }, // Rev
+              { wch: 15 }, // Cost Total
+              { wch: 15 }, // Profit
+              { wch: 10 }  // Margin
+          ];
+          ws['!cols'] = colWidths;
+
+          const wb = XLSX.utils.book_new();
+          XLSX.utils.book_append_sheet(wb, ws, isRevMode ? "Revenue Report" : "Profit Report");
+
+          // Trigger download
+          const dateStr = new Date().toISOString().split('T')[0];
+          XLSX.writeFile(wb, `Vizbix_Data_${dateStr}.xlsx`);
+          
+          showToast('Excel downloaded! ✓', 'success');
+      } catch (err) {
+          console.error("Excel generation failed:", err);
+          showToast('Excel export failed.', 'error');
+      }
+  }, 300);
+}
 
 </script>
 
