@@ -3318,33 +3318,36 @@ function showHelp(platform) {
   modal.style.display = 'flex';
 
   if (platform === 'woo') {
-    title.innerText = "How to get WooCommerce Keys";
+    title.innerText = "How to connect WooCommerce (Read-Only)";
     content.innerHTML = `
       <div style="background:#f8fafc; border-radius:12px; height:180px; display:flex; align-items:center; justify-content:center; margin-bottom:20px; border:1px solid #e2e8f0; overflow:hidden;">
          <div style="color:#94a3b8; font-size:12px; font-weight:600;">[ Replace this div with an &lt;img&gt; tag of your WooCommerce GIF ]</div>
       </div>
       <ol style="padding-left:20px; margin:0;">
-        <li style="margin-bottom:10px;">Log in to your <strong>WordPress Admin</strong>.</li>
+        <li style="margin-bottom:10px;">Log in to your <strong>WordPress Admin</strong> dashboard.</li>
         <li style="margin-bottom:10px;">Go to <strong>WooCommerce > Settings</strong>.</li>
         <li style="margin-bottom:10px;">Click the <strong>Advanced</strong> tab, then <strong>REST API</strong>.</li>
         <li style="margin-bottom:10px;">Click <strong>Add Key</strong>. Name it "Vizbix".</li>
-        <li style="margin-bottom:10px;"><strong>Important:</strong> Set Permissions to <strong>Read/Write</strong>.</li>
-        <li>Click <strong>Generate API Key</strong> and copy the codes here.</li>
+        <li style="margin-bottom:10px;"><strong>Permissions:</strong> Change this to <strong>Read</strong>. <em>(Crucial: Do not select Read/Write!)</em></li>
+        <li>Click <strong>Generate API Key</strong> and copy both keys here.</li>
       </ol>`;
   } else {
-    title.innerText = "How to get Shopify Token";
+    title.innerText = "How to connect Shopify (Read-Only)";
     content.innerHTML = `
       <div style="background:#f0fdf4; border-radius:12px; height:180px; display:flex; align-items:center; justify-content:center; margin-bottom:20px; border:1px solid #bbf7d0; overflow:hidden;">
          <div style="color:#059669; font-size:12px; font-weight:600;">[ Replace this div with an &lt;img&gt; tag of your Shopify GIF ]</div>
       </div>
       <ol style="padding-left:20px; margin:0;">
-        <li style="margin-bottom:10px;">Log in to <strong>Shopify Admin</strong> > <strong>Settings</strong>.</li>
+        <li style="margin-bottom:10px;">Log in to <strong>Shopify Admin</strong> > <strong>Settings</strong> (bottom left).</li>
         <li style="margin-bottom:10px;">Go to <strong>Apps and sales channels</strong> > <strong>Develop apps</strong>.</li>
         <li style="margin-bottom:10px;">Click <strong>Create an app</strong>. Name it "Vizbix".</li>
         <li style="margin-bottom:10px;">Click <strong>Configure Admin API scopes</strong>.</li>
-        <li style="margin-bottom:10px;">Search for "Products" and check <strong>read_products</strong>.</li>
-        <li>Click <strong>Save</strong>, then <strong>Install App</strong> to reveal your token.</li>
-      </ol>`;
+        <li style="margin-bottom:10px;">Search for and check these three boxes: <strong>read_orders</strong>, <strong>read_products</strong>, and <strong>read_inventory</strong>.</li>
+        <li style="margin-bottom:10px;">Click <strong>Save</strong>, then <strong>Install App</strong> to reveal your token.</li>
+      </ol>
+      <div style="font-size:12px; color:#059669; margin-top:16px; padding:10px; background:#d1fae5; border-radius:8px; border:1px solid #a7f3d0; text-align:center; font-weight:600;">
+        *(Note: We never ask for Write access. Vizbix can never edit or delete your store data.)*
+      </div>`;
   }
 }
 
