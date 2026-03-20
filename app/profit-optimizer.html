@@ -3354,25 +3354,8 @@ function showHelp(platform) {
 document.addEventListener('DOMContentLoaded', ()=>{
   restoreChatSession();
   renderFeatureTable();
-  
-  // --- NEW: Catch Shopify OAuth Return ---
-  const urlParams = new URLSearchParams(window.location.search);
-  if (urlParams.get('shopify_connected') === 'true') {
-      // Clean up the URL so it doesn't trigger again on refresh
-      window.history.replaceState({}, document.title, window.location.pathname);
-      
-      // Tell the user and automatically start pulling their data
-      showToast('Shopify Connected! Fetching your data...', 'success', 3000);
-      
-      // If the user isn't fully authenticated yet, wait a second for auth.js to catch up
-      setTimeout(() => {
-          checkSavedStoreConnections();
-      }, 1000);
-  } else {
-      // Only restore local data if we AREN'T returning from Shopify
-      const restored = loadDataFromStorage();
-      if (restored) showToast('Your previous data has been restored ✓', 'info', 2500);
-  }
+  const restored = loadDataFromStorage();
+  if (restored) showToast('Your previous data has been restored ✓', 'info', 2500);
 });
 // ══════════════════════════════════════════
 //  COST MISSING MODAL
@@ -4324,37 +4307,6 @@ function exportToExcel() {
   }, 300);
 }
 
-function startShopifyOAuth() {
-  if (!AppState.userEmail) {
-    return showToast('Please log in to Vizbix first.', 'error');
-  }
-
-  let shop = document.getElementById('shopUrl').value.trim();
-  if (!shop) return showToast('Please enter your Shop URL', 'error');
-
-  // Clean up the URL just in case the user pastes the full https:// link
-  shop = shop.replace('https://', '').replace('http://', '').split('/')[0];
-  if (!shop.includes('.myshopify.com')) {
-      shop += '.myshopify.com';
-  }
-
-  // Your Client ID from the Settings screenshot
-  const clientId = '99c1e02f723852674e12958ded63041a'; 
-  const scopes = 'read_products,read_orders,read_inventory';
-  
-  // This MUST match the Redirect URL you paste into the Shopify Dashboard
-  const redirectUri = encodeURIComponent('https://vizbix-api.vizbixhq.workers.dev/shopify/callback');
-  
-  // Pass the user's email in the state parameter so your backend knows 
-  // which Vizbix user to attach the generated token to.
-  const state = btoa(AppState.userEmail);
-
-  // Build the authorization URL
-  const authUrl = `https://${shop}/admin/oauth/authorize?client_id=${clientId}&scope=${scopes}&redirect_uri=${redirectUri}&state=${state}`;
-
-  // Redirect the user to Shopify
-  window.location.href = authUrl;
-}
 
 </script>
 
@@ -4497,14 +4449,18 @@ function startShopifyOAuth() {
       <button class="btn btn-primary" id="btnWoo" style="width:100%; padding:12px; margin-top:10px;" onclick="runStoreImport('woo')">Import WooCommerce</button>
     </div>
 
-    <div id="form-shopify" style="display:none;">
-  <div style="margin-bottom:12px;">
-    <label style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Shop URL</label>
-    <input type="text" id="shopUrl" placeholder="mybrand.myshopify.com" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px; margin-top:4px;">
-    <div style="font-size:11px; color:#94a3b8; margin-top:6px;">We will redirect you to Shopify to securely authorize Vizbix.</div>
-  </div>
-  <button class="btn btn-primary" id="btnShop" style="width:100%; background:#059669; border-color:#059669; padding:12px; margin-top:10px;" onclick="startShopifyOAuth()">Connect Shopify</button>
-</div>
+   <div id="form-shopify" style="display:none;">
+      <div style="margin-bottom:12px;">
+        <label style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Shop URL</label>
+        <input type="text" id="shopUrl" placeholder="mybrand.myshopify.com" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px; margin-top:4px;">
+      </div>
+      <div style="margin-bottom:20px;">
+        <label style="font-size:11px; font-weight:700; color:#64748b; text-transform:uppercase;">Admin API Access Token</label>
+        <input type="password" id="shopToken" placeholder="shpat_xxxxxxxxxxxxxxxxxxxx" style="width:100%; padding:10px; border:1px solid #e2e8f0; border-radius:8px; font-size:13px; margin-top:4px;">
+        <a onclick="showHelp('shopify')" style="font-size:12px; color:#059669; cursor:pointer; text-decoration:underline; float:right; margin-top:8px;">How to get this token?</a>
+      </div>
+      <button class="btn btn-primary" id="btnShop" style="width:100%; background:#059669; border-color:#059669; padding:12px; margin-top:10px;" onclick="runStoreImport('shopify')">Connect Shopify</button>
+    </div>
 
   </div>
 </div>
