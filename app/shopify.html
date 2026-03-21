@@ -13,17 +13,7 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
   <style>
-    /* 1. Lock the outer wrapper so it never wraps */
-body, html { overflow: hidden !important; margin: 0; padding: 0; }
-.app-wrapper { display: flex !important; flex-wrap: nowrap !important; height: 100vh !important; width: 100vw !important; }
-
-/* 2. Lock the sidebar width */
-.app-sidebar { flex: 0 0 250px !important; height: 100vh !important; overflow-y: auto !important; position: static !important; }
-
-/* 3. Force main area to stay next to sidebar (min-width: 0 is the magic fix) */
-.app-main { flex: 1 1 0% !important; min-width: 0 !important; height: 100vh !important; overflow-y: auto !important; padding-top: 32px !important; margin: 0 !important; }
-    
-.app-view { display: none; }
+    .app-view { display: none; }
     @keyframes spin {
       from { transform: rotate(0deg); }
       to   { transform: rotate(360deg); }
@@ -550,8 +540,17 @@ body, html { overflow: hidden !important; margin: 0; padding: 0; }
         </div>
         <input type="file" id="importFileInput" accept=".csv,.xlsx,.xls" style="display:none;" onchange="handleImportFile(this)">
 
-        <div id="items" class="di-items">
-            <div class="di-row data-row">
+        <div class="data-input-container">
+          <div class="di-header-row">
+            <div>Product Name</div>
+            <div id="hdr-sell">Sell Price (₹)</div>
+            <div id="hdr-cost">Cost Price (₹)</div>
+            <div>Qty Sold</div>
+            <div>RTO</div>
+            <div></div>
+          </div>
+          <div id="items" class="di-items">
+              <div class="di-row data-row">
               <input type="text"   placeholder="e.g. Wireless Earbuds" class="di-input input-name" value="Wireless Earbuds">
               <input type="number" placeholder="0"             class="di-input input-sell" value="2500">
               <input type="number" placeholder="0"             class="di-input input-cost" value="1200">
