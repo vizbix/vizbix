@@ -114,11 +114,22 @@ async function fetchPlanDetails(email) {
 
 // Handles routing after login success
 function handleLoginSuccess() {
-    // If on landing page, go to app. If on app, just close modal.
-    if (!window.location.pathname.includes('profit-optimizer')) {
+    const path = window.location.pathname;
+
+    // 1. If on the Shopify app, stay there and hide the login modal
+    if (path.includes('shopify')) {
+        const loginModal = document.getElementById('loginModal');
+        if (loginModal) loginModal.style.display = 'none';
+    } 
+    // 2. If on the Profit Optimizer app, do exactly what it always did
+    else if (path.includes('profit-optimizer')) {
+        if (window.closeLogin) {
+            window.closeLogin();
+        }
+    } 
+    // 3. If on the public Vizbix landing page, redirect them into the main app
+    else {
         window.location.href = "/app/profit-optimizer.html";
-    } else if (window.closeLogin) {
-        window.closeLogin();
     }
 }
 
@@ -179,4 +190,3 @@ window.handleEmailSignUp = async function() {
         btn.innerText = originalText;
     }
 };
-
