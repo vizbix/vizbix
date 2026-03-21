@@ -13,6 +13,9 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
   <style>
+    .app-sidebar { top: 0 !important; height: 100vh !important; }
+    .app-wrapper { padding-top: 0 !important; margin-top: 0 !important; }
+    .app-main { padding-top: 0 !important; min-height: 100vh !important; }
     .app-view { display: none; }
     @keyframes spin {
       from { transform: rotate(0deg); }
@@ -550,17 +553,6 @@
               <button class="di-delete-btn delete-btn" onclick="removeRow(this)" title="Remove">
                 <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
               </button>
-            </div>
-          </div>
-
-          <div id="items" class="di-items">
-            <div class="di-row data-row">
-              <input type="text"   placeholder="e.g. Wireless Earbuds" class="di-input input-name" value="Wireless Earbuds">
-              <input type="number" placeholder="0"             class="di-input input-sell" value="2500">
-              <input type="number" placeholder="0"             class="di-input input-cost" value="1200">
-              <input type="number" placeholder="0"             class="di-input input-qty"  value="140">
-              <input type="number" placeholder="0"             class="di-input input-rto"  value="10">
-              <button class="di-delete-btn delete-btn" onclick="removeRow(this)" title="Remove">
             </div>
           </div>
 
@@ -4030,6 +4022,8 @@ window.startShopifyOAuth = function() {
   showToast("Connecting securely to Shopify...", "info");
   window.location.href = workerURL + '/shopify/login?shop=' + encodeURIComponent(shop);
 };
+
+
 
 </script>
 
