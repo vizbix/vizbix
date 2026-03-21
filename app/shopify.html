@@ -13,11 +13,17 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 
   <style>
-    body { background-color: #f8fafc !important; }
-    .app-wrapper { padding-top: 0 !important; }
-    .app-sidebar { top: 0 !important; height: 100vh !important; padding-top: 24px !important; box-sizing: border-box !important; }
-    .app-main { padding-top: 32px !important; min-height: 100vh !important; }
-    .app-view { display: none; }
+    /* 1. Lock the outer wrapper so it never wraps */
+body, html { overflow: hidden !important; margin: 0; padding: 0; }
+.app-wrapper { display: flex !important; flex-wrap: nowrap !important; height: 100vh !important; width: 100vw !important; }
+
+/* 2. Lock the sidebar width */
+.app-sidebar { flex: 0 0 250px !important; height: 100vh !important; overflow-y: auto !important; position: static !important; }
+
+/* 3. Force main area to stay next to sidebar (min-width: 0 is the magic fix) */
+.app-main { flex: 1 1 0% !important; min-width: 0 !important; height: 100vh !important; overflow-y: auto !important; padding-top: 32px !important; margin: 0 !important; }
+    
+.app-view { display: none; }
     @keyframes spin {
       from { transform: rotate(0deg); }
       to   { transform: rotate(360deg); }
