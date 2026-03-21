@@ -30,8 +30,9 @@ onAuthStateChanged(auth, async (user) => {
     const drawerProfile = document.getElementById("drawerProfile");
     const drawerEmailDisplay = document.getElementById("drawerEmailDisplay");
     
-    // Check if we are inside the App (Profit Optimizer)
-    const isAppPage = window.location.pathname.includes('profit-optimizer');
+    // Check if we are inside the App (Profit Optimizer or Shopify)
+    const currentPath = window.location.pathname.toLowerCase();
+    const isAppPage = currentPath.includes('profit-optimizer') || currentPath.includes('shopify');
 
     if (user) {
         // === USER IS LOGGED IN ===
@@ -113,8 +114,9 @@ async function fetchPlanDetails(email) {
 // --- GLOBAL EXPORTS FOR HTML BUTTONS ---
 
 // Handles routing after login success
+// Handles routing after login success
 function handleLoginSuccess() {
-    const path = window.location.pathname;
+    const path = window.location.pathname.toLowerCase();
 
     // 1. If on the Shopify app, stay there and hide the login modal
     if (path.includes('shopify')) {
@@ -136,7 +138,8 @@ function handleLoginSuccess() {
 window.handleLogout = function() {
     if(confirm("Are you sure you want to log out?")) {
         signOut(auth).then(() => { 
-            if (window.location.pathname.includes('profit-optimizer')) {
+            const path = window.location.pathname.toLowerCase();
+            if (path.includes('profit-optimizer') || path.includes('shopify')) {
                 window.location.reload(); // Reload app to reset state
             } else {
                 window.location.href = "/index.html"; 
