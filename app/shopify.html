@@ -4026,7 +4026,7 @@ window.startShopifyOAuth = function() {
   if(!shop.includes('.myshopify.com')) shop += '.myshopify.com';
   
   showToast("Connecting securely to Shopify...", "info");
-  window.location.href = workerURL + '/shopify/login?shop=' + encodeURIComponent(shop);
+  window.location.href = workerURL + '/shopify/login?shop=' + encodeURIComponent(shop) + '&email=' + encodeURIComponent(AppState.userEmail);
 };
 
 
